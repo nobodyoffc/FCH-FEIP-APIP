@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Main-Class: startFEIP.StartFEIP
+Class-Path: /Users/liuchangyong/Desktop/eclipse-web-workspace/FEIP-parse
+ r/target
+

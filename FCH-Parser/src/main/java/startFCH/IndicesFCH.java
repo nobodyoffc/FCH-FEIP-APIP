@@ -1,0 +1,74 @@
+package startFCH;
+
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.ElasticsearchException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import servers.EsTools;
+
+import java.io.IOException;
+
+
+public class IndicesFCH {
+
+	public static final String P2SHIndex = "p2sh";
+	static final Logger log = LoggerFactory.getLogger(IndicesFCH.class);
+	
+
+	public static final String BlockIndex = "block";
+	public static final String BlockHasIndex = "block_has";
+	public static final String TxIndex = "tx";
+	public static final String TxHasIndex = "tx_has";
+	public static final String CashIndex = "cash";
+	public static final String AddressIndex = "address";
+	public static final String OpReturnIndex = "opreturn";
+	public static final String BlockMarkIndex = "block_mark";
+			
+	public static void createAllIndices(ElasticsearchClient esClient) throws ElasticsearchException, IOException {
+
+		if (esClient == null) {
+			System.out.println("Create a Java client for ES first.");
+			return;
+		}
+
+		String blockMarkJsonStr = "{\"mappings\":{\"properties\":{\"_fileOrder\":{\"type\":\"short\"},\"_pointer\":{\"type\":\"long\"},\"height\":{\"type\":\"long\"},\"blockId\":{\"type\":\"keyword\"},\"preId\":{\"type\":\"keyword\"},\"size\":{\"type\":\"long\"},\"status\":{\"type\":\"keyword\"}}}}";
+		String blockJsonStr = "{\"mappings\":{\"properties\":{\"cdd\":{\"type\":\"long\"},\"diffTarget\":{\"type\":\"long\"},\"fee\":{\"type\":\"long\"},\"height\":{\"type\":\"long\"},\"blockId\":{\"type\":\"keyword\"},\"inValueT\":{\"type\":\"long\"},\"merkleRoot\":{\"type\":\"keyword\"},\"nonce\":{\"type\":\"long\"},\"outValueT\":{\"type\":\"long\"},\"preId\":{\"type\":\"keyword\"},\"size\":{\"type\":\"long\"},\"time\":{\"type\":\"long\"},\"txCount\":{\"type\":\"long\"},\"version\":{\"type\":\"keyword\"}}}}";
+		String blockHasJsonStr = "{\"mappings\":{\"properties\":{\"height\":{\"type\":\"long\"},\"blockId\":{\"type\":\"keyword\"},\"txMarks\":{\"properties\":{\"cdd\":{\"type\":\"long\"},\"fee\":{\"type\":\"long\"},\"txId\":{\"type\":\"keyword\"},\"outValue\":{\"type\":\"long\"}}}}}}";
+		String txJsonStr = "{\"mappings\":{\"properties\":{\"blockId\":{\"type\":\"keyword\"},\"blockTime\":{\"type\":\"long\"},\"cdd\":{\"type\":\"long\"},\"coinbase\":{\"type\":\"text\"},\"fee\":{\"type\":\"long\"},\"height\":{\"type\":\"long\"},\"txId\":{\"type\":\"keyword\"},\"inCount\":{\"type\":\"long\"},\"inValueT\":{\"type\":\"long\"},\"lockTime\":{\"type\":\"long\"},\"opReBrief\":{\"type\":\"text\"},\"outCount\":{\"type\":\"long\"},\"outValueT\":{\"type\":\"long\"},\"txIndex\":{\"type\":\"long\"},\"version\":{\"type\":\"long\"}}}}";
+		String txHasJsonStr = "{\"mappings\":{\"properties\":{\"height\":{\"type\":\"long\"},\"txId\":{\"type\":\"keyword\"},\"inMarks\":{\"properties\":{\"fid\":{\"type\":\"wildcard\"},\"cdd\":{\"type\":\"long\"},\"cashId\":{\"type\":\"keyword\"},\"value\":{\"type\":\"long\"}}},\"outMarks\":{\"properties\":{\"fid\":{\"type\":\"wildcard\"},\"cdd\":{\"type\":\"long\"},\"cashId\":{\"type\":\"keyword\"},\"value\":{\"type\":\"long\"}}}}}}";
+		String cashJsonStr = "{\"mappings\":{\"properties\":{\"cashId\":{\"type\":\"keyword\"},\"fid\":{\"type\":\"wildcard\"},\"value\":{\"type\":\"long\"},\"birthHeight\":{\"type\":\"long\"},\"birthTime\":{\"type\":\"long\"},\"birthBlockId\":{\"type\":\"keyword\"},\"birthIndex\":{\"type\":\"long\"},\"birthTxId\":{\"type\":\"keyword\"},\"birthTxIndex\":{\"type\":\"long\"},\"lockScript\":{\"type\":\"text\"},\"sequence\":{\"type\":\"keyword\"},\"sigHash\":{\"type\":\"keyword\"},\"spendBlockId\":{\"type\":\"keyword\"},\"spendHeight\":{\"type\":\"long\"},\"spendIndex\":{\"type\":\"long\"},\"spendTime\":{\"type\":\"long\"},\"spendTxId\":{\"type\":\"keyword\"},\"type\":{\"type\":\"keyword\"},\"unlockScript\":{\"type\":\"text\"},\"valid\":{\"type\":\"boolean\"},\"cdd\":{\"type\":\"long\"}}}}";
+		String addressJsonStr = "{\"mappings\":{\"properties\":{\"balance\":{\"type\":\"long\"},\"birthHeight\":{\"type\":\"long\"},\"btcAddr\":{\"type\":\"wildcard\"},\"cd\":{\"type\":\"long\"},\"cdd\":{\"type\":\"long\"},\"weight\":{\"type\":\"long\"},\"dogeAddr\":{\"type\":\"wildcard\"},\"ethAddr\":{\"type\":\"wildcard\"},\"expend\":{\"type\":\"long\"},\"guide\":{\"type\":\"wildcard\"},\"fid\":{\"type\":\"wildcard\"},\"income\":{\"type\":\"long\"},\"lastHeight\":{\"type\":\"long\"},\"ltcAddr\":{\"type\":\"wildcard\"},\"pubKey\":{\"type\":\"wildcard\"},\"trxAddr\":{\"type\":\"wildcard\"},\"cash\":{\"type\":\"long\"}}}}";
+		String opreturnJsonStr = "{\"mappings\":{\"properties\":{\"cdd\":{\"type\":\"long\"},\"height\":{\"type\":\"long\"},\"txId\":{\"type\":\"keyword\"},\"opReturn\":{\"type\":\"text\"},\"recipient\":{\"type\":\"wildcard\"},\"signer\":{\"type\":\"wildcard\"},\"time\":{\"type\":\"long\"},\"txIndex\":{\"type\":\"long\"}}}}";
+
+		EsTools.createIndex(esClient, BlockMarkIndex, blockMarkJsonStr);
+		EsTools.createIndex(esClient, BlockIndex, blockJsonStr);
+		EsTools.createIndex(esClient, BlockHasIndex, blockHasJsonStr);
+		EsTools.createIndex(esClient, TxIndex, txJsonStr);
+		EsTools.createIndex(esClient, TxHasIndex, txHasJsonStr);
+		EsTools.createIndex(esClient, CashIndex, cashJsonStr);
+		EsTools.createIndex(esClient, AddressIndex, addressJsonStr);
+		EsTools.createIndex(esClient, OpReturnIndex, opreturnJsonStr);
+
+		String p2shJsonStr = "{\"mappings\":{\"properties\":{\"fid\":{\"type\":\"wildcard\"},\"redeemScript\":{\"type\":\"keyword\"},\"m\":{\"type\":\"short\"},\"n\":{\"type\":\"short\"},\"pubKeys\":{\"type\":\"keyword\"},\"fids\":{\"type\":\"wildcard\"},\"birthHeight\":{\"type\":\"long\"},\"birthTime\":{\"type\":\"long\"},\"birthTxId\":{\"type\":\"keyword\"}}}}";
+		EsTools.createIndex(esClient, IndicesFCH.P2SHIndex, p2shJsonStr);
+	}
+
+
+	public static void deleteAllIndices(ElasticsearchClient esClient) throws ElasticsearchException, IOException {
+
+		if(esClient==null) {
+			System.out.println("Create a Java client for ES first.");
+			return;
+		}
+
+		EsTools.deleteIndex(esClient, BlockMarkIndex);
+		EsTools.deleteIndex(esClient, BlockIndex);
+		EsTools.deleteIndex(esClient, BlockHasIndex);
+		EsTools.deleteIndex(esClient, TxIndex);
+		EsTools.deleteIndex(esClient, TxHasIndex);
+		EsTools.deleteIndex(esClient, CashIndex);
+		EsTools.deleteIndex(esClient, AddressIndex);
+		EsTools.deleteIndex(esClient, OpReturnIndex);
+		EsTools.deleteIndex(esClient, IndicesFCH.P2SHIndex);
+	}	
+}

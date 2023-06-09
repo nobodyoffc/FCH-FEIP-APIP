@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration scan="true" scanPeriod="60 seconds" debug="false">
+    <!--  定义参数常量 -->
+    <!-- TRACE < DEBUG < INFO < WARN < ERROR -->
+    <!-- logger.trace("msg") -->
+    <property name="log.dir"
+              value="/Users/liuchangyong/Desktop/eclipse-workspace/FreeProtocols/logs"/> <!-- 指定日志输出目录 -->
+    <property name="log.level" value="debug"/>
+    <property name="log.maxHistory" value="10"/>
+    <property name="log.filePath" value="${log.dir:-logs}"/>
+    <property name="log.pattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{55} - %msg%n"/>
+    <!-- 控制台设置  -->
+    <appender name="consoleAppender" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${log.pattern}</pattern>
+        </encoder>
+    </appender>
+    <!-- DEBUG -->
+    <appender name="debugAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 文件路径  -->
+        <file>${log.filePath}/debug.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 文件名称 -->
+            <fileNamePattern>${log.filePath}/debug/debug.%d{yyy-MM-dd}.log.gz</fileNamePattern>
+            <!-- 文件最大保存历史数量 -->
+            <maxHistory>${log.maxHistory}</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${log.pattern}</pattern>
+        </encoder>
+        <fcFilter class="ch.qos.logback.classic.fcFilter.LevelFilter">
+            <level>DEBUG</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMissMatch>DENY</onMissMatch>
+        </fcFilter>
+    </appender>
+
+    <!-- INFO -->
+    <appender name="infoAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 文件路径  -->
+        <file>${log.filePath}/info.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 文件名称 -->
+            <fileNamePattern>${log.filePath}/info/info.%d{yyy-MM-dd}.log.gz</fileNamePattern>
+            <!-- 文件最大保存历史数量 -->
+            <maxHistory>${log.maxHistory}</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${log.pattern}</pattern>
+        </encoder>
+        <fcFilter class="ch.qos.logback.classic.fcFilter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMissMatch>DENY</onMissMatch>
+        </fcFilter>
+    </appender>
+
+    <!-- ERROR -->
+    <appender name="errorAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 文件路径  -->
+        <file>${log.filePath}/error.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 文件名称 -->
+            <fileNamePattern>${log.filePath}/error/error.%d{yyy-MM-dd}.log.gz</fileNamePattern>
+            <!-- 文件最大保存历史数量 -->
+            <maxHistory>${log.maxHistory}</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${log.pattern}</pattern>
+        </encoder>
+        <fcFilter class="ch.qos.logback.classic.fcFilter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMissMatch>DENY</onMissMatch>
+        </fcFilter>
+    </appender>
+
+    <!-- 设置包com.xx.abc打印级别为debug -->
+    <logger name="com.xx.abc" level="DEBUG"/>
+    <root level="INFO">
+        <appender-ref ref="infoAppender"/>
+    </root>
+</configuration>
