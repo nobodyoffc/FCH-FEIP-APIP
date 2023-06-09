@@ -1,4 +1,4 @@
-# APIP1V1_OpenAPI(zh-CN)
+# APIP1V1_OpenAPI
 
 ## 目录
 
