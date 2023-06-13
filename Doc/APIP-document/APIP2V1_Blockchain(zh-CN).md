@@ -134,7 +134,7 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
   
 ```json
 {
-   "url": "http://localhost:8080/APIP/apip2/v1/cashByIds",
+   "url": "https://cid.cash/APIP/apip2/v1/cashByIds",
    "time": 1677673821267,
    "nonce": 1987697,
    "fcdsl":{
@@ -264,7 +264,7 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
   
 ```json
 {
-   "url": "http://localhost:8080/APIP/apip2/v1/cashSearch",
+   "url": "https://cid.cash/APIP/apip2/v1/cashSearch",
    "time": 1677673821267,
    "nonce": 1987697,
    "fcdsl":{
@@ -357,7 +357,7 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
   
 ```json
 {
-   "url": "http://localhost:8080/APIP/apip2/v1/cashValid",
+   "url": "https://cid.cash/APIP/apip2/v1/cashValid",
    "time": 1677673821267,
    "nonce": 1987697,
    "fcdsl":{
@@ -477,7 +477,7 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
   
 ```json
 {
-   "url": "http://localhost:8080/APIP/apip2/v1/txByIds",
+   "url": "https://cid.cash/APIP/apip2/v1/txByIds",
    "time": 1677673821267,
    "nonce": 1987697,
    "fcdsl":{
@@ -586,7 +586,7 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
 ## txSearch
 ### 说明
 
-对交易信息响应数据data内的各项进行fcdsl查询。
+对交易输入输出中的FID进行fcdsl查询。
   
 ### 默认排序
 
@@ -601,7 +601,12 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
 	"time": <long. 时间戳,精确到毫秒. 必填>,
 	"nonce": <long. 随机数. 必填>,
     "fcdsl":{
-        <查询语句...>
+       "query":{
+         "terms": {
+            "fields": ["inMarks.fid","outMarks.fid"],
+            "values": <string array. fid array>
+         }
+      },
     }
 }
 ```
@@ -624,7 +629,22 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
         "inValueT": <long. 输入总金额>,
         "outValueT": <long. 输出总金额>,
         "fee": <long. 交易费>,
-        "cdd": <long. 币天销毁总额>
+        "cdd": <long. 币天销毁总额>,
+        "spentCashes": [
+                {
+                    "cashId": <string. 花费cash ID>,
+                    "fid": <string. 花费cash 所属fch地址>,
+                    "value": <long. 花费cash 金额>,
+                    "cdd": <long. 花费cash销毁币天数>
+                }
+            ],
+        "issuedCashes": [
+            {
+                "cashId": <string. 发行cash ID>,
+                "fid": <string. 发行cash 所属fch地址>,
+                "value": <long. 发行cash 金额>,
+            }
+        ]
     }
 ]
 ```
@@ -634,14 +654,14 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
   
 ```json
 {
-   "url": "http://localhost:8080/APIP/apip2/v1/txSearch",
+   "url": "https://cid.cash/APIP/apip2/v1/txSearch",
    "time": 1677673821267,
-   "nonce": 1987697,
+   "nonce": 198231,
    "fcdsl":{
       "query":{
-         "range": {
-            "fields": ["fee"],
-            "gt": "500"
+         "terms": {
+            "fields": ["inMarks.fid","outMarks.fid"],
+            "values": ["FEk41Kqjar45fLDriztUDTUkdki7mmcjWK"]
          }
       },
       "size":1
@@ -655,32 +675,72 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
 {
    "code": 0,
    "message": "Success.",
-   "nonce": 1987697,
-   "balance": 35533728799,
+   "nonce": 198231,
+   "balance": 986000000,
    "got": 1,
-   "total": 132583,
-   "bestHeight": 1753324,
+   "total": 1522,
+   "bestHeight": 1782741,
    "data": [
       {
-         "txId": "cf5a8333c5c80cc8deac0835e0fe895f045f9bdd8ac03f9f17c293a61ad14cb4",
+         "id": "4979827b924fca9e02dfda6dd9c4336dc7991e75bf35593767180bba2db0c947",
          "version": 2,
-         "lockTime": 1752914,
-         "blockTime": 1684533249,
-         "blockId": "0000000000000ea9f7fa9b81ef743e0b0aae82eb4822f8e58982a9e1cf872a5e",
+         "lockTime": 0,
+         "blockTime": 1686203298,
+         "blockId": "000000000000043143fea4e2162c54745ca561d2fbdf2649826029e4b6e568e5",
          "txIndex": 1,
-         "outCount": 2,
-         "inCount": 161,
-         "height": 1752946,
-         "inValueT": 100625000000,
-         "outValueT": 100624977221,
-         "fee": 22779,
-         "cdd": 103103
+         "outCount": 3,
+         "inCount": 3,
+         "height": 1777992,
+         "opReBrief": "�{\n  \"type\": \"APIP\",\n  \"sn\": ",
+         "inValueT": 1152129097,
+         "outValueT": 1152128391,
+         "fee": 706,
+         "cdd": 67,
+         "spentCashes": [
+            {
+               "cashId": "8ef247708aacf54f1ff035d3ed44cc14a938a22bd5cadbaba9b8e89375efc865",
+               "fid": "FEk41Kqjar45fLDriztUDTUkdki7mmcjWK",
+               "value": 52129097,
+               "cdd": 1
+            },
+            {
+               "cashId": "75002147742ee060ec2fbfa3a3c364ec54b81d59261f39b8828fc9fbdacd54e0",
+               "fid": "FEk41Kqjar45fLDriztUDTUkdki7mmcjWK",
+               "value": 100000000,
+               "cdd": 6
+            },
+            {
+               "cashId": "a16abf87cc8a9d2538c5d9624ca663aab0ac08c7a87298a8c2eb0a401e945002",
+               "fid": "FEk41Kqjar45fLDriztUDTUkdki7mmcjWK",
+               "value": 1000000000,
+               "cdd": 60
+            }
+         ],
+         "issuedCashes": [
+            {
+               "cashId": "9ff457d1ad7cdfce303c31ea5ca97f6839416fe1f51e9fb75a83fbcdf920e799",
+               "fid": "FUmo2eez6VK2sfGWjek9i9aK5y1mdHSnqv",
+               "value": 1000000000,
+               "cdd": 0
+            },
+            {
+               "cashId": "569434fc7b3f045c92130797b5d81f34f3be9130377ea246a4454caa0d4c9851",
+               "fid": "OpReturn",
+               "value": 0,
+               "cdd": 0
+            },
+            {
+               "cashId": "93cdc14bc3329bb47d73bce77fcf35450168166ca89d2a8fe31fd8428ed2435e",
+               "fid": "FEk41Kqjar45fLDriztUDTUkdki7mmcjWK",
+               "value": 152128391,
+               "cdd": 0
+            }
+         ]
       }
    ],
    "last": [
-      "1752946",
-      "1",
-      "cf5a8333c5c80cc8deac0835e0fe895f045f9bdd8ac03f9f17c293a61ad14cb4"
+      "1777992",
+      "4979827b924fca9e02dfda6dd9c4336dc7991e75bf35593767180bba2db0c947"
    ]
 }
 ```
@@ -729,7 +789,7 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
   
 ```json
 {
-   "url": "http://localhost:8080/APIP/apip2/v1/p2shByIds",
+   "url": "https://cid.cash/APIP/apip2/v1/p2shByIds",
    "time": 1677673821267,
    "nonce": 1987697,
    "fcdsl":{
@@ -817,7 +877,7 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
   
 ```json
 {
-   "url": "http://localhost:8080/APIP/apip2/v1/p2shSearch",
+   "url": "https://cid.cash/APIP/apip2/v1/p2shSearch",
    "time": 1677673821267,
    "nonce": 1987697,
    "fcdsl":{
@@ -926,7 +986,7 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
 
 ```json
 {
-   "url": "http://localhost:8080/APIP/apip2/v1/blockByIds",
+   "url": "https://cid.cash/APIP/apip2/v1/blockByIds",
    "time": 1677673821267,
    "nonce": 1987697,
    "fcdsl":{
@@ -1028,7 +1088,7 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
   
 ```json
 {
-	"url": "http://localhost:8080/APIP/apip2/v1/blockSearch",
+	"url": "https://cid.cash/APIP/apip2/v1/blockSearch",
 	"time": 1677673821267,
 	"nonce": 1987697,
     "fcdsl":{
@@ -1122,7 +1182,7 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
   
 ```json
 {
-	"url": "http://localhost:8080/APIP/apip2/v1/opReturnByIds",
+	"url": "https://cid.cash/APIP/apip2/v1/opReturnByIds",
 	"time": 1677673821267,
 	"nonce": 1987697,
     "fcdsl":{
@@ -1204,7 +1264,7 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
   
 ```json
 {
-	"url": "http://localhost:8080/APIP/apip2/v1/opReturnSearch",
+	"url": "https://cid.cash/APIP/apip2/v1/opReturnSearch",
 	"time": 1677673821267,
 	"nonce": 1987697,
     "fcdsl":{
@@ -1297,7 +1357,7 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
   
 ```json
 {
-   "url": "http://localhost:8080/APIP/apip2/v1/addressByIds",
+   "url": "https://cid.cash/APIP/apip2/v1/addressByIds",
    "time": 1677673821267,
    "nonce": 1987697,
    "fcdsl":{
@@ -1384,7 +1444,7 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
   
 ```json
 {
-  "url": "http://localhost:8080/APIP/apip2/v1/addressSearch",
+  "url": "https://cid.cash/APIP/apip2/v1/addressSearch",
   "time": 1677673821267,
   "nonce": 1987697,
   "fcdsl":{

@@ -1,7 +1,6 @@
-package APIP14V1_Avatar;
+package APIP17V1_Avatar;
 
 import APIP1V1_OpenAPI.*;
-import fcTools.ParseTools;
 import fc_dsl.Fcdsl;
 import initial.Initiator;
 import startAPIP.RedisKeys;
@@ -22,7 +21,7 @@ import java.util.Map;
 import static api.Constant.*;
 
 
-@WebServlet(APIP14V1Path +AvatarsAPI)
+@WebServlet(APIP17V1Path +AvatarsAPI)
 public class Avatars extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

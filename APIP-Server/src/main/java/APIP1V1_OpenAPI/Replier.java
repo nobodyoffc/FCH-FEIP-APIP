@@ -1,9 +1,15 @@
 package APIP1V1_OpenAPI;
 
+
 import api.Constant;
 import initial.Initiator;
+import order.Order;
 import redisTools.ReadRedis;
+import service.Params;
 import startAPIP.RedisKeys;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static initial.Initiator.*;
 
@@ -42,12 +48,12 @@ public class Replier {
 
     public String replyBase(String userAddr, int nPrice) {
 
-        String dataJson = Initiator.gson.toJson(this);
+        String replyJson = Initiator.gson.toJson(this);
 
         balance = ReadRedis.readHashLong(jedis0Common, RedisKeys.Balance, userAddr);
 
         if(isPricePerKBytes){
-            double cost = price * nPrice * (Math.ceil(dataJson.getBytes().length / 1024));
+            double cost = price * nPrice * (Math.ceil((double) replyJson.getBytes().length / 1024));
             balance =  balance - (long)cost;
         }else if(isPricePerRequest) {
             balance = balance - (nPrice * price);
@@ -59,7 +65,17 @@ public class Replier {
             code = Constant.Code1004InsufficientBalance;
             message = Constant.Msg1004InsufficientBalance;
             got = 0;
-            data = null;
+            Map<String,Object> d = new HashMap<>();
+
+            Params params = service.getParams();
+            d.put("currency",params.getCurrency());
+            d.put("sendFrom",userAddr);
+            d.put("sendTo",params.getAccount());
+            d.put("minimumPay",params.getMinPayment());
+            d.put("writeInOpReturn",gson.toJson(Order.getJsonBuyOrder(service.getSid())));
+            d.put("note","When writing OpReturn, remove the escape character!");
+
+            data = d;
             last = null;
             balance = 0;
             return Initiator.gson.toJson(this);

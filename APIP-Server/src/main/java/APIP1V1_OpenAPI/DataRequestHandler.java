@@ -129,8 +129,8 @@ public class DataRequestHandler {
         builder.trackTotalHits(tb.build());
         searchRequest = builder.build();
 
-        //TODO
-        ParseTools.gsonPrint(searchRequest);
+//        //TODO
+//        ParseTools.gsonPrint(searchRequest);
         SearchResponse<T> result;
         try {
             result = esClient.search(searchRequest, tClass);

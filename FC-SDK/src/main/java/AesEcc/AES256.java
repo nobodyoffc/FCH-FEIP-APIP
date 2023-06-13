@@ -19,11 +19,11 @@ public class AES256 {
     private static String Algorithm = "AES";
     private static String AlgorithmProvider = "AES/CBC/PKCS5Padding"; //算法/模式/补码方式
 
-    public static byte[] generatorKey() {
+    public static String generatorKey() {
         byte[] key = new byte[16];
         SecureRandom random = new SecureRandom();
         random.nextBytes(key);
-        return key;
+        return byteToHexString(key);
     }
 
     public static IvParameterSpec getIv() throws UnsupportedEncodingException {

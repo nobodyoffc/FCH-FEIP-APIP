@@ -31,6 +31,8 @@
 
 [general通用接口](#general通用接口)
 
+[totals接口](#totals接口)
+
 ---
 
 ```
@@ -1245,6 +1247,73 @@ URL：http://localhost:8080/APIP/apip1/v1/general
 }
 ```
 
+## totals 数据总量查询接口
+
+查询各索引数据总量
+
+示例：
+URL：http://localhost:8080/APIP/apip1/v1/totals
+
+* Request body
+
+```
+{
+	"url": "http://localhost:8080/APIP/apip1/v1/totals",
+	"time": 1677673821267,
+	"nonce": 19838
+}
+```
+
+* Response body
+
+```
+{
+    "code": 0,
+    "message": "Success.",
+    "nonce": 19838,
+    "balance": 983000000,
+    "got": 35,
+    "total": 35,
+    "bestHeight": 1782774,
+    "data": {
+        "code": "1",
+        "mail": "67",
+        "tx": "1953852",
+        "service_history": "6",
+        "cid_history": "1293",
+        "box": "2",
+        "secret": "306",
+        "parse_mark": "2127",
+        "protocol": "3",
+        "block_mark": "1782759",
+        "contact": "3",
+        "statement": "2",
+        "code_history": "5",
+        "group_history": "372",
+        "proof_history": "12",
+        "reputation_history": "2",
+        "block": "1782740",
+        "proof": "7",
+        "cash": "4568712",
+        "group": "48",
+        "order": "2",
+        "app": "2",
+        "protocol_history": "9",
+        "address": "101554",
+        "p2sh": "1",
+        "tx_has": "1953857",
+        "box_history": "6",
+        "balance_history": "1",
+        "team": "4",
+        "block_has": "1782740",
+        "team_history": "23",
+        "service": "3",
+        "opreturn": "21874",
+        "cid": "594",
+        "app_history": "7"
+    }
+}
+```
 
 
 

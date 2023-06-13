@@ -9,6 +9,7 @@ import co.elastic.clients.elasticsearch.indices.DeleteIndexResponse;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import FeipClass.Service;
+import fcTools.ParseTools;
 import menu.Menu;
 import order.Order;
 import org.slf4j.Logger;
@@ -98,6 +99,7 @@ public class StartAPIP {
 					break;
 				case 4:
 					listIndices();
+					br.readLine();
 					break;
 
 				case 5:
@@ -189,7 +191,7 @@ public class StartAPIP {
 
 	private static void listIndices() {
 		for (Constant.Indices value : Constant.Indices.values()) {
-			System.out.println(value.sn()+" "+value.name());
+			System.out.println(value.sn()+". "+value.name());
 		}
 	}
 
@@ -321,6 +323,7 @@ public class StartAPIP {
 	private static Map<Integer, String> loadAPIs() {
 
 		ArrayList<String> apiList = Constant.apiList;
+
 
 		Map<Integer, String> apiMap = new HashMap<Integer, String>();
 		for (int i = 0; i < apiList.size(); i++) {

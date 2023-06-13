@@ -1,8 +1,8 @@
-package APIP16V1_Proof;
+package APIP3V1_CidInfo;
 
 import APIP1V1_OpenAPI.*;
-import initial.Initiator;
-import FeipClass.Proof;
+import fc_dsl.Fcdsl;
+import identity.CidHist;
 import startFEIP.IndicesFEIP;
 
 import javax.servlet.ServletException;
@@ -12,16 +12,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
+import fc_dsl.Sort;
 import static api.Constant.*;
 
+@WebServlet(APIP3V1Path +NoticeFeeHistoryAPI)
+public class NoticeFeeHistory extends HttpServlet {
 
-@WebServlet(APIP16V1Path + ProofByIdsAPI)
-public class ProofByIds extends HttpServlet {
-
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
@@ -39,21 +39,20 @@ public class ProofByIds extends HttpServlet {
         DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
 
         //Check API
-        if(!isThisApiRequest(requestBody)){
-            response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
-            writer.write(replier.reply1012BadQuery(addr));
-            return;
-        }
+
+        //Add filter
+        if(requestBody.getFcdsl()==null)requestBody.setFcdsl(new Fcdsl());
+        requestBody.getFcdsl().setFilterTerms("sn","10");
+
 
         //Set default sort.
+        ArrayList<Sort> sort =Sort.makeSortList("height",false,"index",false,null,null);
 
         //Request
-        String index = IndicesFEIP.ProofIndex;
-
         DataRequestHandler esRequest = new DataRequestHandler(dataCheckResult.getAddr(),requestBody,response,replier);
-        List<Proof> meetList;
+        List<CidHist> meetList;
         try {
-            meetList = esRequest.doRequest(index,null, Proof.class);
+            meetList = esRequest.doRequest(IndicesFEIP.CidHistIndex, sort, CidHist.class);
             if(meetList==null){
                 return;
             }
@@ -64,25 +63,11 @@ public class ProofByIds extends HttpServlet {
             return;
         }
 
-        Map<String,Proof> meetMap = new HashMap<>();
-        for(Proof proof :meetList){
-            meetMap.put(proof.getProofId(),proof);
-        }
-
         //response
-        replier.setData(meetMap);
-        replier.setGot(meetMap.size());
-        replier.setTotal(meetMap.size());
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ProofByIdsAPI));
-        esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
+        replier.setData(meetList);
+        replier.setGot(meetList.size());
+        esRequest.writeSuccess(dataCheckResult.getSessionKey());
 
-    }
-
-    private boolean isThisApiRequest(DataRequestBody requestBody) {
-        if(requestBody.getFcdsl()==null)
-            return false;
-        if(requestBody.getFcdsl().getIds()==null)
-            return false;
-        return true;
+        return;
     }
 }

@@ -6,7 +6,7 @@ import java.util.HexFormat;
 
 public class AESTest {
     public static void main(String[] args) throws Exception {
-        byte[]  keyBytes= AES256.generatorKey();
+
 
         String keyHex="6175d5b19f6deccfe42540bd59e37a2d";
 
@@ -17,7 +17,7 @@ public class AESTest {
 
         //System.out.println("keyUtf8: "+keyUtf8);
         System.out.println("keyHex: "+keyHex);
-        System.out.println("HexFormat.of : "+ HexFormat.of().formatHex(keyBytes));
+
 
         String srcUtf8 = "BbgGAo5W+BRyTqUVnKcL";
 

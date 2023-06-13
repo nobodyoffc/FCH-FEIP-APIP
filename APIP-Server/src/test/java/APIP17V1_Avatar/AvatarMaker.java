@@ -1,5 +1,6 @@
-package APIP14V1_Avatar;
+package APIP17V1_Avatar;
 
+        import fcTools.ParseTools;
         import net.coobird.thumbnailator.Thumbnails;
         import net.coobird.thumbnailator.geometry.Positions;
         import javax.imageio.ImageIO;
@@ -9,7 +10,7 @@ package APIP14V1_Avatar;
 
 public class AvatarMaker {
 
-    private static Map<String,Integer> data = new HashMap<>();
+    public static Map<String,Integer> data = new HashMap<>();
 
     static {
         data.put("1",0);
@@ -78,8 +79,10 @@ public class AvatarMaker {
         if(!basePath.endsWith("/"))basePath = basePath+"/";
 
         String[] pngFilePaths = new String[addrArray.length];
+
         for(int i = 0; i<addrArray.length; i++){
             String addr = addrArray[i];
+
             pngFilePaths[i] = getAvatar(addr,basePath,filePath+addr+".png");
         }
         return pngFilePaths;

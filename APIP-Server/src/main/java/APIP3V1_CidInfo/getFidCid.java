@@ -1,4 +1,4 @@
-package APIP3V1_Identity;
+package APIP3V1_CidInfo;
 
 import FchClass.Address;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;

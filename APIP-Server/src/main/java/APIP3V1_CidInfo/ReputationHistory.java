@@ -1,10 +1,7 @@
-package APIP3V1_Identity;
+package APIP3V1_CidInfo;
 
 import APIP1V1_OpenAPI.*;
-import fc_dsl.Fcdsl;
-import fc_dsl.Filter;
-import fc_dsl.Terms;
-import identity.CidHist;
+import identity.RepuHist;
 import startFEIP.IndicesFEIP;
 
 import javax.servlet.ServletException;
@@ -20,8 +17,8 @@ import java.util.List;
 import fc_dsl.Sort;
 import static api.Constant.*;
 
-@WebServlet(APIP3V1Path +NoticeFeeHistoryAPI)
-public class NoticeFeeHistory extends HttpServlet {
+@WebServlet(APIP3V1Path +ReputationHistoryAPI)
+public class ReputationHistory extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -42,19 +39,14 @@ public class NoticeFeeHistory extends HttpServlet {
 
         //Check API
 
-        //Add filter
-        if(requestBody.getFcdsl()==null)requestBody.setFcdsl(new Fcdsl());
-        requestBody.getFcdsl().setFilterTerms("sn","10");
-
-
         //Set default sort.
         ArrayList<Sort> sort =Sort.makeSortList("height",false,"index",false,null,null);
 
         //Request
         DataRequestHandler esRequest = new DataRequestHandler(dataCheckResult.getAddr(),requestBody,response,replier);
-        List<CidHist> meetList;
+        List<RepuHist> meetList;
         try {
-            meetList = esRequest.doRequest(IndicesFEIP.CidHistIndex, sort, CidHist.class);
+            meetList = esRequest.doRequest(IndicesFEIP.RepuHistIndex, sort, RepuHist.class);
             if(meetList==null){
                 return;
             }
@@ -70,6 +62,6 @@ public class NoticeFeeHistory extends HttpServlet {
         replier.setGot(meetList.size());
         esRequest.writeSuccess(dataCheckResult.getSessionKey());
 
-        return;
     }
 }
+

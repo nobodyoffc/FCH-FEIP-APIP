@@ -127,7 +127,7 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
 
 ```json
 {
-  "url": "http://localhost:8080/APIP/apip3/v1/cidInfoByIds",
+  "url": "https://cid.cash/APIP/apip3/v1/cidInfoByIds",
   "time": 1677673821267,
   "nonce": 1987697,
   "fcdsl":{
@@ -220,7 +220,7 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
   - request body
 ```json
 {
-  "url": "http://localhost:8080/APIP/apip3/v1/fidCidSeek",
+  "url": "https://cid.cash/APIP/apip3/v1/fidCidSeek",
   "time": 1677673821267,
   "nonce": 1987697,
   "fcdsl":{
@@ -315,7 +315,7 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
   - request body
 ```json
 {
-  "url": "http://localhost:8080/APIP/apip3/v1/cidInfoSearch",
+  "url": "https://cid.cash/APIP/apip3/v1/cidInfoSearch",
   "time": 1677673821267,
   "nonce": 1987697,
   "fcdsl": {
@@ -418,7 +418,7 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
   - request body
 ```json
 {
-  "url": "http://localhost:8080/APIP/apip3/v1/cidHistory",
+  "url": "https://cid.cash/APIP/apip3/v1/cidHistory",
   "time": 1677673821267,
   "nonce": 1987697,
   "fcdsl": {
@@ -520,7 +520,7 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
   - request body
 ```json
 {
-  "url": "http://localhost:8080/APIP/apip3/v1/homepageHistory",
+  "url": "https://cid.cash/APIP/apip3/v1/homepageHistory",
   "time": 1677673821267,
   "nonce": 1987697,
   "fcdsl": {
@@ -613,7 +613,7 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
   - request body
 ```json
 {
-  "url": "http://localhost:8080/APIP/apip3/v1/noticeFeeHistory",
+  "url": "https://cid.cash/APIP/apip3/v1/noticeFeeHistory",
   "time": 1677673821267,
   "nonce": 1987697,
   "fcdsl": {
@@ -715,7 +715,7 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
   - request body
 ```json
 {
-  "url": "http://localhost:8080/APIP/apip3/v1/reputationHistory",
+  "url": "https://cid.cash/APIP/apip3/v1/reputationHistory",
   "time": 1677673821267,
   "nonce": 1987697,
   "fcdsl": {

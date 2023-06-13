@@ -69,6 +69,8 @@ public class Constant {
     public static final String SignInAPI = "signIn";
     public static final String GeneralAPI = "general";
 
+    public static final String TotalsAPI = "totals";
+
     public static final String BlockByIdsAPI = "blockByIds";
     public static final String BlockSearchAPI = "blockSearch";
     public static final String CashByIdsAPI = "cashByIds";
@@ -89,7 +91,6 @@ public class Constant {
     public static final String AddressSearchAPI = "addressSearch";
     public static final String FidCidSeekAPI = "fidCidSeek";
     public static final String CidInfoSearchAPI = "cidInfoSearch";
-    public static final String UsedCidAPI = "usedCid";
     public static final String CidHistoryAPI = "cidHistory";
     public static final String HomepageHistoryAPI = "homepageHistory";
     public static final String NoticeFeeHistoryAPI = "noticeFeeHistory";
@@ -164,7 +165,7 @@ public class Constant {
     public static final String CashValidForCdAPI = "cashValidForCd";
     public static final String CashValidForPayAPI = "cashValidForPay";
 
-    public static final String GetAllSumsAPI = "getAllSums";
+    public static final String GetTotalsAPI = "getTotals";
 
 
     //Header name
@@ -219,6 +220,7 @@ public class Constant {
     static {
         apiList.add(SignInAPI);
         apiList.add(GeneralAPI);
+        apiList.add(TotalsAPI);
 
         apiList.add(BlockByIdsAPI);
         apiList.add(BlockSearchAPI);
@@ -233,20 +235,17 @@ public class Constant {
         apiList.add(OpReturnSearchAPI);
         apiList.add(AddressByIdsAPI);
         apiList.add(AddressSearchAPI);
-
+        apiList.add(P2shByIdsAPI);
+        apiList.add(P2shSearchAPI);
 
         apiList.add(CidInfoByIdsAPI);
         apiList.add(FidCidSeekAPI);
         apiList.add(CidInfoSearchAPI);
-        apiList.add(UsedCidAPI);
         apiList.add(CidHistoryAPI);
         apiList.add(HomepageHistoryAPI);
         apiList.add(NoticeFeeHistoryAPI);
         apiList.add(ReputationHistoryAPI);
 
-
-        apiList.add(P2shByIdsAPI);
-        apiList.add(P2shSearchAPI);
 
         apiList.add(ProtocolByIdsAPI);
         apiList.add(ProtocolSearchAPI);
@@ -284,6 +283,10 @@ public class Constant {
         apiList.add(MyTeamsAPI);
         apiList.add(TeamRateHistoryAPI);
 
+        apiList.add(BoxByIdsAPI);
+        apiList.add(BoxSearchAPI);
+        apiList.add(BoxHistoryAPI);
+
         apiList.add(ContactsAPI);
         apiList.add(ContactsDeletedAPI);
 
@@ -294,25 +297,20 @@ public class Constant {
         apiList.add(MailsDeletedAPI);
         apiList.add(MailThreadAPI);
 
-        apiList.add(StatementsAPI);
-        apiList.add(StatementSearchAPI);
-
         apiList.add(ProofByIdsAPI);
         apiList.add(ProofSearchAPI);
         apiList.add(ProofHistoryAPI);
 
-        apiList.add(BoxByIdsAPI);
-        apiList.add(BoxSearchAPI);
-        apiList.add(BoxHistoryAPI);
+        apiList.add(StatementsAPI);
+        apiList.add(StatementSearchAPI);
 
-        apiList.add(UnconfirmedAPI);
-        apiList.add(BroadcastTxAPI);
-        apiList.add(DecodeRawTxAPI);
-        apiList.add(CashValidLiveAPI);
         apiList.add(AvatarsAPI);
 
+        apiList.add(UnconfirmedAPI);
+        apiList.add(CashValidLiveAPI);
         apiList.add(CashValidForCdAPI);
         apiList.add(CashValidForPayAPI);
+        apiList.add(DecodeRawTxAPI);
+        apiList.add(BroadcastTxAPI);
     }
-
 }

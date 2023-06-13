@@ -1,6 +1,8 @@
 package APIP18V1_Wallet;
 
 import APIP1V1_OpenAPI.*;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import fcTools.ParseTools;
 import initial.Initiator;
 
@@ -11,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +27,7 @@ public class Unconfirmed extends HttpServlet {
     private String SpendValue = "spendValue";
     private String IncomeCount = "incomeCount";
     private String IncomeValue = "incomeValue";
+    private String TxValueMap = "txValueMap";
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("application/json");
@@ -77,6 +81,11 @@ public class Unconfirmed extends HttpServlet {
             if(resultMap.get(IncomeValue)!=null)info.incomeValue = Long.parseLong(resultMap.get(IncomeValue));
             if(resultMap.get(SpendCount)!=null)info.spendCount = Integer.parseInt(resultMap.get(SpendCount));
             if(resultMap.get(SpendValue)!=null)info.spendValue = Long.parseLong(resultMap.get(SpendValue));
+            if(resultMap.get(TxValueMap)!=null){
+                Type mapType = new TypeToken<Map<String, Long>>(){}.getType();
+
+                info.txValueMap = new Gson().fromJson(resultMap.get(TxValueMap),mapType);
+            }
             info.net = info.incomeValue -info.spendValue;
             meetList.add(info);
         }
@@ -116,5 +125,6 @@ public class Unconfirmed extends HttpServlet {
         private long spendValue;
         private int incomeCount;
         private long incomeValue;
+        private Map<String,Long> txValueMap;
     }
 }

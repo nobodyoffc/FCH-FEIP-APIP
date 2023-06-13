@@ -1,10 +1,7 @@
-package APIP3V1_Identity;
+package APIP14V1_Proof;
 
 import APIP1V1_OpenAPI.*;
-import fc_dsl.Fcdsl;
-import fc_dsl.Filter;
-import fc_dsl.Terms;
-import identity.CidHist;
+import initial.Initiator;
 import startFEIP.IndicesFEIP;
 
 import javax.servlet.ServletException;
@@ -20,10 +17,10 @@ import java.util.List;
 import fc_dsl.Sort;
 import static api.Constant.*;
 
-@WebServlet(APIP3V1Path +CidHistoryAPI)
-public class CidHistory extends HttpServlet {
 
-    @Override
+@WebServlet(APIP14V1Path +ProofHistoryAPI)
+public class ProofHistory extends HttpServlet {
+
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
@@ -40,20 +37,20 @@ public class CidHistory extends HttpServlet {
 
         DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
 
-        DataRequestHandler esRequest = new DataRequestHandler(dataCheckResult.getAddr(),requestBody,response,replier);
-
-        List<CidHist> meetList;
-
-        //Add filter
-        if(requestBody.getFcdsl()==null)requestBody.setFcdsl(new Fcdsl());
-        requestBody.getFcdsl().setFilterTerms("sn","3");
+        //Check API
 
         //Set default sort.
-
         ArrayList<Sort> sort =Sort.makeSortList("height",false,"index",false,null,null);
 
+        //Add condition
+
+        //Request
+        String index = IndicesFEIP.ProofHistIndex;
+
+        DataRequestHandler esRequest = new DataRequestHandler(dataCheckResult.getAddr(),requestBody,response,replier);
+        List<publish.ProofHistory> meetList;
         try {
-            meetList = esRequest.doRequest(IndicesFEIP.CidHistIndex, sort, CidHist.class);
+            meetList = esRequest.doRequest(index,sort, publish.ProofHistory.class);
             if(meetList==null){
                 return;
             }
@@ -63,9 +60,11 @@ public class CidHistory extends HttpServlet {
             writer.write(replier.reply1012BadQuery(addr));
             return;
         }
+
+        //response
         replier.setData(meetList);
         replier.setGot(meetList.size());
-        esRequest.writeSuccess(dataCheckResult.getSessionKey());
+        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ProofHistoryAPI));
+        esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
     }
-
 }

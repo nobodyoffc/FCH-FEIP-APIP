@@ -2,7 +2,10 @@ package APIP2V1_Blockchain;
 
 import APIP1V1_OpenAPI.*;
 import FchClass.Tx;
+import FchClass.TxHas;
+import data.TxInfo;
 import initial.Initiator;
+import org.checkerframework.checker.units.qual.A;
 import startFCH.IndicesFCH;
 
 import javax.servlet.ServletException;
@@ -40,16 +43,16 @@ public class TxSearch extends HttpServlet {
         //Check API
 
         //Set default sort.
-        ArrayList<Sort> sort =Sort.makeSortList("height",false,"txIndex",false,"txId",true);
+        ArrayList<Sort> sort =Sort.makeSortList("height",false,"txId",true,null,false);
 
         //Add condition
 
         //Request
         DataRequestHandler esRequest = new DataRequestHandler(dataCheckResult.getAddr(),requestBody,response,replier);
-        List<Tx> meetList;
+        List<TxHas> txHasList;
         try {
-            meetList = esRequest.doRequest(IndicesFCH.TxIndex,sort, Tx.class);
-            if(meetList==null){
+            txHasList = esRequest.doRequest(IndicesFCH.TxHasIndex,sort, TxHas.class);
+            if(txHasList==null){
                 return;
             }
         } catch (Exception e) {
@@ -58,6 +61,21 @@ public class TxSearch extends HttpServlet {
             writer.write(replier.reply1012BadQuery(addr));
             return;
         }
+
+        List<String> idList = new ArrayList<>();
+        for(TxHas txhas :txHasList){
+            idList.add(txhas.getTxId());
+        }
+
+        List<Tx> txList = null;
+        try {
+            txList = servers.EsTools.getMultiByIdList(Initiator.esClient, IndicesFCH.TxIndex, idList, Tx.class).getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        List<TxInfo> meetList = TxInfo.mergeTxAndTxHas(txList, txHasList);
+
         //response
         replier.setData(meetList);
         replier.setGot(meetList.size());

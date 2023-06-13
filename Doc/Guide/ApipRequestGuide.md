@@ -12,24 +12,26 @@ UpdateDate: 2023-06-09
 
 ## Free GET APIs:
 
-[1. Get cid or fid information](https://cid.cash/APIP/freeGet/v1/getFidCid?id=FEk41Kqjar45fLDriztUDTUkdki7mmcjWK)
+1. Get cid or fid information: https://cid.cash/APIP/freeGet/v1/getFidCid?id=FEk41Kqjar45fLDriztUDTUkdki7mmcjWK
 
-[2. Get avatar of a fid](https://cid.cash/APIP/freeGet/v1/getAvatar?fid=FEk41Kqjar45fLDriztUDTUkdki7mmcjWK)
+2. Get avatar of a fid: https://cid.cash/APIP/freeGet/v1/getAvatar?fid=FEk41Kqjar45fLDriztUDTUkdki7mmcjWK
 
-[3. Get cashes(UTXOs) of a fid](https://cid.cash/APIP/freeGet/v1/getCashes?fid=FMZsWGT5hEUqhnZhLhXrxNXXG6uDHcarmX)
+3. Get cashes(UTXOs) of a fid: https://cid.cash/APIP/freeGet/v1/getCashes?fid=FMZsWGT5hEUqhnZhLhXrxNXXG6uDHcarmX
 
-[4. Get service list](https://cid.cash/APIP/freeGet/v1/getServices)
+4. Get service list: https://cid.cash/APIP/freeGet/v1/getServices
 
-[5. Get App list](https://cid.cash/APIP/freeGet/v1/getApps)
+5. Get App list: https://cid.cash/APIP/freeGet/v1/getApps
 
-[6. Get the count of entries of all indices](https://cid.cash/APIP/freeGet/v1/getAllSums)
+6. Get the count of entries of all indices: https://cid.cash/APIP/freeGet/v1/getTotals
 
 APIs above can be requested for free. 76 POST APIs need that the requester paid and signed in the service before to be requested.
 
 ## Buy service and SignIn:
 
 ### Before requesting POST APIs for data, you have to:
+
 	(1) Buy service: send more than 1 fch to `FUmo2eez6VK2sfGWjek9i9aK5y1mdHSnqv` with below JSON attatched:
+
 ```
 {
   "type": "APIP",
@@ -43,9 +45,11 @@ APIs above can be requested for free. 76 POST APIs need that the requester paid 
   }
 }
 ```
+
 	(2) SignIn: POST https://cid.cash/APIP/apip1/v1/signIn
 		
 		* Request header:
+
 ```
 		Sign = < The signature of `Request body` with the private Key of the pubKey in Request body also of the payer of the service. The sign algorithm is the same as in Bitcoin-Qt>
 ```
@@ -150,31 +154,31 @@ See [APIP1V1_OpenAPI(zh-CN)](https://github.com/nobodyoffc/FCH-FEIP-APIP/blob/ma
 ```
 ## POST API list
 
-1. signIn	// signIn to get sessionKey.
-2. general	// for all fcdsl queries on a given ES index.
-3. blockByIds
-4. blockSearch
-5. cashByIds
-6. cashSearch
-7. TxHasByIds
-8. cashValid
-9. txByIds
-10. txSearch
-11. blockHasByIds
-12. opReturnByIds
-13. opReturnSearch
-14. addressByIds
-15. addressSearch
-16. cidInfoByIds
-17. fidCidSeek
-18. cidInfoSearch
-19. usedCid
-20. cidHistory
-21. homepageHistory
-22. noticeFeeHistory
-23. reputationHistory
-24. p2shByIds
-25. p2shSearch
+1. signIn	    // signIn to get sessionKey.
+2. general	    // for all fcdsl queries on a given ES index.
+3. totals       // the total of entries of every index in ES
+4. blockByIds
+5. blockSearch
+6. cashByIds
+7. cashSearch
+8. TxHasByIds
+9. cashValid
+10. txByIds
+11. txSearch
+12. blockHasByIds
+13. opReturnByIds
+14. opReturnSearch
+15. addressByIds
+16. addressSearch
+17. p2shByIds
+18. p2shSearch
+19. cidInfoByIds
+20. fidCidSeek
+21. cidInfoSearch
+22. cidHistory
+23. homepageHistory
+24. noticeFeeHistory
+25. reputationHistory
 26. protocolByIds
 27. protocolSearch
 28. protocolOpHistory
@@ -205,28 +209,28 @@ See [APIP1V1_OpenAPI(zh-CN)](https://github.com/nobodyoffc/FCH-FEIP-APIP/blob/ma
 53. teamOtherPersons
 54. myTeams
 55. teamRateHistory
-56. contacts
-57. contactsDeleted
-58. secrets
-59. secretsDeleted
-60. mails
-61. mailsDeleted
-62. mailThread
-63. statements
-64. statementSearch
-65. proofByIds
-66. proofSearch
-67. proofHistory
-68. boxByIds
-69. boxSearch
-70. boxHistory
-71. unconfirmed
-72. broadcastTx
-73. decodeRawTx
-74. cashValidLive
-75. avatars
-76. cashValidForCd
-77. cashValidForPay
+56. boxByIds
+57. boxSearch
+58. boxHistory
+59. contacts
+60. contactsDeleted
+61. secrets
+62. secretsDeleted
+63. mails
+64. mailsDeleted
+65. mailThread
+66. proofByIds
+67. proofSearch
+68. proofHistory
+69. statements
+70. statementSearch
+71. avatars
+72. unconfirmed
+73. cashValidLive
+74. cashValidForCd
+75. cashValidForPay
+76. decodeRawTx
+77. broadcastTx
 
 ## Indices in ES
 

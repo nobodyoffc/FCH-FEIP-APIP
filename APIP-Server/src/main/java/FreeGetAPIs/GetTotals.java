@@ -19,8 +19,8 @@ import java.util.Map;
 
 import static api.Constant.*;
 
-@WebServlet(FreeGet + GetAllSumsAPI)
-public class GetAllSums extends HttpServlet {
+@WebServlet(FreeGet + GetTotalsAPI)
+public class GetTotals extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 

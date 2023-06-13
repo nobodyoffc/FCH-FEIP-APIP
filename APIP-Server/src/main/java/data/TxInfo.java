@@ -33,7 +33,7 @@ public class TxInfo {
     private ArrayList<CashMark> spentCashes;
     private  ArrayList<CashMark> issuedCashes;
 
-    public List<TxInfo> mergeTxAndTxHas(List<Tx> txList, List<TxHas> txHasList) {
+    public static List<TxInfo> mergeTxAndTxHas(List<Tx> txList, List<TxHas> txHasList) {
         List<TxInfo> result = new ArrayList<>();
         Map<String, Tx> txMap = new HashMap<>();
 

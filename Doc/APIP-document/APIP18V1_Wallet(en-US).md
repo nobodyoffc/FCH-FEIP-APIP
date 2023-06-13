@@ -129,7 +129,7 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
 
 ```json
 {
-	"url": "http://localhost:8080/APIP/apip18/v1/cashValidLive",
+	"url": "https://cid.cash/APIP/apip18/v1/cashValidLive",
 	"time": 1677673821267,
 	"nonce": 1987697,
 	"fcdsl":{
@@ -183,7 +183,6 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
 	]
 }
 ```
-
 
 ## cashValidForCd
 
@@ -248,7 +247,7 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
 
 ```json
 {
-	"url": "http://localhost:8080/APIP/apip18/v1/cashValidForCd",
+	"url": "https://cid.cash/APIP/apip18/v1/cashValidForCd",
 	"time": 1677673821267,
 	"nonce": 1987697,
 	"fcdsl":{
@@ -361,7 +360,7 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
 
 ```json
 {
-	"url": "http://localhost:8080/APIP/apip18/v1/cashValidForPay",
+	"url": "https://cid.cash/APIP/apip18/v1/cashValidForPay",
 	"time": 1677673821267,
 	"nonce": 1987697,
 	"fcdsl":{
@@ -430,7 +429,7 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
 	]
 }
 ```
-## uncofirmed
+## unconfirmed
 
 ### 说明
 
@@ -456,12 +455,15 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
 ```
 [
     {
-        "fid": <string. 所属FCH地址>,
+         "fid": <string. 所属FCH地址>,
          "net": <long. 净变动金额，单位聪>,
          "spendCount": <int. 花费cash个数>,
          "spendValue": <long. 花费金额，单位聪>,
          "incomeCount": <int. 新增cash个数>,
-         "incomeValue": <long. 收入金额，单位聪>
+         "incomeValue": <long. 收入金额，单位聪>,
+         "txValueMap": {
+         	<string. txId>:<long. 本交易净变动金额，单位聪>
+         }
     },
     ...
 ]
@@ -473,7 +475,7 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
 
 ```json
 {
-	"url": "http://localhost:8080/APIP/apip18/v1/unconfirmed",
+	"url": "https://cid.cash/APIP/apip18/v1/unconfirmed",
 	"time": 1677673821267,
 	"nonce": 1987697,
     "fcdsl":{
@@ -487,27 +489,33 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
 {
 	"code": 0,
 	"message": "Success.",
-	"nonce": 1987697,
-	"balance": 35518428799,
+	"nonce": 198769,
+	"balance": 989000000,
 	"got": 2,
 	"total": 2,
-	"bestHeight": 1770887,
+	"bestHeight": 1785456,
 	"data": [
 		{
 			"fid": "FEk41Kqjar45fLDriztUDTUkdki7mmcjWK",
-			"net": -100000360,
-			"spendCount": 2,
-			"spendValue": 1152129676,
-			"incomeCount": 1,
-			"incomeValue": 1052129316
-		},
-		{
-			"fid": "FPL44YJRwPdd2ipziFvqq6y2tw4VnVvpAv",
 			"net": 100000000,
 			"spendCount": 0,
 			"spendValue": 0,
 			"incomeCount": 1,
-			"incomeValue": 100000000
+			"incomeValue": 100000000,
+			"txValueMap": {
+				"d680f6b504a35318561752514ca0b80da216106933ef1da5a2f7071fdc1c32c0": 100000000
+			}
+		},
+		{
+			"fid": "FPL44YJRwPdd2ipziFvqq6y2tw4VnVvpAv",
+			"net": -100000360,
+			"spendCount": 2,
+			"spendValue": 119998677,
+			"incomeCount": 1,
+			"incomeValue": 19998317,
+			"txValueMap": {
+				"d680f6b504a35318561752514ca0b80da216106933ef1da5a2f7071fdc1c32c0": -100000360
+			}
 		}
 	]
 }
@@ -546,7 +554,7 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
 
 ```json
 {
-	"url": "http://localhost:8080/APIP/apip18/v1/decodeRawTx",
+	"url": "https://cid.cash/APIP/apip18/v1/decodeRawTx",
 	"time": 1677673821267,
 	"nonce": 1987697,
 	"fcdsl":{
@@ -602,7 +610,7 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
 
 ```json
 {
-	"url": "http://localhost:8080/APIP/apip18/v1/broadcastTx",
+	"url": "https://cid.cash/APIP/apip18/v1/broadcastTx",
 	"time": 1677673821267,
 	"nonce": 1987697,
 	"fcdsl":{

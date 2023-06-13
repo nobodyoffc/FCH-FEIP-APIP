@@ -49,7 +49,7 @@ public class CashValid extends HttpServlet {
         }
 
         //Set default sort.
-        ArrayList<Sort> sort =Sort.makeSortList("cd",false,"value",false,"cashId",true);
+        ArrayList<Sort> sort =Sort.makeSortList("cd",true,"value",false,"cashId",true);
 
         //Add condition
         Fcdsl fcdsl;

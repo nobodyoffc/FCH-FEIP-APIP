@@ -1,4 +1,4 @@
-package APIP3V1_Identity;
+package APIP3V1_CidInfo;
 
 import APIP1V1_OpenAPI.*;
 import FeipClass.Cid;

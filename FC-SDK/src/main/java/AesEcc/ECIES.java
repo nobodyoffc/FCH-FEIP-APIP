@@ -11,26 +11,28 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 public class ECIES {
-    BigInteger secretKey;
-    BigInteger[] publicKey;
+    BigInteger priKey;
+    BigInteger[] pubKey;
 
     // 随机生成密钥对
     public void generateKeyPair() {
-        secretKey = Math_Modulo.random();
-        publicKey = Secp256k1.multiply_G(secretKey);
+        priKey = Math_Modulo.random();
+        pubKey = Secp256k1.multiply_G(priKey);
     }
 
     // 反序列化
     public void getPair(byte[] keys) {
         // 若 keys 为公钥，则创建仅有公钥，仅用于加密的 KeyPair 对象
         if (keys.length == 64) {
-            publicKey = Secp256k1.setBytes(keys);
-            secretKey = null;
+            pubKey = Secp256k1.setBytes(keys);
+            System.out.println("pubKey:"+ AES256.byteToHexString(pubKey2Bytes())) ;
+            priKey = null;
             // 若 keys 为私钥，则创建完整的 KeyPair 对象
         } else if (keys.length == 32) {
-            secretKey = Math_Modulo.setBytes(keys);
-            System.out.println("secretKey:"+secretKey);
-            publicKey = Secp256k1.multiply_G(secretKey);
+            priKey = Math_Modulo.setBytes(keys);
+            System.out.println("priKey:"+ AES256.byteToHexString(priKey2Bytes())) ;
+            pubKey = Secp256k1.multiply_G(priKey);
+            System.out.println("pubKey:"+ AES256.byteToHexString(pubKey2Bytes())) ;
         }
     }
 
@@ -43,13 +45,13 @@ public class ECIES {
     }
 
     // 私钥序列化
-    public byte[] secretKey2Bytes() {
-        return Math_Modulo.toBytes(secretKey);
+    public byte[] priKey2Bytes() {
+        return Math_Modulo.toBytes(priKey);
     }
 
     // 公钥序列化
-    public byte[] publicKey2Bytes() {
-        return Secp256k1.toBytes(publicKey);
+    public byte[] pubKey2Bytes() {
+        return Secp256k1.toBytes(pubKey);
     }
 
     // 加密
@@ -58,7 +60,7 @@ public class ECIES {
         BigInteger r = Math_Modulo.random();
         // BigInteger r = new BigInteger("123456789", 16);
         BigInteger[] R = Secp256k1.multiply_G(r);
-        BigInteger[] P = Secp256k1.multiply_Point(publicKey, r);
+        BigInteger[] P = Secp256k1.multiply_Point(pubKey, r);
         BigInteger s = P[0];
 
         byte[] k = Hash.SHA256(AES256.byteToHexString(Math_Modulo.toBytes(s)));
@@ -101,7 +103,7 @@ public class ECIES {
         BigInteger[] R = Secp256k1.setBytes(Rbytes);
 
         // 计算 S
-        BigInteger[] P = Secp256k1.multiply_Point(R, secretKey);
+        BigInteger[] P = Secp256k1.multiply_Point(R, priKey);
         BigInteger s = P[0];
 
 

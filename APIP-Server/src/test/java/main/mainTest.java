@@ -1,7 +1,6 @@
 package main;
 
 import AesEcc.AES256;
-import AesEcc.Envelop;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch.core.InfoResponse;
@@ -105,46 +104,6 @@ public class mainTest {
         sortL.add(sort1);
 
         ParseTools.gsonPrint(sortL);
-    }
-
-
-    public void decrypt() throws Exception {
-        String priKey = "L2bHRej6Fxxipvb4TiR5bu1rkT3tRp8yWEsUy4R1Zb8VMm2x7sd8";
-        String msg = "test";
-        String secKey = KeyTools.getPriKey32(priKey);
-        Envelop env = new Envelop();
-        env.setEciesSecKey(secKey);
-
-        String cypher = env.encryptKey(msg);
-        System.out.println("test cypher: "+cypher.length()+"\n"+cypher);
-        System.out.println("decrypted:"+env.decryptKey(cypher));
-
-        //
-        String cd = cypher.substring(64, cypher.length());
-        byte[] pk65Bytes = ("04"+cypher.substring(0,64)).getBytes();
-        String pk33 = KeyTools.compressPK65ToPK33(pk65Bytes);
-        String cypherJs = pk33+cd;
-        Base64.Encoder encoder = Base64.getEncoder();
-        System.out.println("pk33+cd: "+cypherJs.length()+"\n"+ cypherJs);
-
-        byte  []cypherJsBytes = BytesTools.hexToByteArray(cypherJs);
-        String cypherJsStr = new String(encoder.encode(cypherJsBytes));
-        System.out.println("cypherJsStr: "+cypherJsStr.length()+"\n"+cypherJsStr);
-        //
-
-        String cypherFreeSign = "A9ynhf2BsBq3xOQzXCUwLgFA+kR7bE81qi2JZWt6svTQHQJgMOAg7IuLOc9BCc4Gn1bPc+7dRIWFph8JxQxKhtd86peBErFNZ/NAC7KPKVH2VL0Z6xf3U6vytnZm0SV1uQ==";        Base64.Decoder decoder = Base64.getDecoder();
-        byte[] cpfsBytes = decoder.decode(cypherFreeSign);
-        String cpfsHex = AES256.byteToHexString(cpfsBytes);
-        System.out.println("cpfsHex: "+cpfsHex.length()+"\n"+cpfsHex);
-        String cpfsPubKey = cpfsHex.substring(0, 66);
-
-
-        System.out.println("pubkey33: "+cpfsPubKey);
-        String cpfsFullPubKey = KeyTools.recoverPK33ToPK65(cpfsPubKey);
-        System.out.println("pubKey65: "+cpfsFullPubKey);
-        String newCypher = cpfsFullPubKey.substring(2, 130) + cpfsHex.substring(66, cpfsHex.length());
-        System.out.println("newCypher: "+newCypher.length()+"\n"+newCypher);
-       // env.decryptKey(newCypher);
     }
 
     @Test

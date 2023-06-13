@@ -1,7 +1,8 @@
-package APIP3V1_Identity;
+package APIP14V1_Proof;
 
 import APIP1V1_OpenAPI.*;
-import identity.RepuHist;
+import initial.Initiator;
+import FeipClass.Proof;
 import startFEIP.IndicesFEIP;
 
 import javax.servlet.ServletException;
@@ -17,10 +18,10 @@ import java.util.List;
 import fc_dsl.Sort;
 import static api.Constant.*;
 
-@WebServlet(APIP3V1Path +ReputationHistoryAPI)
-public class ReputationHistory extends HttpServlet {
 
-    @Override
+@WebServlet(APIP14V1Path +ProofSearchAPI)
+public class ProofSearch extends HttpServlet {
+
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
@@ -40,13 +41,17 @@ public class ReputationHistory extends HttpServlet {
         //Check API
 
         //Set default sort.
-        ArrayList<Sort> sort =Sort.makeSortList("height",false,"index",false,null,null);
+        ArrayList<Sort> sort =Sort.makeSortList("lastHeight",false,"proofId",true,null,null);
+
+        //Add condition
 
         //Request
+        String index = IndicesFEIP.ProofIndex;
+
         DataRequestHandler esRequest = new DataRequestHandler(dataCheckResult.getAddr(),requestBody,response,replier);
-        List<RepuHist> meetList;
+        List<Proof> meetList;
         try {
-            meetList = esRequest.doRequest(IndicesFEIP.RepuHistIndex, sort, RepuHist.class);
+            meetList = esRequest.doRequest(index,sort, Proof.class);
             if(meetList==null){
                 return;
             }
@@ -60,8 +65,8 @@ public class ReputationHistory extends HttpServlet {
         //response
         replier.setData(meetList);
         replier.setGot(meetList.size());
-        esRequest.writeSuccess(dataCheckResult.getSessionKey());
+        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ProofSearchAPI));
+        esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
 
     }
 }
-

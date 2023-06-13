@@ -1,4 +1,4 @@
-package APIP14V1_Avatar;
+package APIP17V1_Avatar;
 
 import initial.Initiator;
 import startAPIP.RedisKeys;
@@ -17,7 +17,7 @@ import java.io.IOException;
 
 import static api.Constant.*;
 
-@WebServlet(APIP14V1Path + GetAvatarAPI)
+@WebServlet(APIP17V1Path + GetAvatarAPI)
 public class getAvatar extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

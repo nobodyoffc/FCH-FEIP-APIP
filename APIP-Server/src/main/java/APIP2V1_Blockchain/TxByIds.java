@@ -50,10 +50,10 @@ public class TxByIds extends HttpServlet {
         //Request
 
         DataRequestHandler esRequest = new DataRequestHandler(dataCheckResult.getAddr(),requestBody,response,replier);
-        List<TxHas> txHashList;
+        List<TxHas> txHasList;
         try {
-            txHashList = esRequest.doRequest(IndicesFCH.TxHasIndex,null, TxHas.class);
-            if(txHashList==null){
+            txHasList = esRequest.doRequest(IndicesFCH.TxHasIndex,null, TxHas.class);
+            if(txHasList==null){
                 return;
             }
         } catch (Exception e) {
@@ -65,7 +65,7 @@ public class TxByIds extends HttpServlet {
 
         //make data
         List<String> idList = new ArrayList<>();
-        for(TxHas txhas : txHashList){
+        for(TxHas txhas : txHasList){
             idList.add(txhas.getTxId());
         }
 
@@ -76,9 +76,7 @@ public class TxByIds extends HttpServlet {
             e.printStackTrace();
         }
 
-        TxInfo txInfo = new TxInfo();
-
-        List<TxInfo> meetList = txInfo.mergeTxAndTxHas(txList, txHashList);
+        List<TxInfo> meetList = TxInfo.mergeTxAndTxHas(txList, txHasList);
 
 
         //response

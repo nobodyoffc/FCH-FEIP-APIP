@@ -1,7 +1,8 @@
-package APIP16V1_Proof;
+package APIP3V1_CidInfo;
 
 import APIP1V1_OpenAPI.*;
-import initial.Initiator;
+import fc_dsl.Fcdsl;
+import identity.CidHist;
 import startFEIP.IndicesFEIP;
 
 import javax.servlet.ServletException;
@@ -12,17 +13,15 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.ArrayList;
+
 import fc_dsl.Sort;
 import static api.Constant.*;
 
+@WebServlet(APIP3V1Path +CidHistoryAPI)
+public class CidHistory extends HttpServlet {
 
-@WebServlet(APIP16V1Path +ProofHistoryAPI)
-public class ProofHistory extends HttpServlet {
-
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
@@ -39,20 +38,20 @@ public class ProofHistory extends HttpServlet {
 
         DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
 
-        //Check API
+        DataRequestHandler esRequest = new DataRequestHandler(dataCheckResult.getAddr(),requestBody,response,replier);
+
+        List<CidHist> meetList;
+
+        //Add filter
+        if(requestBody.getFcdsl()==null)requestBody.setFcdsl(new Fcdsl());
+        requestBody.getFcdsl().setFilterTerms("sn","3");
 
         //Set default sort.
+
         ArrayList<Sort> sort =Sort.makeSortList("height",false,"index",false,null,null);
 
-        //Add condition
-
-        //Request
-        String index = IndicesFEIP.ProofHistIndex;
-
-        DataRequestHandler esRequest = new DataRequestHandler(dataCheckResult.getAddr(),requestBody,response,replier);
-        List<publish.ProofHistory> meetList;
         try {
-            meetList = esRequest.doRequest(index,sort, publish.ProofHistory.class);
+            meetList = esRequest.doRequest(IndicesFEIP.CidHistIndex, sort, CidHist.class);
             if(meetList==null){
                 return;
             }
@@ -62,11 +61,9 @@ public class ProofHistory extends HttpServlet {
             writer.write(replier.reply1012BadQuery(addr));
             return;
         }
-
-        //response
         replier.setData(meetList);
         replier.setGot(meetList.size());
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ProofHistoryAPI));
-        esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
+        esRequest.writeSuccess(dataCheckResult.getSessionKey());
     }
+
 }

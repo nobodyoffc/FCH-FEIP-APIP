@@ -1,4 +1,4 @@
-package APIP16V1_Proof;
+package APIP14V1_Proof;
 
 import APIP1V1_OpenAPI.*;
 import initial.Initiator;
@@ -12,15 +12,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import fc_dsl.Sort;
 import static api.Constant.*;
 
 
-@WebServlet(APIP14V1Path +ProofSearchAPI)
-public class ProofSearch extends HttpServlet {
+@WebServlet(APIP14V1Path + ProofByIdsAPI)
+public class ProofByIds extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("application/json");
@@ -39,11 +39,13 @@ public class ProofSearch extends HttpServlet {
         DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
 
         //Check API
+        if(!isThisApiRequest(requestBody)){
+            response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
+            writer.write(replier.reply1012BadQuery(addr));
+            return;
+        }
 
         //Set default sort.
-        ArrayList<Sort> sort =Sort.makeSortList("lastHeight",false,"proofId",true,null,null);
-
-        //Add condition
 
         //Request
         String index = IndicesFEIP.ProofIndex;
@@ -51,7 +53,7 @@ public class ProofSearch extends HttpServlet {
         DataRequestHandler esRequest = new DataRequestHandler(dataCheckResult.getAddr(),requestBody,response,replier);
         List<Proof> meetList;
         try {
-            meetList = esRequest.doRequest(index,sort, Proof.class);
+            meetList = esRequest.doRequest(index,null, Proof.class);
             if(meetList==null){
                 return;
             }
@@ -62,11 +64,25 @@ public class ProofSearch extends HttpServlet {
             return;
         }
 
+        Map<String,Proof> meetMap = new HashMap<>();
+        for(Proof proof :meetList){
+            meetMap.put(proof.getProofId(),proof);
+        }
+
         //response
-        replier.setData(meetList);
-        replier.setGot(meetList.size());
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ProofSearchAPI));
+        replier.setData(meetMap);
+        replier.setGot(meetMap.size());
+        replier.setTotal(meetMap.size());
+        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ProofByIdsAPI));
         esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
 
+    }
+
+    private boolean isThisApiRequest(DataRequestBody requestBody) {
+        if(requestBody.getFcdsl()==null)
+            return false;
+        if(requestBody.getFcdsl().getIds()==null)
+            return false;
+        return true;
     }
 }

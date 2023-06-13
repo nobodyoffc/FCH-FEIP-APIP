@@ -55,6 +55,10 @@ public class RawTxParser {
         Map<String, Map<String, Cash>> cashMapMap = parseUnconfirmedTxHex(txHex, txid);
         ArrayList<Cash> inCashList = makeInCashMap(esClient, cashMapMap.get(spendCashMapKey),cashMapMap.get(newCashMapKey));
         ArrayList<Cash> outCashList = new ArrayList<>(cashMapMap.get(newCashMapKey).values());
+
+        for(Cash cash:inCashList) cash.setSpendTxId(txid);
+        for(Cash cash:outCashList) cash.setBirthTxId(txid);
+
         Tx tx = makeTx(txid,inCashList,outCashList);
         TxInMempool txInMempool = new TxInMempool();
         txInMempool.setTx(tx);
