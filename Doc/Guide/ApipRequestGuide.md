@@ -14,6 +14,10 @@ UpdateDate: 2023-06-09
 
 [https://github.com/nobodyoffc/FCH-FEIP-APIP/tree/master/Doc](https://github.com/nobodyoffc/FCH-FEIP-APIP/tree/master/Doc)
 
+## Resources for download
+
+[https://cid.cash/download/](https://cid.cash/download/)
+
 ## Free GET APIs:
 
 1. Get cid or fid information: [https://cid.cash/APIP/freeGet/v1/getFidCid?id=FEk41Kqjar45fLDriztUDTUkdki7mmcjWK](https://cid.cash/APIP/freeGet/v1/getFidCid?id=FEk41Kqjar45fLDriztUDTUkdki7mmcjWK)
@@ -94,7 +98,7 @@ APIs above can be requested for free. More POST APIs need that the requester pai
 }
 ```
 - Encrypt and decrypt with the [Code of AES algorithm in java](https://github.com/nobodyoffc/FCH-FEIP-APIP/blob/master/FC-SDK/src/main/java/AesEcc/AES256.java)
-xample:
+- Example:
 ```
 		plain text(utf-8) = {"data":"test"}
 		symKey(hex) = 7904517bd0c5646aeb861b1475bc4d7801a156b9950d0fadaa3b2196c7cd4c08
@@ -133,15 +137,15 @@ See [APIP1V1_OpenAPI(zh-CN)](https://github.com/nobodyoffc/FCH-FEIP-APIP/blob/ma
 ```
 However, most APIs can be requested without "fcdsl" to list first 20 items in the default sort.
 	
-You can build your own FCH parser, FEIP parser, and APIP service. See 
+You can build your own FCH parser, FEIP parser, and APIP service. See [https://github.com/nobodyoffc/FCH-FEIP-APIP/blob/master/Doc/Guide/ApipServerGuide-v1.md](https://github.com/nobodyoffc/FCH-FEIP-APIP/blob/master/Doc/Guide/ApipServerGuide-v1.md)
 	
-	* Response header:
+* Response header:
 ```
 		Code = <The same code as in request body, but in string>.
 		Sign = < The sha256x2 value of the bytes of `Response body` with your sessionKey added to the end>
 ```
 
-	* Response body:
+* Response body:
 ```
 {
 	"code": 0,

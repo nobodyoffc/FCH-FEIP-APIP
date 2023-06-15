@@ -12,13 +12,13 @@ UpdateDate: 2023-06-15
 
 ## 0. Download resources
 
-	1. All the documents including APIP, FEIP, and FIPA protocols can be found at [https://github.com/nobodyoffc/FCH-FEIP-APIP/tree/master/Doc ](https://github.com/nobodyoffc/FCH-FEIP-APIP/tree/master/Doc )
-	2. Freecash node: [https://github.com/freecashorg/freecash/releases ](https://github.com/freecashorg/freecash/releases )
-	3. FchParser: [https://cid.cash/download/FchParser.jar](https://cid.cash/download/FchParser.jar)
-	4. FeipParser: [https://cid.cash/download/FeipParser.jar](https://cid.cash/download/FeipParser.jar)
-	5. ApipManager: [https://cid.cash/download/ApipManager.jar](https://cid.cash/download/ApipManager.jar)
-	6. ApipServer: [https://cid.cash/download/APIP.war](https://cid.cash/download/APIP.war)
-	7. FcTools: [https://cid.cash/download/FcTools.jar](https://cid.cash/download/FcTools.jar)
+1. All the documents including APIP, FEIP, and FIPA protocols can be found at [https://github.com/nobodyoffc/FCH-FEIP-APIP/tree/master/Doc ](https://github.com/nobodyoffc/FCH-FEIP-APIP/tree/master/Doc )
+2. Freecash node: [https://github.com/freecashorg/freecash/releases ](https://github.com/freecashorg/freecash/releases )
+3. FchParser: [https://cid.cash/download/FchParser.jar](https://cid.cash/download/FchParser.jar)
+4. FeipParser: [https://cid.cash/download/FeipParser.jar](https://cid.cash/download/FeipParser.jar)
+5. ApipManager: [https://cid.cash/download/ApipManager.jar](https://cid.cash/download/ApipManager.jar)
+6. ApipServer: [https://cid.cash/download/APIP.war](https://cid.cash/download/APIP.war)
+7. FcTools: [https://cid.cash/download/FcTools.jar](https://cid.cash/download/FcTools.jar)
 
 ## 1. System
 
@@ -347,22 +347,21 @@ A password will be required. Remember it.
 		3. totals       // the totals of all indices in ES
 * Blockchain
 	- APIP2V1_Blockchain
-		4. blockByIds
-		5. blockSearch
-		6. cashByIds
-		7. cashSearch
-		8. TxHasByIds
-		9. cashValid
-		10. txByIds
-		11. txSearch
-		12. blockHasByIds
-		13. opReturnByIds
-		14. opReturnSearch
-		15. addressByIds
-		16. addressSearch
-		17. p2shByIds
-		18. p2shSearch
-
+        1. blockByIds
+        2. blockSearch
+        3. cashByIds
+        4. cashSearch
+        5. TxHasByIds
+        6. cashValid
+        7. txByIds
+        8. txSearch
+        9. blockHasByIds
+        10. opReturnByIds
+        11. opReturnSearch
+        12. addressByIds
+        13. addressSearch
+        14. p2shByIds
+        15. p2shSearch
 * CidInfo
 	- APIP3V1_CidInfo
 		19. cidInfoByIds
@@ -373,52 +372,36 @@ A password will be required. Remember it.
 		24. homepageHistory
 		25. noticeFeeHistory
 		26. reputationHistory
-
 *  Construct
-
 	- APIP4V1_Protocol
-
 		27. protocolByIds
 		28. protocolSearch
 		29. protocolOpHistory
 		30. protocolRateHistory
-
 	- APIP5V1_Code
-
 		31. codeByIds
 		32. codeSearch
 		33. codeOpHistory
 		34. codeRateHistory
-
-
 	- APIP6V1_Service
-
 		35. serviceByIds
 		36. serviceSearch
 		37. serviceOpHistory
 		38. serviceRateHistory
-
-
 	- APIP7V1_App
-
 		39. appByIds
 		40. appSearch
 		41. appOpHistory
 		42. appRateHistory
-
 * Organization
-
 	- APIP8V1_Group
-
 		43. groupByIds
 		44. groupSearch
 		45. groupOpHistory
 		46. groupMembers
 		47. groupExMembers
 		48. myGroups
-
 	- APIP9V1_Team
-
 		49. teamByIds
 		50. teamSearch
 		51. teamOpHistory
@@ -427,49 +410,32 @@ A password will be required. Remember it.
 		54. teamOtherPersons
 		55. myTeams
 		56. teamRateHistory
-
 * Personal
-
 	- APIP10V1_Box
-
 		57. boxByIds
 		58. boxSearch
 		59. boxHistory
-
 	- APIP11V1_Contact
-
 		60. contacts
 		61. contactsDeleted
 	- APIP12V1_Secret
-
 		62. secrets
 		63. secretsDeleted
-
 	- APIP13V1_Mail
-	
 		64. mails
 		65. mailsDeleted
 		66. mailThread
-
 * Public
-
 	- APIP14V1_Proof
-
 		67. proofByIds
 		68. proofSearch
 		69. proofHistory
-
 	- APIP15V1_Statement
-
 		70. statements
 		71. statementSearch
-
 	- APIP17V1_Avatar
-
 		72. avatars
-
 	- APIP18V1_Wallet
-
 		73. unconfirmed
 		74. cashValidLive
 		75. cashValidForCd
@@ -480,7 +446,6 @@ A password will be required. Remember it.
 ## 11. Indices in ES
 	
 * FCH
-
 	1. block
 	2. block_has
 	3. tx
@@ -490,9 +455,7 @@ A password will be required. Remember it.
 	7. address
 	8. p2sh
 	9. block_mark
-	
 * FEIP
-
 	10. cid
 	11. cid_history
 	12. reputation_history
@@ -517,7 +480,5 @@ A password will be required. Remember it.
 	31. proof
 	32. proof_history
 	33. parse_mark
-
 * APIP
-
 	34. order
