@@ -36,9 +36,9 @@ APIs above can be requested for free. More POST APIs need that the requester pai
 
 ## Buy service and SignIn:
 
-### Before requesting POST APIs for data, you have to:
+Before requesting POST APIs for data, you have to:
 
-(1) Buy service: send more than 1 fch to `FUmo2eez6VK2sfGWjek9i9aK5y1mdHSnqv` with below JSON attatched:
+(1) *Buy service*: send more than 1 fch to `FUmo2eez6VK2sfGWjek9i9aK5y1mdHSnqv` with below JSON attatched:
 
 ```
 {
@@ -54,14 +54,14 @@ APIs above can be requested for free. More POST APIs need that the requester pai
 }
 ```
 
-(2) SignIn: POST https://cid.cash/APIP/apip1/v1/signIn
+(2) *SignIn*: POST https://cid.cash/APIP/apip0/v1/signIn
 		
 * Request header:
 
 ```
 		Sign = < The signature of `Request body` with the private Key of the pubKey in Request body also of the payer of the service. The sign algorithm is the same as in Bitcoin-Qt>
 ```
-			Signature example:
+Signature example:
 ```
 	pubKey(hex) = 030be1d7e633feb2338a74a860e76d893bac525f35a5813cb7b21e27ba1bc8312a
 	priKey(base58check) = L2bHRej6Fxxipvb4TiR5bu1rkT3tRp8yWEsUy4R1Zb8VMm2x7sd8
@@ -73,7 +73,7 @@ APIs above can be requested for free. More POST APIs need that the requester pai
 * Request body:
 ```
 {
-	"url": "https://cid.cash/APIP/apip1/v1/signIn",
+	"url": "https://cid.cash/APIP/apip0/v1/signIn",
 	"pubKey": <string. the public key of the fch address used when you baid this service>,
 	"nonce": <int. random int>,
 	"time": <long. timestamp in millisecond when you are requesting>
@@ -97,7 +97,7 @@ APIs above can be requested for free. More POST APIs need that the requester pai
 	}
 }
 ```
-- Encrypt and decrypt with the [Code of AES algorithm in java](https://github.com/nobodyoffc/FCH-FEIP-APIP/blob/master/FC-SDK/src/main/java/AesEcc/AES256.java)
+- Encrypt and decrypt with the [Code of ECC algorithm in java](https://github.com/nobodyoffc/FCH-FEIP-APIP/blob/master/FC-SDK/src/main/java/AesEcc/ECC256.java)
 - Example:
 ```
 		plain text(utf-8) = {"data":"test"}
@@ -106,11 +106,11 @@ APIs above can be requested for free. More POST APIs need that the requester pai
 ```
 
 There may also be some error codes and messeges if your request is unqualified.
-See [APIP1V1_OpenAPI(zh-CN)](https://github.com/nobodyoffc/FCH-FEIP-APIP/blob/master/Doc/APIP-document/APIP1V1_OpenAPI(zh-CN).md)
+See [APIP0V1_OpenAPI(zh-CN)](https://github.com/nobodyoffc/FCH-FEIP-APIP/blob/master/Doc/APIP-document/APIP1V1_OpenAPI(zh-CN).md)
 
 ### Request POST API
 
-* URL: POST https://cid.cash/APIP/apip1/v1/<API name>
+* URL: POST https://cid.cash/APIP/ <urlTail assigned in APIP protocols>
 * Request header:
 ```
 	Sign = < The sha256x2 value of the bytes of `Request body` with your sessionKey added to the end>
@@ -127,11 +127,11 @@ See [APIP1V1_OpenAPI(zh-CN)](https://github.com/nobodyoffc/FCH-FEIP-APIP/blob/ma
 
 ```
 {
-	"url": <string. https://cid.cash/APIP/apip1/v1/<API name>. required>,
+	"url": <string. https://cid.cash/APIP/<urlTail assigned in APIP protocols>,
 	"time": <long. timestamp in millisecond when you are requesting>,
 	"nonce": <int. random int>,
     "fcdsl":{
-        <object. Simplified Query languge for FreeConsensus based on ElasticSearch DSL. See [APIP1V1_OpenAPI(zh-CN)](https://github.com/nobodyoffc/FCH-FEIP-APIP/blob/master/Doc/APIP-document/APIP1V1_OpenAPI(zh-CN).md)>
+        <object. Simplified Query languge for FreeConsensus based on ElasticSearch DSL. See [APIP0V1_OpenAPI(zh-CN)](https://github.com/nobodyoffc/FCH-FEIP-APIP/blob/master/Doc/APIP-document/APIP0V1_OpenAPI(zh-CN).md)>
     }
 }
 ```
@@ -188,58 +188,59 @@ You can build your own FCH parser, FEIP parser, and APIP service. See [https://g
 24. homepageHistory
 25. noticeFeeHistory
 26. reputationHistory
-27. protocolByIds
-28. protocolSearch
-29. protocolOpHistory
-30. protocolRateHistory
-31. codeByIds
-32. codeSearch
-33. codeOpHistory
-34. codeRateHistory
-35. serviceByIds
-36. serviceSearch
-37. serviceOpHistory
-38. serviceRateHistory
-39. appByIds
-40. appSearch
-41. appOpHistory
-42. appRateHistory
-43. groupByIds
-44. groupSearch
-45. groupOpHistory
-46. groupMembers
-47. groupExMembers
-48. myGroups
-49. teamByIds
-50. teamSearch
-51. teamOpHistory
-52. teamMembers
-53. teamExMembers
-54. teamOtherPersons
-55. myTeams
-56. teamRateHistory
-57. boxByIds
-58. boxSearch
-59. boxHistory
-60. contacts
-61. contactsDeleted
-62. secrets
-63. secretsDeleted
-64. mails
-65. mailsDeleted
-66. mailThread
-67. proofByIds
-68. proofSearch
-69. proofHistory
-70. statements
-71. statementSearch
-72. avatars
-73. unconfirmed
-74. cashValidLive
-75. cashValidForCd
-76. cashValidForPay
-77. decodeRawTx
-78. broadcastTx
+27. nobodys
+28. protocolByIds
+29. protocolSearch
+30. protocolOpHistory
+31. protocolRateHistory
+32. codeByIds
+33. codeSearch
+34. codeOpHistory
+35. codeRateHistory
+36. serviceByIds
+37. serviceSearch
+38. serviceOpHistory
+39. serviceRateHistory
+40. appByIds
+41. appSearch
+42. appOpHistory
+43. appRateHistory
+44. groupByIds
+45. groupSearch
+46. groupOpHistory
+47. groupMembers
+48. groupExMembers
+49. myGroups
+50. teamByIds
+51. teamSearch
+52. teamOpHistory
+53. teamMembers
+54. teamExMembers
+55. teamOtherPersons
+56. myTeams
+57. teamRateHistory
+58. boxByIds
+59. boxSearch
+60. boxHistory
+61. contacts
+62. contactsDeleted
+63. secrets
+64. secretsDeleted
+65. mails
+66. mailsDeleted
+67. mailThread
+68. proofByIds
+69. proofSearch
+70. proofHistory
+71. statements
+72. statementSearch
+73. avatars
+74. unconfirmed
+75. cashValidLive
+76. cashValidForCd
+77. cashValidForPay
+78. decodeRawTx
+79. broadcastTx
 
 ## Indices in ES
 

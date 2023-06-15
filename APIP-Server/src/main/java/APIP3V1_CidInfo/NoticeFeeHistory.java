@@ -1,8 +1,9 @@
 package APIP3V1_CidInfo;
 
-import APIP1V1_OpenAPI.*;
-import fc_dsl.Fcdsl;
+import APIP0V1_OpenAPI.*;
+import APIP1V1_FCDSL.Fcdsl;
 import identity.CidHist;
+import initial.Initiator;
 import startFEIP.IndicesFEIP;
 
 import javax.servlet.ServletException;
@@ -15,7 +16,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import fc_dsl.Sort;
+import APIP1V1_FCDSL.Sort;
 import static api.Constant.*;
 
 @WebServlet(APIP3V1Path +NoticeFeeHistoryAPI)
@@ -66,8 +67,8 @@ public class NoticeFeeHistory extends HttpServlet {
         //response
         replier.setData(meetList);
         replier.setGot(meetList.size());
-        esRequest.writeSuccess(dataCheckResult.getSessionKey());
-
+        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", NoticeFeeHistoryAPI));
+        esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
         return;
     }
 }

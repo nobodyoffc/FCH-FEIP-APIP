@@ -1,4 +1,4 @@
-package APIP1V1_OpenAPI;
+package APIP0V1_OpenAPI;
 
 import AesEcc.ECIES;
 import AesEcc.EXPList;
@@ -54,7 +54,7 @@ import static api.Constant.*;
  *    所有响应均按照service公布的pricePerRequest扣除fid所对应的balance。
  * */
 
-@WebServlet(APIP1V1Path + SignInAPI)
+@WebServlet(APIP0V1Path + SignInAPI)
 public class SignInAPI extends HttpServlet {
     private static Jedis jedis1 = Initiator.jedis1Session;
     private static Jedis jedis0 = Initiator.jedis0Common;

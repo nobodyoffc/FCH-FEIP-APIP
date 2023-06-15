@@ -1,6 +1,6 @@
 package APIP3V1_CidInfo;
 
-import APIP1V1_OpenAPI.*;
+import APIP0V1_OpenAPI.*;
 import FchClass.Address;
 import data.CidInfo;
 import FeipClass.Cid;

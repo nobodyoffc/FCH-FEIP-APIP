@@ -1,8 +1,17 @@
-package fc_dsl;
+package APIP1V1_FCDSL;
 
-public class Match {
+public class Part {
     private String[] fields;
     private String value;
+    private String isCaseInsensitive;
+
+    public String getIsCaseInsensitive() {
+        return isCaseInsensitive;
+    }
+
+    public void setIsCaseInsensitive(String isCaseInsensitive) {
+        this.isCaseInsensitive = isCaseInsensitive;
+    }
 
     public String[] getFields() {
         return fields;

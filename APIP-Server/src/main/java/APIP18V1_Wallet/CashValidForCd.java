@@ -1,6 +1,6 @@
 package APIP18V1_Wallet;
 
-import APIP1V1_OpenAPI.*;
+import APIP0V1_OpenAPI.*;
 import FchClass.Cash;
 import initial.Initiator;
 import startFCH.IndicesFCH;

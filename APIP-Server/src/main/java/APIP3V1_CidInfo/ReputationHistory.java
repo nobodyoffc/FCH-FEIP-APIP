@@ -1,7 +1,8 @@
 package APIP3V1_CidInfo;
 
-import APIP1V1_OpenAPI.*;
+import APIP0V1_OpenAPI.*;
 import identity.RepuHist;
+import initial.Initiator;
 import startFEIP.IndicesFEIP;
 
 import javax.servlet.ServletException;
@@ -14,7 +15,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import fc_dsl.Sort;
+import APIP1V1_FCDSL.Sort;
 import static api.Constant.*;
 
 @WebServlet(APIP3V1Path +ReputationHistoryAPI)
@@ -60,7 +61,8 @@ public class ReputationHistory extends HttpServlet {
         //response
         replier.setData(meetList);
         replier.setGot(meetList.size());
-        esRequest.writeSuccess(dataCheckResult.getSessionKey());
+        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ReputationHistoryAPI));
+        esRequest.writeSuccess(dataCheckResult.getSessionKey(),nPrice);
 
     }
 }

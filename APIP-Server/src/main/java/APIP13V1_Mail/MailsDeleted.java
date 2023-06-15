@@ -1,9 +1,9 @@
 package APIP13V1_Mail;
 
-import APIP1V1_OpenAPI.*;
-import fc_dsl.Fcdsl;
-import fc_dsl.Filter;
-import fc_dsl.Terms;
+import APIP0V1_OpenAPI.*;
+import APIP1V1_FCDSL.Fcdsl;
+import APIP1V1_FCDSL.Filter;
+import APIP1V1_FCDSL.Terms;
 import initial.Initiator;
 import FeipClass.Mail;
 import startFEIP.IndicesFEIP;
@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.ArrayList;
-import fc_dsl.Sort;
+import APIP1V1_FCDSL.Sort;
 import static api.Constant.*;
 
 

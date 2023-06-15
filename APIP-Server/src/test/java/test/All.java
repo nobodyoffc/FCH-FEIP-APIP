@@ -1,9 +1,9 @@
 package test;
 
-import APIP1V1_OpenAPI.DataCheckResult;
-import APIP1V1_OpenAPI.DataRequestHandler;
-import APIP1V1_OpenAPI.Replier;
-import APIP1V1_OpenAPI.RequestChecker;
+import APIP0V1_OpenAPI.DataCheckResult;
+import APIP0V1_OpenAPI.DataRequestHandler;
+import APIP0V1_OpenAPI.Replier;
+import APIP0V1_OpenAPI.RequestChecker;
 import FchClass.Address;
 import startFCH.IndicesFCH;
 

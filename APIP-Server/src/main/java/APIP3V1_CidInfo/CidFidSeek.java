@@ -1,6 +1,6 @@
 package APIP3V1_CidInfo;
 
-import APIP1V1_OpenAPI.*;
+import APIP0V1_OpenAPI.*;
 import FeipClass.Cid;
 import initial.Initiator;
 import startFEIP.IndicesFEIP;
@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import fc_dsl.Sort;
+import APIP1V1_FCDSL.Sort;
 import static api.Constant.*;
 
 @WebServlet(APIP3V1Path + FidCidSeekAPI)

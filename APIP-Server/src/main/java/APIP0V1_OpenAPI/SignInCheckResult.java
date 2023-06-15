@@ -1,4 +1,4 @@
-package APIP1V1_OpenAPI;
+package APIP0V1_OpenAPI;
 
 public class SignInCheckResult {
 

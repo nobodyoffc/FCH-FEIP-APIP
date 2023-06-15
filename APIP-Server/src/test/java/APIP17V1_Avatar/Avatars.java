@@ -1,7 +1,7 @@
 package APIP17V1_Avatar;
 
-import APIP1V1_OpenAPI.*;
-import fc_dsl.Fcdsl;
+import APIP0V1_OpenAPI.*;
+import APIP1V1_FCDSL.Fcdsl;
 import initial.Initiator;
 import startAPIP.RedisKeys;
 

@@ -1,9 +1,7 @@
 package APIP9V1_Team;
 
-import APIP1V1_OpenAPI.*;
-import fc_dsl.Fcdsl;
-import fc_dsl.Query;
-import fc_dsl.Terms;
+import APIP0V1_OpenAPI.*;
+import APIP1V1_FCDSL.Fcdsl;
 import initial.Initiator;
 import organize.TeamHistory;
 import startFEIP.IndicesFEIP;
@@ -18,7 +16,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import fc_dsl.Sort;
+import APIP1V1_FCDSL.Sort;
 import static api.Constant.*;
 
 

@@ -1,9 +1,6 @@
 package APIP8V1_Group;
 
-import APIP1V1_OpenAPI.*;
-import fc_dsl.Except;
-import fc_dsl.Fcdsl;
-import fc_dsl.Terms;
+import APIP0V1_OpenAPI.*;
 import initial.Initiator;
 import organize.GroupHistory;
 import startFEIP.IndicesFEIP;
@@ -16,11 +13,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.ArrayList;
-import fc_dsl.Sort;
+
+import APIP1V1_FCDSL.Sort;
 import static api.Constant.*;
 
 

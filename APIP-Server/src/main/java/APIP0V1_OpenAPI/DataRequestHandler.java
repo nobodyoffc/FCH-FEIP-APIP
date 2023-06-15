@@ -1,11 +1,13 @@
-package APIP1V1_OpenAPI;
+package APIP0V1_OpenAPI;
 
+import APIP1V1_FCDSL.*;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.FieldSort;
 import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.SortOptions;
 import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.query_dsl.*;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.MgetResponse;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
@@ -15,9 +17,7 @@ import co.elastic.clients.elasticsearch.core.search.TrackHits;
 import co.elastic.clients.json.JsonData;
 import javaTools.BytesTools;
 import cryptoTools.SHA;
-import fcTools.ParseTools;
-import fc_dsl.Fcdsl;
-import fc_dsl.Sort;
+import APIP1V1_FCDSL.Sort;
 import initial.Initiator;
 
 import javax.servlet.http.HttpServletResponse;
@@ -69,19 +69,19 @@ public class DataRequestHandler {
             }else {
                 List<Query> queryList = null;
                 if(fcdsl.getQuery()!=null) {
-                    fc_dsl.Query query = fcdsl.getQuery();
+                    APIP1V1_FCDSL.Query query = fcdsl.getQuery();
                     queryList = getQueryList(query);
                 }
                 
                 List<Query> filterList = null;
                 if(fcdsl.getFilter()!=null) {
-                    fc_dsl.Filter fcFilter = fcdsl.getFilter();
+                    Filter fcFilter = fcdsl.getFilter();
                     filterList = getQueryList(fcFilter);
                 }
                 
                 List<Query> exceptList = null;
                 if(fcdsl.getExcept()!=null) {
-                    fc_dsl.Except fcExcept = fcdsl.getExcept();
+                    Except fcExcept = fcdsl.getExcept();
                     exceptList = getQueryList(fcExcept);
                 }
 
@@ -171,7 +171,7 @@ public class DataRequestHandler {
 
     }
 
-    private List<Query> getQueryList(fc_dsl.Query query) {
+    private List<Query> getQueryList(APIP1V1_FCDSL.Query query) {
         BoolQuery termsQuery;
         BoolQuery partQuery;
         BoolQuery matchQuery;
@@ -266,7 +266,7 @@ public class DataRequestHandler {
         }else return meetList;
     }
 
-    private BoolQuery getMatchQuery(fc_dsl.Match match) {
+    private BoolQuery getMatchQuery(Match match) {
         BoolQuery.Builder bBuilder = new BoolQuery.Builder();
         if(match.getValue()==null)return null;
         if(match.getFields()==null || match.getFields().length==0)return null;
@@ -308,7 +308,7 @@ public class DataRequestHandler {
         return ueBuilder.mustNot(queryList).build();
     }
 
-    private BoolQuery getEqualQuery(fc_dsl.Equals equals) {
+    private BoolQuery getEqualQuery(Equals equals) {
         if(equals.getValues()==null|| equals.getFields()==null)return null;
 
         BoolQuery.Builder boolBuilder;
@@ -340,7 +340,7 @@ public class DataRequestHandler {
         return  boolBuilder.build();
     }
 
-    private BoolQuery getRangeQuery(fc_dsl.Range range) {
+    private BoolQuery getRangeQuery(Range range) {
         if(range.getFields()==null)return null;
 
         String[] fields = range.getFields();
@@ -382,7 +382,7 @@ public class DataRequestHandler {
         return bBuilder.build();
     }
 
-    private BoolQuery getPartQuery(fc_dsl.Part part) {
+    private BoolQuery getPartQuery(Part part) {
         BoolQuery.Builder partBoolBuilder = new BoolQuery.Builder();
         boolean isCaseInSensitive;
         try{
@@ -425,7 +425,7 @@ public class DataRequestHandler {
         return soList;
     }
 
-    private BoolQuery getTermsQuery(fc_dsl.Terms terms) {
+    private BoolQuery getTermsQuery(Terms terms) {
         BoolQuery.Builder termsBoolBuider;
 
         List<FieldValue> valueList = new ArrayList<>();

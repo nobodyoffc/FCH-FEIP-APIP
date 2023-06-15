@@ -1,6 +1,6 @@
 package test;
 
-import APIP1V1_OpenAPI.*;
+import APIP0V1_OpenAPI.*;
 import FchClass.Address;
 import startFCH.IndicesFCH;
 

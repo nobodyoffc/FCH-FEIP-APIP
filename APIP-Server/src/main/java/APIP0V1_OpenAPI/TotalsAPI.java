@@ -1,4 +1,4 @@
-package APIP1V1_OpenAPI;
+package APIP0V1_OpenAPI;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.cat.IndicesResponse;
@@ -18,7 +18,7 @@ import java.util.Map;
 
 import static api.Constant.*;
 
-@WebServlet(APIP1V1Path + TotalsAPI)
+@WebServlet(APIP0V1Path + TotalsAPI)
 public class TotalsAPI extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

@@ -1,6 +1,6 @@
-package fc_dsl;
+package APIP1V1_FCDSL;
 
-public class Equals {
+public class Terms {
     private String[] fields;
     private String[] values;
 

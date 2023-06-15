@@ -1,8 +1,8 @@
 package APIP2V1_Blockchain;
 
-import APIP1V1_OpenAPI.*;
+import APIP0V1_OpenAPI.*;
 import FchClass.Cash;
-import fc_dsl.Sort;
+import APIP1V1_FCDSL.Sort;
 import initial.Initiator;
 import startFCH.IndicesFCH;
 

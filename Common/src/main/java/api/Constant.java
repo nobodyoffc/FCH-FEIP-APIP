@@ -41,6 +41,7 @@ public class Constant {
     }
 
     //APIP path
+    public static final String APIP0V1Path = "/apip0/v1/";
     public static final String APIP1V1Path = "/apip1/v1/";
     public static final String APIP2V1Path = "/apip2/v1/";
     public static final String APIP3V1Path = "/apip3/v1/";
@@ -96,6 +97,7 @@ public class Constant {
     public static final String HomepageHistoryAPI = "homepageHistory";
     public static final String NoticeFeeHistoryAPI = "noticeFeeHistory";
     public static final String ReputationHistoryAPI = "reputationHistory";
+    public static final String NobodysAPI = "nobodys";
     public static final String P2shByIdsAPI = "p2shByIds";
     public static final String P2shSearchAPI = "p2shSearch";
 
@@ -247,6 +249,7 @@ public class Constant {
         apiList.add(HomepageHistoryAPI);
         apiList.add(NoticeFeeHistoryAPI);
         apiList.add(ReputationHistoryAPI);
+        apiList.add(NobodysAPI);
 
 
         apiList.add(ProtocolByIdsAPI);

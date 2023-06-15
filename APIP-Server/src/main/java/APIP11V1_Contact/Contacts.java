@@ -1,10 +1,10 @@
 package APIP11V1_Contact;
 
-import APIP1V1_OpenAPI.*;
+import APIP0V1_OpenAPI.*;
 import FeipClass.Contact;
-import fc_dsl.Fcdsl;
-import fc_dsl.Filter;
-import fc_dsl.Terms;
+import APIP1V1_FCDSL.Fcdsl;
+import APIP1V1_FCDSL.Filter;
+import APIP1V1_FCDSL.Terms;
 import initial.Initiator;
 import startFEIP.IndicesFEIP;
 
@@ -18,7 +18,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import fc_dsl.Sort;
+import APIP1V1_FCDSL.Sort;
 import static api.Constant.*;
 
 

@@ -827,3 +827,83 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
   ]
 }
 ```
+
+## nobodys
+
+### 说明
+
+搜索已经在链上公布私钥的nobody。
+
+### 默认排序
+
+- height: desc
+- index: desc
+
+### Request body
+```
+{
+	"url": <string. urlHead+urlTail. 必填>,
+	"time": <long. 时间戳,精确到毫秒. 必填>,
+	"nonce": <long. 随机数. 必填>,
+    "fcdsl":{
+        <查询语句>
+    }
+}
+```
+### data in response body
+```
+[
+	{
+		"txId": <string. txid where the record is located>,
+		"height": <long. block height>,
+		"index": <int. index of the transaction in the block>,
+		"time": <long. block timestamp>,
+		"sn": "9",
+		"ver": <int. protocol version>,
+		"signer": <the signer of this transaction>,
+		"priKey": <string. private key>
+	}
+]
+
+```
+### 示例
+- request body
+```json
+{
+  "url": "http://localhost:8080/APIP/apip3/v1/nobodys",
+  "time": 1677673821267,
+  "nonce": 237,
+  "fcdsl": {
+    "size":"5"
+  }
+}
+```
+
+- response body
+```json
+{
+  "code": 0,
+  "message": "Success.",
+  "nonce": 237,
+  "balance": 980000000,
+  "got": 1,
+  "total": 1,
+  "bestHeight": 1786683,
+  "data": [
+    {
+      "txId": "a6971b8c2967804e596e324d6d9f0a14b6b88df7af5c1c3ea4ee9bc0f538ccaf",
+      "height": 1567767,
+      "index": 1,
+      "time": 1673083950,
+      "sn": "4",
+      "ver": "1",
+      "signer": "FEk41Kqjar45fLDriztUDTUkdki7mmcjWK",
+      "priKey": "L2bHRej6Fxxipvb4TiR5bu1rkT3tRp8yWEsUy4R1Zb8VMm2x7sd8"
+    }
+  ],
+  "last": [
+    "1567767",
+    "1"
+  ]
+}
+```

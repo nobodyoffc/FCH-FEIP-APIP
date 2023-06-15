@@ -1,6 +1,11 @@
-package APIP1V1_OpenAPI;
+package APIP3V1_CidInfo;
 
+import APIP0V1_OpenAPI.*;
+import APIP1V1_FCDSL.Fcdsl;
+import APIP1V1_FCDSL.Sort;
+import identity.CidHist;
 import initial.Initiator;
+import startFEIP.IndicesFEIP;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -9,13 +14,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.List;
 
 import static api.Constant.*;
 
-@WebServlet(APIP1V1Path + GeneralAPI)
-public class GeneralAPI extends HttpServlet {
+@WebServlet(APIP3V1Path +NobodysAPI)
+public class Nobodys extends HttpServlet {
 
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
@@ -33,18 +40,20 @@ public class GeneralAPI extends HttpServlet {
         DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
 
         //Check API
-        if(!isThisApiRequest(requestBody)){
-            response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
-            writer.write(replier.reply1012BadQuery(addr));
-            return;
-        }
-        //Request
-        String index = requestBody.getFcdsl().getIndex();
 
+        //Add filter
+        if(requestBody.getFcdsl()==null)requestBody.setFcdsl(new Fcdsl());
+        requestBody.getFcdsl().setFilterTerms("sn","4");
+
+
+        //Set default sort.
+        ArrayList<Sort> sort =Sort.makeSortList("height",false,"index",false,null,null);
+
+        //Request
         DataRequestHandler esRequest = new DataRequestHandler(dataCheckResult.getAddr(),requestBody,response,replier);
-        List<Object> meetList;
+        List<CidHist> meetList;
         try {
-            meetList = esRequest.doRequest(index,null, Object.class);
+            meetList = esRequest.doRequest(IndicesFEIP.CidHistIndex, sort, CidHist.class);
             if(meetList==null){
                 return;
             }
@@ -58,17 +67,7 @@ public class GeneralAPI extends HttpServlet {
         //response
         replier.setData(meetList);
         replier.setGot(meetList.size());
-        if(replier.getTotal()==0)replier.setTotal(meetList.size());
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", GroupByIdsAPI));
+        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", NobodysAPI));
         esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
-
-    }
-    private boolean isThisApiRequest(DataRequestBody requestBody) {
-        if(requestBody.getFcdsl()==null)
-            return false;
-        if(requestBody.getFcdsl().getIndex()==null)
-            return false;
-        return true;
     }
 }
-

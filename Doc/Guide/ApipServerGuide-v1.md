@@ -341,7 +341,7 @@ A password will be required. Remember it.
 ## 10. POST API list
 
 * OpenAPI
-	- APIP1V1_OpenAPI
+	- APIP0V1_OpenAPI
 		1. signIn		// signIn to get sessionKey.
 		2. general		// for all fcdsl queries on a given ES index.
 		3. totals       // the totals of all indices in ES
@@ -364,84 +364,85 @@ A password will be required. Remember it.
         15. p2shSearch
 * CidInfo
 	- APIP3V1_CidInfo
-		19. cidInfoByIds
-		20. cidByIds
-		21. fidCidSeek
-		22. cidInfoSearch
-		23. cidHistory
-		24. homepageHistory
-		25. noticeFeeHistory
-		26. reputationHistory
+        1. cidInfoByIds
+        2. cidByIds
+        3. fidCidSeek
+        4. cidInfoSearch
+        5. cidHistory
+        6. homepageHistory
+        7. noticeFeeHistory
+        8. reputationHistory
+        9. nobodys
 *  Construct
 	- APIP4V1_Protocol
-		27. protocolByIds
-		28. protocolSearch
-		29. protocolOpHistory
-		30. protocolRateHistory
+        1. protocolByIds
+        2. protocolSearch
+        3. protocolOpHistory
+        4. protocolRateHistory
 	- APIP5V1_Code
-		31. codeByIds
-		32. codeSearch
-		33. codeOpHistory
-		34. codeRateHistory
+        1. codeByIds
+        2. codeSearch
+        3. codeOpHistory
+        4. codeRateHistory
 	- APIP6V1_Service
-		35. serviceByIds
-		36. serviceSearch
-		37. serviceOpHistory
-		38. serviceRateHistory
+        1. serviceByIds
+        2. serviceSearch
+        3. serviceOpHistory
+        4. serviceRateHistory
 	- APIP7V1_App
-		39. appByIds
-		40. appSearch
-		41. appOpHistory
-		42. appRateHistory
+        1. appByIds
+        2. appSearch
+        3. appOpHistory
+        4. appRateHistory
 * Organization
 	- APIP8V1_Group
-		43. groupByIds
-		44. groupSearch
-		45. groupOpHistory
-		46. groupMembers
-		47. groupExMembers
-		48. myGroups
+        1. groupByIds
+        2. groupSearch
+        3. groupOpHistory
+        4. groupMembers
+        5. groupExMembers
+        6. myGroups
 	- APIP9V1_Team
-		49. teamByIds
-		50. teamSearch
-		51. teamOpHistory
-		52. teamMembers
-		53. teamExMembers
-		54. teamOtherPersons
-		55. myTeams
-		56. teamRateHistory
+        1. teamByIds
+        2. teamSearch
+        3. teamOpHistory
+        4. teamMembers
+        5. teamExMembers
+        6. teamOtherPersons
+        7. myTeams
+        8. teamRateHistory
 * Personal
 	- APIP10V1_Box
-		57. boxByIds
-		58. boxSearch
-		59. boxHistory
+        1. boxByIds
+        2. boxSearch
+        3. boxHistory
 	- APIP11V1_Contact
-		60. contacts
-		61. contactsDeleted
+        1. contacts
+        2. contactsDeleted
 	- APIP12V1_Secret
-		62. secrets
-		63. secretsDeleted
+        1. secrets
+        2. secretsDeleted
 	- APIP13V1_Mail
-		64. mails
-		65. mailsDeleted
-		66. mailThread
+        1. mails
+        2. mailsDeleted
+        3. mailThread
 * Public
 	- APIP14V1_Proof
-		67. proofByIds
-		68. proofSearch
-		69. proofHistory
+        1. proofByIds
+        2. proofSearch
+        3. proofHistory
 	- APIP15V1_Statement
-		70. statements
-		71. statementSearch
+        1. statements
+        2. statementSearch
 	- APIP17V1_Avatar
-		72. avatars
+        1. avatars
 	- APIP18V1_Wallet
-		73. unconfirmed
-		74. cashValidLive
-		75. cashValidForCd
-		76. cashValidForPay
-		77. decodeRawTx
-		78. broadcastTx
+        1. unconfirmed
+        2. cashValidLive
+        3. cashValidForCd
+        4. cashValidForPay
+        5. decodeRawTx
+        6. broadcastTx
 
 ## 11. Indices in ES
 	
@@ -456,29 +457,29 @@ A password will be required. Remember it.
 	8. p2sh
 	9. block_mark
 * FEIP
-	10. cid
-	11. cid_history
-	12. reputation_history
-	13. protocol
-	14. code
-	15. service
-	16. app
-	17. protocol_history
-	18. code_history
-	19. service_history
-	20. app_history
-	21. contact
-	22. mail
-	23. secret
-	24. box
-	25. box_history
-	26. group
-	27. team
-	28. group_history
-	29. team_history
-	30. statement
-	31. proof
-	32. proof_history
-	33. parse_mark
+    1. cid
+    2. cid_history
+    3. reputation_history
+    4. protocol
+    5. code
+    6. service
+    7. app
+    8. protocol_history
+    9. code_history
+    10. service_history
+    11. app_history
+    12. contact
+    13. mail
+    14. secret
+    15. box
+    16. box_history
+    17. group
+    18. team
+    19. group_history
+    20. team_history
+    21. statement
+    22. proof
+    23. proof_history
+    24. parse_mark
 * APIP
-	34. order
+    1. order
