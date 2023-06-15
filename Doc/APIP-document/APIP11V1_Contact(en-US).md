@@ -110,7 +110,7 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
   
 ```json
 {
-   "url": "http://localhost:8080/APIP/apip11/v1/contacts",
+   "url": "https://cid.cash/APIP/apip11/v1/contacts",
    "time": 1677673821267,
    "nonce": 1987697,
    "fcdsl":{
@@ -205,7 +205,7 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
   
 ```json
 {
-   "url": "http://localhost:8080/APIP/apip11/v1/contactsDeleted",
+   "url": "https://cid.cash/APIP/apip11/v1/contactsDeleted",
    "time": 1677673821267,
    "nonce": 1987697,
    "fcdsl":{

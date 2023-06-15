@@ -1,6 +1,6 @@
 package Test;
 
-import AesEcc.AES256;
+import AesEcc.AES128;
 import AesEcc.ECIES;
 import AesEcc.EXPList;
 import com.googlecode.jsonrpc4j.Base64;
@@ -69,12 +69,12 @@ public class Test {
 //		System.out.println(AES256.byteToHexString(kee.getBytes()));
 //		System.out.println("new :"+AES256.encrypt(plainText,kee));
 
-		String cyphertext = AES256.byteToHexString(AES256.encrypt(plainText.getBytes(),AES256.hexStringToBytes(symKey)));//aesEncrypt(plainText,AES256.hexStringToBytes(symKey));
-		String cyphertextBase64 = Base64.encodeBytes(AES256.encrypt(plainText.getBytes(),AES256.hexStringToBytes(symKey)));//aesEncrypt(plainText,AES256.hexStringToBytes(symKey));
+		String cyphertext = AES128.byteToHexString(AES128.encrypt(plainText.getBytes(), AES128.hexStringToBytes(symKey)));//aesEncrypt(plainText,AES256.hexStringToBytes(symKey));
+		String cyphertextBase64 = Base64.encodeBytes(AES128.encrypt(plainText.getBytes(), AES128.hexStringToBytes(symKey)));//aesEncrypt(plainText,AES256.hexStringToBytes(symKey));
 
 		System.out.println(cyphertext);
 		System.out.println(cyphertextBase64);
-		System.out.println(new String(AES256.decrypt(AES256.hexStringToBytes(cyphertext),AES256.hexStringToBytes(symKey))));
+		System.out.println(new String(AES128.decrypt(AES128.hexStringToBytes(cyphertext), AES128.hexStringToBytes(symKey))));
 
 	}
 

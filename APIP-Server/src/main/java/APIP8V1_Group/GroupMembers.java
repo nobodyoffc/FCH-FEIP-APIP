@@ -85,8 +85,6 @@ public class GroupMembers extends HttpServlet {
             return false;
         if(requestBody.getFcdsl().getIds()==null)
             return false;
-//        if(requestBody.getFcdsl().getIds().length!=1)
-//            return false;
         return true;
     }
 }

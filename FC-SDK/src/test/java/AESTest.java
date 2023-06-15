@@ -1,8 +1,4 @@
-import AesEcc.AES256;
-import javaTools.BytesTools;
-
-import java.nio.charset.StandardCharsets;
-import java.util.HexFormat;
+import AesEcc.AES128;
 
 public class AESTest {
     public static void main(String[] args) throws Exception {
@@ -30,7 +26,7 @@ public class AESTest {
         System.out.println("cipherHBase64: "+ cipherBase64);
 
         //System.out.println("utf8:"+ new String(AES256.decrypt(cipherUtf8,keyUtf8),StandardCharsets.UTF_8));
-        System.out.println("textUtf8: "+ AES256.decryptFc(cipherBase64,keyHex));
+        System.out.println("textUtf8: "+ AES128.decryptFc(cipherBase64,keyHex));
 
     }
 }

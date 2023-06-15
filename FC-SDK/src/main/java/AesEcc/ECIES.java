@@ -25,20 +25,20 @@ public class ECIES {
         // 若 keys 为公钥，则创建仅有公钥，仅用于加密的 KeyPair 对象
         if (keys.length == 64) {
             pubKey = Secp256k1.setBytes(keys);
-            System.out.println("pubKey:"+ AES256.byteToHexString(pubKey2Bytes())) ;
+            System.out.println("pubKey:"+ AES128.byteToHexString(pubKey2Bytes())) ;
             priKey = null;
             // 若 keys 为私钥，则创建完整的 KeyPair 对象
         } else if (keys.length == 32) {
             priKey = Math_Modulo.setBytes(keys);
-            System.out.println("priKey:"+ AES256.byteToHexString(priKey2Bytes())) ;
+            System.out.println("priKey:"+ AES128.byteToHexString(priKey2Bytes())) ;
             pubKey = Secp256k1.multiply_G(priKey);
-            System.out.println("pubKey:"+ AES256.byteToHexString(pubKey2Bytes())) ;
+            System.out.println("pubKey:"+ AES128.byteToHexString(pubKey2Bytes())) ;
         }
     }
 
     public void generateKeyPair(String sk) {
         byte[] sk_final = new byte[32];
-        byte[] sk_buf = AES256.hexStringToBytes(sk.toUpperCase());
+        byte[] sk_buf = AES128.hexStringToBytes(sk.toUpperCase());
         System.arraycopy(sk_buf, 0, sk_final, 32 - sk_buf.length, sk_buf.length);
 
         getPair(sk_final);
@@ -63,19 +63,19 @@ public class ECIES {
         BigInteger[] P = Secp256k1.multiply_Point(pubKey, r);
         BigInteger s = P[0];
 
-        byte[] k = Hash.SHA256(AES256.byteToHexString(Math_Modulo.toBytes(s)));
+        byte[] k = Hash.SHA256(AES128.byteToHexString(Math_Modulo.toBytes(s)));
         byte[] ke = new byte[16];
         byte[] km = new byte[16];
         System.arraycopy(k, 0, ke, 0, 16);
         System.arraycopy(k, 16, km, 0, 16);
-        String kee = AES256.byteToHexString(ke).toUpperCase();
-        byte[] c = AES256.encrypt(message, kee);
+        String kee = AES128.byteToHexString(ke).toUpperCase();
+        byte[] c = AES128.encrypt(message, kee);
         byte[] msgTotal = new byte[16 + c.length];
 
         System.arraycopy(km, 0, msgTotal, 0, 16);
         System.arraycopy(c, 0, msgTotal, 16, c.length);
 
-        byte[] d = Hash.SHA256(AES256.byteToHexString(msgTotal));
+        byte[] d = Hash.SHA256(AES128.byteToHexString(msgTotal));
         byte[] cypherTotal = new byte[96 + c.length];
 
         System.arraycopy(Secp256k1.toBytes(R), 0, cypherTotal, 0, 64);
@@ -108,23 +108,23 @@ public class ECIES {
 
 
         // 计算 ke 和 km
-        byte[] k = Hash.SHA256(AES256.byteToHexString(Math_Modulo.toBytes(s)));
+        byte[] k = Hash.SHA256(AES128.byteToHexString(Math_Modulo.toBytes(s)));
 
         byte[] ke = new byte[16];
         byte[] km = new byte[16];
         System.arraycopy(k, 0, ke, 0, 16);
         System.arraycopy(k, 16, km, 0, 16);
-        String kee = AES256.byteToHexString(ke).toUpperCase();
+        String kee = AES128.byteToHexString(ke).toUpperCase();
 
         byte[] msgTotal = new byte[16 + c.length];
 
         System.arraycopy(km, 0, msgTotal, 0, 16);
         System.arraycopy(c, 0, msgTotal, 16, c.length);
 
-        byte[] d0 = Hash.SHA256(AES256.byteToHexString(msgTotal));
+        byte[] d0 = Hash.SHA256(AES128.byteToHexString(msgTotal));
 
         if (Arrays.equals(d, d0)) {
-            byte[] message = AES256.decrypt(AES256.byteToHexString(c), kee);
+            byte[] message = AES128.decrypt(AES128.byteToHexString(c), kee);
             return message;
         } else {
             return null;

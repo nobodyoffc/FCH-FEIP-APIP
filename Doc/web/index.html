@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cid.Cash</title>
+</head>
+<body>
+
+<div id="content"></div>
+<script src="https://cdn.jsdelivr.net/npm/showdown@1.9.1/dist/showdown.min.js"></script>
+<script>
+    fetch('ApipRequestGuide.md')
+        .then(response => response.text())
+        .then(text => {
+            let converter = new showdown.Converter(),
+                html = converter.makeHtml(text);
+            document.getElementById('content').innerHTML = html;
+        });
+</script>
+
+
+</body>
+</html>

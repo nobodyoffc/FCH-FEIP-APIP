@@ -1,6 +1,5 @@
 package main;
 
-import AesEcc.AES256;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch.core.InfoResponse;
@@ -9,7 +8,6 @@ import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
 import FchClass.Cash;
 import javaTools.BytesTools;
-import keyTools.KeyTools;
 import fcTools.ParseTools;
 import fc_dsl.Sort;
 import org.bitcoinj.core.ECKey;

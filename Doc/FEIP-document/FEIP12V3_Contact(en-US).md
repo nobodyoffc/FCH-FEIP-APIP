@@ -115,7 +115,7 @@ When user adds a contact, the data object contains:
     "note": "A public test address.",
     "noNoticeFee": true,
     "seeStatement": true,
-    "seeWorks": true
+    "seeWritings": true
 }
 ```
 

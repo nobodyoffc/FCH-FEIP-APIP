@@ -1,6 +1,6 @@
 package APIP1V1_OpenAPI;
 
-import AesEcc.AES256;
+import AesEcc.AES128;
 import com.google.gson.Gson;
 import javaTools.BytesTools;
 import cryptoTools.SHA;
@@ -9,7 +9,6 @@ import initial.Initiator;
 import order.Order;
 import org.bitcoinj.core.ECKey;
 import redis.clients.jedis.Jedis;
-import service.ApipService;
 import startAPIP.RedisKeys;
 
 import javax.servlet.http.HttpServletRequest;
@@ -260,7 +259,7 @@ public class RequestChecker {
     private boolean isGoodSymSign(String sign) {
         if(sign==null)return false;
         byte[] signBytes = BytesTools.bytesMerger(requestBodyBytes, BytesTools.hexToByteArray(sessionKey));
-        String doubleSha256Hash = AES256.byteToHexString(SHA.Sha256x2(signBytes));
+        String doubleSha256Hash = AES128.byteToHexString(SHA.Sha256x2(signBytes));
 
         if(!sign.equals(doubleSha256Hash)){
             replier.setData(doubleSha256Hash);

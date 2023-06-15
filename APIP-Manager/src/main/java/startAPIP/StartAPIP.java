@@ -1,6 +1,6 @@
 package startAPIP;
 
-import AesEcc.AES256;
+import AesEcc.AES128;
 import api.Constant;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.ElasticsearchException;
@@ -9,7 +9,6 @@ import co.elastic.clients.elasticsearch.indices.DeleteIndexResponse;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import FeipClass.Service;
-import fcTools.ParseTools;
 import menu.Menu;
 import order.Order;
 import org.slf4j.Logger;
@@ -237,7 +236,7 @@ public class StartAPIP {
 			//configAPIP.copyConfigFileIntoTomcat();
 		}
 
-		String esPasswordCipher = AES256.encryptFc(password,configAPIP.getRandomSymKeyHex());
+		String esPasswordCipher = AES128.encryptFc(password,configAPIP.getRandomSymKeyHex());
 
 		jedis.set(RedisKeys.EsPasswordCypher,esPasswordCipher);
 		System.out.println("Your ES password is encrypted and saved locally.");

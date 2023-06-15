@@ -90,6 +90,7 @@ public class Constant {
     public static final String GetFidCidAPI = "getFidCid";
     public static final String AddressSearchAPI = "addressSearch";
     public static final String FidCidSeekAPI = "fidCidSeek";
+    public static final String CidByIdsAPI = "cidByIds";
     public static final String CidInfoSearchAPI = "cidInfoSearch";
     public static final String CidHistoryAPI = "cidHistory";
     public static final String HomepageHistoryAPI = "homepageHistory";
@@ -239,6 +240,7 @@ public class Constant {
         apiList.add(P2shSearchAPI);
 
         apiList.add(CidInfoByIdsAPI);
+        apiList.add(CidByIdsAPI);
         apiList.add(FidCidSeekAPI);
         apiList.add(CidInfoSearchAPI);
         apiList.add(CidHistoryAPI);

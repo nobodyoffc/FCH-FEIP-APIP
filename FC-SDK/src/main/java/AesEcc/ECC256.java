@@ -27,7 +27,7 @@ public class ECC256 {
     //获取ECC公钥
     public String getEciesPubKey() {
         byte[] pk = ecies.pubKey2Bytes();
-        return AES256.byteToHexString(pk);
+        return AES128.byteToHexString(pk);
     }
 
     //更换ECC的公钥
@@ -41,7 +41,7 @@ public class ECC256 {
     	}
     	
         byte[] pk_final = new byte[64];
-        byte[] pk_buf = AES256.hexStringToBytes(pk.toUpperCase());
+        byte[] pk_buf = AES128.hexStringToBytes(pk.toUpperCase());
         System.arraycopy(pk_buf, 0, pk_final, 64 - pk_buf.length, pk_buf.length);
 
         ecies.getPair(pk_final);
@@ -50,7 +50,7 @@ public class ECC256 {
     //获取ECC私钥
     public String getEciesPriKey() {
         byte[] sk = ecies.priKey2Bytes();
-        return AES256.byteToHexString(sk);
+        return AES128.byteToHexString(sk);
     }
 
     //更换ECC的私钥
@@ -105,7 +105,7 @@ public class ECC256 {
                 y = p.subtract(y);
             }
 
-            return "04" + PK33.substring(2) + AES256.byteToHexString((y.toByteArray()));
+            return "04" + PK33.substring(2) + AES128.byteToHexString((y.toByteArray()));
         } else return null;
     }
 }

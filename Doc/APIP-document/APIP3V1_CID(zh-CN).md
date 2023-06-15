@@ -18,11 +18,11 @@ UpdateDate：2023-05-04
 
 [主要共识](#主要共识)
 
-[cidAddrByIds](#)
+[cidInfoByIds](#)
 
-[cidAddrSeek](#)
+[fidCidSeek](#)
 
-[cidSearch](#)
+[cidInfoSearch](#)
 
 [cidHistory](#)
 
@@ -179,6 +179,72 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
 }
 
 ```
+
+## cidByIds
+
+### 说明
+
+获取指定fid列表的cid列表。
+
+### 默认排序
+
+- 无排序
+
+### Request body
+```
+{
+	"url": <string. urlHead+urlTail. 必填>,
+	"time": <long. 时间戳,精确到毫秒. 必填>,
+	"nonce": <long. 随机数. 必填>,
+    "fcdsl":{
+        "ids":<string array. FID数组. 必填>
+    }
+}
+```
+### data in response body
+```
+{
+  <fid>:{
+    <string. fid>:<string. cid>,
+    ...
+  }
+}
+
+```
+### 示例
+
+- request body
+
+```json
+{
+  "url": "http://localhost:8080/APIP/apip3/v1/cidByIds",
+  "time": 1677673821267,
+  "nonce": 1297,
+  "fcdsl":{
+    "ids":["FEk41Kqjar45fLDriztUDTUkdki7mmcjWK","FPL44YJRwPdd2ipziFvqq6y2tw4VnVvpAv"]
+  }
+}
+
+```
+
+- response body
+
+```json
+{
+  "code": 0,
+  "message": "Success.",
+  "nonce": 1297,
+  "balance": 981000000,
+  "got": 2,
+  "total": 2,
+  "bestHeight": 1786431,
+  "data": {
+    "FEk41Kqjar45fLDriztUDTUkdki7mmcjWK": "",
+    "FPL44YJRwPdd2ipziFvqq6y2tw4VnVvpAv": "CY_vpAv"
+  }
+}
+```
+
 ## fidCidSeek
 
 ### 说明
@@ -259,6 +325,7 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
   ]
 }
 ```
+
 ## cidInfoSearch
 
 ### 说明
@@ -371,6 +438,7 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
     ]
 }
 ```
+
 ## cidHistory
 
 ### 说明
@@ -566,6 +634,7 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
   ]
 }
 ```
+
 ## noticeFeeHistory
 
 ### 说明
@@ -666,6 +735,7 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
   ]
 }
 ```
+
 ## reputationHistory
 
 ### 说明

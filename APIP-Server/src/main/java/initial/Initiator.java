@@ -1,6 +1,6 @@
 package initial;
 
-import AesEcc.AES256;
+import AesEcc.AES128;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import com.google.gson.Gson;
 import fcTools.ParseTools;
@@ -19,8 +19,6 @@ import startAPIP.RedisKeys;
 import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServlet;
 import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.HexFormat;
 
 public class Initiator extends HttpServlet {
     @Serial
@@ -132,7 +130,7 @@ public class Initiator extends HttpServlet {
     public static String getEsPassword(ConfigAPIP configAPIP, Jedis jedis) throws Exception {
         String esPasswordCipher = jedis.get(RedisKeys.EsPasswordCypher);
         if(esPasswordCipher==null)return null;
-        return AES256.decryptFc(esPasswordCipher,configAPIP.getRandomSymKeyHex());
+        return AES128.decryptFc(esPasswordCipher,configAPIP.getRandomSymKeyHex());
     }
 
     public static boolean isFreeGetAllowed(PrintWriter writer) {
