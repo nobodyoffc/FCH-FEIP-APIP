@@ -41,6 +41,7 @@ public class StartFEIP {
 
 			esClient = newEsClient.checkEsClient(esClient, configFEIP);
 			if (esClient == null) {
+				log.debug("Creating ES client failed.");
 				newEsClient.shutdownClient();
 				return;
 			}

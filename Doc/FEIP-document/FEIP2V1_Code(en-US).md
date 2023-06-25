@@ -1,3 +1,15 @@
+```
+ProtocolType: FEIP
+SerialNumber: 2
+ProtocolName: Code
+Version: 1
+Description : Publish and manage code information on Freecash blockchain. 
+Authors: C_armX, Deisler-JJ_Sboy
+Language: en-US
+CreateDate: 2022-12-28
+UpdateDate: 2023-05-07
+```
+
 # FEIP2V1_Code(en-US)
 
 ## Contents
@@ -20,17 +32,6 @@
 
 [QR code](#qr-code)
 
-```
-ProtocolType: FEIP
-SerialNumber: 2
-ProtocolName: Code
-Version: 1
-Description : Publish and manage code information on Freecash blockchain. 
-Authors: C_armX, Deisler-JJ_Sboy
-Language: en-US
-CreateDate: 2022-12-28
-UpdateDate: 2023-05-07
-```
 
 ## Consensuses of FEIP
 

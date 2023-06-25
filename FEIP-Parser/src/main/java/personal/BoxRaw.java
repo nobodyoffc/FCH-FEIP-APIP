@@ -7,6 +7,28 @@ public class BoxRaw {
     private String name;
     private String desc;
     private Object contain;
+    private String cipher;
+    private String alg;
+
+    public String getAlg() {
+        return alg;
+    }
+
+    public void setAlg(String alg) {
+        this.alg = alg;
+    }
+
+    public void setContain(Object contain) {
+        this.contain = contain;
+    }
+
+    public String getCipher() {
+        return cipher;
+    }
+
+    public void setCipher(String cipher) {
+        this.cipher = cipher;
+    }
 
     public String getBid() {
         return bid;

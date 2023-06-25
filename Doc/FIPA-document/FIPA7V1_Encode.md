@@ -1,10 +1,10 @@
 
-
-symkey hex
+固定长度Hex,人类识别utf8,长字节数据Base64
+symKey hex
 cipher Base64
 text   utf-8
-priKey hex or WIF Compressed
-pubKey hex or Base58check
+priKey hex or WIF Compressed L或K开头
+pubKey hex
 fid    Base58check
 
 

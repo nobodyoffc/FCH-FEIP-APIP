@@ -5,7 +5,6 @@ import FeipClass.Team;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import com.google.gson.Gson;
-import fcTools.ParseTools;
 import FeipClass.Cid;
 import opReturn.Feip;
 import opReturn.OpReturn;
@@ -29,8 +28,6 @@ public class OrganizationParser {
 		}catch(com.google.gson.JsonSyntaxException e) {
 			return null;
 		}
-
-		ParseTools.gsonPrint(groupRaw);
 
 		GroupHistory groupHist = new GroupHistory();
 
@@ -288,8 +285,6 @@ public class OrganizationParser {
 		}catch(com.google.gson.JsonSyntaxException e) {
 			return null;
 		}
-
-		ParseTools.gsonPrint(teamRaw);
 
 		TeamHistory teamHist = new TeamHistory();
 

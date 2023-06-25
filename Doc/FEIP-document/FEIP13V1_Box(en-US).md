@@ -67,12 +67,14 @@ UpdateDate: 2023-05-25
 ## create
 The data object contains:
 
-|field| type   |content|required|
-|:----|:-------|:----|:----|
-|op| string |operation: "create"|Y|
-|name| string ||N|
-|desc| string ||N|
-|contain| Object ||Y|
+| field   | type    | content                | required |
+|:--------|:--------|:-----------------------|:---------|
+| op      | string  | operation: "create"    | Y        |
+| name    | string  |                        | N        |
+| desc    | string  |                        | N        |
+| contain | Object  |                        | Y        |
+| alg     | string  | The encrypt algorithm. | Y        |
+| cipher  | string  | Encrypted content      | Y        |
 
 * Example
 

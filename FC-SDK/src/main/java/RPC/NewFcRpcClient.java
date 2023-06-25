@@ -3,6 +3,8 @@ package RPC;
 import com.googlecode.jsonrpc4j.Base64;
 import com.googlecode.jsonrpc4j.JsonRpcHttpClient;
 import fcTools.ParseTools;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -20,6 +22,7 @@ public class NewFcRpcClient {
 
     private String rpcPassword;
 
+    private static final Logger log = LoggerFactory.getLogger(NewFcRpcClient.class);
     public NewFcRpcClient(String rpcIp,int rpcPort,String rpcUser,String rpcPassword) {
         this.rpcUser = rpcUser;
         this.rpcIp = rpcIp;
@@ -43,10 +46,11 @@ public class NewFcRpcClient {
                 headers.put("Authorization", "Basic " + cred);
                 client = new JsonRpcHttpClient(new URL("http://" + rpcIp + ":" + rpcPort), headers);
                 ParseTools.gsonPrint(client.invoke("getblockchaininfo",new Object[]{},Object.class));
+                log.debug("Freecash RPC client is ready.");
                 break;
             } catch (Exception e) {
                 e.printStackTrace();
-                System.out.println("Failed to Create freecash RPC.");
+                log.error("Failed to Create freecash RPC.");
                 break;
             } catch (Throwable e) {
                 throw new RuntimeException(e);

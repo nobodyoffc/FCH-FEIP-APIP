@@ -6,8 +6,9 @@ public class Constant {
     public static  final String UserDir = "user.dir";
     public static final int MaxRequestSize = 100;
     public static final int DefaultSize = 20;
+    public static final String zeroBlockId = "";
 
-    public static void main(String[] args) {
+    public static void printIndices() {
         Indices indices = Indices.cid;
         System.out.println(indices.name()+indices.ordinal());
 
@@ -167,8 +168,10 @@ public class Constant {
     public static final String CashValidLiveAPI = "cashValidLive";
     public static final String CashValidForCdAPI = "cashValidForCd";
     public static final String CashValidForPayAPI = "cashValidForPay";
-
+    public static final String SendForCsAPI = "sendForCs";
+    public static final String SendForCsByCdAPI = "sendForCsByCd";
     public static final String GetTotalsAPI = "getTotals";
+    public static final String NidSearchAPI = "nidSearch";
 
 
     //Header name
@@ -190,7 +193,7 @@ public class Constant {
     public static final String Msg1003MissBody = "Miss request body.";
 
     public static final int Code1004InsufficientBalance = 1004;
-    public static final String Msg1004InsufficientBalance = "Insufficient balance, please purchase service.";
+    public static final String Msg1004InsufficientBalance = "Insufficient balance. Buy the service please.";
     public static final int Code1005UrlUnequal = 1005;
     public static final String Msg1005UrlUnequal = "The request URL isn't the same as the one you signed.";
     public static final int Code1006RequestTimeExpired = 1006;
@@ -308,6 +311,7 @@ public class Constant {
 
         apiList.add(StatementsAPI);
         apiList.add(StatementSearchAPI);
+        apiList.add(NidSearchAPI);
 
         apiList.add(AvatarsAPI);
 
@@ -317,5 +321,7 @@ public class Constant {
         apiList.add(CashValidForPayAPI);
         apiList.add(DecodeRawTxAPI);
         apiList.add(BroadcastTxAPI);
+        apiList.add(SendForCsAPI);
+        apiList.add(SendForCsByCdAPI);
     }
 }

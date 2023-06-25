@@ -69,9 +69,9 @@ When user adds a new secret, the OP_RETURN contains the data as follows:
 |5|pid|hex|Id of this protocol|N|
 |6|data.op|string|operation: "add"|Y|
 |7|data.alg|string|The encrypt algorithm. "ECC256k1-AES256CBC" is default.|Y|
-|8|data.ciphertext|string|Encrypted message|Y|
+|8|data.cipher|string|Encrypted message|Y|
 
-### Decrypted data of data.ciphertext
+### Decrypted data of data.cipher
 
 |field number|field name|type|content|required|
 |:-|:-|:-|:-|:-|
@@ -97,11 +97,11 @@ OP_RETURN content:
     "data":{
         "op": "add",
         "alg": "ECC256k1-AES256CBC",
-        "ciphertext": "AjTU0rGQvDxhCs3F5x4Pcz3Bsiiry2LryPcKcPIZ2iDsD68U5he9FkM6AVUzEHTjmfBLkhfFu7rv4fveoyMi5YH+wQoiWDxgs/MYjGZBL/Fuq6XZ6IOCXfWyfwphE4uxhEg5TD9ZBRsrJbNxwbdfee5ev5Gvc8kwYROycs0sAG3rNdoJbEZZ7bs2DqvHbAWdG7w4gYLhP9o+C/xVTZHz7Ks9VHb6i04/1at40etlWXxPWSvkdDWxTtyWSSsY2jrbYjfe+ytXQRTRY4gYQdwg+9s="
+        "cipher": "AjTU0rGQvDxhCs3F5x4Pcz3Bsiiry2LryPcKcPIZ2iDsD68U5he9FkM6AVUzEHTjmfBLkhfFu7rv4fveoyMi5YH+wQoiWDxgs/MYjGZBL/Fuq6XZ6IOCXfWyfwphE4uxhEg5TD9ZBRsrJbNxwbdfee5ev5Gvc8kwYROycs0sAG3rNdoJbEZZ7bs2DqvHbAWdG7w4gYLhP9o+C/xVTZHz7Ks9VHb6i04/1at40etlWXxPWSvkdDWxTtyWSSsY2jrbYjfe+ytXQRTRY4gYQdwg+9s="
         }
 }
 ```
-Decrypted information of data.ciphertext:
+Decrypted information of data.cipher:
 ```
 {
     "type": "password",

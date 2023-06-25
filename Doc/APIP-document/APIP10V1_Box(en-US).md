@@ -91,6 +91,8 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
         "name": <string. the name of the box.>,
 		"desc": <string. the description of the box.>,
         "contain": <string. the content of the box.>,
+		"cipher": <string. encrypted details of the box.>,
+		"alg": <string. encrypting algorithm of the cipher.> ",
         "owner": <string. the owner of this box.>
         "birthTime": <long. the timestamp of the block in which the group was published> ,
         "birthHeight": <long. the height of the block in which the group was published>,
@@ -176,6 +178,8 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
         "name": <string. the name of the box.>,
 		"desc": <string. the description of the box.>,
         "contain": <string. the content of the box.>,
+        "cipher": <string. encrypted details of the box.>,
+		"alg": <string. encrypting algorithm of the cipher.> ",
         "owner": <string. the owner of this box.>
         "birthTime": <long. the timestamp of the block in which the group was published> ,
         "birthHeight": <long. the height of the block in which the group was published>,
@@ -279,6 +283,8 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
         "name": <string. the name of the box.>,
 		"desc": <string. the description of the box.>,
         "contain": <string. the content of the box.>,
+        "cipher": <string. encrypted details of the box.>,
+		"alg": <string. encrypting algorithm of the cipher.> ",
 	}
 ]
 ```

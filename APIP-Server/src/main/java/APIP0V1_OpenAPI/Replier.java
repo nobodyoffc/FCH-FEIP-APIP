@@ -2,9 +2,11 @@ package APIP0V1_OpenAPI;
 
 
 import api.Constant;
+import fcTools.ParseTools;
 import initial.Initiator;
 import order.Order;
 import redisTools.ReadRedis;
+import service.ApipService;
 import service.Params;
 import startAPIP.RedisKeys;
 
@@ -67,7 +69,14 @@ public class Replier {
             got = 0;
             Map<String,Object> d = new HashMap<>();
 
-            Params params = service.getParams();
+            String serviceStr = jedis0Common.get(RedisKeys.Service);
+            if(serviceStr==null){
+                data= "Can't read service from Redis. Set it with ApipManager.jar.";
+                return Initiator.gson.toJson(this);
+            }
+            ApipService service1 = gson.fromJson(serviceStr, ApipService.class);
+            Params params = service1.getParams();
+
             d.put("currency",params.getCurrency());
             d.put("sendFrom",userAddr);
             d.put("sendTo",params.getAccount());

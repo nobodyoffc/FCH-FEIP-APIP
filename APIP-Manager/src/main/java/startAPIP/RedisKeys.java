@@ -6,7 +6,7 @@ public class RedisKeys {
     //Redis keys
     public static final String Sid = "sid";
     public static final String Service = "service";
-    public static final String EsPasswordCypher = "espasswordcypher";
+    public static final String EsPasswordCypher = "espasswordcipher";
     public static final String Balance = "balance";
     public static final String OrderLastHeight = "orderHeight";
     public static final String AddrSessionName = "sessionName";

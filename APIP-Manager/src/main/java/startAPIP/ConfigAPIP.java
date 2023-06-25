@@ -1,5 +1,8 @@
 package startAPIP;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import servers.ConfigBase;
 import startFEIP.ConfigFEIP;
 
 import java.io.BufferedReader;
@@ -17,8 +20,8 @@ public class ConfigAPIP extends ConfigFEIP {
     private String rpcUser = "user";
 
     private String rpcPassword = "password";
-    private String avatarBasePath = System.getProperty("user.dir")+"/avatar/elements";
-    private String avatarPngPath = System.getProperty("user.dir")+"/avatar/png";
+    private String avatarBasePath = "/avatar/elements";//System.getProperty("user.dir")+"/avatar/elements";
+    private String avatarPngPath = "/avatar/png";//System.getProperty("user.dir")+"/avatar/png";
     private boolean scanMempool = true;
 
     public void switchScanMempool() {
@@ -27,6 +30,7 @@ public class ConfigAPIP extends ConfigFEIP {
     public boolean isScanMempool() {
         return scanMempool;
     }
+    private static final Logger log = LoggerFactory.getLogger(ConfigAPIP.class);
 
     @Override
     public void config(BufferedReader br) throws IOException {
@@ -41,8 +45,8 @@ public class ConfigAPIP extends ConfigFEIP {
         setRpcPort(br);
         setRpcUsername(br);
         setRpcPassword(br);
-        setAvatarBasePath(br);
-        setAvatarPngPath(br);
+        //setAvatarBasePath(br);
+        //setAvatarPngPath(br);
         setConfigFilePath(br);
         writeConfigToFile();
         //copyConfigFileIntoTomcat();
@@ -270,6 +274,8 @@ public class ConfigAPIP extends ConfigFEIP {
             } else {
                 this.tomcatBasePath = str1;
                 System.out.println("\nThe path for tomcat base was set.");
+                this.avatarBasePath = tomcatBasePath + "webapps/APIP"+"/avatar/elements";
+                this.avatarPngPath = tomcatBasePath + "webapps/APIP"+"/avatar/png";
                 return;
             }
         }
@@ -309,7 +315,7 @@ public class ConfigAPIP extends ConfigFEIP {
             Files.copy(sourcePath, destinationPath, StandardCopyOption.REPLACE_EXISTING);
             System.out.println("File copied to "+this.getTomcatBasePath()+"bin/ successfully.");
         } catch (IOException e) {
-            System.out.println("An error occurred while copying the file: " + e.getMessage());
+            log.debug("An error occurred while copying the file: "+e.getMessage());
         }
     }
 }

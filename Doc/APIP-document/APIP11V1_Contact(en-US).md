@@ -93,8 +93,8 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
 [
 	{
 		"contactId": <string. txid where the contact was added.>,
-		"alg": <string. encrypting algorithm of the ciphertext.> ",
-		"ciphertext": <string. encrypted details of the contact.>,
+		"alg": <string. encrypting algorithm of the cipher.> ",
+		"cipher": <string. encrypted details of the contact.>,
 		"owner": <string. the owner of this contact.>
 		"birthTime": <long. the timestamp of the block in which the group was published> ,
 		"birthHeight": <long. the height of the block in which the group was published>,
@@ -140,7 +140,7 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
       {
          "contactId": "31b81c6d3d6015a8d53add5ce1cb97095db849ce789f39e2fe5c53ae1584c377",
          "alg": "ECC256k1-AES256CBC",
-         "ciphertext": "AtrFmWIFjVgOAiJV9ecB0V8vpWeGbc8nZwmJUFjan5zfnLQWLl0NH5Sjh/qWBU849x8yTpn7v6V0Hgdm2zuNGk4flfU2wyYBG2sRFlmagSLZNJQ8T/meD3FX3EGXken+bbG9P6MmSWqWZsAqnx/MtIu/ngXy/+TB6UyyvH3/e1rvPzqfrNKpzVRpcfycUFSlHmm4xU15DA/SZu01PYDUI+AR/x2poKftABu7CxQinEp8bWBARYiDkvsplJLl7h+RJDtg5UgZZlAqG03GdgvmDEWkhHDuYrCKbWpoCILeEilW",
+         "cipher": "AtrFmWIFjVgOAiJV9ecB0V8vpWeGbc8nZwmJUFjan5zfnLQWLl0NH5Sjh/qWBU849x8yTpn7v6V0Hgdm2zuNGk4flfU2wyYBG2sRFlmagSLZNJQ8T/meD3FX3EGXken+bbG9P6MmSWqWZsAqnx/MtIu/ngXy/+TB6UyyvH3/e1rvPzqfrNKpzVRpcfycUFSlHmm4xU15DA/SZu01PYDUI+AR/x2poKftABu7CxQinEp8bWBARYiDkvsplJLl7h+RJDtg5UgZZlAqG03GdgvmDEWkhHDuYrCKbWpoCILeEilW",
          "owner": "FPL44YJRwPdd2ipziFvqq6y2tw4VnVvpAv",
          "birthTime": 1684728368,
          "birthHeight": 1756179,
@@ -188,8 +188,8 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
 [
 	{
 		"contactId": <string. txid where the contact was added.>,
-		"alg": <string. encrypting algorithm of the ciphertext.> ",
-		"ciphertext": <string. encrypted details of the contact.>,
+		"alg": <string. encrypting algorithm of the cipher.> ",
+		"cipher": <string. encrypted details of the contact.>,
 		"owner": <string. the owner of this contact.>
 		"birthTime": <long. the timestamp of the block in which the group was published> ,
 		"birthHeight": <long. the height of the block in which the group was published>,
@@ -235,7 +235,7 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
       {
          "contactId": "009c74b692e7792dea9c6b943e6e46731bb30bf81c5f6399d79c2d43237b60b2",
          "alg": "ECC256k1-AES256CBC",
-         "ciphertext": "AtrFmWIFjVgOAiJV9ecB0V8vpWeGbc8nZwmJUFjan5zfnLQWLl0NH5Sjh/qWBU849x8yTpn7v6V0Hgdm2zuNGk4flfU2wyYBG2sRFlmagSLZNJQ8T/meD3FX3EGXken+bbG9P6MmSWqWZsAqnx/MtIu/ngXy/+TB6UyyvH3/e1rvPzqfrNKpzVRpcfycUFSlHmm4xU15DA/SZu01PYDUI+AR/x2poKftABu7CxQinEp8bWBARYiDkvsplJLl7h+RJDtg5UgZZlAqG03GdgvmDEWkhHDuYrCKbWpoCILeEilW",
+         "cipher": "AtrFmWIFjVgOAiJV9ecB0V8vpWeGbc8nZwmJUFjan5zfnLQWLl0NH5Sjh/qWBU849x8yTpn7v6V0Hgdm2zuNGk4flfU2wyYBG2sRFlmagSLZNJQ8T/meD3FX3EGXken+bbG9P6MmSWqWZsAqnx/MtIu/ngXy/+TB6UyyvH3/e1rvPzqfrNKpzVRpcfycUFSlHmm4xU15DA/SZu01PYDUI+AR/x2poKftABu7CxQinEp8bWBARYiDkvsplJLl7h+RJDtg5UgZZlAqG03GdgvmDEWkhHDuYrCKbWpoCILeEilW",
          "owner": "FPL44YJRwPdd2ipziFvqq6y2tw4VnVvpAv",
          "birthTime": 1684723889,
          "birthHeight": 1756084,

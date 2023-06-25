@@ -48,16 +48,18 @@ Update date：2023-05-06
 
 5. To authorize an address as master, the OP_RETURN contains:
 
-|field|type|content|required|
-|:----|:----|:----|:----|
-|type|string|Fixed: "FEIP"|Y|
-|sn|int|Serial number. Fixed: 6|Y|
-|ver|int|Version. Fixed: 1|Y|
-|name|string|Fixed: "Master"|N|
-|pid|string|PID of this protocol. The txid where this protocol was published.|N|
-|did|string|DID of this protocol file. The sha256x2 hash of the protocol file in hex.|N|
-|data.master|string|The address designated as the master.|Y|
-|data.promise|string|Fixed:"The master owns all my rights."|Y|
+| field             | type   | content                                                                   | required |
+|:------------------|:-------|:--------------------------------------------------------------------------|:---------|
+| type              | string | Fixed: "FEIP"                                                             | Y        |
+| sn                | int    | Serial number. Fixed: 6                                                   | Y        |
+| ver               | int    | Version. Fixed: 1                                                         | Y        |
+| name              | string | Fixed: "Master"                                                           | N        |
+| pid               | string | PID of this protocol. The txid where this protocol was published.         | N        |
+| did               | string | DID of this protocol file. The sha256x2 hash of the protocol file in hex. | N        |
+| data.master       | string | The address designated as the master.                                     | Y        |
+| data.promise      | string | Fixed:"The master owns all my rights."                                    | Y        |
+| data.cipherPriKey | string | The private Key encrypted with master's public key.                       | N        |
+| data.alg          | string | The algorithm of encrypting.                                              | N        |
 
 ### Example
 
@@ -70,7 +72,9 @@ Update date：2023-05-06
     "pid": ""
     "data":{
         "master":"FTqiqAyXHnK7uDTXzMap3acvqADK4ZGzts",
-        "promise":"The master owns all my rights."
-        }
+        "promise":"The master owns all my rights.",
+        "cipherPriKey":"The master owns all my rights.",
+        "alg":"EccAes256K1P7@No1_NrC7"
+    }
 }
 ```

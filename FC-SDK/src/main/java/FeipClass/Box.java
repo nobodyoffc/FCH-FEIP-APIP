@@ -5,8 +5,9 @@ public class Box {
     private String name;
     private String desc;
     private Object contain;
+    private String cipher;
+    private String alg;
     private boolean active;
-
     private String owner;
     private long birthTime;
     private long birthHeight;
@@ -14,6 +15,21 @@ public class Box {
     private long lastTime;
     private long lastHeight;
 
+    public String getAlg() {
+        return alg;
+    }
+
+    public void setAlg(String alg) {
+        this.alg = alg;
+    }
+
+    public String getCipher() {
+        return cipher;
+    }
+
+    public void setCipher(String cipher) {
+        this.cipher = cipher;
+    }
     public String getBid() {
         return bid;
     }

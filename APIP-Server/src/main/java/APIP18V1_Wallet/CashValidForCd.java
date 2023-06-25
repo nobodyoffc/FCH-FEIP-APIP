@@ -50,7 +50,7 @@ public class CashValidForCd extends HttpServlet {
 
         long cd = 0;
         try {
-            cd = Long.parseLong(requestBody.getFcdsl().getOther());
+            cd = Long.parseLong((String)requestBody.getFcdsl().getOther());
             if(cd<=0){
                 response.setHeader(CodeInHeader, String.valueOf(Code1020OtherError));
                 replier.setData("cd <= 0");

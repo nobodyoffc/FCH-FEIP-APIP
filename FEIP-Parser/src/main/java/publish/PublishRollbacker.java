@@ -18,17 +18,17 @@ public class PublishRollbacker {
 	public boolean rollback(ElasticsearchClient esClient, long lastHeight) throws Exception {
 		// TODO Auto-generated method stub
 		boolean error = false;
-		error = rollbackStatement(esClient,lastHeight);
+		error = rollbackStatementAndNid(esClient,lastHeight);
 		error = rollbackProof(esClient,lastHeight);
 
 		return error;
-
 	}
 
-	public boolean rollbackStatement(ElasticsearchClient esClient, long lastHeight) throws ElasticsearchException, IOException, InterruptedException {
+	public boolean rollbackStatementAndNid(ElasticsearchClient esClient, long lastHeight) throws ElasticsearchException, IOException, InterruptedException {
 		// TODO Auto-generated method stub
 		List<String> indexList = new ArrayList<String>();
 		indexList.add(IndicesFEIP.StatementIndex);
+		indexList.add(IndicesFEIP.NidIndex);
 
 		esClient.deleteByQuery(d->d.index(indexList).query(q->q.range(r->r.field("birthHeight").gt(JsonData.of(lastHeight)))));
 		

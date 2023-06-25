@@ -39,7 +39,7 @@ public class DecodeRawTx extends HttpServlet {
             writer.write(replier.reply1012BadQuery(addr));
             return;
         }
-        String rawTxHex = dataCheckResult.getDataRequestBody().getFcdsl().getOther();
+        Object rawTxHex = dataCheckResult.getDataRequestBody().getFcdsl().getOther();
 
         String result = "";
         try {

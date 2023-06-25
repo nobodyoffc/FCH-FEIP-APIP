@@ -10,6 +10,9 @@ import java.util.Map;
 
 public class FcRpcMethods {
 
+    public static String getChainInfo(JsonRpcHttpClient fcClient) throws Throwable {
+        return fcClient.invoke("getblockchaininfo",new Object[] {},String.class);
+    }
     public static String getRawTx(JsonRpcHttpClient fcClient, String  txid) throws Throwable {
         if(txid==null)return null;
         Object[] params = new Object[] { txid };
@@ -27,7 +30,7 @@ public class FcRpcMethods {
         return idList.toArray(new String[0]);
     }
 
-    public static String decodeTx(JsonRpcHttpClient fcClient,String rawTx){
+    public static String decodeTx(JsonRpcHttpClient fcClient, Object rawTx){
         if(rawTx==null||"".equals(rawTx))return null;
         Object result;
         try {
@@ -38,7 +41,7 @@ public class FcRpcMethods {
         return ParseTools.gsonString(result);
     }
 
-    public static String sendTx(JsonRpcHttpClient fcClient,String rawTx) {
+    public static String sendTx(JsonRpcHttpClient fcClient, Object rawTx) {
         if(rawTx==null||"".equals(rawTx))return null;
         Object result = null;
         try {

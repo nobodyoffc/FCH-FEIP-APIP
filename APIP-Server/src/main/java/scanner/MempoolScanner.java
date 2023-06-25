@@ -1,5 +1,6 @@
 package scanner;
 
+import RPC.FcRpcMethods;
 import RPC.NewFcRpcClient;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import com.google.gson.Gson;
@@ -8,12 +9,16 @@ import com.googlecode.jsonrpc4j.JsonRpcHttpClient;
 import FchClass.Cash;
 import FchClass.Tx;
 import fcTools.ParseTools;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import parser.TxInMempool;
 import redis.clients.jedis.Jedis;
 import servers.NewEsClient;
 import startAPIP.ConfigAPIP;
 import startAPIP.RedisKeys;
+import startFEIP.StartFEIP;
 
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
@@ -36,57 +41,79 @@ public class MempoolScanner extends Thread {
      * 6. 将所有in和out按addr累加到redis
      * 7. API查询addrs,响应income数量，income金额，spend数量，spend金额，net净变化。
      */
+    private static final Logger log = LoggerFactory.getLogger(MempoolScanner.class);
     private final Jedis jedis3Unconfirmed;
 
     private final long IntervalSeconds = 5;
     private static final NewEsClient newEsClient = new NewEsClient();
     private ElasticsearchClient esClient = null;
 
-    private Gson gson = new Gson();
+    private final Gson gson = new Gson();
 
     public static JsonRpcHttpClient fcClient;
 
     public MempoolScanner() {
         this.jedis3Unconfirmed = new Jedis();
-        jedis3Unconfirmed.select(3);
+        try {
+            jedis3Unconfirmed.select(3);
+        }catch (Exception e){
+            log.error("Redis is not read when select 3 in mempool scanning.");
+        }
 
-        System.out.println("Create esClient for "+this.getClass());
         ConfigAPIP configAPIP = new ConfigAPIP();
         configAPIP.setConfigFilePath(jedis0Common.get(RedisKeys.ConfigFilePath));
+
         try {
             configAPIP = configAPIP.getClassInstanceFromFile(ConfigAPIP.class);
-            if (configAPIP.getEsIp() == null||configAPIP.getEsPort()==0) System.out.println("Es IP is null. Config first.");
+            if (configAPIP.getEsIp() == null||configAPIP.getEsPort()==0) {
+                log.error("Es IP is null. Config first.");
+                return;
+            }
+        } catch (IOException e) {
+            log.error("Preparing config failed: "+e.getMessage());
+            throw new RuntimeException(e);
+        }
 
-            String rpcIp = configAPIP.getRpcIp();
-            int rpcPort = configAPIP.getRpcPort();
-            String rpcUser = configAPIP.getRpcUser();
-            String rpcPassword = configAPIP.getRpcPassword();
+        String rpcIp = configAPIP.getRpcIp();
+        int rpcPort = configAPIP.getRpcPort();
+        String rpcUser = configAPIP.getRpcUser();
+        String rpcPassword = configAPIP.getRpcPassword();
 
-
-            System.out.println("Create FcRpcClient for "+this.getClass());
+        try {
+            log.debug("Create FcRpcClient for "+this.getClass());
             NewFcRpcClient newFcRpcClient = new NewFcRpcClient(rpcIp, rpcPort,rpcUser,rpcPassword);
             fcClient = newFcRpcClient.getClient();
+        } catch (Exception e) {
+            log.error("Creating FchRpcClient failed."+ e.getMessage());
+            throw new RuntimeException(e);
+        }
 
-
+        try {
+            log.debug("Create esClient for "+this.getClass());
             Jedis jedis0Common = new Jedis();
             if(jedis0Common.get(RedisKeys.EsPasswordCypher)!=null){
-                String esPassword = getEsPassword(configAPIP,jedis0Common);
+                String esPassword = null;
+
+                    esPassword = getEsPassword(configAPIP,jedis0Common);
+
                 if(esPassword==null)return;
+                log.debug("ES client is ready.");
                 esClient = newEsClient.getClientHttps(configAPIP.getEsIp(), configAPIP.getEsPort(),configAPIP.getEsUsername(),esPassword);
             }else{
                 esClient = newEsClient.getClientHttp(configAPIP.getEsIp(), configAPIP.getEsPort());
             }
             if (esClient == null) {
                 newEsClient.shutdownClient();
-                System.out.println("ElasticSearch is not ready.");
+                log.error("ElasticSearch is not ready.");
             }
         } catch (Exception e) {
+            log.error("Creating esClient failed."+ e.getMessage());
             throw new RuntimeException(e);
         }
     }
 
     public void run() {
-        System.out.println("Scanning mempool...");
+        log.debug("Scanning mempool...");
         while (true) {
             String[] txIds;
 

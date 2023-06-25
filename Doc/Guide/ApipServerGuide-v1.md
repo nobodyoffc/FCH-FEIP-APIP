@@ -38,7 +38,7 @@ UpdateDate: 2023-06-15
 
 ## 2. Install freecash full node
 
-* Install docker
+* Install docker: https://get.docker.com
 ```
 	$ sudo curl -fsSL https://get.docker.com | bash -s docker --mirror Aliyun
 ```
@@ -63,7 +63,7 @@ UpdateDate: 2023-06-15
 ```
 * Create fc_miner container in docker
 ```
-	$ sudo docker run -dit --name fc_miner --net=host -v /home/newuser/fc_data:/opt/newcoin fc.io:latest /bin/bash
+	$ sudo docker run -dit --name fc_miner --net=host -v /home/armx/fc_data:/opt/newcoin fc.io:latest /bin/bash
 	cba65abb2e535aa574a51d997c47726db4511c21f01fb23649762f9cc9f2a6aa
 ```
 * Check if the container is started. 
@@ -76,27 +76,45 @@ UpdateDate: 2023-06-15
 ```
 	$ sudo docker start cba65abb2e53
 ```
-- Check if you has been in the container. If not, get into the container:
+- Get into the container:
 ```
 	$ sudo docker exec -it cba65abb2e53 /bin/bash
+	root@yourhost:/# 
+	
 ```
-- Stop the container if you want to try again.
+* Note: You are using root role. To run ElasticSearch you can't use root and have to create the fc_data directory of freecash with non-root role.
+* Add the same name of armx within the container
 ```
-	$ sudo docker stop cba65abb2e53
+	$ useradd armx
 ```
-* Add the same name of newuser within the container
-```
-	$ useradd newuser
-```
-* Make sure the user newuser has the same id in `/etc/group` and `/etc/passwd` inside and outside the container. If not, change it:
+* Make sure the user armx has the same id in `/etc/group` and `/etc/passwd` inside and outside the container. If not, change it:
 ```
 	$ vi /etc/group
 	$ vi /etc/passwd
 ```
-* login with newuser
+* Make armx being the owner of directory /opt
 ```
-	$ su newuser
+    $ chown -R armx:armx opt
 ```
+* login with armx
+```
+	$ su armx
+```
+* To start RPC service, it's necessary to create freecash.conf.
+```
+    $ cd opt/newcoin
+    $ vi freecash.conf
+```
+
+* Write settings below :
+```
+server=1
+rpcuser=user
+rpcpassword=password
+rpcallowip=127.0.0.1
+```
+
+
 * Start freecash node
 ```
 	$ freecashd -listen=1 -server=1 -datadir=/opt/newcoin -logtimemicros -gen=0 -daemon
@@ -104,13 +122,7 @@ UpdateDate: 2023-06-15
 ```
 - "-server=1" makes RPC service started.
 - "-gen=0" closed mining.
-- To start RPC service, it's necessery to set parameters in ~/fc_data/freecash.conf as below :
-```
-	server=1
-	rpcuser=user
-	rpcpassword=password
-	rpcallowip=127.0.0.1
-```
+
 * Check the blockchain info after a while of the node started 
 ```
 	$ freecash-cli -datadir=/opt/newcoin getblockchaininfo
@@ -129,7 +141,28 @@ UpdateDate: 2023-06-15
 	  "warnings": ""
 	}
 ```
+* Check RPC:
+```
+    $ curl --user user --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "getblockchaininfo", "params": [] }' -H 'content-type: text/plain;' http://127.0.0.1:8332/ | cat
+    Enter host password for user 'user':password
+```
+
 * Wait for your node catching up the newest block.
+* If you want to stop freecash node:
+```
+    # exit
+    $ exit
+	$ sudo docker ps -a
+	$ sodu docker stop containerId
+```
+* To restart freecash node:
+```
+    $ sudo docker start cba65abb2e53
+    $ sudo docker exec -it cba65abb2e53 /bin/bash
+    root@yourhost:/# su armx
+    $ freecashd -listen=1 -server=1 -datadir=/opt/newcoin -logtimemicros -gen=0 -daemon
+```
+
 
 ## 3. Install ElasticSearch
 * Download ES
@@ -152,6 +185,10 @@ UpdateDate: 2023-06-15
 ```
 	$ sudo apt install openjdk-19-jre-headless
 ```
+   For CentOs:
+```
+	$ sudo yum install java-latest-openjdk.x86_64
+```
 * Find the directory of jvm
 ```
 	$ readlink -f /usr/bin/java
@@ -164,13 +201,30 @@ or
 	
 - Find the java_HOME directory, assuming it's "/usr/lib/jvm/java-19-openjdk-amd64/".
 ```
-	$ keytool -importcert -file  /home/newuser/es/config/certs/http_ca.crt  -keystore /usr/lib/jvm/java-19-openjdk-amd64/lib/security/cacerts -storepass changeit -alias es
+	$ sudo keytool -importcert -file  /home/armx/elasticsearch-8.8.0/config/certs/http_ca.crt  -keystore /usr/lib/jvm/java-19-openjdk-amd64/lib/security/cacerts -storepass changeit -alias es
 ```
-## 5. Parse Freecash blockchain
-* Copy FchParser.jar to you server:
+## 5. Run Redis
+
+* install redis
 ```
-	$ scp FchParser.jar newuser@<server-ip>:/home/newuser/parsers/
+    * sudo apt install redis
 ```
+
+* Install and start redis on CentOs
+```
+    $ sudo yum install epel-release
+    $ sudo yum install redis
+    $ sudo systemctl start redis
+    $ redis-cli
+    > ping
+```
+
+## 6. Parse Freecash blockchain
+* Copy apip.zip to you server:
+```
+	$ scp apip.zip armx@<server-ip>:/home/armx/apip/
+```
+* Unzip apip.zip
 * Run FchParser.jar
 ```
 	$ java -jar FchParser.jar
@@ -187,11 +241,11 @@ or
 		- p2sh				//p2sh address information
 		- block_mark		//Parsing marks to locate blocks in the blk*.dat files 
 
-## 6. Parse FEIP protocol data from opreturn0.byte
+## 7. Parse FEIP protocol data from opreturn0.byte
 
 * Copy FeipParser.jar to the directory where FchParser.jar is
 ```
-	$ scp FeipParser.jar newuser@<server-ip>:/home/newuser/parsers/
+	$ scp FeipParser.jar armx@<server-ip>:/home/armx/parsers/
 ```
 * Run FchParser.jar
 ```
@@ -230,63 +284,39 @@ or
 		- parse_mark	//FEIP parsing marks
 		- order			//The orders for your APIP service
 
-## 7. Run Redis and ApipManager
+## Run ApipManager
 
-* Check if Homebrew exists
-```
-	$ brew --version
-```
-* If not, install Homebrew and do what the installer suggested
-```
-	$ /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-```
-* Install redis
-```
-	$ brew install redis
-```
-* Start redis
-```
-	$ brew services start redis
-```
-Or, if you don't want/need a background service you can just run:
-```
-	$  /home/linuxbrew/.linuxbrew/opt/redis/bin/redis-server /home/linuxbrew/.linuxbrew/etc/redis.conf
-```
-* Copy ApipManager.jar to the directory where FchParser.jar is in
-```
-	$ scp ApipManager.jar newuser@<server-ip>:/home/newuser/parsers/
-```
 * Run ApipManager
 ```
 	$ java -jar ApipManager.jar
 ```
-* List APIs and set nPrices in the first menu
-* Manage your service
-    - Menu
-    - 1 Manage Service
-    - 1 Publish New Service: get the publishing json str and write it in blockchain with a TX sent by your fch address.
-    - 2 Find service: After you published the service and wait a few minutes, find your service by the address, then save it into redis for you.
-    - 3 Show service: Show the detail of your service with json.
-* As the nPrice for all APIs and the service were set, ApipManager can be shutdown. 
+*  Run ApipManager.jar to initial some important parameters
+- Log in ES. The password of ES would have save been encrypted and saved in redis.
+- Manage your service information by Menu 1 Manage Service
+  -     1 Manage Service
+  -     2 Publish New Service: get the publishing json str and write it in blockchain with a TX sent by your fch address.
+  -     3 Find service: After you published the service and wait a few minutes, find your service by the address, then save it into redis for you.
+  -     4 Show service: Show the detail of your service with json.
+- Set the nPrice of your APIs by Menu 3 List APIs and Set nPrice
+- Set the windowTime by Menu Set windowTime
+- Switch on/off freeGet API service by Menu 7 Switch free get APIs
+
+* As the nPrice for all APIs and the service were set, ApipManager can be shutdown.
 * If you changed the `params` of the service on blockchain, you need to run ApipManager to reload your service in Manage Service entry.
 
-## 8. Run ApipServer
-	
+## 8. Deploy tomcat and APIP.war
 * Install Tomcat
 
 * Download and unzip tomcat
 ```
 	$ curl -O --insecure https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.76/bin/apache-tomcat-9.0.76.tar.gz
-	$ tar -xzvf apache-tomcat-9.0.76-deployer.tar.gz
+	$ tar -xzvf apache-tomcat-9.0.76.tar.gz
 ```
-* Copy APIP.war to tomcat/webapps/
-```
-	$ scp APIP.jar newuser@<server-ip>:/home/newuser/tomcat/webapps/
-```
+
+* Copy APIP.war to: apache-tomcat-9.0.76/webapps/
 
 * Start tomcat
 
-		- Before start tomcat, you have to run ApipManager.jar to initial some important parameters, such as the password of ElasticSearch client. It's not necessary to keep it running.
 ```
 	$ sudo ./startup.sh
 ```
@@ -295,6 +325,8 @@ Or, if you don't want/need a background service you can just run:
 	$ chmod +x startup.sh
 ```
 May be, there are more files to be done with "chmod".
+
+## 8. Run ApipServer
 
 * Try your APIP server from a web explorer with URL: 
 ```
@@ -338,7 +370,15 @@ A password will be required. Remember it.
 
 [6. Get the count of entries of all indices](https://<your domain name or IP>/APIP/freeGet/v1/getTotals)
 
-## 10. POST API list
+
+## 10. The default ports and allowed IPs:
+
+* freecash node : 8333 for 0.0.0.0, 8332 for 127.0.0.1
+* ElasticSearch: 9200 for 127.0.0.1
+* Tomcat: 8080 for 0.0.0.0
+* Redis : 6379 for 127.0.0.1
+
+## 11. POST API list
 
 * OpenAPI
 	- APIP0V1_OpenAPI

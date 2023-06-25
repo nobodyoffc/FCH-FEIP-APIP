@@ -95,9 +95,9 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
 [
 	{
 		"mailId": <string. txid where the mail was added.>,
-		"alg": <string. encrypting algorithm of the ciphertext.> ",
-		"ciphertextSend": <string. mail encrypted with the public key of the sender.>,
-		"ciphertextReci": <string. mail encrypted with the public key of the recipient.>,
+		"alg": <string. encrypting algorithm of the cipher.> ",
+		"cipherSend": <string. mail encrypted with the public key of the sender.>,
+		"cipherReci": <string. mail encrypted with the public key of the recipient.>,
 		"sender": <string. the sender of this mail.>
 		"recipient": <string. the recipient of this mail.>
 		"birthTime": <long. the timestamp of the block in which the group was published> ,
@@ -144,8 +144,8 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
       {
          "mailId": "e3e69cb370d08b34bd02cfe48a3a5c7ee006211f2841ff495e314343b0769336",
          "alg": "ECC256k1-AES256CBC",
-         "ciphertextSend": "AtpfHV/b+P2TMG8eFYpwdR7FCOhRjsK5I9UiZBIwUBtBAzi+B/tS5lMv27T9ofORhmSTYRYEfMIaffEwkwtfgEdormE5u4YKnBf001bWPeIQIXEz8HAj7XVt1rYLciJPdQ==",
-         "ciphertextReci": "Avmexwg3OUjOPl7KyAcu1VcAYy1ln90DmqLH/POOPtwDD6PhiitBd/aRjRBZR9Tx9khysbQLHXKFL4BJ6Af0J6iKiDLZXOfvlzdXNM+TzADj0ryOsX9vtVXPsiljS6PjFg==",
+         "cipherSend": "AtpfHV/b+P2TMG8eFYpwdR7FCOhRjsK5I9UiZBIwUBtBAzi+B/tS5lMv27T9ofORhmSTYRYEfMIaffEwkwtfgEdormE5u4YKnBf001bWPeIQIXEz8HAj7XVt1rYLciJPdQ==",
+         "cipherReci": "Avmexwg3OUjOPl7KyAcu1VcAYy1ln90DmqLH/POOPtwDD6PhiitBd/aRjRBZR9Tx9khysbQLHXKFL4BJ6Af0J6iKiDLZXOfvlzdXNM+TzADj0ryOsX9vtVXPsiljS6PjFg==",
          "textId": "c269f3b03960a695e1e2e4ab451bd645c7134d3328a327c98c00ed102f76b451",
          "sender": "FEk41Kqjar45fLDriztUDTUkdki7mmcjWK",
          "recipient": "F86zoAvNaQxEuYyvQssV5WxEzapNaiDtTW",
@@ -195,9 +195,9 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
 [
 	{
 		"mailId": <string. txid where the mail was added.>,
-		"alg": <string. encrypting algorithm of the ciphertext.> ",
-		"ciphertextSend": <string. mail encrypted with the public key of the sender.>,
-		"ciphertextReci": <string. mail encrypted with the public key of the recipient.>,
+		"alg": <string. encrypting algorithm of the cipher.> ",
+		"cipherSend": <string. mail encrypted with the public key of the sender.>,
+		"cipherReci": <string. mail encrypted with the public key of the recipient.>,
 		"sender": <string. the sender of this mail.>
 		"recipient": <string. the recipient of this mail.>
 		"birthTime": <long. the timestamp of the block in which the group was published> ,
@@ -244,8 +244,8 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
       {
          "mailId": "e51d9e87341bdb4ee497d2252dd1db075accf61df8dccd353ed518a558a066ac",
          "alg": "ECC256k1-AES256CBC",
-         "ciphertextSend": "AtpfHV/b+P2TMG8eFYpwdR7FCOhRjsK5I9UiZBIwUBtBAzi+B/tS5lMv27T9ofORhmSTYRYEfMIaffEwkwtfgEdormE5u4YKnBf001bWPeIQIXEz8HAj7XVt1rYLciJPdQ==",
-         "ciphertextReci": "Avmexwg3OUjOPl7KyAcu1VcAYy1ln90DmqLH/POOPtwDD6PhiitBd/aRjRBZR9Tx9khysbQLHXKFL4BJ6Af0J6iKiDLZXOfvlzdXNM+TzADj0ryOsX9vtVXPsiljS6PjFg==",
+         "cipherSend": "AtpfHV/b+P2TMG8eFYpwdR7FCOhRjsK5I9UiZBIwUBtBAzi+B/tS5lMv27T9ofORhmSTYRYEfMIaffEwkwtfgEdormE5u4YKnBf001bWPeIQIXEz8HAj7XVt1rYLciJPdQ==",
+         "cipherReci": "Avmexwg3OUjOPl7KyAcu1VcAYy1ln90DmqLH/POOPtwDD6PhiitBd/aRjRBZR9Tx9khysbQLHXKFL4BJ6Af0J6iKiDLZXOfvlzdXNM+TzADj0ryOsX9vtVXPsiljS6PjFg==",
          "textId": "c269f3b03960a695e1e2e4ab451bd645c7134d3328a327c98c00ed102f76b451",
          "sender": "FEk41Kqjar45fLDriztUDTUkdki7mmcjWK",
          "recipient": "F86zoAvNaQxEuYyvQssV5WxEzapNaiDtTW",
@@ -302,9 +302,9 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
 [
 	{
 		"mailId": <string. txid where the mail was added.>,
-		"alg": <string. encrypting algorithm of the ciphertext.> ",
-		"ciphertextSend": <string. mail encrypted with the public key of the sender.>,
-		"ciphertextReci": <string. mail encrypted with the public key of the recipient.>,
+		"alg": <string. encrypting algorithm of the cipher.> ",
+		"cipherSend": <string. mail encrypted with the public key of the sender.>,
+		"cipherReci": <string. mail encrypted with the public key of the recipient.>,
 		"sender": <string. the sender of this mail.>
 		"recipient": <string. the recipient of this mail.>
 		"birthTime": <long. the timestamp of the block in which the group was published> ,
@@ -357,8 +357,8 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
       {
          "mailId": "e3e69cb370d08b34bd02cfe48a3a5c7ee006211f2841ff495e314343b0769336",
          "alg": "ECC256k1-AES256CBC",
-         "ciphertextSend": "AtpfHV/b+P2TMG8eFYpwdR7FCOhRjsK5I9UiZBIwUBtBAzi+B/tS5lMv27T9ofORhmSTYRYEfMIaffEwkwtfgEdormE5u4YKnBf001bWPeIQIXEz8HAj7XVt1rYLciJPdQ==",
-         "ciphertextReci": "Avmexwg3OUjOPl7KyAcu1VcAYy1ln90DmqLH/POOPtwDD6PhiitBd/aRjRBZR9Tx9khysbQLHXKFL4BJ6Af0J6iKiDLZXOfvlzdXNM+TzADj0ryOsX9vtVXPsiljS6PjFg==",
+         "cipherSend": "AtpfHV/b+P2TMG8eFYpwdR7FCOhRjsK5I9UiZBIwUBtBAzi+B/tS5lMv27T9ofORhmSTYRYEfMIaffEwkwtfgEdormE5u4YKnBf001bWPeIQIXEz8HAj7XVt1rYLciJPdQ==",
+         "cipherReci": "Avmexwg3OUjOPl7KyAcu1VcAYy1ln90DmqLH/POOPtwDD6PhiitBd/aRjRBZR9Tx9khysbQLHXKFL4BJ6Af0J6iKiDLZXOfvlzdXNM+TzADj0ryOsX9vtVXPsiljS6PjFg==",
          "textId": "c269f3b03960a695e1e2e4ab451bd645c7134d3328a327c98c00ed102f76b451",
          "sender": "FEk41Kqjar45fLDriztUDTUkdki7mmcjWK",
          "recipient": "F86zoAvNaQxEuYyvQssV5WxEzapNaiDtTW",
@@ -370,8 +370,8 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
       {
          "mailId": "e51d9e87341bdb4ee497d2252dd1db075accf61df8dccd353ed518a558a066ac",
          "alg": "ECC256k1-AES256CBC",
-         "ciphertextSend": "AtpfHV/b+P2TMG8eFYpwdR7FCOhRjsK5I9UiZBIwUBtBAzi+B/tS5lMv27T9ofORhmSTYRYEfMIaffEwkwtfgEdormE5u4YKnBf001bWPeIQIXEz8HAj7XVt1rYLciJPdQ==",
-         "ciphertextReci": "Avmexwg3OUjOPl7KyAcu1VcAYy1ln90DmqLH/POOPtwDD6PhiitBd/aRjRBZR9Tx9khysbQLHXKFL4BJ6Af0J6iKiDLZXOfvlzdXNM+TzADj0ryOsX9vtVXPsiljS6PjFg==",
+         "cipherSend": "AtpfHV/b+P2TMG8eFYpwdR7FCOhRjsK5I9UiZBIwUBtBAzi+B/tS5lMv27T9ofORhmSTYRYEfMIaffEwkwtfgEdormE5u4YKnBf001bWPeIQIXEz8HAj7XVt1rYLciJPdQ==",
+         "cipherReci": "Avmexwg3OUjOPl7KyAcu1VcAYy1ln90DmqLH/POOPtwDD6PhiitBd/aRjRBZR9Tx9khysbQLHXKFL4BJ6Af0J6iKiDLZXOfvlzdXNM+TzADj0ryOsX9vtVXPsiljS6PjFg==",
          "textId": "c269f3b03960a695e1e2e4ab451bd645c7134d3328a327c98c00ed102f76b451",
          "sender": "FEk41Kqjar45fLDriztUDTUkdki7mmcjWK",
          "recipient": "F86zoAvNaQxEuYyvQssV5WxEzapNaiDtTW",

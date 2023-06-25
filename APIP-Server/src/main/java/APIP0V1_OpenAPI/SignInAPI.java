@@ -1,18 +1,13 @@
 package APIP0V1_OpenAPI;
 
-import AesEcc.ECIES;
-import AesEcc.EXPList;
+import EccAes256K1P7.EccAes256K1P7;
 import service.ApipService;
 import javaTools.BytesTools;
-import keyTools.KeyTools;
 import initial.Initiator;
 import redis.clients.jedis.Jedis;
 import service.Params;
 import startAPIP.RedisKeys;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -20,9 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.security.*;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,10 +26,10 @@ import static api.Constant.*;
 
 /**
  * 1. 验证请求
- *    1）公钥地址是否有余额：不在返回1000
- *    2）验证url是否当前请求url，不在返回1001
- *    3）时间戳是否在窗口期：不在返回1002
- *    4）验证签名，失败返回1003.
+ *    1）公钥地址是否有余额
+ *    2）验证url是否当前请求url
+ *    3）时间戳是否在窗口期
+ *    4）验证签名
  * 2. 分配session
  *    1) sessionKey: 32字节随机数
  *    2) sessionName: sessionKey的两次sha256值的hex字符串的后12个字符
@@ -56,14 +49,12 @@ import static api.Constant.*;
 
 @WebServlet(APIP0V1Path + SignInAPI)
 public class SignInAPI extends HttpServlet {
-    private static Jedis jedis1 = Initiator.jedis1Session;
-    private static Jedis jedis0 = Initiator.jedis0Common;
-    private static ApipService service = Initiator.service;
-    private static Params params = new Params();
-    private static long price = Initiator.price;
+    private static final Jedis jedis1 = Initiator.jedis1Session;
+    private static final Jedis jedis0 = Initiator.jedis0Common;
+    private static final ApipService service = Initiator.service;
     private String fid = null;
     private String pubKey = null;
-    private Replier replier = new Replier();
+    private final Replier replier = new Replier();
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -83,7 +74,7 @@ public class SignInAPI extends HttpServlet {
         fid = signInCheckResult.getFid();
         pubKey = signInCheckResult.getPubKey();
 
-        SignInReplyData signInReplyData = null;
+        SignInReplyData signInReplyData;
 
         try {
             signInReplyData = makeSession();
@@ -98,7 +89,7 @@ public class SignInAPI extends HttpServlet {
         writer.write(replier.reply0Success(fid));
     }
 
-    private SignInReplyData makeSession() throws NoSuchPaddingException, InvalidAlgorithmParameterException, UnsupportedEncodingException, IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException, InvalidKeyException {
+    private SignInReplyData makeSession() throws Exception {
 
         String sessionKey = genSessionKey();
         String sessionKeyEncrypted = encryptSessionKey(sessionKey,pubKey);
@@ -115,7 +106,7 @@ public class SignInAPI extends HttpServlet {
 
         //Set the new session
         jedis1.hmset(sessionName,sessionMap);
-        params = (Params) service.getParams();
+        Params params = service.getParams();
         jedis1.expire(sessionName,Long.parseLong(params.getSessionDays())*86400);
 
         data.setSessionKeyEncrypted(sessionKeyEncrypted);
@@ -135,36 +126,25 @@ public class SignInAPI extends HttpServlet {
 
         byte[] keyBytes = new byte[32];
         random.nextBytes(keyBytes);
-        String sessionKey = BytesTools.bytesToHexStringBE(keyBytes);
-        return sessionKey;
+        return BytesTools.bytesToHexStringBE(keyBytes);
     }
     private String makeSessionName(String sessionKey) {
         return sessionKey.substring(0,12);
     }
-    private String encryptSessionKey(String sessionKey, String pubKey) throws NoSuchPaddingException, InvalidKeyException, UnsupportedEncodingException, IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException {
-
-        String pubKey65 = KeyTools.recoverPK33ToPK65(pubKey);
-        byte[] pubKeyBytes = BytesTools.hexToByteArray(pubKey65.substring(2));
-
-        EXPList.set_EXP_List();
-        ECIES ecies = new ECIES();
-        ecies.getPair(pubKeyBytes);
-        byte[] cypherBytes = ecies.encrypt(sessionKey);
-        Base64.Encoder encoder = Base64.getEncoder();
-        String encryptedSessionKey = encoder.encodeToString(cypherBytes);//AES256.byteToHexString(cypherBytes);
-        return encryptedSessionKey;
+    private String encryptSessionKey(String sessionKey, String pubKey) throws Exception {
+        EccAes256K1P7 ecc = new EccAes256K1P7();
+        return ecc.encrypt(sessionKey,pubKey);
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setContentType("text/plain");
         resp.setCharacterEncoding("UTF-8");
-        resp.getWriter().write("This API accepts only POST request. 抱歉！");
+        resp.getWriter().write("This API accepts only POST request.");
     }
 
     @Override
-    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.getWriter().write("This API accepts only POST request. 抱歉！");
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        resp.getWriter().write("This API accepts only POST request.");
     }
-
 }

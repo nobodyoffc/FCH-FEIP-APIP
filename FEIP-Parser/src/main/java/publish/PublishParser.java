@@ -1,11 +1,13 @@
 package publish;
 
 import FeipClass.Proof;
+import FeipClass.Nid;
 import FeipClass.Statement;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.ElasticsearchException;
+import co.elastic.clients.elasticsearch.core.GetResponse;
 import com.google.gson.Gson;
-import fcTools.ParseTools;
+import fcTools.Hash;
 import opReturn.Feip;
 import opReturn.OpReturn;
 import servers.EsTools;
@@ -27,8 +29,6 @@ public class PublishParser {
         }catch(com.google.gson.JsonSyntaxException e) {
             return null;
         }
-
-        ParseTools.gsonPrint(proofRaw);
 
         ProofHistory proofHist = new ProofHistory();
 
@@ -82,9 +82,7 @@ public class PublishParser {
             default:
                 return null;
         }
-        //TODO
-        System.out.println("proof made.");
-        ParseTools.gsonPrint(proofHist);
+
         return proofHist;
     }
 
@@ -173,10 +171,6 @@ public class PublishParser {
                 proof.setLastTime(proofHist.getTime());
                 proof.setLastHeight(proofHist.getHeight());
 
-                //TODO
-                System.out.println("proof made.");
-                ParseTools.gsonPrint(proof);
-
                 Proof proof1=proof;
 
                 esClient.index(i->i.index(IndicesFEIP.ProofIndex).id(proofHist.getProofId()).document(proof1));
@@ -258,4 +252,98 @@ public class PublishParser {
         }
         return false;
     }
+
+    public boolean parseNid(ElasticsearchClient esClient, OpReturn opre, Feip feip) throws ElasticsearchException, IOException {
+        // TODO Auto-generated method stub
+        boolean isValid = false;
+
+        Gson gson = new Gson();
+
+        NidRaw nidRaw = new NidRaw();
+
+        try {
+            nidRaw = gson.fromJson(gson.toJson(feip.getData()), NidRaw.class);
+        }catch(com.google.gson.JsonSyntaxException e) {
+            return false;
+        }
+
+        Nid nid = new Nid();
+
+        long height;
+        switch(nidRaw.getOp()) {
+
+            case "add":
+                if(nidRaw.getName()==null)return false;
+                if(nidRaw.getOid()==null) return false;
+
+                nid.setNameId(Hash.Sha256x2(nidRaw.getName()+opre.getSigner()));
+                nid.setName(nidRaw.getName());
+                nid.setDesc(nidRaw.getDesc());
+                nid.setOid(nidRaw.getOid());
+
+                nid.setNamer(opre.getSigner());
+                nid.setBirthTime(opre.getTime());
+                nid.setBirthHeight(opre.getHeight());
+                nid.setLastTime(opre.getTime());
+                nid.setLastHeight(opre.getHeight());
+                nid.setActive(true);
+
+                Nid nid0 = nid;
+
+                esClient.index(i->i.index(IndicesFEIP.NidIndex).id(nid0.getNameId()).document(nid0));
+                isValid = true;
+                break;
+
+            case "stop":
+
+                if(nidRaw.getName()==null)return false;
+                String nameId = Hash.Sha256x2(nidRaw.getName()+opre.getSigner());
+                height = opre.getHeight();
+
+                GetResponse<Nid> result = esClient.get(g->g.index(IndicesFEIP.NidIndex).id(nameId), Nid.class);
+
+                if(!result.found())return false;
+
+                nid = result.source();
+
+                if(!nid.getNamer().equals(opre.getSigner()))return false;
+
+                nid.setActive(false);
+                nid.setLastTime(opre.getTime());
+                nid.setLastHeight(height);
+
+                Nid nid2 = nid;
+                esClient.index(i->i.index(IndicesFEIP.NidIndex).id(nid2.getNameId()).document(nid2));
+
+                isValid = true;
+                break;
+
+            case "recover":
+                if(nidRaw.getName()==null)return false;
+                String nameId1 = Hash.Sha256x2(nidRaw.getName()+opre.getSigner());
+                height = opre.getHeight();
+
+                GetResponse<Nid> result1 = esClient.get(g->g.index(IndicesFEIP.NidIndex).id(nameId1), Nid.class);
+
+                if(!result1.found())return false;
+
+                nid = result1.source();
+
+                if(!nid.getNamer().equals(opre.getSigner()))return false;
+
+                nid.setActive(true);
+                nid.setLastTime(opre.getTime());
+                nid.setLastHeight(height);
+
+                Nid nid3 = nid;
+                esClient.index(i->i.index(IndicesFEIP.NidIndex).id(nid3.getNameId()).document(nid3));
+
+                isValid = true;
+                break;
+            default:
+                break;
+        }
+        return isValid;
+    }
+
 }

@@ -14,7 +14,7 @@ public class Fcdsl{
     private ArrayList<Sort> sort;
     private List<String> after;
 
-    private String other;
+    private Object other;
 
 
     public void setFilterTerms(String field, String value) {
@@ -43,7 +43,7 @@ public class Fcdsl{
         this.except=except1;
     }
 
-    public String getOther() {
+    public Object getOther() {
         return other;
     }
 

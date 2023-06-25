@@ -55,7 +55,7 @@ public class CashValidForPay extends HttpServlet {
 
         long amount = 0;
         try {
-            amount = (long)(Double.parseDouble(requestBody.getFcdsl().getOther())*100000000);
+            amount = (long)(Double.parseDouble((String)requestBody.getFcdsl().getOther())*100000000);
             if(amount<=0){
                 response.setHeader(CodeInHeader, String.valueOf(Code1020OtherError));
                 replier.setData("amount <= 0");

@@ -5,9 +5,15 @@ public class ContactRaw {
 	private String op;
 	private String contactId;
 	private String alg;
-	private String ciphertext;
-	
+	private String cipher;
 
+	public String getCipher() {
+		return cipher;
+	}
+
+	public void setCipher(String cipher) {
+		this.cipher = cipher;
+	}
 	public String getOp() {
 		return op;
 	}
@@ -28,12 +34,5 @@ public class ContactRaw {
 	public void setAlg(String alg) {
 		this.alg = alg;
 	}
-	public String getCiphertext() {
-		return ciphertext;
-	}
-	public void setCiphertext(String ciphertext) {
-		this.ciphertext = ciphertext;
-	}
-	
 	
 }

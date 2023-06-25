@@ -1,4 +1,4 @@
-import AesEcc.AES128;
+import EccAes256K1P7.Aes256CbcP7;
 
 public class AESTest {
     public static void main(String[] args) throws Exception {
@@ -26,7 +26,7 @@ public class AESTest {
         System.out.println("cipherHBase64: "+ cipherBase64);
 
         //System.out.println("utf8:"+ new String(AES256.decrypt(cipherUtf8,keyUtf8),StandardCharsets.UTF_8));
-        System.out.println("textUtf8: "+ AES128.decryptFc(cipherBase64,keyHex));
+        System.out.println("textUtf8: "+ Aes256CbcP7.decrypt(cipherBase64,keyHex));
 
     }
 }

@@ -3,6 +3,8 @@ package servers;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import fcTools.ParseTools;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -44,10 +46,11 @@ public class ConfigBase {
         configFilePath = System.getProperty(UserDir);
 
     }
-
+    private static final Logger log = LoggerFactory.getLogger(ConfigBase.class);
     public <T> T getClassInstanceFromFile(BufferedReader br, Class<T> tClass) throws IOException {
 
         T t;
+        if(configFilePath==null)configFilePath=System.getProperty("user.dir");
         System.out.println("config path: "+configFilePath+" config name:"+configFileName);
         File configFile = new File(configFilePath,configFileName);
         System.out.println("Path of config.json: "+configFile.getAbsolutePath());
@@ -117,7 +120,8 @@ public class ConfigBase {
                 System.out.println("File '" + fileName + "' already exists.");
             }
         } catch (IOException e) {
-            System.out.println("Error creating the file '" + fileName + "': " + e.getMessage());
+            System.out.println("Error creating the file: " + fileName);
+            log.debug(e.getMessage());
         }
     }
 
@@ -130,6 +134,7 @@ public class ConfigBase {
                 configFile.createNewFile();
             }catch (Exception e){
                 System.out.println("Wrong file path.");
+                log.debug(e.getMessage());
                 return;
             }
         }
@@ -191,6 +196,7 @@ public class ConfigBase {
                 i = Integer.parseInt(str);
             } catch (Exception e) {
                 System.out.println("It must be a port. It's a integer between 0 and 655350. Input again.\"");
+                log.debug(e.getMessage());
             }
             if (i > 0 && i < 65535) {
                 this.esPort = i;
@@ -215,6 +221,7 @@ public class ConfigBase {
         String str = br.readLine();
         if ("d".equals(str)) {
             this.esUsername = null;
+            return;
         }
         if ("s".equals(str)||"".equals(str)) return;
         this.esUsername = str;

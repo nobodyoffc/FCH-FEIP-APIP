@@ -93,8 +93,8 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
 [
 	{
 		"secretId": <string. txid where the secret was added.>,
-		"alg": <string. encrypting algorithm of the ciphertext.> ",
-		"ciphertext": <string. encrypted details of the secret.>,
+		"alg": <string. encrypting algorithm of the cipher.> ",
+		"cipher": <string. encrypted details of the secret.>,
 		"owner": <string. the owner of this secret.>
 		"birthTime": <long. the timestamp of the block in which the group was published> ,
 		"birthHeight": <long. the height of the block in which the group was published>,
@@ -140,7 +140,7 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
       {
          "secretId": "6234623ab3befbbca0610a1a8c2821665a4734c6db40c2504256d672f446dd3f",
          "alg": "ECC256k1-AES256CBC",
-         "ciphertext": "Ap1G/crcuoG2WHpSoXIJ88y3pIKfXFSANe5Ht0BURS8NEf8iho8vn7ILXXz3dFWGqQ1dJCMoa5CceJSrmd7hDIKHQO11Xs7s4Fzkdgx/8mCWX/tiLWY24IQpw5csomwfcnINa6V4O0pfUeN0c+9uacLJB38moFz3jX3ameUvVFBEVRZBdPjfOyenmLjPTeq4XhcnB9Lyw4CyzHEtKSZjUcI2UmVhKywA3A9Iwqn+fZ4mczO0/GwoJhsZC+3gmUqKkB4oik1351eSmS9/jeUGioA=",
+         "cipher": "Ap1G/crcuoG2WHpSoXIJ88y3pIKfXFSANe5Ht0BURS8NEf8iho8vn7ILXXz3dFWGqQ1dJCMoa5CceJSrmd7hDIKHQO11Xs7s4Fzkdgx/8mCWX/tiLWY24IQpw5csomwfcnINa6V4O0pfUeN0c+9uacLJB38moFz3jX3ameUvVFBEVRZBdPjfOyenmLjPTeq4XhcnB9Lyw4CyzHEtKSZjUcI2UmVhKywA3A9Iwqn+fZ4mczO0/GwoJhsZC+3gmUqKkB4oik1351eSmS9/jeUGioA=",
          "owner": "FEk41Kqjar45fLDriztUDTUkdki7mmcjWK",
          "birthTime": 1684734246,
          "birthHeight": 1756255,
@@ -188,8 +188,8 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
 [
 	{
 		"secretId": <string. txid where the secret was added.>,
-		"alg": <string. encrypting algorithm of the ciphertext.> ",
-		"ciphertext": <string. encrypted details of the secret.>,
+		"alg": <string. encrypting algorithm of the cipher.> ",
+		"cipher": <string. encrypted details of the secret.>,
 		"owner": <string. the owner of this secret.>
 		"birthTime": <long. the timestamp of the block in which the group was published> ,
 		"birthHeight": <long. the height of the block in which the group was published>,
@@ -235,7 +235,7 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
       {
          "secretId": "fa5c2ca808fb6fabddd6d9b58f0c1467920e5ce5b25da59a26b1b77a33320eed",
          "alg": "ECC256k1-AES256CBC",
-         "ciphertext": "A5YX+a/UTWL4/MPBhyOeCdkJLKmzShDZPDJOYQiQVanZ+8l3a/AdusX96V/zjboIA2hOHL2LMzyywRuJsYAi+qhf17Bt45xzVJC0mlKuQl7bi8LSCbOvu6SzErtOxefqI0TcBY/aktlNYgPcYF6t4WdKs6OgLF+7s7+78nvqV87KxsOBNbxKy2CXdIuWqky+ttcHwcZDag0573SdeAaeVNY=",
+         "cipher": "A5YX+a/UTWL4/MPBhyOeCdkJLKmzShDZPDJOYQiQVanZ+8l3a/AdusX96V/zjboIA2hOHL2LMzyywRuJsYAi+qhf17Bt45xzVJC0mlKuQl7bi8LSCbOvu6SzErtOxefqI0TcBY/aktlNYgPcYF6t4WdKs6OgLF+7s7+78nvqV87KxsOBNbxKy2CXdIuWqky+ttcHwcZDag0573SdeAaeVNY=",
          "owner": "FEk41Kqjar45fLDriztUDTUkdki7mmcjWK",
          "birthTime": 1619135477,
          "birthHeight": 685746,

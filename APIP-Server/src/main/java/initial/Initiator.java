@@ -1,10 +1,12 @@
 package initial;
 
-import AesEcc.AES128;
+import EccAes256K1P7.Aes256CbcP7;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import com.google.gson.Gson;
 import fcTools.ParseTools;
 import opReturn.OpReFileTools;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 import scanner.MempoolCleaner;
 import scanner.MempoolScanner;
@@ -15,6 +17,7 @@ import service.Params;
 import startAPIP.ConfigAPIP;
 import startAPIP.IndicesAPIP;
 import startAPIP.RedisKeys;
+import startFEIP.StartFEIP;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServlet;
@@ -47,23 +50,26 @@ public class Initiator extends HttpServlet {
     public static long windowTime = 0;
     public static boolean isPricePerKBytes;
     public static boolean isPricePerRequest;
-
+    private static final Logger log = LoggerFactory.getLogger(StartFEIP.class);
     @Override
     public void init(ServletConfig config) {
+        log.debug("init starting...");
         NewEsClient newEsClient = new NewEsClient();
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
         try {
-            System.out.println("Redis started: " + jedis0Common.toString());
+            log.debug("Redis started: " + jedis0Common.toString());
         }catch (Exception e){
-            System.out.println("Startup redis first.");
+            log.error("Jedis server is not ready. Start it.");
             return;
         }
 
-        System.out.println("Create esClient for "+this.getClass());
+        log.debug("Create esClient for "+this.getClass()+"...");
+
         ConfigAPIP configAPIP = new ConfigAPIP();
         configAPIP.setConfigFilePath(jedis0Common.get(RedisKeys.ConfigFilePath));
-        System.out.println(configAPIP.getConfigFilePath());
+
+        log.debug("configAPIP path: "+configAPIP.getConfigFilePath());
 
         try {
             configAPIP = configAPIP.getClassInstanceFromFile(br,ConfigAPIP.class);
@@ -78,59 +84,68 @@ public class Initiator extends HttpServlet {
             }
             if (esClient == null) {
                 newEsClient.shutdownClient();
-                System.out.println("ElasticSearch is not ready.");
+                log.error("Creating ES client failed.");
                 return;
             }
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            log.error("Initiating ApipServer failed. \n"+e.getMessage());
         }
 
-        service = gson.fromJson(jedis0Common.get(IndicesAPIP.ServiceIndex), ApipService.class);
-        System.out.println("Service: "+ ParseTools.gsonString(service));
+
+        service = gson.fromJson(jedis0Common.get(RedisKeys.Service), ApipService.class);
+
+        if(service ==null )log.error("Reading service from redis failed.");
+
+        log.debug("Service: "+ ParseTools.gsonString(service));
 
         Params params = service.getParams();
 
         if(params.getPricePerRequest()!=null) {
             price = (long)(Double.parseDouble(params.getPricePerRequest())*100000000);
             isPricePerRequest = true;
-            System.out.println("PricePerRequest: "+ true);
+
+            log.debug("PricePerRequest: "+ true);
         }
 
         if(params.getPricePerKBytes()!=null) {
             price = (long)(Double.parseDouble(params.getPricePerKBytes())*100000000);
             isPricePerKBytes = true;
-            System.out.println("PricePerKBytes: "+ true);
+
+            log.debug("PricePerKBytes: "+ true);
         }
 
         if (jedis0Common.get("windowTime") == null) {
             jedis0Common.set("windowTime", "5000");
         }
         windowTime = Long.parseLong(jedis0Common.get("windowTime"));
-        System.out.println("windowTime: "+ windowTime);
 
+        log.debug("windowTime: "+ windowTime);
         if (configAPIP.isScanMempool()) {
-            System.out.println("Clean mempool data in Redis...");
+
+            log.debug("Clean mempool data in Redis...");
             MempoolCleaner mempoolCleaner = new MempoolCleaner(configAPIP.getBlockFilePath());
             mempoolCleaner.start();
 
             MempoolScanner mempoolScanner = new MempoolScanner();
             mempoolScanner.start();
-            System.out.println("Mempool scanner started: "+ true);
+
+            log.debug("Mempool scanner is running.");
         }
 
-        System.out.println("Start order scanner...");
+        log.debug("Start order scanner...");
         String opReturnFilePath = configAPIP.getOpReturnFilePath();
         String lastOpReturnFileName = OpReFileTools.getLastOpReturnFileName(opReturnFilePath);
 
         OrderScanner orderScanner = new OrderScanner(opReturnFilePath+lastOpReturnFileName);
         orderScanner.start();
+        log.debug("Order scanner is running.");
 
     }
 
     public static String getEsPassword(ConfigAPIP configAPIP, Jedis jedis) throws Exception {
         String esPasswordCipher = jedis.get(RedisKeys.EsPasswordCypher);
         if(esPasswordCipher==null)return null;
-        return AES128.decryptFc(esPasswordCipher,configAPIP.getRandomSymKeyHex());
+        return Aes256CbcP7.decrypt(esPasswordCipher,configAPIP.getRandomSymKeyHex());
     }
 
     public static boolean isFreeGetAllowed(PrintWriter writer) {

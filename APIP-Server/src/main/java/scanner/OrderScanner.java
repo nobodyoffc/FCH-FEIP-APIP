@@ -12,6 +12,8 @@ import initial.Initiator;
 import opReturn.OpReturn;
 import order.Order;
 import order.OrderOpReturn;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import parser.BlockFileTools;
 
 import redis.clients.jedis.Jedis;
@@ -44,8 +46,8 @@ public class OrderScanner extends Thread {
 
     private Params params=new Params();
 
-    private String opReturnFileStr;
-
+    private final String opReturnFileStr;
+    private static final Logger log = LoggerFactory.getLogger(OrderScanner.class);
     public OrderScanner(String opReturnFile) {
         this.opReturnFileStr = opReturnFile;
     }
@@ -55,7 +57,8 @@ public class OrderScanner extends Thread {
         service = gson.fromJson(jedis0Common.get(IndicesAPIP.ServiceIndex), ApipService.class);
         params = service.getParams();
         //Create ES client
-        System.out.println("Create esClient for "+this.getClass());
+        log.debug("Create esClient for "+this.getClass());
+
         ConfigAPIP configAPIP = new ConfigAPIP();
         configAPIP.setConfigFilePath(jedis0Common.get(RedisKeys.ConfigFilePath));
         NewEsClient newEsClient = new NewEsClient();
@@ -64,20 +67,23 @@ public class OrderScanner extends Thread {
             configAPIP = configAPIP.getClassInstanceFromFile(ConfigAPIP.class);
             if (configAPIP.getEsIp() == null||configAPIP.getEsPort()==0) System.out.println("Es IP is null. Config first.");
 
-
             if(jedis0Common.get(RedisKeys.EsPasswordCypher)!=null){
                 String esPassword = getEsPassword(configAPIP,jedis0Common);
-                if(esPassword==null)return;
+                if(esPassword==null){
+                    log.error("Decrypting ES password from redis failed.");
+                    return;
+                }
                 esClient = newEsClient.getClientHttps(configAPIP.getEsIp(), configAPIP.getEsPort(),configAPIP.getEsUsername(),esPassword);
             }else{
                 esClient = newEsClient.getClientHttp(configAPIP.getEsIp(), configAPIP.getEsPort());
             }
             if (esClient == null) {
                 newEsClient.shutdownClient();
-                System.out.println("ElasticSearch is not ready.");
+                log.error("Creating ES client failed for order scanner.");
                 return;
             }
         } catch (Exception e) {
+            log.error("Some thing wrong when creating ES client for order scanner.");
             throw new RuntimeException(e);
         }
 
@@ -101,8 +107,15 @@ public class OrderScanner extends Thread {
             waitNewBlock();
         }
     }
-
     private void checkIfNewStart() {
+        String lastHeightStr = jedis0Common.get(RedisKeys.OrderLastHeight);
+        if(lastHeightStr==null){
+            jedis0Common.set(RedisKeys.OrderLastHeight,"0");
+            jedis0Common.set(RedisKeys.OrderLastBlockId,"00000000cbe04361b1d6de82b893a7d8419e76e99dd2073ac0db2ba0e652eea8");
+        }
+    }
+
+    private void checkIfNewStart1() {
         long lastHeight;
         String lastBlockId = jedis0Common.get(RedisKeys.BestBlockId);
         if (lastBlockId==null) {
@@ -141,7 +154,7 @@ public class OrderScanner extends Thread {
     }
 
     private void reloadService() {
-        service = gson.fromJson(jedis0Common.get(IndicesAPIP.ServiceIndex), ApipService.class);
+        service = gson.fromJson(jedis0Common.get(RedisKeys.Service), ApipService.class);
 
         if (params.getPricePerRequest() != null) {
             Initiator.price = (long) (Double.parseDouble(params.getPricePerRequest()) * 100000000);
@@ -156,7 +169,7 @@ public class OrderScanner extends Thread {
 
     private void checkRollback() {
         long lastHeight = ReadRedis.readLong(jedis0Common, RedisKeys.OrderLastHeight);
-        String lastBlockId = jedis0Common.get(RedisKeys.BestBlockId);
+        String lastBlockId = jedis0Common.get(RedisKeys.OrderLastBlockId);
         try {
             if (Rollbacker.isRolledBack(esClient, lastHeight, lastBlockId))
                 Rollbacker.rollback(esClient, lastHeight - 30);

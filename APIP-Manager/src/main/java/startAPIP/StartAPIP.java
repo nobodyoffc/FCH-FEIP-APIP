@@ -1,6 +1,6 @@
 package startAPIP;
 
-import AesEcc.AES128;
+import EccAes256K1P7.Aes256CbcP7;
 import api.Constant;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.ElasticsearchException;
@@ -9,6 +9,7 @@ import co.elastic.clients.elasticsearch.indices.DeleteIndexResponse;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import FeipClass.Service;
+import fcTools.ParseTools;
 import menu.Menu;
 import order.Order;
 import org.slf4j.Logger;
@@ -21,10 +22,7 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import java.io.*;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
+import java.security.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -35,7 +33,7 @@ import static api.Constant.UserDir;
 public class StartAPIP {
 
 	private static final Logger log = LoggerFactory.getLogger(StartAPIP.class);
-	private static NewEsClient newEsClient = new NewEsClient();
+	private static final NewEsClient newEsClient = new NewEsClient();
 
 	public static void main(String[] args)throws Exception{
 
@@ -53,7 +51,8 @@ public class StartAPIP {
 
 		Jedis jedis = getJedis(configAPIP, br);
 		if(jedis==null){
-			System.out.println("Redis is not ready.");
+			log.debug("Redis is not ready.");
+			br.readLine();
 			return;
 		}
 
@@ -109,7 +108,7 @@ public class StartAPIP {
 						configAPIP.switchScanMempool();
 						configAPIP.writeConfigToFile();
 					}
-					System.out.println("scanMempool: "+configAPIP.isScanMempool());
+					log.debug("scanMempool: "+configAPIP.isScanMempool());
 					break;
 				case 6: //Set windowTime
 					String windowTimeStr = jedis.get(RedisKeys.WindowTime);
@@ -119,7 +118,7 @@ public class StartAPIP {
 					try{
 						long windowTime = Long.parseLong(windowTimeStr);
 						jedis.set(RedisKeys.WindowTime,windowTimeStr);
-						System.out.println("The windowTime was set to "+jedis.get(RedisKeys.WindowTime));
+						log.debug("The windowTime was set to "+jedis.get(RedisKeys.WindowTime));
 						br.readLine();
 					}catch (Exception e){
 						System.out.println("It's not a integer. ");
@@ -176,7 +175,7 @@ public class StartAPIP {
 					break;
 				case 0:
 					if (esClient != null) newEsClient.shutdownClient();
-					if(jedis!=null)jedis.close();
+					jedis.close();
 					System.out.println("Exited, see you again.");
 					end = true;
 					break;
@@ -218,9 +217,14 @@ public class StartAPIP {
 			}else {
 				try {
 					esClient = newEsClient.getClientHttps(configAPIP.getEsIp(), configAPIP.getEsPort(), configAPIP.getEsUsername(), password);
-					if (esClient != null) setEncryptedEsPassword(password, configAPIP, jedis);
+
+					if (esClient != null) {
+						setEncryptedEsPassword(password, configAPIP, jedis);
+					}else{
+						log.debug("Create SSL ES client failed. Check ES and Config.json.");
+					}
 				} catch (Exception e) {
-					System.out.println("Create SSL ES client failed. Check ES and Config.json.");
+					log.debug("Create SSL ES client failed. Check ES and Config.json.");
 					e.printStackTrace();
 				}
 			}
@@ -228,18 +232,18 @@ public class StartAPIP {
 		return esClient;
 	}
 
-	public static void setEncryptedEsPassword(String password, ConfigAPIP configAPIP,Jedis jedis) throws IOException, InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
+	public static void setEncryptedEsPassword(String password, ConfigAPIP configAPIP,Jedis jedis) throws IOException, InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException, NoSuchProviderException {
 
 		if(configAPIP.getRandomSymKeyHex()==null){
 			configAPIP.setSymKey();
 			configAPIP.writeConfigToFile();
-			//configAPIP.copyConfigFileIntoTomcat();
 		}
 
-		String esPasswordCipher = AES128.encryptFc(password,configAPIP.getRandomSymKeyHex());
+		String esPasswordCipher = Aes256CbcP7.encrypt(password,configAPIP.getRandomSymKeyHex());
 
 		jedis.set(RedisKeys.EsPasswordCypher,esPasswordCipher);
 		System.out.println("Your ES password is encrypted and saved locally.");
+		log.debug("ES password is encrypted and saved locally.");
 	}
 
 	private static void setNPrices(Jedis jedis, BufferedReader br) throws IOException {
@@ -331,61 +335,6 @@ public class StartAPIP {
 		return apiMap;
 	}
 
-	public static ElasticsearchClient checkEsClient(ElasticsearchClient esClient, ConfigAPIP configAPIP, BufferedReader br) throws IOException, KeyManagementException, NoSuchAlgorithmException {
-		if (esClient == null) {
-			if (configAPIP.getEsUsername() == null) {
-				return newEsClient.getClientHttp(configAPIP.getEsIp(), configAPIP.getEsPort());
-			} else {
-				System.out.println("Input the password of " + configAPIP.getEsUsername() + ":");
-				String password = br.readLine();
-				return newEsClient.getClientHttps(configAPIP.getEsIp(), configAPIP.getEsPort(), configAPIP.getEsUsername(), password);
-			}
-		}
-		return esClient;
-	}
-
-	public static ElasticsearchClient getEsClient(BufferedReader br, NewEsClient newEsClient) {
-		ElasticsearchClient esClient=null;
-		ConfigAPIP configAPIP = new ConfigAPIP();
-		try {
-			configAPIP = configAPIP.getClassInstanceFromFile(br,ConfigAPIP.class);
-			if (configAPIP == null || configAPIP.getEsIp() == null) configAPIP.config(br);
-
-			esClient = newEsClient.checkEsClient(esClient, configAPIP);
-			if (esClient == null) {
-				System.out.println("ES client is not available.");
-				newEsClient.shutdownClient();
-				return null;
-			}
-		} catch (Exception e) {
-			System.out.println("Create ES client failed.");
-			e.printStackTrace();
-			return null;
-		}
-		return esClient;
-	}
-
-	public static ElasticsearchClient getEsClient(NewEsClient newEsClient) {
-		ElasticsearchClient esClient=null;
-		ConfigAPIP configAPIP = new ConfigAPIP();
-		try {
-			configAPIP = configAPIP.getClassInstanceFromFile(ConfigAPIP.class);
-			if (configAPIP == null || configAPIP.getEsIp() == null)System.out.println("Es IP is null. Config first.") ;
-
-			esClient = newEsClient.checkEsClient(esClient, configAPIP);
-			if (esClient == null) {
-				System.out.println("ES client is not available.");
-				newEsClient.shutdownClient();
-				return null;
-			}
-		} catch (Exception e) {
-			System.out.println("Create ES client failed.");
-			e.printStackTrace();
-			return null;
-		}
-		return esClient;
-	}
-
 	private static void recreateOrderIndex(ElasticsearchClient esClient) throws InterruptedException {
 
 		if(esClient==null) {
@@ -396,10 +345,10 @@ public class StartAPIP {
 			DeleteIndexResponse req = esClient.indices().delete(c -> c.index("order"));
 
 			if(req.acknowledged()) {
-				log.info("Index order was deleted.");
+				log.debug("Index order was deleted.");
 			}
 		}catch(ElasticsearchException | IOException e) {
-			log.info("Deleting index order failed.",e);
+			log.debug("Deleting index order failed.",e);
 		}
 
 		TimeUnit.SECONDS.sleep(2);
@@ -411,13 +360,13 @@ public class StartAPIP {
 			orderJsonStrIs.close();
 			System.out.println(req.toString());
 			if(req.acknowledged()) {
-				log.info("Index order was created.");
+				log.debug("Index order was created.");
 			}else {
-				log.info("Creating index order failed.");
+				log.debug("Creating index order failed.");
 				return;
 			}
 		}catch(ElasticsearchException | IOException e) {
-			log.info("Creating index order failed.",e);
+			log.debug("Creating index order failed.",e);
 			return;
 		}
 	}
@@ -441,7 +390,7 @@ public class StartAPIP {
 					jedis.set("esPort", String.valueOf(configAPIP.getEsPort()));
 					return jedis;
 				}else {
-					System.out.println("Failed to startup redis.");
+					log.debug("Failed to startup redis.");
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -455,30 +404,6 @@ public class StartAPIP {
 		}
 	}
 
-	@SuppressWarnings("deprecation")
-	public static boolean execCmd(String command) {
-        // String command = "cmd /c D:\\workSoft\\apache-tomcat-8.0.53-9000\\bin\\startup.bat";
-
-        System.out.println(command);
-        Process exec = null;
-        BufferedReader in = null;
-        try {
-            exec = Runtime.getRuntime().exec(command);
-            System.out.println(exec.isAlive());
-            in = new BufferedReader(new InputStreamReader(exec.getInputStream()));
-            String line = null;
-            while ((line = in.readLine()) != null) {
-                System.out.println(line);
-            }
-            in.close();
-            return true;
-
-        } catch (Exception e) {
-            System.out.println("Something wrong.");
-            return false;
-        }
-    }
-
 	public static void findUsers(BufferedReader br) throws IOException {
 		System.out.println("Input user's fch address or session name. Press enter to list all users:");
 		String str = br.readLine();
@@ -491,15 +416,15 @@ public class StartAPIP {
 			Set<String> addrSet = jedis0Common.hkeys(RedisKeys.AddrSessionName);
 			for(String addr: addrSet){
 				UserAPIP user = getUser(addr,jedis0Common,jedis1Session);
-				System.out.println(user.toString());
+				System.out.println(ParseTools.gsonString(user));
 			}
 		}else{
 			if(jedis0Common.hget(RedisKeys.AddrSessionName,str)!=null){
 				UserAPIP user = getUser(str, jedis0Common, jedis1Session);
-				System.out.println(user.toString());
+				System.out.println(ParseTools.gsonString(user));
 			}else if(jedis1Session.hgetAll(str)!=null){
 				UserAPIP user = getUser(jedis1Session.hget(str,"addr"), jedis0Common, jedis1Session);
-				System.out.println(user.toString());
+				System.out.println(ParseTools.gsonString(user));
 			}
 		}
 

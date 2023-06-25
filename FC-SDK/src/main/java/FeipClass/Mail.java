@@ -3,8 +3,9 @@ package FeipClass;
 public class Mail {
 	private String mailId;
     private String alg;
-	private String ciphertextSend;
-	private String ciphertextReci;
+	private String cipher;
+	private String cipherSend;
+	private String cipherReci;
 	private String textId;
 	
 	private String sender;
@@ -22,17 +23,17 @@ public class Mail {
     public void setAlg(String alg) {
         this.alg = alg;
 	}
-	public String getCiphertextSend() {
-		return ciphertextSend;
+	public String getCipherSend() {
+		return cipherSend;
 	}
-	public void setCiphertextSend(String ciphertextSend) {
-		this.ciphertextSend = ciphertextSend;
+	public void setCipherSend(String cipherSend) {
+		this.cipherSend = cipherSend;
 	}
-	public String getCiphertextReci() {
-		return ciphertextReci;
+	public String getCipherReci() {
+		return cipherReci;
 	}
-	public void setCiphertextReci(String ciphertextReci) {
-		this.ciphertextReci = ciphertextReci;
+	public void setCipherReci(String cipherReci) {
+		this.cipherReci = cipherReci;
 	}
 	public long getBirthTime() {
 		return birthTime;
@@ -82,6 +83,12 @@ public class Mail {
 	public void setTextId(String textId) {
 		this.textId = textId;
 	}
-	
-	
+
+	public String getCipher() {
+		return cipher;
+	}
+
+	public void setCipher(String cipher) {
+		this.cipher = cipher;
+	}
 }

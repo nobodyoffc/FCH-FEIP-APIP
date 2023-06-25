@@ -1,6 +1,5 @@
 package APIP0V1_OpenAPI;
 
-import AesEcc.AES128;
 import com.google.gson.Gson;
 import javaTools.BytesTools;
 import cryptoTools.SHA;
@@ -17,6 +16,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.security.SignatureException;
 import java.util.HashMap;
+import java.util.HexFormat;
 import java.util.Map;
 
 import static api.Constant.*;
@@ -259,7 +259,7 @@ public class RequestChecker {
     private boolean isGoodSymSign(String sign) {
         if(sign==null)return false;
         byte[] signBytes = BytesTools.bytesMerger(requestBodyBytes, BytesTools.hexToByteArray(sessionKey));
-        String doubleSha256Hash = AES128.byteToHexString(SHA.Sha256x2(signBytes));
+        String doubleSha256Hash = HexFormat.of().formatHex(SHA.Sha256x2(signBytes));
 
         if(!sign.equals(doubleSha256Hash)){
             replier.setData(doubleSha256Hash);

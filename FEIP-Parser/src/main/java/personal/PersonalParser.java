@@ -8,7 +8,6 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import co.elastic.clients.elasticsearch.core.GetResponse;
 import com.google.gson.Gson;
-import fcTools.ParseTools;
 import opReturn.Feip;
 import opReturn.OpReturn;
 import servers.EsTools;
@@ -22,85 +21,84 @@ public class PersonalParser {
 	public boolean parseContact(ElasticsearchClient esClient, OpReturn opre, Feip feip) throws ElasticsearchException, IOException {
 		// TODO Auto-generated method stub
 		boolean isValid = false;
-		
+
 		Gson gson = new Gson();
-		
+
 		ContactRaw contactRaw = new ContactRaw();
-		
+
 		try {
 			contactRaw = gson.fromJson(gson.toJson(feip.getData()), ContactRaw.class);
 		}catch(com.google.gson.JsonSyntaxException e) {
 			return isValid;
 		}
-		
+
 		Contact contact = new Contact();
-		
+
 		long height;
 		switch(contactRaw.getOp()) {
-		
-		case "add":
-			contact.setContactId(opre.getTxId());
 
-            if (contactRaw.getAlg() != null) {
-                contact.setAlg(contactRaw.getAlg());
-			}
-			contact.setCiphertext(contactRaw.getCiphertext());
-			
-			contact.setOwner(opre.getSigner());
-			contact.setBirthTime(opre.getTime());
-			contact.setBirthHeight(opre.getHeight());
-			contact.setLastHeight(opre.getHeight());
-			contact.setActive(true);
-			
-			Contact contact1 = contact;
-			esClient.index(i->i.index(IndicesFEIP.ContactIndex).id(contact1.getContactId()).document(contact1));
-			isValid = true;
-			break;
-		case "delete":
-			if(contactRaw.getContactId() ==null)return isValid;
-			height = opre.getHeight();
-			ContactRaw contactRaw1 = contactRaw;
-			
-			GetResponse<Contact> result = esClient.get(g->g.index(IndicesFEIP.ContactIndex).id(contactRaw1.getContactId()), Contact.class);
-			
-			if(!result.found())return isValid;
+			case "add":
+				contact.setContactId(opre.getTxId());
 
-			contact = result.source();
-			
-			if(!contact.getOwner().equals(opre.getSigner()))return isValid;
-			
-			contact.setActive(false);
-			contact.setLastHeight(height);
-			
-			Contact contact2 = contact;
-			esClient.index(i->i.index(IndicesFEIP.ContactIndex).id(contact2.getContactId()).document(contact2));
-			
-			isValid = true;
-			break;
-		case "recover":
-			if(contactRaw.getContactId() ==null)return isValid;
-			height = opre.getHeight();
-			
-			ContactRaw contactRaw2 = contactRaw;
-			
-			GetResponse<Contact> result1 = esClient.get(g->g.index(IndicesFEIP.ContactIndex).id(contactRaw2.getContactId()), Contact.class);
-			
-			if(!result1.found())return isValid;
+            	if (contactRaw.getAlg() != null)contact.setAlg(contactRaw.getAlg());
+				if (contact.getContactId()==null)return false;
+				contact.setCipher(contactRaw.getCipher());
 
-			contact = result1.source();
-			
-			if(!contact.getOwner().equals(opre.getSigner()))return isValid;
-			
-			contact.setActive(true);
-			contact.setLastHeight(height);
-			
-			Contact contact3 = contact;
-			esClient.index(i->i.index(IndicesFEIP.ContactIndex).id(contact3.getContactId()).document(contact3));
-			
-			isValid = true;
-			break;
-		default:
-			break;
+				contact.setOwner(opre.getSigner());
+				contact.setBirthTime(opre.getTime());
+				contact.setBirthHeight(opre.getHeight());
+				contact.setLastHeight(opre.getHeight());
+				contact.setActive(true);
+
+				Contact contact1 = contact;
+				esClient.index(i->i.index(IndicesFEIP.ContactIndex).id(contact1.getContactId()).document(contact1));
+				isValid = true;
+				break;
+			case "delete":
+				if(contactRaw.getContactId() ==null)return isValid;
+				height = opre.getHeight();
+				ContactRaw contactRaw1 = contactRaw;
+
+				GetResponse<Contact> result = esClient.get(g->g.index(IndicesFEIP.ContactIndex).id(contactRaw1.getContactId()), Contact.class);
+
+				if(!result.found())return isValid;
+
+				contact = result.source();
+
+				if(!contact.getOwner().equals(opre.getSigner()))return isValid;
+
+				contact.setActive(false);
+				contact.setLastHeight(height);
+
+				Contact contact2 = contact;
+				esClient.index(i->i.index(IndicesFEIP.ContactIndex).id(contact2.getContactId()).document(contact2));
+
+				isValid = true;
+				break;
+			case "recover":
+				if(contactRaw.getContactId() ==null)return isValid;
+				height = opre.getHeight();
+
+				ContactRaw contactRaw2 = contactRaw;
+
+				GetResponse<Contact> result1 = esClient.get(g->g.index(IndicesFEIP.ContactIndex).id(contactRaw2.getContactId()), Contact.class);
+
+				if(!result1.found())return isValid;
+
+				contact = result1.source();
+
+				if(!contact.getOwner().equals(opre.getSigner()))return isValid;
+
+				contact.setActive(true);
+				contact.setLastHeight(height);
+
+				Contact contact3 = contact;
+				esClient.index(i->i.index(IndicesFEIP.ContactIndex).id(contact3.getContactId()).document(contact3));
+
+				isValid = true;
+				break;
+			default:
+				break;
 		}
 		return isValid;
 	}
@@ -108,209 +106,215 @@ public class PersonalParser {
 	public boolean parseMail(ElasticsearchClient esClient, OpReturn opre, Feip feip) throws ElasticsearchException, IOException {
 		// TODO Auto-generated method stub
 		boolean isValid = false;
-		
+
 		Gson gson = new Gson();
-		
+
 		MailRaw mailRaw = new MailRaw();
-		
+
 		try {
 			mailRaw = gson.fromJson(gson.toJson(feip.getData()),MailRaw.class);
 		}catch(com.google.gson.JsonSyntaxException e) {
 			return isValid;
 		}
-		
+
 		Mail mail = new Mail();
-		
+
 		long height;
 		if(mailRaw.getOp()==null && mailRaw.getMsg()==null)return isValid;
+
 		// For the old version mails.
 		if(mailRaw.getMsg()!=null) {
             mail.setAlg(mailRaw.getAlg());
-			mail.setCiphertextReci(mailRaw.getMsg());
-			
+			mail.setCipherReci(mailRaw.getMsg());
+
 			mail.setSender(opre.getSigner());
 			mail.setRecipient(opre.getRecipient());
 			mail.setBirthTime(opre.getTime());
 			mail.setBirthHeight(opre.getHeight());
 			mail.setLastHeight(opre.getHeight());
 			mail.setActive(true);
-			
+
 			Mail mail1 = mail;
 			esClient.index(i->i.index(IndicesFEIP.MailIndex).id(mail1.getMailId()).document(mail1));
-			
+
 			isValid = true;
 			return isValid;
 		}
 		//Version 4
 		if(mailRaw.getOp()!=null) {
 			switch(mailRaw.getOp()) {
-			case "send":
-				mail.setMailId(opre.getTxId());
+				case "send":
+					mail.setMailId(opre.getTxId());
+					if(mailRaw.getCipher()==null
+							&&mailRaw.getCipherReci()==null
+							&&mailRaw.getCipherSend()==null)
+						return false;
 
-                if (mailRaw.getAlg() != null) {
-                    mail.setAlg(mailRaw.getAlg());
-				}
-				
-				if(mailRaw.getCiphertextSend()!=null) {
-				mail.setCiphertextSend(mailRaw.getCiphertextSend());
-				}
-				
-				if(mailRaw.getCiphertextReci()!=null) {
-					mail.setCiphertextReci(mailRaw.getCiphertextReci());
-				}else return isValid;
-				
-				if(mailRaw.getTextId()!=null) {
-					mail.setTextId(mailRaw.getTextId());
-				}
-				
-				mail.setSender(opre.getSigner());
-				mail.setRecipient(opre.getRecipient());
-				mail.setBirthTime(opre.getTime());
-				mail.setBirthHeight(opre.getHeight());
-				mail.setLastHeight(opre.getHeight());
-				mail.setActive(true);
-				
-				Mail mail0 = mail;
-				esClient.index(i->i.index(IndicesFEIP.MailIndex).id(mail0.getMailId()).document(mail0));
-				isValid = true;
-				break;
-			case "delete":
-				if(mailRaw.getMailId() ==null)return isValid;
-				height = opre.getHeight();
-				MailRaw mailRaw1 = mailRaw;
-				
-				GetResponse<Mail> result = esClient.get(g->g.index(IndicesFEIP.MailIndex).id(mailRaw1.getMailId()), Mail.class);
-				
-				if(!result.found())return isValid;
+					if (mailRaw.getAlg() != null) {
+						mail.setAlg(mailRaw.getAlg());
+					}
 
-				mail = result.source();
-				
-				if(!mail.getRecipient().equals(opre.getSigner()))return isValid;
-				
-				mail.setActive(false);
-				mail.setLastHeight(height);
-				
-				Mail mail2 = mail;
-				esClient.index(i->i.index(IndicesFEIP.MailIndex).id(mail2.getMailId()).document(mail2));
-				
-				isValid = true;
-				break;
-			case "recover":
-				if(mailRaw.getMailId() ==null)return isValid;
-				height = opre.getHeight();
-				MailRaw mailRaw2 = mailRaw;
-				
-				GetResponse<Mail> result1 = esClient.get(g->g.index(IndicesFEIP.MailIndex).id(mailRaw2.getMailId()), Mail.class);
-				
-				if(!result1.found())return isValid;
+					if(mailRaw.getCipher()!=null) {
+						mail.setCipher(mailRaw.getCipher());
+					}else  {
+						if(mailRaw.getCipherSend()!=null)mail.setCipherSend(mailRaw.getCipherSend());
+						if(mailRaw.getCipherReci()!=null) {
+							mail.setCipherReci(mailRaw.getCipherReci());
+						}
+					}
 
-				mail = result1.source();
-				
-				if(!mail.getRecipient().equals(opre.getSigner()))return isValid;
-				
-				mail.setActive(true);
-				mail.setLastHeight(height);
-				
-				Mail mail3 = mail;
-				esClient.index(i->i.index(IndicesFEIP.MailIndex).id(mail3.getMailId()).document(mail3));
-				
-				isValid = true;
-				break;
-			default:
-				break;
+					if(mailRaw.getTextId()!=null) {
+						mail.setTextId(mailRaw.getTextId());
+					}
+
+					mail.setSender(opre.getSigner());
+					mail.setRecipient(opre.getRecipient());
+					mail.setBirthTime(opre.getTime());
+					mail.setBirthHeight(opre.getHeight());
+					mail.setLastHeight(opre.getHeight());
+					mail.setActive(true);
+
+					Mail mail0 = mail;
+					esClient.index(i->i.index(IndicesFEIP.MailIndex).id(mail0.getMailId()).document(mail0));
+					isValid = true;
+					break;
+				case "delete":
+					if(mailRaw.getMailId() ==null)return isValid;
+					height = opre.getHeight();
+					MailRaw mailRaw1 = mailRaw;
+
+					GetResponse<Mail> result = esClient.get(g->g.index(IndicesFEIP.MailIndex).id(mailRaw1.getMailId()), Mail.class);
+
+					if(!result.found())return isValid;
+
+					mail = result.source();
+
+					if(!mail.getRecipient().equals(opre.getSigner()))return isValid;
+
+					mail.setActive(false);
+					mail.setLastHeight(height);
+
+					Mail mail2 = mail;
+					esClient.index(i->i.index(IndicesFEIP.MailIndex).id(mail2.getMailId()).document(mail2));
+
+					isValid = true;
+					break;
+				case "recover":
+					if(mailRaw.getMailId() ==null)return isValid;
+					height = opre.getHeight();
+					MailRaw mailRaw2 = mailRaw;
+
+					GetResponse<Mail> result1 = esClient.get(g->g.index(IndicesFEIP.MailIndex).id(mailRaw2.getMailId()), Mail.class);
+
+					if(!result1.found())return isValid;
+
+					mail = result1.source();
+
+					if(!mail.getRecipient().equals(opre.getSigner()))return isValid;
+
+					mail.setActive(true);
+					mail.setLastHeight(height);
+
+					Mail mail3 = mail;
+					esClient.index(i->i.index(IndicesFEIP.MailIndex).id(mail3.getMailId()).document(mail3));
+
+					isValid = true;
+					break;
+				default:
+					break;
 			}
 		}
 		return isValid;
 	}
 
-	public boolean parseSafe(ElasticsearchClient esClient, OpReturn opre, Feip feip) throws ElasticsearchException, IOException {
+	public boolean parseSecret(ElasticsearchClient esClient, OpReturn opre, Feip feip) throws ElasticsearchException, IOException {
 		// TODO Auto-generated method stub
 		boolean isValid = false;
-		
+
 		Gson gson = new Gson();
-		
-		SecretRaw safeRaw = new SecretRaw();
-		
+
+		SecretRaw secretRaw = new SecretRaw();
+
 		try {
-			safeRaw = gson.fromJson(gson.toJson(feip.getData()), SecretRaw.class);
+			secretRaw = gson.fromJson(gson.toJson(feip.getData()), SecretRaw.class);
 		}catch(com.google.gson.JsonSyntaxException e) {
 			return false;
 		}
-		
-		Secret safe = new Secret();
-		
+
+		Secret secret = new Secret();
+
 		long height;
-		switch(safeRaw.getOp()) {
-		
-		case "add":
-			safe.setSecretId(opre.getTxId());
+		switch(secretRaw.getOp()) {
 
-            if (safeRaw.getAlg() != null) {
-                safe.setAlg(safeRaw.getAlg());
+			case "add":
+				secret.setSecretId(opre.getTxId());
+
+            if (secretRaw.getAlg() != null) {
+                secret.setAlg(secretRaw.getAlg());
 			}
-			
-			if(safeRaw.getCiphertext()!=null) {
-				safe.setCiphertext(safeRaw.getCiphertext());
-			}else if(safeRaw.getMsg()!=null) {
-				safe.setCiphertext(safeRaw.getMsg());
-			}else return false;
-			
-			safe.setOwner(opre.getSigner());
-			safe.setBirthTime(opre.getTime());
-			safe.setBirthHeight(opre.getHeight());
-			safe.setLastHeight(opre.getHeight());
-			safe.setActive(true);
-			
-			Secret safe0 = safe;
-			
-			esClient.index(i->i.index(IndicesFEIP.SecretIndex).id(safe0.getSecretId()).document(safe0));
-			isValid = true;
-			break;
-			
-		case "delete":
-			if(safeRaw.getSecretId() ==null)return false;
-			height = opre.getHeight();
-			SecretRaw safeRaw1 = safeRaw;
-			
-			GetResponse<Secret> result = esClient.get(g->g.index(IndicesFEIP.SecretIndex).id(safeRaw1.getSecretId()), Secret.class);
-			
-			if(!result.found())return isValid;
 
-			safe = result.source();
-			
-			if(!safe.getOwner().equals(opre.getSigner()))return isValid;
-			
-			safe.setActive(false);
-			safe.setLastHeight(height);
-			
-			Secret safe2 = safe;
-			esClient.index(i->i.index(IndicesFEIP.SecretIndex).id(safe2.getSecretId()).document(safe2));
-			
-			isValid = true;
-			break;
-		case "recover":
-			if(safeRaw.getSecretId() ==null)return isValid;
-			height = opre.getHeight();
-			SecretRaw safeRaw2 = safeRaw;
-			
-			GetResponse<Secret> result1 = esClient.get(g->g.index(IndicesFEIP.SecretIndex).id(safeRaw2.getSecretId()), Secret.class);
-			
-			if(!result1.found())return isValid;
+				if(secretRaw.getCipher()!=null) {
+					secret.setCipher(secretRaw.getCipher());
+				}else if(secretRaw.getMsg()!=null) {
+					secret.setCipher(secretRaw.getMsg());
+				}else return false;
 
-			safe = result1.source();
-			
-			if(!safe.getOwner().equals(opre.getSigner()))return isValid;
-			
-			safe.setActive(true);
-			safe.setLastHeight(height);
-			
-			Secret safe3 = safe;
-			esClient.index(i->i.index(IndicesFEIP.SecretIndex).id(safe3.getSecretId()).document(safe3));
-			
-			isValid = true;
-			break;
-		default:
-			break;
+				secret.setOwner(opre.getSigner());
+				secret.setBirthTime(opre.getTime());
+				secret.setBirthHeight(opre.getHeight());
+				secret.setLastHeight(opre.getHeight());
+				secret.setActive(true);
+
+				Secret safe0 = secret;
+
+				esClient.index(i->i.index(IndicesFEIP.SecretIndex).id(safe0.getSecretId()).document(safe0));
+				isValid = true;
+				break;
+
+			case "delete":
+				if(secretRaw.getSecretId() ==null)return false;
+				height = opre.getHeight();
+				SecretRaw safeRaw1 = secretRaw;
+
+				GetResponse<Secret> result = esClient.get(g->g.index(IndicesFEIP.SecretIndex).id(safeRaw1.getSecretId()), Secret.class);
+
+				if(!result.found())return isValid;
+
+				secret = result.source();
+
+				if(!secret.getOwner().equals(opre.getSigner()))return isValid;
+
+				secret.setActive(false);
+				secret.setLastHeight(height);
+
+				Secret safe2 = secret;
+				esClient.index(i->i.index(IndicesFEIP.SecretIndex).id(safe2.getSecretId()).document(safe2));
+
+				isValid = true;
+				break;
+			case "recover":
+				if(secretRaw.getSecretId() ==null)return isValid;
+				height = opre.getHeight();
+				SecretRaw safeRaw2 = secretRaw;
+
+				GetResponse<Secret> result1 = esClient.get(g->g.index(IndicesFEIP.SecretIndex).id(safeRaw2.getSecretId()), Secret.class);
+
+				if(!result1.found())return isValid;
+
+				secret = result1.source();
+
+				if(!secret.getOwner().equals(opre.getSigner()))return isValid;
+
+				secret.setActive(true);
+				secret.setLastHeight(height);
+
+				Secret safe3 = secret;
+				esClient.index(i->i.index(IndicesFEIP.SecretIndex).id(safe3.getSecretId()).document(safe3));
+
+				isValid = true;
+				break;
+			default:
+				break;
 		}
 		return isValid;
 	}
@@ -326,8 +330,6 @@ public class PersonalParser {
 			return null;
 		}
 
-		ParseTools.gsonPrint(boxRaw);
-
 		BoxHistory boxHist = new BoxHistory();
 
 		if(boxRaw.getOp()==null)return null;
@@ -336,7 +338,7 @@ public class PersonalParser {
 
 		switch(boxRaw.getOp()) {
 			case "create":
-				if(boxRaw.getName()==null)	return null;
+				if(boxRaw.getName()==null) return null;
 				if(boxRaw.getBid()!=null) return null;
                 if (opre.getHeight() > StartFEIP.CddCheckHeight && opre.getCdd() < StartFEIP.CddRequired * 100)
                     return null;
@@ -350,11 +352,13 @@ public class PersonalParser {
 				if(boxRaw.getName()!=null)boxHist.setName(boxRaw.getName());
 				if(boxRaw.getDesc()!=null)boxHist.setDesc(boxRaw.getDesc());
 				if(boxRaw.getContain()!=null)boxHist.setContain(boxRaw.getContain());
+				if(boxRaw.getCipher()!=null)boxHist.setCipher(boxRaw.getCipher());
+				if(boxRaw.getAlg()!=null)boxHist.setAlg(boxRaw.getAlg());
 
 				break;
 			case "update":
-				if(boxRaw.getBid()==null)	return null;
-				if(boxRaw.getName()==null)	return null;
+				if(boxRaw.getBid()==null) return null;
+				if(boxRaw.getName()==null) return null;
 
 				boxHist.setTxId(opre.getTxId());
 				boxHist.setBid(boxRaw.getBid());
@@ -366,6 +370,8 @@ public class PersonalParser {
 				if(boxRaw.getName()!=null)boxHist.setName(boxRaw.getName());
 				if(boxRaw.getDesc()!=null)boxHist.setDesc(boxRaw.getDesc());
 				if(boxRaw.getContain()!=null)boxHist.setContain(boxRaw.getContain());
+				if(boxRaw.getCipher()!=null)boxHist.setCipher(boxRaw.getCipher());
+				if(boxRaw.getAlg()!=null)boxHist.setAlg(boxRaw.getAlg());
 				break;
 			case "drop":
 
@@ -395,9 +401,11 @@ public class PersonalParser {
 				if(box==null) {
 					box = new Box();
 					box.setBid(boxHist.getTxId());
-					box.setName(boxHist.getName());
-					box.setDesc(boxHist.getDesc());
-					box.setContain(boxHist.getContain());
+					if(boxHist.getName()!=null)box.setName(boxHist.getName());
+					if(boxHist.getDesc()!=null)box.setDesc(boxHist.getDesc());
+					if(boxHist.getContain()!=null)box.setContain(boxHist.getContain());
+					if(boxHist.getCipher()!=null)box.setCipher(boxHist.getCipher());
+					if(boxHist.getAlg()!=null)box.setAlg(boxHist.getAlg());
 
 					box.setOwner(boxHist.getSigner());
 					box.setBirthTime(boxHist.getTime());
@@ -487,9 +495,11 @@ public class PersonalParser {
 					break;
 				}
 
-				box.setName(boxHist.getName());
-				box.setDesc(boxHist.getDesc());
-				box.setContain(boxHist.getContain());
+				if(boxHist.getName()!=null)box.setName(boxHist.getName());
+				if(boxHist.getDesc()!=null)box.setDesc(boxHist.getDesc());
+				if(boxHist.getContain()!=null)box.setContain(boxHist.getContain());
+				if(boxHist.getCipher()!=null)box.setCipher(boxHist.getCipher());
+				if(boxHist.getAlg()!=null)box.setAlg(boxHist.getAlg());
 
 				box.setLastTxId(boxHist.getTxId());
 				box.setLastTime(boxHist.getTime());

@@ -4,7 +4,7 @@ public class Contact {
 
 	private String contactId;
     private String alg;
-	private String ciphertext;
+	private String cipher;
 	
 	private String owner;
 	private long birthTime;
@@ -26,11 +26,11 @@ public class Contact {
     public void setAlg(String alg) {
         this.alg = alg;
 	}
-	public String getCiphertext() {
-		return ciphertext;
+	public String getCipher() {
+		return cipher;
 	}
-	public void setCiphertext(String ciphertext) {
-		this.ciphertext = ciphertext;
+	public void setCipher(String cipher) {
+		this.cipher = cipher;
 	}
 	public String getOwner() {
 		return owner;

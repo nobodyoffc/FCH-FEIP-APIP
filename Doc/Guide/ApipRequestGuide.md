@@ -16,7 +16,7 @@ UpdateDate: 2023-06-09
 
 ## Resources for download
 
-[https://cid.cash/download/](https://cid.cash/download/)
+[Download FCH-FEIP-APIP Package](http://154.221.28.61:8080/download/FchFeipApipInstall.zip)
 
 ## Free GET APIs:
 
@@ -38,7 +38,9 @@ APIs above can be requested for free. More POST APIs need that the requester pai
 
 Before requesting POST APIs for data, you have to:
 
-(1) *Buy service*: send more than 1 fch to `FUmo2eez6VK2sfGWjek9i9aK5y1mdHSnqv` with below JSON attatched:
+### Buy service
+
+Send more than 1 fch to `FUmo2eez6VK2sfGWjek9i9aK5y1mdHSnqv` with below JSON attatched:
 
 ```
 {
@@ -54,7 +56,9 @@ Before requesting POST APIs for data, you have to:
 }
 ```
 
-(2) *SignIn*: POST https://cid.cash/APIP/apip0/v1/signIn
+### SignIn
+
+POST https://cid.cash/APIP/apip0/v1/signIn
 		
 * Request header:
 

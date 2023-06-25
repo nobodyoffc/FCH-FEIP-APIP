@@ -66,13 +66,14 @@ UpdateDate: 2023-05-22
 
 When user sends a mail, the data object contains:
 
-|field|type|content|required|
-|:----|:----|:----|:----|
-|op|string|operation: "send"|Y|
-|alg|string|The encrypt algorithm. "ECC256k1-AES256CBC" is recommended.|Y|
-|ciphertextSend|string|mail encrypted with the public key of the sender|Y|
-|ciphertextReci|string|mail encrypted with the public key of the recipient|Y|
-|textId|string|Double sha256 hash value of the plain text of the mail|N|
+| field         | type   | content                                                     | required |
+|:--------------|:-------|:------------------------------------------------------------|:---------|
+| op            | string | operation: "send"                                           | Y        |
+| alg           | string | The encrypt algorithm.                                      | Y        |
+| ciphertext    | string | mail encrypted with sender's priKey and recipient's pubKey. | N        |
+| cipherSend| string | mail encrypted with the public key of the sender            | N        |
+| cipherReci| string | mail encrypted with the public key of the recipient         | N        |
+| textId        | string | Double sha256 hash value of the plain text of the mail      | N        |
 
 * Example
 

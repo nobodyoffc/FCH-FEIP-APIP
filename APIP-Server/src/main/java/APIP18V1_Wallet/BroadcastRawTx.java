@@ -39,7 +39,7 @@ public class BroadcastRawTx extends HttpServlet {
             writer.write(replier.reply1012BadQuery(addr));
             return;
         }
-        String rawTxHex = dataCheckResult.getDataRequestBody().getFcdsl().getOther();
+        Object rawTxHex = dataCheckResult.getDataRequestBody().getFcdsl().getOther();
 
         String result = "";
         try {
@@ -48,6 +48,9 @@ public class BroadcastRawTx extends HttpServlet {
             response.setHeader(CodeInHeader, String.valueOf(Code1020OtherError));
             writer.write(replier.reply1020OtherError(addr));
         }
+
+        if(result.startsWith("\""))result=result.substring(1);
+        if(result.endsWith("\""))result=result.substring(0,result.length()-2);
 
         replier.setData(result);
         int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", DecodeRawTxAPI));

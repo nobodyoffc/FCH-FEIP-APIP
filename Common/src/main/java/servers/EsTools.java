@@ -260,8 +260,7 @@ public class EsTools {
                 System.out.println("Index " + indexName + " deleted.");
             }
         } catch (ElasticsearchException e) {
-            e.printStackTrace();
-            System.out.println("Index " + indexName + " deleting failed.");
+            System.out.println("Index " + indexName + " does not exist.");
         }
     }
 

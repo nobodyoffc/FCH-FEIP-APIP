@@ -74,17 +74,17 @@ When user adds a contact, the data object contains:
 |:----|:----|:----|:----|
 |op|string|operation: "add"|Y|
 |alg|string|The encrypt algorithm. "ECC256k1-AES256CBC" is recommended.|Y|
-|ciphertext|string|Encrypted message|Y|
+|cipher|string|Encrypted message|Y|
 
-* Decrypted data of data.ciphertext
+* Decrypted data of data.cipher
 
-|field|type|content|required|
-|:----|:----|:----|:----|
-|address|string|The FCH address of the contact|Y|
-|note|string|Notes to this contact|N|
-|noNoticeFee|boolean|Accept all notices from it regardless notice fee(see FEIP27).|N|
-|seeStatement|boolean|Whether see its statements(see FEIP8).|N|
-|seeWorks|boolean|Whether see its works(see FEIP8).|N|
+| field        |type| content                                                       |required|
+|:-------------|:----|:--------------------------------------------------------------|:----|
+| fid          |string| The FCH address of the contact                                |Y|
+| memo         |string| Memo for this fid                                             |N|
+| noNoticeFee  |boolean| Accept all notices from it regardless notice fee(see FEIP27). |N|
+| seeStatement |boolean| Whether see its statements(see FEIP8).                        |N|
+| seeWorks     |boolean| Whether see its works(see FEIP8).                             |N|
 
 * Example
 
@@ -102,17 +102,17 @@ When user adds a contact, the data object contains:
     "data":{
         "op": "add",
         "alg": "ECC256k1-AES256CBC",
-        "ciphertext": "AtrFmWIFjVgOAiJV9ecB0V8vpWeGbc8nZwmJUFjan5zfnLQWLl0NH5Sjh/qWBU849x8yTpn7v6V0Hgdm2zuNGk4flfU2wyYBG2sRFlmagSLZNJQ8T/meD3FX3EGXken+bbG9P6MmSWqWZsAqnx/MtIu/ngXy/+TB6UyyvH3/e1rvPzqfrNKpzVRpcfycUFSlHmm4xU15DA/SZu01PYDUI+AR/x2poKftABu7CxQinEp8bWBARYiDkvsplJLl7h+RJDtg5UgZZlAqG03GdgvmDEWkhHDuYrCKbWpoCILeEilW"
+        "cipher": "A4MF+Ys1rHRaZ3bcZ68rz9GA2Qdh1/x8bGSFQyzWAkRfV9Ks0d4Mm1AQ5eTn1Uj/3O4MPD85uJHlBZ9uV5x8YYhU+hb/"
     }
 }
 ```
  
-   - Decrypted data of data.ciphertext:
+   - Decrypted data of data.cipher:
 
 ```
 {
-    "address": "F86zoAvNaQxEuYyvQssV5WxEzapNaiDtTW",
-    "note": "A public test address.",
+    "fid": "F86zoAvNaQxEuYyvQssV5WxEzapNaiDtTW",
+    "memo": "A public test address.",
     "noNoticeFee": true,
     "seeStatement": true,
     "seeWritings": true

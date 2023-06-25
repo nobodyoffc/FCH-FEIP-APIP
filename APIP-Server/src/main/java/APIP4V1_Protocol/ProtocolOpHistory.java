@@ -40,7 +40,6 @@ public class ProtocolOpHistory extends HttpServlet {
         DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
 
         //Check API
-
         //Set default sort.
         ArrayList<Sort> sort =Sort.makeSortList("height",false,"index",false,null,null);
 

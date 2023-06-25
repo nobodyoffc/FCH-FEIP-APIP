@@ -10,8 +10,8 @@ import com.google.gson.JsonSyntaxException;
 import construct.*;
 import fcTools.ParseTools;
 import identity.CidHist;
-import identity.CidParser;
-import identity.CidRollbacker;
+import identity.IdentityParser;
+import identity.IdentityRollbacker;
 import identity.RepuHist;
 import opReturn.Feip;
 import opReturn.OpReFileTools;
@@ -52,15 +52,15 @@ public class FileParser {
 	private String lastId = null;
 
 	enum FEIP_NAME{
-		CID,ABANDON,MASTER,HOMEPAGE,NOTICE_FEE,REPUTATION,SERVICE,PROTOCOL,APP,CODE,CONTACTS,MAIL,SAFE,STATEMENT,GROUP,TEAM, BOX,PROOF
+		CID,ABANDON,MASTER,HOMEPAGE,NOTICE_FEE,REPUTATION,SERVICE,PROTOCOL,APP,CODE,NID, CONTACT,MAIL,SAFE,STATEMENT,GROUP,TEAM, BOX,PROOF
 	}
 
 	private static final Logger log = LoggerFactory.getLogger(FileParser.class);
 
 	public boolean parseFile(ElasticsearchClient esClient, boolean isRollback) throws Exception {
 
-		CidRollbacker cidRollbacker = new CidRollbacker();
-		CidParser cidParser = new CidParser();
+		IdentityRollbacker cidRollbacker = new IdentityRollbacker();
+		IdentityParser cidParser = new IdentityParser();
 
 		ConstructParser constructParser = new ConstructParser();
 		ConstructRollbacker constructRollbacker = new ConstructRollbacker();
@@ -102,8 +102,6 @@ public class FileParser {
 			pointer += length;
 
 			boolean isValid= false;
-			System.out.println("ReadOpResult: ");
-			ParseTools.gsonPrint(readOpResult);
 
 			if(readOpResult.isFileEnd()) {
 				if(pointer>251658240) {
@@ -136,10 +134,6 @@ public class FileParser {
 
 			OpReturn opre = readOpResult.getOpReturn();
 
-			//TODO
-			System.out.println("opre: ");
-			ParseTools.gsonPrint(opre);
-
 			lastHeight = opre.getHeight();
 			lastIndex = opre.getTxIndex();
 			lastId = opre.getTxId();
@@ -150,10 +144,6 @@ public class FileParser {
 			if(feip==null)continue;
 			if(feip.getType()==null)continue;
 			if(!feip.getType().equals("FEIP"))continue;
-
-			//TODO
-			System.out.println("feip: ");
-			ParseTools.gsonPrint(feip);
 
 			FEIP_NAME feipName = checkFeipSn(feip);
 			if(feipName == null)continue;
@@ -230,8 +220,12 @@ public class FileParser {
 					isValid = constructParser.parseCode(esClient,codeHist);
 					if(isValid)esClient.index(i->i.index(IndicesFEIP.CodeHistIndex).id(codeHist.getTxId()).document(codeHist));
 					break;
-				case CONTACTS:
-					System.out.println("Contacts.");
+				case NID:
+					System.out.println("Nid.");
+					isValid = publishParser.parseNid(esClient,opre,feip);
+					break;
+				case CONTACT:
+					System.out.println("Contact.");
 					isValid = personalParser.parseContact(esClient,opre,feip);
 					break;
 				case MAIL:
@@ -240,7 +234,7 @@ public class FileParser {
 					break;
 				case SAFE:
 					System.out.println("Safe.");
-					isValid = personalParser.parseSafe(esClient,opre,feip);
+					isValid = personalParser.parseSecret(esClient,opre,feip);
 					break;
 				case STATEMENT:
 					System.out.println("Statement.");
@@ -312,8 +306,7 @@ public class FileParser {
 		try {
 			feip = new Gson().fromJson(protStr, Feip.class);
 		}catch(JsonSyntaxException e) {
-			e.printStackTrace();
-			System.out.println("Invalid opReturn content. Check the JSON string of FEIP.");
+			System.out.println("Invalid opReturn content. Check the JSON string of FEIP:\n"+opre.getOpReturn());
 		}
 		return  feip;
 	}
@@ -331,7 +324,8 @@ public class FileParser {
 		if(sn.equals("8"))return FEIP_NAME.STATEMENT;
 		if(sn.equals("9"))return FEIP_NAME.HOMEPAGE;
 		if(sn.equals("10"))return FEIP_NAME.NOTICE_FEE;
-		if(sn.equals("12"))return FEIP_NAME.CONTACTS;
+		if(sn.equals("11"))return FEIP_NAME.NID;
+		if(sn.equals("12"))return FEIP_NAME.CONTACT;
 
 		if(sn.equals("13"))return FEIP_NAME.BOX;
 		if(sn.equals("14"))return FEIP_NAME.PROOF;
@@ -413,9 +407,9 @@ public class FileParser {
 				ArrayList<CidHist> reparseCidList = getReparseHistList(esClient, IndicesFEIP.CidHistIndex,idList,"signer", CidHist.class);
 
 				for(CidHist idHist: reparseCidList) {
-					new CidParser().parseCidInfo(esClient,idHist);
+					new IdentityParser().parseCidInfo(esClient,idHist);
 				}
-				new CidRollbacker().reviseCidRepuAndHot(esClient, (ArrayList<String>) idList);
+				new IdentityRollbacker().reviseCidRepuAndHot(esClient, (ArrayList<String>) idList);
 				break;
 			case IndicesFEIP.ProtocolIndex:
 				EsTools.bulkDeleteList(esClient, IndicesFEIP.ProtocolIndex, (ArrayList<String>) idList);

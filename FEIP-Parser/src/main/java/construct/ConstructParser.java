@@ -7,7 +7,6 @@ import FeipClass.Service;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import com.google.gson.Gson;
-import fcTools.ParseTools;
 import FeipClass.Cid;
 import opReturn.Feip;
 import opReturn.OpReturn;
@@ -36,8 +35,6 @@ public class ConstructParser {
 			}
 			return null;
 		}
-		
-		ParseTools.gsonPrint(protocolRaw);
 		
 		ProtocolHistory protocolHist = new ProtocolHistory();
 		
@@ -146,8 +143,6 @@ public class ConstructParser {
 		}catch(com.google.gson.JsonSyntaxException e) {
 			return null;
 		}
-		
-		ParseTools.gsonPrint(serviceRaw);
 		
 		ServiceHistory serviceHist = new ServiceHistory();
 		
@@ -260,8 +255,6 @@ public class ConstructParser {
 		}catch(com.google.gson.JsonSyntaxException e) {
 			return null;
 		}
-		
-		ParseTools.gsonPrint(appRaw);
 		
 		AppHistory appHist = new AppHistory();
 		
@@ -378,8 +371,6 @@ public class ConstructParser {
 		}catch(com.google.gson.JsonSyntaxException e) {
 			return null;
 		}
-		
-		ParseTools.gsonPrint(codeRaw);
 		
 		CodeHistory codeHist = new CodeHistory();
 		
@@ -872,7 +863,6 @@ public class ConstructParser {
 
 			break;
 		case "rate":
-			ParseTools.gsonPrint(serviceHist);
 			service = EsTools.getById(esClient, IndicesFEIP.ServiceIndex, serviceHist.getSid(), Service.class);
 
 			if(service==null) {

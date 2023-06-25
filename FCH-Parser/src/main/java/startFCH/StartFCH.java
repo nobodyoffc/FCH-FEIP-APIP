@@ -26,7 +26,7 @@ public class StartFCH {
         newEsClient = new NewEsClient();
         ElasticsearchClient esClient = null;
 
-        log.info("Start.");
+        log.debug("FchParser is start...");
 
         ConfigFCH configFCH = new ConfigFCH();
         while (true) {
@@ -37,6 +37,7 @@ public class StartFCH {
 
             esClient = newEsClient.checkEsClient(esClient, configFCH);
             if (esClient == null) {
+                log.debug("Creating ES client failed.");
                 newEsClient.shutdownClient();
                 return;
             }
@@ -93,7 +94,7 @@ public class StartFCH {
                         Block bestBlock = ChainParser.getBestBlock(esClient);
                         bestHeight = bestBlock.getHeight();
 
-                        System.out.println("Restarting from BestHeight: " + (bestHeight - 1) + " ...");
+                        log.debug("Restarting from BestHeight: " + (bestHeight - 1) + " ...");
 
                         path = configFCH.getBlockFilePath();
                         bestHeight = bestHeight - 1;
@@ -122,6 +123,7 @@ public class StartFCH {
                 case 0:
                     //startMyEsClient.esClient.esClient.shutdown();
                     if (esClient != null) newEsClient.shutdownClient();
+                    log.debug("FchParser closed by user.");
                     System.out.println("Exited, see you again.");
                     br.close();
                     return;
