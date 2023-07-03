@@ -142,9 +142,9 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
             "sid": "f656fa9532f8cbdda754365a609c466a7bef102768c0935f9b909aae5289e0a1",
             "stdName": "ApipServer",
             "localNames": [
-                "API??"
+                "SignIn??"
             ],
-            "desc": "Server for the series API of APIP of free consensus.",
+            "desc": "Server for the series SignIn of APIP of free consensus.",
             "types": [
                 "APIP",
                 "FEIP"
@@ -265,9 +265,9 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
             "sid": "f656fa9532f8cbdda754365a609c466a7bef102768c0935f9b909aae5289e0a1",
             "stdName": "ApipServer",
             "localNames": [
-                "API??"
+                "SignIn??"
             ],
-            "desc": "Server for the series API of APIP of free consensus.",
+            "desc": "Server for the series SignIn of APIP of free consensus.",
             "types": [
                 "APIP",
                 "FEIP"
@@ -389,7 +389,7 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
          "localNames": [
             "API服务"
          ],
-         "desc": "Server for the series API of APIP of free consensus.",
+         "desc": "Server for the series SignIn of APIP of free consensus.",
          "types": [
             "APIP",
             "FEIP"

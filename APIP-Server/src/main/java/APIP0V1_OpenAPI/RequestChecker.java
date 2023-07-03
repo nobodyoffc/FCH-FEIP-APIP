@@ -53,7 +53,7 @@ public class RequestChecker {
 
     public SignInCheckResult checkSignInRequest(Replier replier) throws IOException, SignatureException {
         this.replier=replier;
-        SignInCheckResult connectCheckResult = new SignInCheckResult();
+        SignInCheckResult signInCheckResult = new SignInCheckResult();
 
         String sign = request.getHeader(SignInHeader);
 
@@ -74,7 +74,7 @@ public class RequestChecker {
         if(signInRequestBody==null)return null;
 
         pubKey = signInRequestBody.getPubKey();
-        connectCheckResult.setPubKey(pubKey);
+        signInCheckResult.setPubKey(pubKey);
 
         if(pubKey==null){
             response.setHeader(CodeInHeader,String.valueOf(Code1001MissPubKey));
@@ -83,7 +83,7 @@ public class RequestChecker {
         }
 
         fid = KeyTools.pubKeyToFchAddr(pubKey);
-        connectCheckResult.setFid(fid);
+        signInCheckResult.setFid(fid);
 
         if(!isGoodBalance()){
             response.setHeader(CodeInHeader,String.valueOf(Code1004InsufficientBalance));
@@ -130,10 +130,9 @@ public class RequestChecker {
             return null;
         }
 
-        connectCheckResult.setConnectRequestBody(signInRequestBody);
-        return connectCheckResult;
+        signInCheckResult.setSignInRequestBody(signInRequestBody);
+        return signInCheckResult;
     }
-
     private boolean isGoodAsySign(String sign) throws SignatureException {
         String message = new String(requestBodyBytes);
 
@@ -143,7 +142,6 @@ public class RequestChecker {
 
         return signPubKey.equals(pubKey);
     }
-
     private SignInRequestBody getSignInRequestBody(byte[] requestBodyBytes) {
         String requestDataJson = new String(requestBodyBytes);
         SignInRequestBody connectRequestBody;
@@ -241,7 +239,6 @@ public class RequestChecker {
         dataCheckResult.setDataRequestBody(dataRequestBody);
         return dataCheckResult;
     }
-
     public Session getSession(String sessionName) {
 
         String fid = jedis1.hget(sessionName,"fid");
@@ -255,7 +252,6 @@ public class RequestChecker {
         session.setSessionName(sessionName);
         return session;
     }
-
     private boolean isGoodSymSign(String sign) {
         if(sign==null)return false;
         byte[] signBytes = BytesTools.bytesMerger(requestBodyBytes, BytesTools.hexToByteArray(sessionKey));
@@ -267,12 +263,10 @@ public class RequestChecker {
         }
         return true;
     }
-
     private byte[] getRequestBodyBytes(HttpServletRequest request) throws IOException {
         byte[] requestBodyBytes = request.getInputStream().readAllBytes();
         return requestBodyBytes;
     }
-
     private DataRequestBody getDataRequestBody(byte[] requestBodyBytes) throws IOException {
 
         String requestDataJson = new String(requestBodyBytes);
@@ -290,17 +284,15 @@ public class RequestChecker {
 
         return dataRequestBody;
     }
-
     public boolean isGoodNonce(long nonce){
         if(nonce == 0)return false;
         String nonceStr = String.valueOf(nonce);
         if(jedis2.get(nonceStr)!=null)
             return false;
         jedis2.set(nonceStr,"");
-        jedis2.expire(nonceStr,windowTime);
+        jedis2.expire(nonceStr,windowTime);/**/
         return true;
     }
-
     public boolean isGoodBalance(){
         long balance = readHashLong(jedis0, RedisKeys.Balance, fid);
         if(balance < price){
@@ -308,14 +300,12 @@ public class RequestChecker {
         }
         return true;
     }
-
     public boolean isGoodUrl(String signedUrl){
         if(!request.getRequestURL().toString().equals(signedUrl)){
             return false;
         }
         return true;
     }
-
     public boolean isGoodTime(long time){
         windowTime = Long.parseLong(jedis0.get("windowTime"));
         if(Math.abs(System.currentTimeMillis()- time)> windowTime){

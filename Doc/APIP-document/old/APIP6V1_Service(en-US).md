@@ -213,10 +213,10 @@ https://www.sign.cash/api/apip6/v1/getServiceList
 	"data": {
 		"list": [{
 				"sid": "222220000000000011111",
-				"stdName": "Free cid API",
+				"stdName": "Free cid SignIn",
 				"localName": ["免费cid信息接口"],
 				"desc": "提供cid的地址、公钥、homepage、通知费等详情信息",
-				"types": ["CID", "Basic API"],
+				"types": ["CID", "Basic SignIn"],
 				"urls": ["https://www.sign.cash/cidInfo"],
 				"pubKeyAdmin": "2222222222222222222222",
 				"signer": "FPL44YJRwPdd2ipziFvqq6y2tw4VnVvpAv",
@@ -358,10 +358,10 @@ https://www.sign.cash/api/apip6/v1/getServiceOpHistory
 			{
 				"sid": "222220000000000011111111111111",
 				"op": "update",
-				"stdName": "Free cid API",
+				"stdName": "Free cid SignIn",
 				"localName": ["免费cid信息接口"],
 				"desc": "提供cid的地址、公钥、homepage、通知费等详情信息",
-				"type": ["CID", "Basic API"],
+				"type": ["CID", "Basic SignIn"],
 				"urls": ["https://www.sign.cash/cidInfo"],
 				"pubKeyAdmin": "033333333333333333333333",
 				"txTime": 1610261291,

@@ -46,13 +46,24 @@ public class BroadcastRawTx extends HttpServlet {
              result = FcRpcMethods.sendTx(fcClient,rawTxHex);
         } catch (Throwable e) {
             response.setHeader(CodeInHeader, String.valueOf(Code1020OtherError));
+            replier.setData(e.getMessage());
             writer.write(replier.reply1020OtherError(addr));
+            return;
         }
+        if(result.contains("{")){
+            response.setHeader(CodeInHeader, String.valueOf(Code1020OtherError));
+            replier.setData(result);
+            writer.write(replier.reply1020OtherError(addr));
+            return;
+        }
+
 
         if(result.startsWith("\""))result=result.substring(1);
         if(result.endsWith("\""))result=result.substring(0,result.length()-2);
 
         replier.setData(result);
+        replier.setGot(1);
+        replier.setTotal(1);
         int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", DecodeRawTxAPI));
         response.setHeader(CodeInHeader, String.valueOf(Code0Success));
         String reply = replier.reply0Success(addr,nPrice);

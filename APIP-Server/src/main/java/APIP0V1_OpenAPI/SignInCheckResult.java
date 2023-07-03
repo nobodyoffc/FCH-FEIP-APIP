@@ -2,7 +2,7 @@ package APIP0V1_OpenAPI;
 
 public class SignInCheckResult {
 
-    private SignInRequestBody connectRequestBody;
+    private SignInRequestBody signInRequestBody;
     private String fid;
     private String pubKey;
     private String sessionName;
@@ -42,11 +42,11 @@ public class SignInCheckResult {
 
 
 
-    public SignInRequestBody getConnectRequestBody() {
-        return connectRequestBody;
+    public SignInRequestBody getSignInRequestBody() {
+        return signInRequestBody;
     }
 
-    public void setConnectRequestBody(SignInRequestBody connectRequestBody) {
-        this.connectRequestBody = connectRequestBody;
+    public void setSignInRequestBody(SignInRequestBody signInRequestBody) {
+        this.signInRequestBody = signInRequestBody;
     }
 }

@@ -297,8 +297,4 @@ public class MempoolScanner extends Thread {
         }
 
     }
-
-    private void addAddressInfoToRedis1(List<Cash> inList, List<Cash> outList) {
-        FidInMempool fidInMempool = new FidInMempool();
-    }
 }

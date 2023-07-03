@@ -2,7 +2,7 @@ package fcTools;
 
 import java.util.List;
 
-public class DataForSignInCs {
+public class DataForOffLineTx {
     private String fromFid;
     private List<SendTo> sendToList;
     private long cd;

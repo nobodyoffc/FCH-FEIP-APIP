@@ -299,7 +299,7 @@ or
   -     4 Show service: Show the detail of your service with json.
 - Set the nPrice of your APIs by Menu 3 List APIs and Set nPrice
 - Set the windowTime by Menu Set windowTime
-- Switch on/off freeGet API service by Menu 7 Switch free get APIs
+- Switch on/off freeGet SignIn service by Menu 7 Switch free get APIs
 
 * As the nPrice for all APIs and the service were set, ApipManager can be shutdown.
 * If you changed the `params` of the service on blockchain, you need to run ApipManager to reload your service in Manage Service entry.
@@ -378,7 +378,7 @@ A password will be required. Remember it.
 * Tomcat: 8080 for 0.0.0.0
 * Redis : 6379 for 127.0.0.1
 
-## 11. POST API list
+## 11. POST SignIn list
 
 * OpenAPI
 	- APIP0V1_OpenAPI

@@ -23,7 +23,6 @@ public class StartFCH {
 
     static NewEsClient newEsClient = new NewEsClient();
     public static void main(String[] args) throws Exception {
-        newEsClient = new NewEsClient();
         ElasticsearchClient esClient = null;
 
         log.debug("FchParser is start...");

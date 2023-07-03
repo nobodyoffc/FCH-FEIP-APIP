@@ -1,11 +1,12 @@
 import EccAes256K1P7.Aes256CbcP7;
 
+import java.util.HexFormat;
+
 public class AESTest {
     public static void main(String[] args) throws Exception {
 
 
         String keyHex="6175d5b19f6deccfe42540bd59e37a2d";
-
 
 
         //String keyHex = BytesTools.bytesToHexStringBE(keyBytes);

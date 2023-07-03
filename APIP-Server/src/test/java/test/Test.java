@@ -28,6 +28,9 @@ public class Test {
             itemValueList.add(FieldValue.of(v));
         }
 
+        String lo = "134388482942";
+        long lon = Long.parseLong(lo);
+
         List<String> lastSort = new ArrayList<String>();
         String index="cid_history";
         String termsField = "signer";

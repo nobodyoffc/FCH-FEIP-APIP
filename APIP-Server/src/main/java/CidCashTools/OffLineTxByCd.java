@@ -1,12 +1,13 @@
-package APIP18V1_Wallet;
+package CidCashTools;
 
 import APIP0V1_OpenAPI.*;
 import FchClass.Cash;
 import fcTools.CryptoSigner;
-import fcTools.DataForSignInCs;
+import fcTools.DataForOffLineTx;
 import fcTools.FcConstant;
 import fcTools.SendTo;
 import initial.Initiator;
+import tools.WalletTools;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -18,12 +19,12 @@ import java.io.PrintWriter;
 import java.util.List;
 
 import static api.Constant.*;
-import static fcTools.CryptoSigner.parseDataForSignInCsFromOther;
-import static tools.WalletTools.getCashListForPay;
+import static fcTools.CryptoSigner.parseDataForOffLineTxFromOther;
 
 
-@WebServlet(APIP18V1Path + SendForCsAPI)
-public class SendForCs extends HttpServlet {
+@WebServlet(ToolsPath + OffLineTxByCdAPI)
+public class OffLineTxByCd extends HttpServlet {
+
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("application/json");
@@ -42,7 +43,7 @@ public class SendForCs extends HttpServlet {
         DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
         replier.setNonce(requestBody.getNonce());
 
-        DataForSignInCs dataForSignInCs = parseDataForSignInCsFromOther(requestBody.getFcdsl().getOther());
+        DataForOffLineTx dataForSignInCs = parseDataForOffLineTxFromOther(requestBody.getFcdsl().getOther());
 
         //Check API
         if(dataForSignInCs==null) {
@@ -52,6 +53,24 @@ public class SendForCs extends HttpServlet {
         }
 
         String addrRequested = dataForSignInCs.getFromFid();
+
+        long cd = 0;
+        try {
+            cd = dataForSignInCs.getCd();
+            if(cd<=0){
+                response.setHeader(CodeInHeader, String.valueOf(Code1020OtherError));
+                replier.setData("cd <= 0");
+                writer.write(replier.reply1020OtherError(addr));
+                return;
+            }
+        } catch (Exception e) {
+            response.setHeader(CodeInHeader, String.valueOf(Code1020OtherError));
+            replier.setData(e);
+            writer.write(replier.reply1020OtherError(addr));
+            return;
+        }
+
+        DataRequestHandler esRequest = new DataRequestHandler(dataCheckResult.getAddr(),requestBody,response,replier);
 
         long amount = 0;
         if(dataForSignInCs.getSendToList()!=null) {
@@ -66,37 +85,34 @@ public class SendForCs extends HttpServlet {
             }
         }
 
-        try {
-            if(amount<=0){
-                response.setHeader(CodeInHeader, String.valueOf(Code1020OtherError));
-                replier.setData("amount <= 0");
-                writer.write(replier.reply1020OtherError(addr));
-                return;
-            }
-        } catch (Exception e) {
-            response.setHeader(CodeInHeader, String.valueOf(Code1020OtherError));
-            replier.setData(e);
-            writer.write(replier.reply1020OtherError(addr));
-            return;
-        }
+        List<Cash> meetList = WalletTools.getCashForCd(replier, addrRequested, cd);
 
-        DataRequestHandler esRequest = new DataRequestHandler(dataCheckResult.getAddr(),requestBody,response,replier);
-
-        //response
-        List<Cash> meetList = getCashListForPay(amount,addrRequested,replier);
         if(meetList==null){
             response.setHeader(CodeInHeader, String.valueOf(Code1020OtherError));
             writer.write(replier.reply1020OtherError(addr));
             return;
         }
 
+        long totalValue = 0;
+        for(Cash cash :meetList){
+            totalValue += cash.getValue();
+        }
+
+        if(totalValue<amount+1000){
+            response.setHeader(CodeInHeader, String.valueOf(Code1020OtherError));
+            replier.setData("Cashes meeting this cd can't match the total amount of outputs.");
+            writer.write(replier.reply1020OtherError(addr));
+            return;
+        }
+
+
+
         String rawTxForCs = CryptoSigner.makeRawTxForCs(dataForSignInCs,meetList);
 
         replier.setData(rawTxForCs);
         replier.setGot(1);
         replier.setTotal(1);
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", SendForCsAPI));
+        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", OffLineTxByCdAPI));
         esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
     }
-
 }

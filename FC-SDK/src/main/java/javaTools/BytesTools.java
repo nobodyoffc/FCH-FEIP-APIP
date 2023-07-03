@@ -1,14 +1,9 @@
 package javaTools;
 
-import org.bouncycastle.util.encoders.Hex;
-
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Iterator;
+import java.util.*;
 
 
 public class BytesTools {
@@ -162,7 +157,7 @@ public class BytesTools {
 
 
     public static String bytesToHexStringBE(byte[] b) {
-        return Hex.toHexString(b);
+        return HexFormat.of().formatHex(b);
     }
 
 

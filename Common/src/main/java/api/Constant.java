@@ -63,7 +63,7 @@ public class Constant {
     public static final String APIP18V1Path = "/apip18/v1/";
     public static final String APIP19V1Path = "/apip19/v1/";
     public static final String APIP20V1Path = "/apip20/v1/";
-
+    public static final String ToolsPath = "/tools/";
     public static final String FreeGet = "/freeGet/v1/";
 
     //API names
@@ -168,10 +168,16 @@ public class Constant {
     public static final String CashValidLiveAPI = "cashValidLive";
     public static final String CashValidForCdAPI = "cashValidForCd";
     public static final String CashValidForPayAPI = "cashValidForPay";
-    public static final String SendForCsAPI = "sendForCs";
-    public static final String SendForCsByCdAPI = "sendForCsByCd";
+
     public static final String GetTotalsAPI = "getTotals";
     public static final String NidSearchAPI = "nidSearch";
+    public static final String EncryptAPI = "encrypt";
+    public static final String VerifyAPI = "verify";
+    public static final String OffLineTxAPI = "offLineTx";
+    public static final String OffLineTxByCdAPI = "offLineTxByCd";
+    public static final String AddressesAPI = "addresses";
+
+
 
 
     //Header name
@@ -321,7 +327,12 @@ public class Constant {
         apiList.add(CashValidForPayAPI);
         apiList.add(DecodeRawTxAPI);
         apiList.add(BroadcastTxAPI);
-        apiList.add(SendForCsAPI);
-        apiList.add(SendForCsByCdAPI);
+
+        apiList.add(OffLineTxAPI);
+        apiList.add(OffLineTxByCdAPI);
+        apiList.add(EncryptAPI);
+        apiList.add(VerifyAPI);
+        apiList.add(AddressesAPI);
+
     }
 }

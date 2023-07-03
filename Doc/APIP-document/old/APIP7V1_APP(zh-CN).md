@@ -219,10 +219,10 @@ https://www.sign.cash/api/apip7/v1/getAppList
 	"data": {
 		"list": [{
 				"aid": "0000000000000000000000000011111111111",
-				"stdName": "Free cid API",
+				"stdName": "Free cid SignIn",
 				"localNames": ["免费cid信息接口"],
 				"desc": "提供cid的地址、公钥、homepage、通知费等详情信息",
-				"types": ["CID", "Basic API"],
+				"types": ["CID", "Basic SignIn"],
 				"urls": ["https://www.sign.cash/cidInfo"],
 				"protocols": ["11111111111111111111111111", "22222222222222222222222"],
 				"services": ["33333333333333333333333333", "44444444444444444444444"],
@@ -374,7 +374,7 @@ https://www.sign.cash/api/apip7/v1/getAppOpHistory
 				"stdName": "Freesign",
 				"localNames": ["飞签"],
 				"desc": "提供cid的地址、公钥、homepage、通知费等详情信息",
-				"types": ["CID", "Basic API"],
+				"types": ["CID", "Basic SignIn"],
 				"urls": ["https://www.sign.cash/cidInfo"],
 				"protocols": ["11111111111111111111111111", "22222222222222222222222"],
 				"services": ["33333333333333333333333333", "44444444444444444444444"],

@@ -68,6 +68,10 @@ public class Initiator extends HttpServlet {
 
         ConfigAPIP configAPIP = new ConfigAPIP();
         configAPIP.setConfigFilePath(jedis0Common.get(RedisKeys.ConfigFilePath));
+        if(configAPIP.getConfigFilePath()==null){
+            log.debug("Config file path wasn't set yet. Run ApipManager.jar first.");
+            return;
+        }
 
         log.debug("configAPIP path: "+configAPIP.getConfigFilePath());
 
@@ -120,6 +124,7 @@ public class Initiator extends HttpServlet {
         windowTime = Long.parseLong(jedis0Common.get("windowTime"));
 
         log.debug("windowTime: "+ windowTime);
+
         if (configAPIP.isScanMempool()) {
 
             log.debug("Clean mempool data in Redis...");

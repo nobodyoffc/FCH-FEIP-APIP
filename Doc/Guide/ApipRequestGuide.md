@@ -112,7 +112,7 @@ Signature example:
 There may also be some error codes and messeges if your request is unqualified.
 See [APIP0V1_OpenAPI(zh-CN)](https://github.com/nobodyoffc/FCH-FEIP-APIP/blob/master/Doc/APIP-document/APIP1V1_OpenAPI(zh-CN).md)
 
-### Request POST API
+### Request POST SignIn
 
 * URL: POST https://cid.cash/APIP/ <urlTail assigned in APIP protocols>
 * Request header:
@@ -164,7 +164,7 @@ You can build your own FCH parser, FEIP parser, and APIP service. See [https://g
 	}
 }
 ```
-## POST API list
+## POST SignIn list
 
 1. signIn	    // signIn to get sessionKey.
 2. general	    // for all FC-DSL queries on a given ES index.

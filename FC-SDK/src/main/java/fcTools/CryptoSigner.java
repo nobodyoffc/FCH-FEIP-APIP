@@ -6,7 +6,7 @@ import com.google.gson.Gson;
 import java.util.List;
 
 public class CryptoSigner {
-    public static String makeRawTxForCs(DataForSignInCs sendRequestForCs, List<Cash> meetList) {
+    public static String makeRawTxForCs(DataForOffLineTx sendRequestForCs, List<Cash> meetList) {
         Gson gson = new Gson();
         StringBuilder RawTx = new StringBuilder("[");
         int i =0;
@@ -49,9 +49,9 @@ public class CryptoSigner {
         return RawTx.toString();
     }
 
-    public static DataForSignInCs parseDataForSignInCsFromOther(Object other) {
+    public static DataForOffLineTx parseDataForOffLineTxFromOther(Object other) {
         Gson gson = new Gson();
         ParseTools.gsonPrint(other);
-        return gson.fromJson(gson.toJson(other), DataForSignInCs.class);
+        return gson.fromJson(gson.toJson(other), DataForOffLineTx.class);
     }
 }

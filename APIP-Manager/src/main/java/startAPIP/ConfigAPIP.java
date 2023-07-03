@@ -20,8 +20,8 @@ public class ConfigAPIP extends ConfigFEIP {
     private String rpcUser = "user";
 
     private String rpcPassword = "password";
-    private String avatarBasePath = "/avatar/elements";//System.getProperty("user.dir")+"/avatar/elements";
-    private String avatarPngPath = "/avatar/png";//System.getProperty("user.dir")+"/avatar/png";
+    private String avatarBasePath = "/avatar/elements";
+    private String avatarPngPath = "/avatar/png";
     private boolean scanMempool = true;
 
     public void switchScanMempool() {
@@ -45,8 +45,6 @@ public class ConfigAPIP extends ConfigFEIP {
         setRpcPort(br);
         setRpcUsername(br);
         setRpcPassword(br);
-        //setAvatarBasePath(br);
-        //setAvatarPngPath(br);
         setConfigFilePath(br);
         writeConfigToFile();
         //copyConfigFileIntoTomcat();
@@ -274,8 +272,6 @@ public class ConfigAPIP extends ConfigFEIP {
             } else {
                 this.tomcatBasePath = str1;
                 System.out.println("\nThe path for tomcat base was set.");
-                this.avatarBasePath = tomcatBasePath + "webapps/APIP"+"/avatar/elements";
-                this.avatarPngPath = tomcatBasePath + "webapps/APIP"+"/avatar/png";
                 return;
             }
         }

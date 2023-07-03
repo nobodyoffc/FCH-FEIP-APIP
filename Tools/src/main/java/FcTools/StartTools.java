@@ -9,6 +9,7 @@ import java.nio.ByteBuffer;
 import java.security.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -16,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
 
 import org.bitcoinj.core.ECKey;
 import EccAes256K1P7.EccAes256K1P7;
@@ -63,7 +65,7 @@ public class StartTools {
             int choice = menu.choose(br);
             switch (choice) {
                 case 1:
-                	getRandom(br);
+                    getRandom(br);
                     break;
                 case 2:
                     try {
@@ -100,43 +102,43 @@ public class StartTools {
                     }
                     break;
                 case 10:
-                	signWithEcdsa();
-                	break;
+                    signWithEcdsa();
+                    break;
                 case 11:
-                	signWithSchnorr();
-                	break;
+                    signWithSchnorr();
+                    break;
                 case 12:
-                	signFchTx();
-                	break;
+                    signFchTx();
+                    break;
                 case 13:
-                	verifyEcdsa();
-                	break;
+                    verifyEcdsa();
+                    break;
                 case 14:
-                	verifySchnorr();
-                	break;
+                    verifySchnorr();
+                    break;
                 case 15:
-                	encryptWithSymKey(br);
-                	break;
+                    encryptWithSymKey(br);
+                    break;
                 case 16:
-                	encryptWithPassword(br);
-                	break;
+                    encryptWithPassword(br);
+                    break;
                 case 17:
-                	encryptWithFcEcc(br);
+                    encryptWithFcEcc(br);
                     br.readLine();
-                	break;
+                    break;
                 case 18:
-                	decryptWithSymKey(br);
-                	break;
+                    decryptWithSymKey(br);
+                    break;
                 case 19:
-                	decryptWithPassword(br);
-                	break;
+                    decryptWithPassword(br);
+                    break;
                 case 20:
-                	decryptWithEccFC(br);
-                	break;
+                    decryptWithEccFC(br);
+                    break;
                 case 21:
-                	gainTimestamp();
+                    gainTimestamp();
                     br.readLine();
-                	break;
+                    break;
 
                 case 0:
                     br.close();
@@ -152,84 +154,84 @@ public class StartTools {
     }
 
     private static void encryptWithSymKey(BufferedReader br) throws IOException, InvalidKeyException, InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, NoSuchProviderException {
-		// TODO Auto-generated method stub
+        // TODO Auto-generated method stub
 
-    	System.out.println("Input the symKey in hex:");
-    	String symKey = br.readLine();
-    	if(symKey.length()!=64) {
-        	System.out.println("The symKey should be 32 bytes in hex.");
-        	return;
-    	}
-    	System.out.println("Input the plaintext:");
-    	String msg = br.readLine();
-    	EccAes256K1P7 ecc = new EccAes256K1P7();
+        System.out.println("Input the symKey in hex:");
+        String symKey = br.readLine();
+        if(symKey.length()!=64) {
+            System.out.println("The symKey should be 32 bytes in hex.");
+            return;
+        }
+        System.out.println("Input the plaintext:");
+        String msg = br.readLine();
+        EccAes256K1P7 ecc = new EccAes256K1P7();
 
-    	String cipher = ecc.encryptWithSymKey(msg, symKey);
+        String cipher = ecc.encryptWithSymKey(msg, symKey);
 
-    	System.out.println("Ciphertext:\n"+ cipher);
-    	br.close();
+        System.out.println("Ciphertext:\n"+ cipher);
+        br.close();
 
-	}
+    }
 
-	private static void decryptWithSymKey(BufferedReader br) throws Exception {
-		// TODO Auto-generated method stub
-    	System.out.println("Input the symKey in hex:");
-    	String symKey = br.readLine();
-    	if(symKey.length()!=64) {
-        	System.out.println("The symKey should be 32 bytes in hex.");
-        	return;
-    	}
-    	System.out.println("Input the cipherext:");
-    	String cipher = br.readLine();
+    private static void decryptWithSymKey(BufferedReader br) throws Exception {
+        // TODO Auto-generated method stub
+        System.out.println("Input the symKey in hex:");
+        String symKey = br.readLine();
+        if(symKey.length()!=64) {
+            System.out.println("The symKey should be 32 bytes in hex.");
+            return;
+        }
+        System.out.println("Input the cipherext:");
+        String cipher = br.readLine();
 
-    	EccAes256K1P7 ecc = new EccAes256K1P7();
+        EccAes256K1P7 ecc = new EccAes256K1P7();
 
-    	String msg = ecc.decrypt(cipher, symKey);
-    	System.out.println("Plaintext:\n"+ msg);
-    	br.readLine();
-	}
+        String msg = ecc.decrypt(cipher, symKey);
+        System.out.println("Plaintext:\n"+ msg);
+        br.readLine();
+    }
 
     private static void encryptWithPassword(BufferedReader br) throws IOException, InvalidKeyException, InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, NoSuchProviderException {
-		// TODO Auto-generated method stub
+        // TODO Auto-generated method stub
 
-    	System.out.println("Input the password:");
-    	String password = br.readLine();
-    	if("".equals(password)) {
-        	return;
-    	}
-    	System.out.println("Input the plaintext:");
-    	String msg = br.readLine();
-    	EccAes256K1P7 ecc = new EccAes256K1P7();
+        System.out.println("Input the password:");
+        String password = br.readLine();
+        if("".equals(password)) {
+            return;
+        }
+        System.out.println("Input the plaintext:");
+        String msg = br.readLine();
+        EccAes256K1P7 ecc = new EccAes256K1P7();
 
-    	String cipher = ecc.encryptWithPassword(msg, password);
+        String cipher = ecc.encryptWithPassword(msg, password);
 
-    	System.out.println("Ciphertext:\n"+ cipher);
-    	br.readLine();
+        System.out.println("Ciphertext:\n"+ cipher);
+        br.readLine();
 
-	}
+    }
 
-	private static void decryptWithPassword(BufferedReader br) throws Exception {
-		// TODO Auto-generated method stub
-    	System.out.println("Input the password in hex:");
-    	String password = br.readLine();
-    	if("".equals(password)) {
-        	return;
-    	}
-    	System.out.println("Input the cipherext:");
-    	String cipher = br.readLine();
+    private static void decryptWithPassword(BufferedReader br) throws Exception {
+        // TODO Auto-generated method stub
+        System.out.println("Input the password in hex:");
+        String password = br.readLine();
+        if("".equals(password)) {
+            return;
+        }
+        System.out.println("Input the cipherext:");
+        String cipher = br.readLine();
 
-    	EccAes256K1P7 ecc = new EccAes256K1P7();
+        EccAes256K1P7 ecc = new EccAes256K1P7();
 
-    	String msg = ecc.decrypt(cipher, password);
-    	System.out.println("Plaintext:\n"+ msg);
-    	br.readLine();
-	}
+        String msg = ecc.decrypt(cipher, password);
+        System.out.println("Plaintext:\n"+ msg);
+        br.readLine();
+    }
 
 
-	private static void decryptWithEccFC(BufferedReader br) throws Exception {
-		// TODO Auto-generated method stub
-    	System.out.println("Input the recipent private key in hex:");
-    	String priKey = br.readLine();
+    private static void decryptWithEccFC(BufferedReader br) throws Exception {
+        // TODO Auto-generated method stub
+        System.out.println("Input the recipent private key in hex:");
+        String priKey = br.readLine();
 
         if ("".equals(priKey)) {
             return;
@@ -238,94 +240,93 @@ public class StartTools {
         EccAes256K1P7 ecc = new EccAes256K1P7();
 
 
-    	System.out.println("Input the ciphertext in Bast64:");
-    	String input = br.readLine();
+        System.out.println("Input the ciphertext in Bast64:");
+        String input = br.readLine();
 
         String textUtf8 = ecc.decrypt(input,priKey);
         
         System.out.println("\n# decrypted: ");
         System.out.println(textUtf8);
-        
         br.readLine();
 
-	}
+    }
 
-	private static void decryptWithBtcEcc() {
-		// TODO Auto-generated method stub
+    private static void decryptWithBtcEcc() {
+        // TODO Auto-generated method stub
 
-    	System.out.println("Input the ciphertext encrypted with BtcAlgorithm:");
-	}
+        System.out.println("Input the ciphertext encrypted with BtcAlgorithm:");
+    }
 
-	private static void encryptWithFcEcc(BufferedReader br) throws Exception {
-		// TODO Auto-generated method stub
+    private static void encryptWithFcEcc(BufferedReader br) throws Exception {
+        // TODO Auto-generated method stub
 
-    	System.out.println("Input the recipent public key in hex:");
-    	String pubKey = br.readLine();
+        System.out.println("Input the recipent public key in hex:");
+        String pubKey = br.readLine();
 
-    	EccAes256K1P7 ecc = new EccAes256K1P7();
+        EccAes256K1P7 ecc = new EccAes256K1P7();
 
-    	System.out.println("Input the plaintext to be encrypted with EccAes256P7K1 of FC:");
-    	String input = br.readLine();
+        System.out.println("Input the plaintext to be encrypted with EccAes256P7K1 of FC:");
+        String input = br.readLine();
 
-    	String cipher = ecc.encrypt(input,pubKey);
+        String cipher = ecc.encrypt(input,pubKey);
 
-    	System.out.println("\n# Ciphertext:\n"+ cipher);
+        System.out.println("\n# Ciphertext:\n"+ cipher);
 
-	}
+    }
 
-	private static void encryptWithBtcEcc() {
-		// TODO Auto-generated method stub
-    	System.out.println("encryptWithBtcAlgo is under developing:");
-	}
+    private static void encryptWithBtcEcc() {
+        // TODO Auto-generated method stub
+        System.out.println("encryptWithBtcAlgo is under developing:");
+    }
 
-	private static void verifySchnorr() {
-		// TODO Auto-generated method stub
-    	System.out.println("verifySchnorr is under developing:");
-	}
+    private static void verifySchnorr() {
+        // TODO Auto-generated method stub
+        System.out.println("verifySchnorr is under developing:");
+    }
 
-	private static void verifyEcdsa() {
-		// TODO Auto-generated method stub
-    	System.out.println("verifyEcdsa is under developing:");
-	}
+    private static void verifyEcdsa() {
+        // TODO Auto-generated method stub
+        System.out.println("verifyEcdsa is under developing:");
+    }
 
-	private static void signFchTx() {
-		// TODO Auto-generated method stub
-    	System.out.println("signFchTx is under developing:");
-	}
+    private static void signFchTx() {
+        // TODO Auto-generated method stub
+        System.out.println("signFchTx is under developing:");
+    }
 
-	private static void signWithSchnorr() {
-		// TODO Auto-generated method stub
-    	System.out.println("signWithSchnorr is under developing:");
-	}
+    private static void signWithSchnorr() {
+        // TODO Auto-generated method stub
+        System.out.println("signWithSchnorr is under developing:");
+    }
 
-	private static void signWithEcdsa() {
-		// TODO Auto-generated method stub
-    	System.out.println("signWithEcdsa is under developing:");
-	}
+    private static void signWithEcdsa() {
+        // TODO Auto-generated method stub
+        System.out.println("signWithEcdsa is under developing:");
+    }
 
-	private static void getRandom(BufferedReader br) throws IOException {
-		// TODO Auto-generated method stub
+    public static void getRandom(BufferedReader br) throws IOException {
+        // TODO Auto-generated method stub
         SecureRandom secureRandom = new SecureRandom();
         int len =0;
         while(true) {
-        	System.out.println("Input the bytes length of the random you want. Enter to exit:");
-        	String input = br.readLine();
+            System.out.println("Input the bytes length of the random you want. Enter to exit:");
+            String input = br.readLine();
             if ("".equals(input)) {
                 return;
             }
 
-        	try {
-        		len = Integer.parseInt(input);
-        		break;
-        	}catch(Exception e) {
-        		continue;
-        	}
+            try {
+                len = Integer.parseInt(input);
+                break;
+            }catch(Exception e) {
+                continue;
+            }
         }
-    	byte[] bytes = new byte[len];
-    	secureRandom.nextBytes(bytes);
+        byte[] bytes = new byte[len];
+        secureRandom.nextBytes(bytes);
 
 
-    	if (bytes.length <= 8) {
+        if (bytes.length <= 8) {
             // Create a ByteBuffer with the byte array
             ByteBuffer buffer = ByteBuffer.allocate(8);
             buffer.put(bytes);
@@ -341,12 +342,12 @@ public class StartTools {
             
             System.out.println("No longer than 8 bytes, in number:\n----\n"+Math.abs(value)+"\n----");
         }else {
-        	System.out.println("Longer than 8 bytes, in hex:\n----\n"+BytesTools.bytesToHexStringBE(bytes)+"\n----");
+            System.out.println("Longer than 8 bytes, in hex:\n----\n"+BytesTools.bytesToHexStringBE(bytes)+"\n----");
         }
         br.readLine();
-	}
+    }
 
-	private static void hex32Base58(BufferedReader br) throws IOException {
+    private static void hex32Base58(BufferedReader br) throws IOException {
         String input=null;
         while (true) {
             System.out.println("Input 32 bytes hex or base58 string, enter to exit:");
@@ -392,15 +393,15 @@ public class StartTools {
             ECKey ecKey = new ECKey();
             String fid = KeyTools.pubKeyToFchAddr(ecKey.getPubKey());
             if(fid.substring(30).equals(input)){
-            	System.out.println("----");
+                System.out.println("----");
                 System.out.println("FID:"+fid);
                 System.out.println("PubKey: "+ecKey.getPublicKeyAsHex());
                 System.out.println("PriKey: "+ecKey.getPrivateKeyAsHex());
-            	System.out.println("----");
+                System.out.println("----");
                 System.out.println("Begin at: "+sdf.format(begin));
                 Date end = new Date();
                 System.out.println("End at: "+sdf.format(end));
-            	System.out.println("----");
+                System.out.println("----");
                 break;
             }
             i++;
@@ -441,8 +442,8 @@ public class StartTools {
             File file = new File(filePath);
             // Check if the file exists
             if(file.isDirectory()){
-            	System.out.println("It's a directory.");
-            	break;
+                System.out.println("It's a directory.");
+                break;
             }
             if (file.exists()) {
                 System.out.println("File name: " + file.getName());
@@ -451,10 +452,10 @@ public class StartTools {
                 break;
             }
             String hash = Hash.Sha256(file);
-        	System.out.println("----");
+            System.out.println("----");
             System.out.println("file:" + filePath);
             System.out.println("sha256:" + hash );
-        	System.out.println("----");
+            System.out.println("----");
             br.readLine();
         }
     }
@@ -470,8 +471,8 @@ public class StartTools {
             File file = new File(filePath);
             // Check if the file exists
             if(file.isDirectory()){
-            	System.out.println("It's a directory.");
-            	break;
+                System.out.println("It's a directory.");
+                break;
             }
             if (file.exists()) {
                 System.out.println("File name: " + file.getName());
@@ -480,10 +481,10 @@ public class StartTools {
                 break;
             }
             String hash = Hash.Sha256x2(file);
-        	System.out.println("----");
+            System.out.println("----");
             System.out.println("file:" + filePath );
             System.out.println("sha256:" + hash);
-        	System.out.println("----");
+            System.out.println("----");
             br.readLine();
         }
     }
@@ -492,13 +493,13 @@ public class StartTools {
         System.out.println("Input the string to be hashed:");
         String text = inputString(br);
         String hash = Hash.Sha256(text);
-    	System.out.println("----");
+        System.out.println("----");
         System.out.println("raw string:");
-    	System.out.println("----");
+        System.out.println("----");
         System.out.println(text);
-    	System.out.println("----");
+        System.out.println("----");
         System.out.println("sha256:" +hash);
-    	System.out.println("----");
+        System.out.println("----");
         br.readLine();
     }
 
@@ -506,13 +507,13 @@ public class StartTools {
         System.out.println("Input the string to be hashed:");
         String text = inputString(br);
         String hash = Hash.Sha256x2(text);
-    	System.out.println("----");
+        System.out.println("----");
         System.out.println("raw string:");
-    	System.out.println("----");
+        System.out.println("----");
         System.out.println(text);
-    	System.out.println("----");
+        System.out.println("----");
         System.out.println("sha256:" +hash);
-    	System.out.println("----");
+        System.out.println("----");
         br.readLine();
     }
 
@@ -527,11 +528,11 @@ public class StartTools {
             System.out.println("Input text to be signed, enter to input, 'q' to exit:");
             String text = inputString(br);
             if("q".equals(text))return;
-        	System.out.println("----");
+            System.out.println("----");
             System.out.println("Signature:");
-        	System.out.println("----");
+            System.out.println("----");
             System.out.println(getSign(symKey,text));
-        	System.out.println("----");
+            System.out.println("----");
         }
     }
 
@@ -560,13 +561,13 @@ public class StartTools {
         byte[] textBytes = text.getBytes();
         byte[] keyBytes = BytesTools.hexToByteArray(symKey);
         byte[] bytes = BytesTools.bytesMerger(textBytes,keyBytes);
-    	System.out.println("----");
+        System.out.println("----");
         System.out.println("SymKey: ");
-    	System.out.println("----");
+        System.out.println("----");
         System.out.println(symKey);
         System.out.println("------");
         System.out.println("Raw text: ");
-    	System.out.println("----");
+        System.out.println("----");
         System.out.println(new String(bytes));
         System.out.println("------");
         byte[] signBytes = Hash.Sha256x2(bytes);

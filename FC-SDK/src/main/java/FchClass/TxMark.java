@@ -2,9 +2,9 @@ package FchClass;
 
 public class TxMark {
 	private String txId;
-	private long outValue;	//tx hashs
-	private long fee;	//tx hashs
-	private long cdd;	//tx hashs
+	private long outValue;
+	private long fee;
+	private long cdd;
 	
 	public String getTxId() {
 		return txId;
