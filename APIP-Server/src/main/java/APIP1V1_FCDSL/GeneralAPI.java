@@ -1,6 +1,8 @@
 package APIP1V1_FCDSL;
 
 import APIP0V1_OpenAPI.*;
+import constants.ApiNames;
+import constants.ReplyInfo;
 import initial.Initiator;
 
 import javax.servlet.ServletException;
@@ -12,9 +14,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
-import static api.Constant.*;
-
-@WebServlet(APIP1V1Path + GeneralAPI)
+@WebServlet(ApiNames.APIP1V1Path + ApiNames.GeneralAPI)
 public class GeneralAPI extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -23,7 +23,7 @@ public class GeneralAPI extends HttpServlet {
         Replier replier = new Replier();
         PrintWriter writer = response.getWriter();
 
-        RequestChecker requestChecker = new RequestChecker(request,response);
+        RequestChecker requestChecker = new RequestChecker(request,response, replier);
 
         DataCheckResult dataCheckResult = requestChecker.checkDataRequest();
 
@@ -35,7 +35,7 @@ public class GeneralAPI extends HttpServlet {
 
         //Check API
         if(!isThisApiRequest(requestBody)){
-            response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
             writer.write(replier.reply1012BadQuery(addr));
             return;
         }
@@ -51,7 +51,7 @@ public class GeneralAPI extends HttpServlet {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
             writer.write(replier.reply1012BadQuery(addr));
             return;
         }
@@ -60,7 +60,7 @@ public class GeneralAPI extends HttpServlet {
         replier.setData(meetList);
         replier.setGot(meetList.size());
         if(replier.getTotal()==0)replier.setTotal(meetList.size());
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", GroupByIdsAPI));
+        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.GroupByIdsAPI));
         esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
 
     }

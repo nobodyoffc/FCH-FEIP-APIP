@@ -3,7 +3,7 @@ package main;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import com.googlecode.jsonrpc4j.Base64;
 import com.googlecode.jsonrpc4j.JsonRpcHttpClient;
-import FchClass.Cash;
+import fchClass.Cash;
 import javaTools.BytesTools;
 import fcTools.ParseTools;
 import fcTools.ParseTools.VarintResult;
@@ -11,8 +11,7 @@ import org.junit.Test;
 import redis.clients.jedis.Jedis;
 import servers.EsTools;
 import servers.NewEsClient;
-import startAPIP.ConfigAPIP;
-import startFCH.IndicesFCH;
+import config.ConfigAPIP;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -20,6 +19,7 @@ import java.net.URL;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+import static constants.IndicesNames.CASH;
 import static fcTools.ParseTools.parseVarint;
 
 public class MempoolScannerTest extends Thread {
@@ -32,6 +32,7 @@ public class MempoolScannerTest extends Thread {
      * 6. 将所有in和out按addr累加到redis
      * 7. API查询addrs,响应income数量，income金额，spend数量，spend金额，net净变化。
      */
+    private Jedis jedis0Common;
     private Jedis jedis3Unconfirmed;
     private JsonRpcHttpClient client;
     private static NewEsClient newEsClient = new NewEsClient();
@@ -54,14 +55,18 @@ public class MempoolScannerTest extends Thread {
     private String IncomeValue = "incomeValue";
 
     public MempoolScannerTest() {
-        this.jedis3Unconfirmed = new Jedis();
-        {
-            jedis3Unconfirmed.select(3);
-        }
+
 
         ConfigAPIP configAPIP = new ConfigAPIP();
         try {
             configAPIP = configAPIP.getClassInstanceFromFile(ConfigAPIP.class);
+
+            this.jedis0Common = new Jedis();
+
+            this.jedis3Unconfirmed = new Jedis();
+            {
+                jedis3Unconfirmed.select(3);
+            }
 
             configAPIP.writeConfigToFile();
             this.rpcUser = configAPIP.getRpcUser();
@@ -70,7 +75,7 @@ public class MempoolScannerTest extends Thread {
             this.esIp = configAPIP.getRpcIp();
             this.esPort = configAPIP.getEsPort();
 
-            this.esClient = newEsClient.checkEsClient(esClient,configAPIP);
+            this.esClient = newEsClient.getEsClientSilent(configAPIP,jedis0Common);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -201,7 +206,7 @@ public class MempoolScannerTest extends Thread {
     }
 
     private List<Cash> getInCashList(List<String> inIdList) throws Exception {
-        EsTools.MgetResult<Cash> result = EsTools.getMultiByIdList(esClient, IndicesFCH.CashIndex, inIdList, Cash.class);
+        EsTools.MgetResult<Cash> result = EsTools.getMultiByIdList(esClient, CASH, inIdList, Cash.class);
         return result.getResultList();
     }
 

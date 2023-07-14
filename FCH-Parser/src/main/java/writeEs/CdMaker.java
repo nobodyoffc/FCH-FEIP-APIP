@@ -11,14 +11,16 @@ import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.UpdateByQueryResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
-import FchClass.Address;
-import FchClass.Block;
+import fchClass.Address;
+import fchClass.Block;
 import parser.WeightMethod;
 import servers.EsTools;
-import startFCH.IndicesFCH;
 
 import java.io.IOException;
 import java.util.*;
+
+import static constants.IndicesNames.ADDRESS;
+import static constants.IndicesNames.CASH;
 
 public class CdMaker {
 
@@ -32,7 +34,7 @@ public class CdMaker {
 		UpdateByQueryResponse response = esClient.updateByQuery(u -> u
 				.conflicts(Conflicts.Proceed)
 				.timeout(Time.of(t->t.time("1800s")))
-				.index(IndicesFCH.CashIndex)
+				.index(CASH)
 				.query(q -> q.bool(b -> b
 						.filter(f -> f.term(t -> t.field("valid").value(true)))))
 				.script(s -> s.inline(i1 -> i1.source(
@@ -51,7 +53,7 @@ public class CdMaker {
 		System.out.println("Make all cd of Addresses...");
 
 		SearchResponse<Address> response = esClient.search(
-				s -> s.index(IndicesFCH.AddressIndex).size(EsTools.READ_MAX).sort(sort -> sort.field(f -> f.field("fid"))),
+				s -> s.index(ADDRESS).size(EsTools.READ_MAX).sort(sort -> sort.field(f -> f.field("fid"))),
 				Address.class);
 
 		ArrayList<Address> addrOldList = getResultAddrList(response);
@@ -69,7 +71,7 @@ public class CdMaker {
 				break;
 			Hit<Address> last = response.hits().hits().get(response.hits().hits().size() - 1);
 			String lastId = last.id();
-			response = esClient.search(s -> s.index(IndicesFCH.AddressIndex).size(EsTools.READ_MAX)
+			response = esClient.search(s -> s.index(ADDRESS).size(EsTools.READ_MAX)
 					.sort(sort -> sort.field(f -> f.field("fid"))).searchAfter(lastId), Address.class);
 
 			addrOldList = getResultAddrList(response);
@@ -117,7 +119,7 @@ public class CdMaker {
 		}
 
 		SearchResponse<Address> response = esClient.search(
-				s -> s.index(IndicesFCH.CashIndex).size(0).query(q -> q.term(t -> t.field("valid").value(true)))
+				s -> s.index(CASH).size(0).query(q -> q.term(t -> t.field("valid").value(true)))
 						.aggregations("filterByAddr",
 								a -> a.filter(f -> f.terms(t -> t.field("addr").terms(t1 -> t1.value(fieldValueList))))
 										.aggregations("termByAddr",
@@ -150,7 +152,7 @@ public class CdMaker {
 			long weight = addrNewWeightMap.get(addr);
 			updateMap.put("cd", cd);
 			updateMap.put("weight",weight);
-			br.operations(o -> o.update(u -> u.index(IndicesFCH.AddressIndex).id(addr).action(a -> a.doc(updateMap))));
+			br.operations(o -> o.update(u -> u.index(ADDRESS).id(addr).action(a -> a.doc(updateMap))));
 		}
 
 		if(addrNewCdMap.size()>0)

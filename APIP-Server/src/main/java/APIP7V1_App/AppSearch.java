@@ -1,9 +1,11 @@
 package APIP7V1_App;
 
 import APIP0V1_OpenAPI.*;
-import FeipClass.App;
+import constants.ApiNames;
+import constants.IndicesNames;
+import constants.ReplyInfo;
+import feipClass.App;
 import initial.Initiator;
-import startFEIP.IndicesFEIP;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -16,10 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import APIP1V1_FCDSL.Sort;
-import static api.Constant.*;
 
 
-@WebServlet(APIP7V1Path +AppSearchAPI)
+@WebServlet(ApiNames.APIP7V1Path + ApiNames.AppSearchAPI)
 public class AppSearch extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -28,7 +29,7 @@ public class AppSearch extends HttpServlet {
         Replier replier = new Replier();
         PrintWriter writer = response.getWriter();
 
-        RequestChecker requestChecker = new RequestChecker(request,response);
+        RequestChecker requestChecker = new RequestChecker(request,response, replier);
 
         DataCheckResult dataCheckResult = requestChecker.checkDataRequest();
 
@@ -47,7 +48,7 @@ public class AppSearch extends HttpServlet {
         //Add condition
 
         //Request
-        String index = IndicesFEIP.AppIndex;
+        String index = IndicesNames.APP;
 
         DataRequestHandler esRequest = new DataRequestHandler(dataCheckResult.getAddr(),requestBody,response,replier);
         List<App> meetList;
@@ -58,7 +59,7 @@ public class AppSearch extends HttpServlet {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
             writer.write(replier.reply1012BadQuery(addr));
             return;
         }
@@ -66,7 +67,7 @@ public class AppSearch extends HttpServlet {
         //response
         replier.setData(meetList);
         replier.setGot(meetList.size());
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", AppSearchAPI));
+        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.AppSearchAPI));
         esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
 
     }

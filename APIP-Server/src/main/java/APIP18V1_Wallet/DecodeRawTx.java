@@ -1,7 +1,9 @@
 package APIP18V1_Wallet;
 
 import APIP0V1_OpenAPI.*;
-import RPC.FcRpcMethods;
+import constants.ApiNames;
+import constants.ReplyInfo;
+import freecashRPC.FcRpcMethods;
 import initial.Initiator;
 
 import javax.servlet.ServletException;
@@ -12,10 +14,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import static api.Constant.*;
-import static scanner.MempoolScanner.fcClient;
+import static mempool.MempoolScanner.fcClient;
 
-@WebServlet(APIP18V1Path +DecodeRawTxAPI)
+@WebServlet(ApiNames.APIP18V1Path + ApiNames.DecodeRawTxAPI)
 public class DecodeRawTx extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("application/json");
@@ -23,7 +24,7 @@ public class DecodeRawTx extends HttpServlet {
         Replier replier = new Replier();
         PrintWriter writer = response.getWriter();
 
-        RequestChecker requestChecker = new RequestChecker(request,response);
+        RequestChecker requestChecker = new RequestChecker(request,response, replier);
 
         DataCheckResult dataCheckResult = requestChecker.checkDataRequest();
 
@@ -31,11 +32,13 @@ public class DecodeRawTx extends HttpServlet {
 
         String addr = dataCheckResult.getAddr();
 
+        if (RequestChecker.checkPublicSessionKey(response, replier, writer, addr)) return;
+
         DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
         replier.setNonce(requestBody.getNonce());
         //Check API
         if(!isThisApiRequest(requestBody)){
-            response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
             writer.write(replier.reply1012BadQuery(addr));
             return;
         }
@@ -45,20 +48,20 @@ public class DecodeRawTx extends HttpServlet {
         try {
              result = FcRpcMethods.decodeTx(fcClient,rawTxHex);
         } catch (Throwable e) {
-            response.setHeader(CodeInHeader, String.valueOf(Code1020OtherError));
+            response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1020OtherError));
             writer.write(replier.reply1020OtherError(addr));
         }
 
         replier.setData(result);
         replier.setGot(1);
         replier.setTotal(1);
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", DecodeRawTxAPI));
-        response.setHeader(CodeInHeader, String.valueOf(Code0Success));
+        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.DecodeRawTxAPI));
+        response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code0Success));
         String reply = replier.reply0Success(addr,nPrice);
         if(reply==null)return;
         String sign = DataRequestHandler.symSign(reply,dataCheckResult.getSessionKey());
         if(sign==null)return;
-        response.setHeader(SignInHeader,sign);
+        response.setHeader(ReplyInfo.SignInHeader,sign);
 
         writer.write(reply);
     }

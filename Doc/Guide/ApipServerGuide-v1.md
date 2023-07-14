@@ -100,7 +100,7 @@ UpdateDate: 2023-06-15
 ```
 	$ su armx
 ```
-* To start RPC service, it's necessary to create freecash.conf.
+* To start freecashRPC service, it's necessary to create freecash.conf.
 ```
     $ cd opt/newcoin
     $ vi freecash.conf
@@ -120,7 +120,7 @@ rpcallowip=127.0.0.1
 	$ freecashd -listen=1 -server=1 -datadir=/opt/newcoin -logtimemicros -gen=0 -daemon
 	Freecash server starting
 ```
-- "-server=1" makes RPC service started.
+- "-server=1" makes freecashRPC service started.
 - "-gen=0" closed mining.
 
 * Check the blockchain info after a while of the node started 
@@ -141,7 +141,7 @@ rpcallowip=127.0.0.1
 	  "warnings": ""
 	}
 ```
-* Check RPC:
+* Check freecashRPC:
 ```
     $ curl --user user --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "getblockchaininfo", "params": [] }' -H 'content-type: text/plain;' http://127.0.0.1:8332/ | cat
     Enter host password for user 'user':password
@@ -218,6 +218,7 @@ or
     $ redis-cli
     > ping
 ```
+* set persistence: find redis.conf and set RDF or AOF to make your data persistently saved on your disk.
 
 ## 6. Parse Freecash blockchain
 * Copy apip.zip to you server:
@@ -290,8 +291,8 @@ or
 ```
 	$ java -jar ApipManager.jar
 ```
-*  Run ApipManager.jar to initial some important parameters
-- Log in ES. The password of ES would have save been encrypted and saved in redis.
+*  Run ApipManager.jar to initial some important parameters.
+- Log in ES. The password of ES would have been encrypted and saved in redis.
 - Manage your service information by Menu 1 Manage Service
   -     1 Manage Service
   -     2 Publish New Service: get the publishing json str and write it in blockchain with a TX sent by your fch address.
@@ -299,10 +300,9 @@ or
   -     4 Show service: Show the detail of your service with json.
 - Set the nPrice of your APIs by Menu 3 List APIs and Set nPrice
 - Set the windowTime by Menu Set windowTime
-- Switch on/off freeGet SignIn service by Menu 7 Switch free get APIs
-
-* As the nPrice for all APIs and the service were set, ApipManager can be shutdown.
-* If you changed the `params` of the service on blockchain, you need to run ApipManager to reload your service in Manage Service entry.
+- Switch on/off freeGet API service by Menu 7 Switch free get APIs
+- As long as parameters are set, it's not necessary to keep ApipManager running.
+* If you changed the `params` of the service on blockchain, you need to restart ApipManager to reload your service in Manage Service entry.
 
 ## 8. Deploy tomcat and APIP.war
 * Install Tomcat

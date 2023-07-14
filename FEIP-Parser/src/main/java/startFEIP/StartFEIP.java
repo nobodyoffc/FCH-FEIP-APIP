@@ -5,6 +5,8 @@ import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.json.JsonData;
 import com.google.gson.Gson;
+import config.ConfigFEIP;
+import constants.IndicesNames;
 import fcTools.ParseTools;
 import menu.Menu;
 import org.slf4j.Logger;
@@ -16,6 +18,9 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import static startFEIP.IndicesFEIP.createAllIndices;
+import static startFEIP.IndicesFEIP.deleteAllIndices;
 
 public class StartFEIP {
 	public static long CddCheckHeight=2000000;
@@ -39,7 +44,7 @@ public class StartFEIP {
 				configFEIP.config(br);
 			String opReturnJsonPath = configFEIP.getOpReturnFilePath();
 
-			esClient = newEsClient.checkEsClient(esClient, configFEIP);
+			esClient = newEsClient.getElasticSearchClient(br, configFEIP, null);
 			if (esClient == null) {
 				log.debug("Creating ES client failed.");
 				newEsClient.shutdownClient();
@@ -72,11 +77,11 @@ public class StartFEIP {
 						if (delete.equals("y")) {
 
 							System.out.println("Deleting indices...");
-							IndicesFEIP.deleteAllIndices(esClient);
+							deleteAllIndices(esClient);
 							TimeUnit.SECONDS.sleep(3);
 
 							System.out.println("Creating indices...");
-							IndicesFEIP.createAllIndices(esClient);
+							createAllIndices(esClient);
 							TimeUnit.SECONDS.sleep(2);
 
 							end = startNewFromFile(esClient, opReturnJsonPath);
@@ -142,7 +147,7 @@ public class StartFEIP {
 	private static boolean restartFromFile(ElasticsearchClient esClient, String path) throws Exception {
 		
 		SearchResponse<ParseMark> result = esClient.search(s->s
-				.index(IndicesFEIP.ParseMarkIndex)
+				.index(IndicesNames.FEIP_MARK)
 				.size(1)
 				.sort(s1->s1
 						.field(f->f
@@ -177,7 +182,7 @@ public class StartFEIP {
 	private static boolean manualRestartFromFile(ElasticsearchClient esClient, String path, long height) throws Exception {
 		
 		SearchResponse<ParseMark> result = esClient.search(s->s
-				.index(IndicesFEIP.ParseMarkIndex)
+				.index(IndicesNames.FEIP_MARK)
 				.query(q->q.range(r->r.field("lastHeight").lte(JsonData.of(height))))
 				.size(1)
 				.sort(s1->s1

@@ -268,8 +268,6 @@ public class EsTools {
             , String indexT, ArrayList<T> tList
             , ArrayList<String> idList
             , Class<T> classT) throws Exception {
-
-        if (tList.isEmpty()) return null;
         if (tList.isEmpty()) return null;
         BulkResponse response = null;
 

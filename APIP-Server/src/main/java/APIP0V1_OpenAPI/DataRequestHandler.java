@@ -15,6 +15,8 @@ import co.elastic.clients.elasticsearch.core.mget.MultiGetResponseItem;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.elasticsearch.core.search.TrackHits;
 import co.elastic.clients.json.JsonData;
+import constants.Constants;
+import constants.ReplyInfo;
 import javaTools.BytesTools;
 import cryptoTools.SHA;
 import APIP1V1_FCDSL.Sort;
@@ -25,10 +27,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
 
-import static api.Constant.*;
-
 public class DataRequestHandler {
-    private Replier replier;
+    private final Replier replier;
     private final HttpServletResponse response;
     private final ElasticsearchClient esClient;
     private final String addr;
@@ -41,7 +41,6 @@ public class DataRequestHandler {
         this.esClient = Initiator.esClient;
         this.response = response;
         this.replier = replier;
-        replier.setNonce(dataRequestBody.getNonce());
         this.writer = response.getWriter();
     }
 
@@ -103,11 +102,11 @@ public class DataRequestHandler {
                 }
             }catch(Exception e){
                 e.printStackTrace();
-                response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
+                response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
                 writer.write(replier.reply1012BadQuery(addr));
                 return null;
             }
-            if(size==0 || size>MaxRequestSize) size=DefaultSize;
+            if(size==0 || size> Constants.MaxRequestSize) size= Constants.DefaultSize;
             builder.size(size);
 
             if(fcdsl.getSort()!=null) {
@@ -136,22 +135,23 @@ public class DataRequestHandler {
             result = esClient.search(searchRequest, tClass);
         }catch(Exception e){
             e.printStackTrace();
-            this.response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
+            this.response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
             writer.write(replier.reply1012BadQuery(addr));
             return null;
         }
 
         if(result==null){
-            this.response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
+            this.response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
             writer.write(replier.reply1012BadQuery(addr));
             return null;
         }
 
+        assert result.hits().total() != null;
         replier.setTotal(result.hits().total().value());
 
         List<Hit<T>> hitList = result.hits().hits();
         if(hitList.size()==0){
-            this.response.setHeader(CodeInHeader, String.valueOf(Code1011DataNotFound));
+            this.response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1011DataNotFound));
             writer.write(replier.reply1011DataNotFound(addr));
             return null;
         }
@@ -233,9 +233,9 @@ public class DataRequestHandler {
     private <T> List<T> doIdsRequest(String index, Class<T> clazz) {
 
         ArrayList<String> idList = new ArrayList<>(Arrays.asList(dataRequestBody.getFcdsl().getIds()));
-        if(idList.size()> MaxRequestSize) {
-            this.response.setHeader(CodeInHeader,String.valueOf(Code1010TooMuchData));
-            replier.setData(new HashMap<String, Integer>().put("maxSize", MaxRequestSize));
+        if(idList.size()> Constants.MaxRequestSize) {
+            this.response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1010TooMuchData));
+            replier.setData(new HashMap<String, Integer>().put("maxSize", Constants.MaxRequestSize));
             writer.write(replier.reply1010TooMuchData(addr));
             return null;
         }
@@ -244,7 +244,7 @@ public class DataRequestHandler {
         try {
             result = esClient.mget(m -> m.index(index).ids(idList), clazz);
         }catch(Exception e){
-            this.response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
+            this.response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
             writer.write(replier.reply1012BadQuery(addr));
             return null;
         }
@@ -260,7 +260,7 @@ public class DataRequestHandler {
         }
 
         if(meetList.size()==0) {
-            this.response.setHeader(CodeInHeader, String.valueOf(Code1011DataNotFound));
+            this.response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1011DataNotFound));
             writer.write(replier.reply1011DataNotFound(addr));
             return null;
         }else return meetList;
@@ -319,7 +319,7 @@ public class DataRequestHandler {
                 try {
                     valueList.add(FieldValue.of(Double.parseDouble(str)));
                 }catch(Exception e){
-                    this.response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
+                    this.response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
                     writer.write(replier.reply1012BadQuery(addr));
                     return null;
                 }
@@ -327,7 +327,7 @@ public class DataRequestHandler {
                 try {
                     valueList.add(FieldValue.of(Long.parseLong(str)));
                 }catch(Exception e){
-                                this.response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
+                                this.response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
             writer.write(replier.reply1012BadQuery(addr));
                     return null;
                 }
@@ -388,7 +388,7 @@ public class DataRequestHandler {
         try{
            isCaseInSensitive = Boolean.parseBoolean(part.getIsCaseInsensitive());
         }catch(Exception e){
-            response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
             writer.write(replier.reply1012BadQuery(addr));
             return null;
         }
@@ -461,23 +461,23 @@ public class DataRequestHandler {
         return queryBuilder.build();
     }
 
-    public void writeSuccess(String sessionKey,int nPrice) {
-        response.setHeader(CodeInHeader, String.valueOf(Code0Success));
+    public void writeSuccess(String sessionKey, int nPrice) {
+        response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code0Success));
         String reply = replier.reply0Success(addr,nPrice);
         if(reply==null)return;
         String sign = symSign(reply,sessionKey);
         if(sign==null)return;
-        response.setHeader(SignInHeader,sign);
+        response.setHeader(ReplyInfo.SignInHeader,sign);
         writer.write(reply);
     }
 
     public void writeSuccess(String sessionKey) {
-        response.setHeader(CodeInHeader, String.valueOf(Code0Success));
+        response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code0Success));
         String reply = replier.reply0Success(addr);
         if(reply==null)return;
         String sign = symSign(reply,sessionKey);
         if(sign==null)return;
-        response.setHeader(SignInHeader,sign);
+        response.setHeader(ReplyInfo.SignInHeader,sign);
         writer.write(reply);
     }
 

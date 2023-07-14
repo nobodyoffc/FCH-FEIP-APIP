@@ -1,18 +1,18 @@
 package writeEs;
 
-import FchClass.*;
+import constants.IndicesNames;
+import fchClass.*;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.BulkRequest.Builder;
 import co.elastic.clients.elasticsearch.core.BulkResponse;
 import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import parser.OpReFileTools;
+import fileTools.OpReFileTools;
 import parser.Preparer;
 import parser.ReadyBlock;
 import redis.clients.jedis.Jedis;
 import servers.EsTools;
-import startFCH.IndicesFCH;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -90,7 +90,7 @@ public class BlockWriter {
 	private void putBlockMark(ElasticsearchClient esClient, BlockMark blockMark, Builder br) throws Exception {
 
 		// BulkRequest.Builder br = new BulkRequest.Builder();
-		br.operations(op -> op.index(i -> i.index(IndicesFCH.BlockMarkIndex).id(blockMark.getBlockId()).document(blockMark)));
+		br.operations(op -> op.index(i -> i.index(IndicesNames.BLOCK_MARK).id(blockMark.getBlockId()).document(blockMark)));
         // EsTools.bulkWithBuilder(esClient.esClient, br);
 	}
 
@@ -101,13 +101,13 @@ public class BlockWriter {
 			ArrayList<String> idList = new ArrayList<String>();
 			while (iter.hasNext())
 				idList.add(iter.next().getFid());
-			EsTools.bulkWriteList(esClient, IndicesFCH.AddressIndex, addrList, idList, Address.class);
+			EsTools.bulkWriteList(esClient, IndicesNames.ADDRESS, addrList, idList, Address.class);
 			TimeUnit.SECONDS.sleep(3);
 		} else {
 			Iterator<Address> iterAd = addrList.iterator();
 			while (iterAd.hasNext()) {
 				Address am = iterAd.next();
-				br.operations(op -> op.index(i -> i.index(IndicesFCH.AddressIndex).id(am.getFid()).document(am)));
+				br.operations(op -> op.index(i -> i.index(IndicesNames.ADDRESS).id(am.getFid()).document(am)));
 			}
 		}
 	}
@@ -121,13 +121,13 @@ public class BlockWriter {
 				ArrayList<String> idList = new ArrayList<String>();
 				while (iter.hasNext())
 					idList.add(iter.next().getTxId());
-				EsTools.bulkWriteList(esClient, IndicesFCH.OpReturnIndex, opReturnList, idList, OpReturn.class);
+				EsTools.bulkWriteList(esClient, IndicesNames.OPRETURN, opReturnList, idList, OpReturn.class);
 				TimeUnit.SECONDS.sleep(3);
 			} else {
 				Iterator<OpReturn> iterOR = opReturnList.iterator();
 				while (iterOR.hasNext()) {
 					OpReturn or = iterOR.next();
-					br.operations(op -> op.index(i -> i.index(IndicesFCH.OpReturnIndex).id(or.getTxId()).document(or)));
+					br.operations(op -> op.index(i -> i.index(IndicesNames.OPRETURN).id(or.getTxId()).document(or)));
 				}
 			}
 		}
@@ -140,13 +140,13 @@ public class BlockWriter {
 				ArrayList<String> idList = new ArrayList<String>();
 				while (iter.hasNext())
 					idList.add(iter.next().getCashId());
-				EsTools.bulkWriteList(esClient, IndicesFCH.CashIndex, inList, idList, Cash.class);
+				EsTools.bulkWriteList(esClient, IndicesNames.CASH, inList, idList, Cash.class);
 				TimeUnit.SECONDS.sleep(3);
 			} else {
 				Iterator<Cash> iterTxo = inList.iterator();
 				while (iterTxo.hasNext()) {
 					Cash om = iterTxo.next();
-					br.operations(op -> op.index(i -> i.index(IndicesFCH.CashIndex).id(om.getCashId()).document(om)));
+					br.operations(op -> op.index(i -> i.index(IndicesNames.CASH).id(om.getCashId()).document(om)));
 				}
 			}
 		}
@@ -158,13 +158,13 @@ public class BlockWriter {
 			ArrayList<String> idList = new ArrayList<String>();
 			while (iter.hasNext())
 				idList.add(iter.next().getCashId());
-			EsTools.bulkWriteList(esClient, IndicesFCH.CashIndex, outList, idList, Cash.class);
+			EsTools.bulkWriteList(esClient, IndicesNames.CASH, outList, idList, Cash.class);
 			TimeUnit.SECONDS.sleep(3);
 		} else {
 			Iterator<Cash> iterTxo = outList.iterator();
 			while (iterTxo.hasNext()) {
 				Cash om = iterTxo.next();
-				br.operations(op -> op.index(i -> i.index(IndicesFCH.CashIndex).id(om.getCashId()).document(om)));
+				br.operations(op -> op.index(i -> i.index(IndicesNames.CASH).id(om.getCashId()).document(om)));
 			}
 		}
 	}
@@ -176,13 +176,13 @@ public class BlockWriter {
 				ArrayList<String> idList = new ArrayList<String>();
 				while (iter.hasNext())
 					idList.add(iter.next().getTxId());
-				EsTools.bulkWriteList(esClient, IndicesFCH.TxHasIndex, txHasList, idList, TxHas.class);
+				EsTools.bulkWriteList(esClient, IndicesNames.TX_HAS, txHasList, idList, TxHas.class);
 				TimeUnit.SECONDS.sleep(3);
 			} else {
 				Iterator<TxHas> iterOInTx = txHasList.iterator();
 				while (iterOInTx.hasNext()) {
 					TxHas ot = iterOInTx.next();
-					br.operations(op -> op.index(i -> i.index(IndicesFCH.TxHasIndex).id(ot.getTxId()).document(ot)));
+					br.operations(op -> op.index(i -> i.index(IndicesNames.TX_HAS).id(ot.getTxId()).document(ot)));
 				}
 			}
 		}
@@ -194,22 +194,22 @@ public class BlockWriter {
 			ArrayList<String> idList = new ArrayList<String>();
 			while (iter.hasNext())
 				idList.add(iter.next().getTxId());
-			EsTools.bulkWriteList(esClient, IndicesFCH.TxIndex, txList, idList, Tx.class);
+			EsTools.bulkWriteList(esClient, IndicesNames.TX, txList, idList, Tx.class);
 			TimeUnit.SECONDS.sleep(3);
 		} else {
 			Iterator<Tx> iterTx = txList.iterator();
 			while (iterTx.hasNext()) {
 				Tx tm = iterTx.next();
-				br.operations(op -> op.index(i -> i.index(IndicesFCH.TxIndex).id(tm.getTxId()).document(tm)));
+				br.operations(op -> op.index(i -> i.index(IndicesNames.TX).id(tm.getTxId()).document(tm)));
 			}
 		}
 	}
 
 	private void putBlockHas(BlockHas blockHas, Builder br) {
-		br.operations(op -> op.index(i -> i.index(IndicesFCH.BlockHasIndex).id(blockHas.getBlockId()).document(blockHas)));
+		br.operations(op -> op.index(i -> i.index(IndicesNames.BLOCK_HAS).id(blockHas.getBlockId()).document(blockHas)));
 	}
 
 	private void putBlock(ElasticsearchClient esClient, Block block, Builder br) throws Exception {
-		br.operations(op -> op.index(i -> i.index(IndicesFCH.BlockIndex).id(block.getBlockId()).document(block)));
+		br.operations(op -> op.index(i -> i.index(IndicesNames.BLOCK).id(block.getBlockId()).document(block)));
 	}
 }

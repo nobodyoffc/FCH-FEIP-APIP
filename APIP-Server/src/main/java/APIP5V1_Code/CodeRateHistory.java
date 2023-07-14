@@ -1,10 +1,12 @@
 package APIP5V1_Code;
 
 import APIP0V1_OpenAPI.*;
+import constants.ApiNames;
+import constants.IndicesNames;
+import constants.ReplyInfo;
 import construct.CodeHistory;
 import APIP1V1_FCDSL.Fcdsl;
 import initial.Initiator;
-import startFEIP.IndicesFEIP;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -17,10 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import APIP1V1_FCDSL.Sort;
-import static api.Constant.*;
 
 
-@WebServlet(APIP5V1Path +CodeRateHistoryAPI)
+@WebServlet(ApiNames.APIP5V1Path + ApiNames.CodeRateHistoryAPI)
 public class CodeRateHistory extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -29,7 +30,7 @@ public class CodeRateHistory extends HttpServlet {
         Replier replier = new Replier();
         PrintWriter writer = response.getWriter();
 
-        RequestChecker requestChecker = new RequestChecker(request,response);
+        RequestChecker requestChecker = new RequestChecker(request,response, replier);
 
         DataCheckResult dataCheckResult = requestChecker.checkDataRequest();
 
@@ -49,7 +50,7 @@ public class CodeRateHistory extends HttpServlet {
         requestBody.getFcdsl().setFilterTerms("op","rate");
 
         //Request
-        String index = IndicesFEIP.CodeHistIndex;
+        String index = IndicesNames.CODE_HISTORY;
 
         DataRequestHandler esRequest = new DataRequestHandler(dataCheckResult.getAddr(),requestBody,response,replier);
         List<CodeHistory> meetList;
@@ -60,7 +61,7 @@ public class CodeRateHistory extends HttpServlet {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
             writer.write(replier.reply1012BadQuery(addr));
             return;
         }
@@ -68,7 +69,7 @@ public class CodeRateHistory extends HttpServlet {
         //response
         replier.setData(meetList);
         replier.setGot(meetList.size());
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", CodeRateHistoryAPI));
+        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.CodeRateHistoryAPI));
         esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
 
     }

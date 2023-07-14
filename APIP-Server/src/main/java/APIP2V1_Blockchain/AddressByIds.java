@@ -1,9 +1,11 @@
 package APIP2V1_Blockchain;
 
 import APIP0V1_OpenAPI.*;
-import FchClass.Address;
+import constants.ApiNames;
+import constants.IndicesNames;
+import constants.ReplyInfo;
+import fchClass.Address;
 import initial.Initiator;
-import startFCH.IndicesFCH;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -16,9 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static api.Constant.*;
-
-@WebServlet(APIP2V1Path + AddressByIdsAPI)
+@WebServlet(ApiNames.APIP2V1Path + ApiNames.AddressByIdsAPI)
 public class AddressByIds extends HttpServlet {
 
     @Override
@@ -28,7 +28,7 @@ public class AddressByIds extends HttpServlet {
         Replier replier = new Replier();
         PrintWriter writer = response.getWriter();
 
-        RequestChecker requestChecker = new RequestChecker(request,response);
+        RequestChecker requestChecker = new RequestChecker(request,response, replier);
 
         DataCheckResult dataCheckResult = requestChecker.checkDataRequest();
 
@@ -39,7 +39,7 @@ public class AddressByIds extends HttpServlet {
         DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
 
         if(!isThisApiRequest(requestBody)){
-            response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
             writer.write(replier.reply1012BadQuery(addr));
             return;
         }
@@ -47,9 +47,9 @@ public class AddressByIds extends HttpServlet {
         DataRequestHandler esRequest = new DataRequestHandler(dataCheckResult.getAddr(),requestBody,response,replier);
         List<Address> meetAddrList;
         try{
-            meetAddrList = esRequest.doRequest(IndicesFCH.AddressIndex, null,Address.class);
+            meetAddrList = esRequest.doRequest(IndicesNames.ADDRESS, null,Address.class);
             if(meetAddrList==null){
-                response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
+                response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
                 writer.write(replier.reply1012BadQuery(addr));
                 return;
             }
@@ -61,7 +61,7 @@ public class AddressByIds extends HttpServlet {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
             writer.write(replier.reply1012BadQuery(addr));
             return;
         }
@@ -74,7 +74,7 @@ public class AddressByIds extends HttpServlet {
         replier.setData(meetMap);
         replier.setGot(meetMap.size());
         replier.setTotal(meetMap.size());
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", AddressByIdsAPI));
+        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.AddressByIdsAPI));
         esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
     }
 

@@ -1,9 +1,11 @@
 package APIP3V1_CidInfo;
 
 import APIP0V1_OpenAPI.*;
-import FeipClass.Cid;
+import constants.ApiNames;
+import constants.IndicesNames;
+import constants.ReplyInfo;
+import feipClass.Cid;
 import initial.Initiator;
-import startFEIP.IndicesFEIP;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -18,9 +20,8 @@ import java.util.List;
 import java.util.Map;
 
 import APIP1V1_FCDSL.Sort;
-import static api.Constant.*;
 
-@WebServlet(APIP3V1Path + FidCidSeekAPI)
+@WebServlet(ApiNames.APIP3V1Path + ApiNames.FidCidSeekAPI)
 public class CidFidSeek extends HttpServlet {
 
     @Override
@@ -30,7 +31,7 @@ public class CidFidSeek extends HttpServlet {
         Replier replier = new Replier();
         PrintWriter writer = response.getWriter();
 
-        RequestChecker requestChecker = new RequestChecker(request,response);
+        RequestChecker requestChecker = new RequestChecker(request,response, replier);
 
         DataCheckResult dataCheckResult = requestChecker.checkDataRequest();
 
@@ -41,7 +42,7 @@ public class CidFidSeek extends HttpServlet {
         DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
 
         if(!isThisApiRequest(requestBody)){
-            response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
             writer.write(replier.reply1012BadQuery(addr));
             return;
         }
@@ -56,7 +57,7 @@ public class CidFidSeek extends HttpServlet {
         ArrayList<Sort> sort =Sort.makeSortList("lastHeight",false,"fid",true,null,null);
 
         try {
-            meetList = esRequest.doRequest(IndicesFEIP.CidIndex, sort, Cid.class);
+            meetList = esRequest.doRequest(IndicesNames.CID, sort, Cid.class);
             if(meetList==null){
                 return;
             }
@@ -66,19 +67,19 @@ public class CidFidSeek extends HttpServlet {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
             writer.write(replier.reply1012BadQuery(addr));
             return;
         }
 
         if(meetList.size() ==0){
-            response.setHeader(CodeInHeader,String.valueOf(Code1011DataNotFound));
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1011DataNotFound));
             writer.write(replier.reply1011DataNotFound(addr));
             return;
         }
         replier.setGot(cidAddrMap.size());
         replier.setData(cidAddrMap);
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", AddressSearchAPI));
+        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.AddressSearchAPI));
         esRequest.writeSuccess(dataCheckResult.getSessionKey(),nPrice);
     }
 

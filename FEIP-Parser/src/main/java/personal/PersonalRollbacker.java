@@ -5,9 +5,9 @@ import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
+import constants.IndicesNames;
 import fcTools.ParseTools;
 import servers.EsTools;
-import startFEIP.IndicesFEIP;
 
 import java.io.IOException;
 import java.util.*;
@@ -20,9 +20,9 @@ public class PersonalRollbacker {
 		rollbackBox(esClient,lastHeight);
 
 		List<String> indexList = new ArrayList<String>();
-		indexList.add(IndicesFEIP.ContactIndex);
-		indexList.add(IndicesFEIP.MailIndex);
-		indexList.add(IndicesFEIP.SecretIndex);
+		indexList.add(IndicesNames.CONTACT);
+		indexList.add(IndicesNames.MAIL);
+		indexList.add(IndicesNames.SECRET);
 		esClient.deleteByQuery(d->d.index(indexList).query(q->q.range(r->r.field("birthHeight").gt(JsonData.of(lastHeight)))));
 		
 		TimeUnit.SECONDS.sleep(3);
@@ -40,12 +40,12 @@ public class PersonalRollbacker {
 		if(itemIdList==null||itemIdList.isEmpty())return false;
 		System.out.println("If rolling back is interrupted, reparse all effected ids of index 'box': ");
 		ParseTools.gsonPrint(itemIdList);
-		deleteEffectedItems(esClient, IndicesFEIP.BoxIndex,itemIdList);
+		deleteEffectedItems(esClient, IndicesNames.BOX,itemIdList);
 		if(histIdList==null||histIdList.isEmpty())return false;
-		deleteRolledHists(esClient, IndicesFEIP.BoxHistIndex,histIdList);
+		deleteRolledHists(esClient, IndicesNames.BOX_HISTORY,histIdList);
 		TimeUnit.SECONDS.sleep(2);
 
-		List<BoxHistory>reparseHistList = EsTools.getHistsForReparse(esClient, IndicesFEIP.BoxHistIndex,"bid",itemIdList,BoxHistory.class);
+		List<BoxHistory>reparseHistList = EsTools.getHistsForReparse(esClient, IndicesNames.BOX_HISTORY,"bid",itemIdList,BoxHistory.class);
 
 		reparseBox(esClient,reparseHistList);
 
@@ -55,7 +55,7 @@ public class PersonalRollbacker {
 	private Map<String, ArrayList<String>> getEffectedBoxes(ElasticsearchClient esClient, long lastHeight) throws ElasticsearchException, IOException {
 		// TODO Auto-generated method stub
 		SearchResponse<BoxHistory> resultSearch = esClient.search(s->s
-				.index(IndicesFEIP.BoxHistIndex)
+				.index(IndicesNames.BOX_HISTORY)
 				.query(q->q
 						.range(r->r
 								.field("height")

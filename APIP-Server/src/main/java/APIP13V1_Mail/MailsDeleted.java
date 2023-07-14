@@ -4,9 +4,11 @@ import APIP0V1_OpenAPI.*;
 import APIP1V1_FCDSL.Fcdsl;
 import APIP1V1_FCDSL.Filter;
 import APIP1V1_FCDSL.Terms;
+import constants.ApiNames;
+import constants.IndicesNames;
+import constants.ReplyInfo;
 import initial.Initiator;
-import FeipClass.Mail;
-import startFEIP.IndicesFEIP;
+import feipClass.Mail;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -18,10 +20,9 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.ArrayList;
 import APIP1V1_FCDSL.Sort;
-import static api.Constant.*;
 
 
-@WebServlet(APIP13V1Path +MailsDeletedAPI)
+@WebServlet(ApiNames.APIP13V1Path + ApiNames.MailsDeletedAPI)
 public class MailsDeleted extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -30,7 +31,7 @@ public class MailsDeleted extends HttpServlet {
         Replier replier = new Replier();
         PrintWriter writer = response.getWriter();
 
-        RequestChecker requestChecker = new RequestChecker(request,response);
+        RequestChecker requestChecker = new RequestChecker(request,response, replier);
 
         DataCheckResult dataCheckResult = requestChecker.checkDataRequest();
 
@@ -38,11 +39,13 @@ public class MailsDeleted extends HttpServlet {
 
         String addr = dataCheckResult.getAddr();
 
+        if (RequestChecker.checkPublicSessionKey(response, replier, writer, addr)) return;
+
         DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
 
         //Check API
         if(!isThisApiRequest(requestBody)){
-            response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
             writer.write(replier.reply1012BadQuery(addr));
             return;
         }
@@ -73,7 +76,7 @@ public class MailsDeleted extends HttpServlet {
         requestBody.setFcdsl(fcdsl);
 
         //Request
-        String index = IndicesFEIP.MailIndex;
+        String index = IndicesNames.MAIL;
 
         DataRequestHandler esRequest = new DataRequestHandler(dataCheckResult.getAddr(),requestBody,response,replier);
         List<Mail> meetList;
@@ -84,7 +87,7 @@ public class MailsDeleted extends HttpServlet {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
             writer.write(replier.reply1012BadQuery(addr));
             return;
         }
@@ -94,7 +97,7 @@ public class MailsDeleted extends HttpServlet {
         //response
         replier.setData(meetList);
         replier.setGot(meetList.size());
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", MailsDeletedAPI));
+        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.MailsDeletedAPI));
         esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
     }
 

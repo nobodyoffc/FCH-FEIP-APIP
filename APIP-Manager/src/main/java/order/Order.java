@@ -2,9 +2,9 @@ package order;
 
 public class Order {
     private String cashId;//cash id
-    private String fromAddr;
-    private String toAddr;
-    private String[] via;
+    private String fromFid;
+    private String toFid;
+    private String via;
     private long amount;
     private long time;
     private String txId;
@@ -25,11 +25,11 @@ public class Order {
         return orderOpReturn;
     }
 
-    public String[] getVia() {
+    public String getVia() {
         return via;
     }
 
-    public void setVia(String[] via) {
+    public void setVia(String via) {
         this.via = via;
     }
 
@@ -50,20 +50,20 @@ public class Order {
     }
 
 
-    public String getFromAddr() {
-        return fromAddr;
+    public String getFromFid() {
+        return fromFid;
     }
 
-    public void setFromAddr(String fromAddr) {
-        this.fromAddr = fromAddr;
+    public void setFromFid(String fromFid) {
+        this.fromFid = fromFid;
     }
 
-    public String getToAddr() {
-        return toAddr;
+    public String getToFid() {
+        return toFid;
     }
 
-    public void setToAddr(String toAddr) {
-        this.toAddr = toAddr;
+    public void setToFid(String toFid) {
+        this.toFid = toFid;
     }
 
     public long getAmount() {

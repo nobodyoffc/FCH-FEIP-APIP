@@ -1,5 +1,8 @@
-public class SimpleTest {
-    public static void main(String[] args) {
+import java.io.IOException;
 
-    }
+import static constants.Strings.CONFIG;
+import static constants.Strings.CONFIG_FILE_PATH;
+
+public class SimpleTest {
+
 }

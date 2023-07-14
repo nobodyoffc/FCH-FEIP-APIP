@@ -1,22 +1,24 @@
 package identity;
 
-import FeipClass.Cid;
+import feipClass.Cid;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import co.elastic.clients.elasticsearch.core.GetResponse;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import com.google.gson.Gson;
-import FchClass.Address;
+import fchClass.Address;
 import keyTools.KeyTools;
 import opReturn.Feip;
 import opReturn.OpReturn;
 import parser.WeightMethod;
-import startFCH.IndicesFCH;
-import startFEIP.IndicesFEIP;
 import startFEIP.StartFEIP;
 
 import java.io.IOException;
 import java.util.*;
+
+import static constants.IndicesNames.ADDRESS;
+import static constants.IndicesNames.CID;
+
 public class IdentityParser {
 
 	public CidHist makeCid(OpReturn opre, Feip feip) throws ElasticsearchException, IOException {
@@ -194,14 +196,14 @@ public class IdentityParser {
 	private boolean parseNobody(ElasticsearchClient esClient, CidHist cidHist) throws ElasticsearchException, IOException {
 
 		boolean isValid = false;
-		GetResponse<Cid> resultGetCid = esClient.get(g->g.index(IndicesFEIP.CidIndex).id(cidHist.getSigner()), Cid.class);
+		GetResponse<Cid> resultGetCid = esClient.get(g->g.index(CID).id(cidHist.getSigner()), Cid.class);
 
 		if(resultGetCid.found()) {
 			Cid cid  = resultGetCid.source();
 			if(cid.getPriKey()==null) {
 				cid.setPriKey(cidHist.getPriKey());
 				cid.setLastHeight(cidHist.getHeight());
-				esClient.index(i->i.index(IndicesFEIP.CidIndex).id(cidHist.getSigner()).document(cid));
+				esClient.index(i->i.index(CID).id(cidHist.getSigner()).document(cid));
 				isValid = true;
 			}
 		}
@@ -222,13 +224,13 @@ public class IdentityParser {
 				String cidStr1 = cidStr;
 				SearchResponse<Cid> resultCidSearch = esClient.search(s->s
 								.query(q->q.term(t->t.field("usedCids").value(cidStr1)))
-								.index(IndicesFEIP.CidIndex)
+								.index(CID)
 						, Cid.class);
 
 
 				if(resultCidSearch.hits().total().value()==0) {
 					Cid cid = new Cid();
-					GetResponse<Cid> resultGetCid = esClient.get(g->g.index(IndicesFEIP.CidIndex).id(cidHist.getSigner()), Cid.class);
+					GetResponse<Cid> resultGetCid = esClient.get(g->g.index(CID).id(cidHist.getSigner()), Cid.class);
 
 					if(resultGetCid.found()) cid = resultGetCid.source();
 
@@ -264,7 +266,7 @@ public class IdentityParser {
 
 					Cid cid1 = cid;
 					//rule 3
-					esClient.index(i->i.index(IndicesFEIP.CidIndex).id(cidHist.getSigner()).document(cid1));
+					esClient.index(i->i.index(CID).id(cidHist.getSigner()).document(cid1));
 
 					isValid = true;
 
@@ -278,7 +280,7 @@ public class IdentityParser {
 					cid.setLastHeight(cidHist.getHeight());
 
 					//rule 3
-					esClient.index(i->i.index(IndicesFEIP.CidIndex).id(cid.getFid()).document(cid));
+					esClient.index(i->i.index(CID).id(cid.getFid()).document(cid));
 					isValid = true;
 
 					break;
@@ -292,7 +294,7 @@ public class IdentityParser {
 
 		}else if(cidHist.getOp().equals("unregister")) {
 
-			GetResponse<Cid> result = esClient.get(g -> g.index(IndicesFEIP.CidIndex).id(cidHist.getSigner()), Cid.class);
+			GetResponse<Cid> result = esClient.get(g -> g.index(CID).id(cidHist.getSigner()), Cid.class);
 
 			if(result.found()==true){
 				Cid cid = result.source();
@@ -302,7 +304,7 @@ public class IdentityParser {
 					updata.put("lastHeight",cidHist.getHeight());
 
 					//rule 6
-					esClient.update(u->u.index(IndicesFEIP.CidIndex).id(cidHist.getSigner()).doc(updata), Cid.class);
+					esClient.update(u->u.index(CID).id(cidHist.getSigner()).doc(updata), Cid.class);
 
 					isValid = true;
 				}
@@ -315,14 +317,14 @@ public class IdentityParser {
 	private boolean parseMaster(ElasticsearchClient esClient, CidHist cidHist) throws ElasticsearchException, IOException {
 
 		boolean isValid = false;
-		GetResponse<Cid> resultGetCid = esClient.get(g->g.index(IndicesFEIP.CidIndex).id(cidHist.getSigner()), Cid.class);
+		GetResponse<Cid> resultGetCid = esClient.get(g->g.index(CID).id(cidHist.getSigner()), Cid.class);
 
 		if(resultGetCid.found()) {
 			Cid cid  = resultGetCid.source();
 			if(cid.getMaster()==null || cid.getMaster().isBlank()) {
 				cid.setMaster(cidHist.getMaster());
 				cid.setLastHeight(cidHist.getHeight());
-				esClient.index(i->i.index(IndicesFEIP.CidIndex).id(cidHist.getSigner()).document(cid));
+				esClient.index(i->i.index(CID).id(cidHist.getSigner()).document(cid));
 				isValid = true;
 			}
 		}else {
@@ -330,7 +332,7 @@ public class IdentityParser {
 			cid.setFid(cidHist.getSigner());
 			cid.setMaster(cidHist.getMaster());
 			cid.setLastHeight(cidHist.getHeight());
-			esClient.index(i->i.index(IndicesFEIP.CidIndex).id(cidHist.getSigner()).document(cid));
+			esClient.index(i->i.index(CID).id(cidHist.getSigner()).document(cid));
 			isValid = true;
 		}
 		return isValid;
@@ -339,7 +341,7 @@ public class IdentityParser {
 	private boolean parseHomepage(ElasticsearchClient esClient, CidHist cidHist) throws ElasticsearchException, IOException {
 
 		boolean isValid = false;
-		GetResponse<Cid> resultGetCid = esClient.get(g->g.index(IndicesFEIP.CidIndex).id(cidHist.getSigner()), Cid.class);
+		GetResponse<Cid> resultGetCid = esClient.get(g->g.index(CID).id(cidHist.getSigner()), Cid.class);
 
 		if(cidHist.getOp().equals("register")) {
 			if(resultGetCid.found()) {
@@ -347,7 +349,7 @@ public class IdentityParser {
 
 				cid.setHomepages(cidHist.getHomepages());
 				cid.setLastHeight(cidHist.getHeight());
-				esClient.index(i->i.index(IndicesFEIP.CidIndex).id(cidHist.getSigner()).document(cid));
+				esClient.index(i->i.index(CID).id(cidHist.getSigner()).document(cid));
 				isValid = true;
 
 			}else {
@@ -355,7 +357,7 @@ public class IdentityParser {
 				cid.setFid(cidHist.getSigner());
 				cid.setHomepages(cidHist.getHomepages());
 				cid.setLastHeight(cidHist.getHeight());
-				esClient.index(i->i.index(IndicesFEIP.CidIndex).id(cidHist.getSigner()).document(cid));
+				esClient.index(i->i.index(CID).id(cidHist.getSigner()).document(cid));
 				isValid = true;
 			}
 		}else if(cidHist.getOp().equals("unregister")) {
@@ -366,7 +368,7 @@ public class IdentityParser {
 				}else {
 					cid.setHomepages(null);
 					cid.setLastHeight(cidHist.getHeight());
-					esClient.index(i->i.index(IndicesFEIP.CidIndex).id(cidHist.getSigner()).document(cid));
+					esClient.index(i->i.index(CID).id(cidHist.getSigner()).document(cid));
 					isValid = true;
 				}
 			}
@@ -379,14 +381,14 @@ public class IdentityParser {
 	private boolean parseNoticeFee(ElasticsearchClient esClient, CidHist cidHist) throws ElasticsearchException, IOException {
 
 		boolean isValid = false;
-		GetResponse<Cid> resultGetCid = esClient.get(g->g.index(IndicesFEIP.CidIndex).id(cidHist.getSigner()), Cid.class);
+		GetResponse<Cid> resultGetCid = esClient.get(g->g.index(CID).id(cidHist.getSigner()), Cid.class);
 
 		if(resultGetCid.found()) {
 			Cid cid  = resultGetCid.source();
 
 			cid.setNoticeFee(cidHist.getNoticeFee());
 			cid.setLastHeight(cidHist.getHeight());
-			esClient.index(i->i.index(IndicesFEIP.CidIndex).id(cidHist.getSigner()).document(cid));
+			esClient.index(i->i.index(CID).id(cidHist.getSigner()).document(cid));
 			isValid = true;
 
 		}else {
@@ -394,7 +396,7 @@ public class IdentityParser {
 			cid.setFid(cidHist.getSigner());
 			cid.setNoticeFee(cidHist.getNoticeFee());
 			cid.setLastHeight(cidHist.getHeight());
-			esClient.index(i->i.index(IndicesFEIP.CidIndex).id(cidHist.getSigner()).document(cid));
+			esClient.index(i->i.index(CID).id(cidHist.getSigner()).document(cid));
 			isValid = true;
 		}
 		return isValid;
@@ -403,7 +405,7 @@ public class IdentityParser {
 	public boolean parseReputation(ElasticsearchClient esClient, RepuHist repuHist) throws ElasticsearchException, IOException {
 
 		boolean isValid = false;
-		GetResponse<Cid> resultGetCid = esClient.get(g->g.index(IndicesFEIP.CidIndex).id(repuHist.getRatee()), Cid.class);
+		GetResponse<Cid> resultGetCid = esClient.get(g->g.index(CID).id(repuHist.getRatee()), Cid.class);
 		Cid cid;
 		if(resultGetCid.found()) {
 			cid  = resultGetCid.source();
@@ -420,14 +422,14 @@ public class IdentityParser {
 			cid.setLastHeight(repuHist.getHeight());
 			isValid = true;
 		}
-		GetResponse<Address> resultAddr = esClient.get(g -> g.index(IndicesFCH.AddressIndex).id(repuHist.getRatee()), Address.class);
+		GetResponse<Address> resultAddr = esClient.get(g -> g.index(ADDRESS).id(repuHist.getRatee()), Address.class);
 		Address addr;
 		if(resultAddr!=null && resultAddr.source()!=null) {
 			addr = resultAddr.source();
 			addr.setWeight((long) (addr.getWeight()+(repuHist.getReputation()*WeightMethod.repuPercentInWeight)/100));
-			esClient.index(i -> i.index(IndicesFCH.AddressIndex).id(repuHist.getRatee()).document(addr));
+			esClient.index(i -> i.index(ADDRESS).id(repuHist.getRatee()).document(addr));
 		}
-		esClient.index(i -> i.index(IndicesFEIP.CidIndex).id(repuHist.getRatee()).document(cid));
+		esClient.index(i -> i.index(CID).id(repuHist.getRatee()).document(cid));
 		return isValid;
 	}
 }

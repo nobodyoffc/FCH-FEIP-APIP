@@ -2,7 +2,7 @@ package parser;
 
 import java.util.ArrayList;
 
-import FchClass.OpReturn;
+import fchClass.OpReturn;
 
 public class ResultReadOpReFromFile {
 	public ArrayList<OpReturn> opReturnList;

@@ -1,11 +1,13 @@
 package APIP5V1_Code;
 
 import APIP0V1_OpenAPI.*;
+import constants.ApiNames;
+import constants.IndicesNames;
+import constants.ReplyInfo;
 import construct.CodeHistory;
 import APIP1V1_FCDSL.Fcdsl;
 import APIP1V1_FCDSL.Sort;
 import initial.Initiator;
-import startFEIP.IndicesFEIP;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -17,10 +19,8 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static api.Constant.*;
 
-
-@WebServlet(APIP5V1Path +CodeOpHistoryAPI)
+@WebServlet(ApiNames.APIP5V1Path + ApiNames.CodeOpHistoryAPI)
 public class CodeOpHistory extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -29,7 +29,7 @@ public class CodeOpHistory extends HttpServlet {
         Replier replier = new Replier();
         PrintWriter writer = response.getWriter();
 
-        RequestChecker requestChecker = new RequestChecker(request,response);
+        RequestChecker requestChecker = new RequestChecker(request,response, replier);
 
         DataCheckResult dataCheckResult = requestChecker.checkDataRequest();
 
@@ -49,7 +49,7 @@ public class CodeOpHistory extends HttpServlet {
         requestBody.getFcdsl().setExceptTerms("op","rate");
 
         //Request
-        String index = IndicesFEIP.CodeHistIndex;
+        String index = IndicesNames.CODE_HISTORY;
 
         DataRequestHandler esRequest = new DataRequestHandler(dataCheckResult.getAddr(),requestBody,response,replier);
         List<CodeHistory> meetList;
@@ -60,7 +60,7 @@ public class CodeOpHistory extends HttpServlet {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
             writer.write(replier.reply1012BadQuery(addr));
             return;
         }
@@ -68,7 +68,7 @@ public class CodeOpHistory extends HttpServlet {
         //response
         replier.setData(meetList);
         replier.setGot(meetList.size());
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", CodeOpHistoryAPI));
+        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.CodeOpHistoryAPI));
         esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
 
     }

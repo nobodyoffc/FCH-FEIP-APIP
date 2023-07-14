@@ -1,55 +1,23 @@
 package parser;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import FchClass.Cash;
-import FchClass.Tx;
+import fchClass.Cash;
+import fchClass.Tx;
 import javaTools.BytesTools;
 import keyTools.KeyTools;
 import fcTools.ParseTools;
 import servers.EsTools;
-import servers.NewEsClient;
-import startFCH.ConfigFCH;
-import startFCH.IndicesFCH;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
+import static constants.IndicesNames.CASH;
 import static fcTools.ParseTools.parseVarint;
 
 public class RawTxParser {
     static String spendCashMapKey = "spentCashMap";
     static String newCashMapKey = "newCashMap";
-
-//    public static void main(String[] args) throws Exception {
-//        String txHex = "020000000288fb3f1dec2201a614b3b4ba6d6cfe9030b888b4915e00e2c588da6450662ca70100000064414aa17004d314d8024d4489ae343dd7456926cfd930028a243c9c7cf8f48b1d84d0d286a03d7a03b4264b5fa315fe0087d1342d554d5182a112924cd732673972412103f1af10342bfac3b06f2088e1340941d70e27aa8adecdfe24f6f1ba1e334c6eaaffffffff88fb3f1dec2201a614b3b4ba6d6cfe9030b888b4915e00e2c588da6450662ca700000000644173a5defd95d171ac91f74276a6c9a0fc8f6a263d9f0b43304f56df687ffa30c8c9b8b8bb7afd9ab1ea530855b88bae5a11d9fd1983b3daeec415ab324d1b29b2412103f1af10342bfac3b06f2088e1340941d70e27aa8adecdfe24f6f1ba1e334c6eaaffffffff0200ca9a3b000000001976a914bff35cb6b032194a8cb6fb85578054a0378db03d88ac8d016ccf000000001976a914bff35cb6b032194a8cb6fb85578054a0378db03d88ac00000000";
-//        String txid = "1679b78c8f4c5cdc57f269612b0293190db8a1e4a890d4c427ba6008f395c66d";
-//        byte[] txBytes = BytesTools.hexToByteArray(txHex);
-////        System.out.println("Txid: " + txid);
-////        System.out.println("rawTx BE:" + BytesTools.bytesToHexStringBE(txBytes));
-////        System.out.println("Txid caculated is :" + BytesTools.bytesToHexStringLE(Hash.Sha256x2(txBytes)));
-////        System.out.println("rawTx inverted BE: " + BytesTools.bytesToHexStringBE(BytesTools.invertArray(txBytes)));
-////        System.out.println("Txid caculated and converted is :" + BytesTools.bytesToHexStringBE(Hash.Sha256x2(BytesTools.invertArray(txBytes))));
-////        parseUnconfirmedTxBytes(txBytes, txid);
-//
-//        ElasticsearchClient esClient = getEsclient();
-//        TxInMempool txInPool = parseMempoolTx(esClient, txHex, txid);
-//        ParseTools.gsonPrint(txInPool);
-//    }
-
-    private static ElasticsearchClient getEsclient() throws IOException, NoSuchAlgorithmException, KeyManagementException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        ConfigFCH configFCH = new ConfigFCH();
-        NewEsClient newEsClient;
-        newEsClient = new NewEsClient();
-        ElasticsearchClient esClient = null;
-        configFCH= configFCH.getClassInstanceFromFile(br, ConfigFCH.class);
-        return newEsClient.checkEsClient(esClient, configFCH);
-    }
 
     public static TxInMempool parseMempoolTx(ElasticsearchClient esClient,String txHex, String txid) throws Exception {
         Map<String, Map<String, Cash>> cashMapMap = parseUnconfirmedTxHex(txHex, txid);
@@ -260,7 +228,7 @@ public class RawTxParser {
     }
     private static Map<String, Cash> getInCashListFromEs(ElasticsearchClient esClient, List<String> inIdList) throws Exception {
         if(inIdList==null || inIdList.size()==0)return null;
-        EsTools.MgetResult<Cash> result = EsTools.getMultiByIdList(esClient, IndicesFCH.CashIndex, inIdList, Cash.class);
+        EsTools.MgetResult<Cash> result = EsTools.getMultiByIdList(esClient, CASH, inIdList, Cash.class);
         List<Cash> cashList = result.getResultList();
         List<String> missList = result.getMissList();
         Map<String,Cash> cashMap = new HashMap<>();

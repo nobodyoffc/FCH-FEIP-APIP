@@ -3,6 +3,7 @@ package CidCashTools;
 import APIP0V1_OpenAPI.*;
 import EccAes256K1P7.EccAes256K1P7;
 import com.google.gson.Gson;
+import constants.ReplyInfo;
 import data.EncryptIn;
 import initial.Initiator;
 
@@ -21,8 +22,8 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 
-import static api.Constant.EncryptAPI;
-import static api.Constant.*;
+import static constants.ApiNames.EncryptAPI;
+import static constants.Constants.*;
 
 @WebServlet(ToolsPath +EncryptAPI)
 public class EncryptAPI extends HttpServlet {
@@ -32,7 +33,7 @@ public class EncryptAPI extends HttpServlet {
         Replier replier = new Replier();
         PrintWriter writer = response.getWriter();
 
-        RequestChecker requestChecker = new RequestChecker(request,response);
+        RequestChecker requestChecker = new RequestChecker(request,response, replier);
 
         DataCheckResult dataCheckResult = requestChecker.checkDataRequest();
 
@@ -40,11 +41,13 @@ public class EncryptAPI extends HttpServlet {
 
         String addr = dataCheckResult.getAddr();
 
+        if (RequestChecker.checkPublicSessionKey(response, replier, writer, addr)) return;
+
         DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
         replier.setNonce(requestBody.getNonce());
         //Check API
         if(!isThisApiRequest(requestBody)){
-            response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
             writer.write(replier.reply1012BadQuery(addr));
             return;
         }
@@ -54,7 +57,7 @@ public class EncryptAPI extends HttpServlet {
             Gson gson = new Gson();
             encryptIn = gson.fromJson(gson.toJson(dataCheckResult.getDataRequestBody().getFcdsl().getOther()),EncryptIn.class);
         }catch (Exception e){
-            response.setHeader(CodeInHeader, String.valueOf(Code1020OtherError));
+            response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1020OtherError));
             replier.setData("Can't get parameters correctly from Json string.");
             writer.write(replier.reply1020OtherError(addr));
             return;
@@ -67,7 +70,7 @@ public class EncryptAPI extends HttpServlet {
             }else if (encryptIn.getPubKey()!=null){
                 cipher = eccAes.encrypt(encryptIn.getMsg(), encryptIn.getPubKey());
             }else{
-                response.setHeader(CodeInHeader, String.valueOf(Code1020OtherError));
+                response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1020OtherError));
                 replier.setData("No symKey or pubKey.");
                 writer.write(replier.reply1020OtherError(addr));
                 return;
@@ -75,7 +78,7 @@ public class EncryptAPI extends HttpServlet {
         } catch (InvalidAlgorithmParameterException | InvalidKeyException | NoSuchProviderException |
                  BadPaddingException | NoSuchAlgorithmException | IllegalBlockSizeException |
                  NoSuchPaddingException e) {
-            response.setHeader(CodeInHeader, String.valueOf(Code1020OtherError));
+            response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1020OtherError));
             replier.setData("Something wrong when encrypting message.");
             writer.write(replier.reply1020OtherError(addr));
             return;
@@ -85,12 +88,12 @@ public class EncryptAPI extends HttpServlet {
         replier.setGot(1);
         replier.setTotal(1);
         int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", EncryptAPI));
-        response.setHeader(CodeInHeader, String.valueOf(Code0Success));
+        response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code0Success));
         String reply = replier.reply0Success(addr,nPrice);
         if(reply==null)return;
         String sign = DataRequestHandler.symSign(reply,dataCheckResult.getSessionKey());
         if(sign==null)return;
-        response.setHeader(SignInHeader,sign);
+        response.setHeader(ReplyInfo.SignInHeader,sign);
 
         writer.write(reply);
     }

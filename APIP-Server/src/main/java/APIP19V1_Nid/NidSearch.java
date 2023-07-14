@@ -2,9 +2,11 @@ package APIP19V1_Nid;
 
 import APIP0V1_OpenAPI.*;
 import APIP1V1_FCDSL.Sort;
-import FeipClass.Nid;
+import constants.ApiNames;
+import constants.IndicesNames;
+import constants.ReplyInfo;
+import feipClass.Nid;
 import initial.Initiator;
-import startFEIP.IndicesFEIP;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -16,10 +18,8 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static api.Constant.*;
 
-
-@WebServlet(APIP19V1Path +NidSearchAPI)
+@WebServlet(ApiNames.APIP19V1Path + ApiNames.NidSearchAPI)
 public class NidSearch extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -28,7 +28,7 @@ public class NidSearch extends HttpServlet {
         Replier replier = new Replier();
         PrintWriter writer = response.getWriter();
 
-        RequestChecker requestChecker = new RequestChecker(request,response);
+        RequestChecker requestChecker = new RequestChecker(request,response, replier);
 
         DataCheckResult dataCheckResult = requestChecker.checkDataRequest();
 
@@ -46,7 +46,7 @@ public class NidSearch extends HttpServlet {
         //Add condition
 
         //Request
-        String index = IndicesFEIP.NidIndex;
+        String index = IndicesNames.NID;
 
         DataRequestHandler esRequest = new DataRequestHandler(dataCheckResult.getAddr(),requestBody,response,replier);
         List<Nid> meetList;
@@ -57,7 +57,7 @@ public class NidSearch extends HttpServlet {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
             writer.write(replier.reply1012BadQuery(addr));
             return;
         }
@@ -65,7 +65,7 @@ public class NidSearch extends HttpServlet {
         //response
         replier.setData(meetList);
         replier.setGot(meetList.size());
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", NidSearchAPI));
+        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.NidSearchAPI));
         esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
 
         return;

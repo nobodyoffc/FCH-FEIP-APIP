@@ -419,10 +419,10 @@ public class StartTools {
             return;
         }
         Map<String, String> addrMap = KeyTools.pubKeyToAddresses(pubKey);
+
+
         System.out.println("----");
-//        for(String type: addrMap.keySet()){
-//            System.out.println(type+": "+ addrMap.get(type));
-//        }      
+
         System.out.println("FCH"+": "+ addrMap.get("fchAddr"));
         System.out.println("BTC"+": "+ addrMap.get("btcAddr"));
         System.out.println("ETH"+": "+ addrMap.get("ethAddr"));

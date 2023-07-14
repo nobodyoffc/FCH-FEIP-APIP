@@ -1,1 +1,21 @@
-{"opReturnFilePath":"/Users/liuchangyong/fchain/","esIp":"127.0.0.1","esPort":9200,"randomSymKeyHex":"d2360ce2a301840fdd8876606d0d4d6f","blockFilePath":"/Users/liuchangyong/fc_data/blocks/","configFileName":"config.json","configFilePath":"/Users/liuchangyong/Desktop/IdeaProjects/FCH-FEIP-APIP"}
+{
+  "avatarBasePath": "/Users/liuchangyong/Desktop/IdeaProjects/FCH-FEIP-APIP/avatar/elements",
+  "avatarPngPath": "/Users/liuchangyong/Desktop/IdeaProjects/FCH-FEIP-APIP/avatar/png",
+  "serviceName": "APIP",
+  "windowTime": 50000000000,
+  "checkOrderOpReturn": true,
+  "forbidFreeGet": false,
+  "scanMempool": true,
+  "tomcatBasePath": "/Users/liuchangyong/tomcat-9.0.73/",
+  "listenPath": "/Users/liuchangyong/fc_data/blocks/",
+  "rpcIp": "127.0.0.1",
+  "rpcPort": 8332,
+  "rpcUser": "user",
+  "rpcPassword": "password",
+  "esIp": "127.0.0.1",
+  "esPort": 9200,
+  "blockFilePath": "/Users/liuchangyong/fc_data/blocks/",
+  "configFileName": "config.json",
+  "configFilePath": "/Users/liuchangyong/Desktop/IdeaProjects/FCH-FEIP-APIP",
+  "opReturnFilePath": "/Users/liuchangyong/Desktop/IdeaProjects/FCH-FEIP-APIP/opreturn/"
+}

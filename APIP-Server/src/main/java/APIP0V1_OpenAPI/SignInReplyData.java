@@ -1,31 +1,23 @@
 package APIP0V1_OpenAPI;
 
 public class SignInReplyData {
-    private String sessionKeyEncrypted;
-    private int sessionDays;
-    private long startTime;
+    private String sessionKey;
+    private long expireTime;
 
-    public String getSessionKeyEncrypted() {
-        return sessionKeyEncrypted;
+    public long getExpireTime() {
+        return expireTime;
     }
 
-    public void setSessionKeyEncrypted(String sessionKeyEncrypted) {
-        this.sessionKeyEncrypted = sessionKeyEncrypted;
+    public void setExpireTime(long expireTime) {
+        this.expireTime = expireTime;
     }
 
-    public int getSessionDays() {
-        return sessionDays;
+    public String getSessionKey() {
+        return sessionKey;
     }
 
-    public void setSessionDays(int sessionDays) {
-        this.sessionDays = sessionDays;
+    public void setSessionKey(String sessionKey) {
+        this.sessionKey = sessionKey;
     }
 
-    public long getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(long startTime) {
-        this.startTime = startTime;
-    }
 }

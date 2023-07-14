@@ -1,6 +1,6 @@
 package construct;
 
-import FeipClass.App;
+import feipClass.App;
 
 public class AppRaw {
 	

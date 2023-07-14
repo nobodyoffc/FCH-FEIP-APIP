@@ -4,6 +4,15 @@ public class SignInRequestBody {
     private String url;
     private long time;
     private long nonce;
+    private String mode;
+
+    public String getMode() {
+        return mode;
+    }
+
+    public void setMode(String mode) {
+        this.mode = mode;
+    }
 
     public String getPubKey() {
         return pubKey;

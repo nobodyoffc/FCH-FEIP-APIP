@@ -1,9 +1,11 @@
 package APIP9V1_Team;
 
 import APIP0V1_OpenAPI.*;
+import constants.ApiNames;
+import constants.IndicesNames;
+import constants.ReplyInfo;
 import initial.Initiator;
-import FeipClass.Team;
-import startFEIP.IndicesFEIP;
+import feipClass.Team;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -16,10 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import APIP1V1_FCDSL.Sort;
-import static api.Constant.*;
 
 
-@WebServlet(APIP9V1Path +TeamSearchAPI)
+@WebServlet(ApiNames.APIP9V1Path + ApiNames.TeamSearchAPI)
 public class TeamSearch extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -28,7 +29,7 @@ public class TeamSearch extends HttpServlet {
         Replier replier = new Replier();
         PrintWriter writer = response.getWriter();
 
-        RequestChecker requestChecker = new RequestChecker(request,response);
+        RequestChecker requestChecker = new RequestChecker(request,response, replier);
 
         DataCheckResult dataCheckResult = requestChecker.checkDataRequest();
 
@@ -46,7 +47,7 @@ public class TeamSearch extends HttpServlet {
         //Add condition
 
         //Request
-        String index = IndicesFEIP.TeamIndex;
+        String index = IndicesNames.TEAM;
 
         DataRequestHandler esRequest = new DataRequestHandler(dataCheckResult.getAddr(),requestBody,response,replier);
         List<Team> meetList;
@@ -57,7 +58,7 @@ public class TeamSearch extends HttpServlet {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
             writer.write(replier.reply1012BadQuery(addr));
             return;
         }
@@ -75,7 +76,7 @@ public class TeamSearch extends HttpServlet {
         //response
         replier.setData(meetList);
         replier.setGot(meetList.size());
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", TeamSearchAPI));
+        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.TeamSearchAPI));
         esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
 
     }

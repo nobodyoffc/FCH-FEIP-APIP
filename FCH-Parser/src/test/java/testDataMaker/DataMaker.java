@@ -8,9 +8,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
-import parser.ChainParser;
+import constants.Constants;
 import javaTools.BytesTools;
-import parser.BlockFileTools;
+import fileTools.BlockFileTools;
 import cryptoTools.SHA;
 
 public class DataMaker {
@@ -123,7 +123,7 @@ public class DataMaker {
 			//Check valid header fork
 			b4 = Arrays.copyOfRange(blockBodyBytes, 0, 4);
 			String b4Hash = BytesTools.bytesToHexStringBE(b4) ;
-			if(b4Hash.equals(ChainParser.MAGIC)) {
+			if(b4Hash.equals(Constants.MAGIC)) {
 				System.out.println("Found valid header fork. Pointer: "+pointer);
 				pointer += 88;
 			}

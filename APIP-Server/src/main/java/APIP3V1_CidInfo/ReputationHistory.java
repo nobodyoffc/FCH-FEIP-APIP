@@ -1,9 +1,11 @@
 package APIP3V1_CidInfo;
 
 import APIP0V1_OpenAPI.*;
+import constants.ApiNames;
+import constants.IndicesNames;
+import constants.ReplyInfo;
 import identity.RepuHist;
 import initial.Initiator;
-import startFEIP.IndicesFEIP;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -16,9 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import APIP1V1_FCDSL.Sort;
-import static api.Constant.*;
 
-@WebServlet(APIP3V1Path +ReputationHistoryAPI)
+@WebServlet(ApiNames.APIP3V1Path + ApiNames.ReputationHistoryAPI)
 public class ReputationHistory extends HttpServlet {
 
     @Override
@@ -28,7 +29,7 @@ public class ReputationHistory extends HttpServlet {
         Replier replier = new Replier();
         PrintWriter writer = response.getWriter();
 
-        RequestChecker requestChecker = new RequestChecker(request,response);
+        RequestChecker requestChecker = new RequestChecker(request,response, replier);
 
         DataCheckResult dataCheckResult = requestChecker.checkDataRequest();
 
@@ -47,13 +48,13 @@ public class ReputationHistory extends HttpServlet {
         DataRequestHandler esRequest = new DataRequestHandler(dataCheckResult.getAddr(),requestBody,response,replier);
         List<RepuHist> meetList;
         try {
-            meetList = esRequest.doRequest(IndicesFEIP.RepuHistIndex, sort, RepuHist.class);
+            meetList = esRequest.doRequest(IndicesNames.REPUTATION_HISTORY, sort, RepuHist.class);
             if(meetList==null){
                 return;
             }
         } catch (Exception e) {
             e.printStackTrace();
-            response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
             writer.write(replier.reply1012BadQuery(addr));
             return;
         }
@@ -61,7 +62,7 @@ public class ReputationHistory extends HttpServlet {
         //response
         replier.setData(meetList);
         replier.setGot(meetList.size());
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ReputationHistoryAPI));
+        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.ReputationHistoryAPI));
         esRequest.writeSuccess(dataCheckResult.getSessionKey(),nPrice);
 
     }

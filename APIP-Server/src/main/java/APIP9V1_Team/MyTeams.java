@@ -1,9 +1,11 @@
 package APIP9V1_Team;
 
 import APIP0V1_OpenAPI.*;
+import constants.ApiNames;
+import constants.IndicesNames;
+import constants.ReplyInfo;
 import initial.Initiator;
-import FeipClass.Team;
-import startFEIP.IndicesFEIP;
+import feipClass.Team;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -16,10 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import APIP1V1_FCDSL.Sort;
-import static api.Constant.*;
 
 
-@WebServlet(APIP9V1Path +MyTeamsAPI)
+@WebServlet(ApiNames.APIP9V1Path + ApiNames.MyTeamsAPI)
 public class MyTeams extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -29,7 +30,7 @@ public class MyTeams extends HttpServlet {
 
         PrintWriter writer = response.getWriter();
 
-        RequestChecker requestChecker = new RequestChecker(request,response);
+        RequestChecker requestChecker = new RequestChecker(request,response, replier);
 
         DataCheckResult dataCheckResult = requestChecker.checkDataRequest();
 
@@ -41,7 +42,7 @@ public class MyTeams extends HttpServlet {
 
         //Check API
         if(!isThisApiRequest(requestBody)){
-            response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
             writer.write(replier.reply1012BadQuery(addr));
             return;
         }
@@ -52,7 +53,7 @@ public class MyTeams extends HttpServlet {
         //Add condition
 
         //Request
-        String index = IndicesFEIP.TeamIndex;
+        String index = IndicesNames.TEAM;
 
         DataRequestHandler esRequest = new DataRequestHandler(dataCheckResult.getAddr(),requestBody,response,replier);
         List<Team> meetList;
@@ -63,7 +64,7 @@ public class MyTeams extends HttpServlet {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
             writer.write(replier.reply1012BadQuery(addr));
             return;
         }
@@ -84,7 +85,7 @@ public class MyTeams extends HttpServlet {
         //response
         replier.setData(dataList);
         replier.setGot(dataList.size());
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", MyTeamsAPI));
+        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.MyTeamsAPI));
         esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
 
         return;

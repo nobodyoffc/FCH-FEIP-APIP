@@ -1,9 +1,11 @@
 package APIP2V1_Blockchain;
 
 import APIP0V1_OpenAPI.*;
-import FchClass.OpReturn;
+import constants.ApiNames;
+import constants.IndicesNames;
+import constants.ReplyInfo;
+import fchClass.OpReturn;
 import initial.Initiator;
-import startFCH.IndicesFCH;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -16,9 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static api.Constant.*;
-
-@WebServlet(APIP2V1Path + OpReturnByIdsAPI)
+@WebServlet(ApiNames.APIP2V1Path + ApiNames.OpReturnByIdsAPI)
 public class OpReturnByIds extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -27,7 +27,7 @@ public class OpReturnByIds extends HttpServlet {
         Replier replier = new Replier();
         PrintWriter writer = response.getWriter();
 
-        RequestChecker requestChecker = new RequestChecker(request,response);
+        RequestChecker requestChecker = new RequestChecker(request,response, replier);
 
         DataCheckResult dataCheckResult = requestChecker.checkDataRequest();
 
@@ -39,7 +39,7 @@ public class OpReturnByIds extends HttpServlet {
 
         //Check API
         if(!isThisApiRequest(requestBody)){
-            response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
             writer.write(replier.reply1012BadQuery(addr));
             return;
         }
@@ -47,7 +47,7 @@ public class OpReturnByIds extends HttpServlet {
         //Set default sort.
 
         //Request
-        String index = IndicesFCH.OpReturnIndex;
+        String index = IndicesNames.OPRETURN;
 
         DataRequestHandler esRequest = new DataRequestHandler(dataCheckResult.getAddr(),requestBody,response,replier);
         List<OpReturn> meetList;
@@ -58,7 +58,7 @@ public class OpReturnByIds extends HttpServlet {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
             writer.write(replier.reply1012BadQuery(addr));
             return;
         }
@@ -73,7 +73,7 @@ public class OpReturnByIds extends HttpServlet {
         replier.setData(meetMap);
         replier.setGot(meetMap.size());
         replier.setTotal(meetMap.size());
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", OpReturnByIdsAPI));
+        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.OpReturnByIdsAPI));
         esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
 
         return;

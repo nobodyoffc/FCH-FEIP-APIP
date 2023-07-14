@@ -4,10 +4,11 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
-import FeipClass.App;
+import constants.ApiNames;
+import constants.IndicesNames;
+import feipClass.App;
 import fcTools.ParseTools;
 import initial.Initiator;
-import startFEIP.IndicesFEIP;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -19,9 +20,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static api.Constant.*;
-
-@WebServlet(FreeGet + GetAppsAPI)
+@WebServlet(ApiNames.FreeGet + ApiNames.GetAppsAPI)
 public class GetApps extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -31,12 +30,12 @@ public class GetApps extends HttpServlet {
 
         PrintWriter writer = response.getWriter();
 
-        if (!Initiator.isFreeGetAllowed(writer)) return;
+        if (Initiator.isFreeGetForbidden(writer)) return;
 
         ElasticsearchClient esClient = Initiator.esClient;
 
 
-        SearchResponse<App> cashResult = esClient.search(s -> s.index(IndicesFEIP.AppIndex)
+        SearchResponse<App> cashResult = esClient.search(s -> s.index(IndicesNames.APP)
                 .query(q -> q.term(t -> t.field("active").value(true)))
                 .size(20)
                 .sort(so -> so.field(f -> f.field("tRate").order(SortOrder.Desc).field("tCdd").order(SortOrder.Desc)))

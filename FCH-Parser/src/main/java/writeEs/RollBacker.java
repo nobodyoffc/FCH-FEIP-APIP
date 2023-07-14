@@ -9,15 +9,15 @@ import co.elastic.clients.elasticsearch.core.BulkRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
-import FchClass.Cash;
-import FchClass.OpReturn;
+import constants.Constants;
+import constants.IndicesNames;
+import fchClass.Cash;
+import fchClass.OpReturn;
 import javaTools.BytesTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import parser.ChainParser;
-import parser.OpReFileTools;
+import fileTools.OpReFileTools;
 import servers.EsTools;
-import startFCH.IndicesFCH;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -127,7 +127,7 @@ public class RollBacker {
 	private ArrayList<String> readEffectedAddresses(ElasticsearchClient esClient, long lastHeight) throws IOException {
 		Set<String> addrSet = new HashSet<>();
 		int size = EsTools.READ_MAX;
-		SearchResponse<Cash> response = esClient.search(s -> s.index(IndicesFCH.CashIndex)
+		SearchResponse<Cash> response = esClient.search(s -> s.index(IndicesNames.CASH)
 						.size(size)
 						.sort(s1 -> s1.field(f -> f.field("fid").order(SortOrder.Asc)))
 						.trackTotalHits(t->t.enabled(true))
@@ -147,7 +147,7 @@ public class RollBacker {
 
 		while(hitSize>=size){
 			List<String> finalLast = last;
-			response = esClient.search(s -> s.index(IndicesFCH.CashIndex)
+			response = esClient.search(s -> s.index(IndicesNames.CASH)
 							.size(size)
 							.sort(s1 -> s1.field(f -> f.field("cashId").order(SortOrder.Asc)))
 							.searchAfter(finalLast)
@@ -168,7 +168,7 @@ public class RollBacker {
 	}
 
 	public long getBestHeight(ElasticsearchClient esClient) throws ElasticsearchException, IOException {
-		SearchResponse<Void> response = esClient.search(s->s.index(IndicesFCH.BlockIndex).aggregations("bestHeight", a->a.max(m->m.field("height"))), void.class);
+		SearchResponse<Void> response = esClient.search(s->s.index(IndicesNames.BLOCK).aggregations("bestHeight", a->a.max(m->m.field("height"))), void.class);
 		return (long)response.aggregations().get("bestHeight").max().value();
 	}
 
@@ -182,7 +182,7 @@ public class RollBacker {
 			fieldValueList.add(FieldValue.of(iter.next()));
 
 		SearchResponse<Void> response = esClient.search(s->s
-						.index(IndicesFCH.CashIndex)
+						.index(IndicesNames.CASH)
 						.size(0)
 						.aggregations("addrFilterAggs",a->a
 								.filter(f->f.terms(t->t
@@ -351,7 +351,7 @@ public class RollBacker {
 			updateMap.put("lastHeight",lastHeight);
 
 			br.operations(o1->o1.update(u->u
-					.index(IndicesFCH.AddressIndex)
+					.index(IndicesNames.ADDRESS)
 					.id(addr)
 					.action(a->a
 							.doc(updateMap)))
@@ -363,7 +363,7 @@ public class RollBacker {
 
 	private void recoverStxoToUtxo(ElasticsearchClient esClient, long lastHeight) throws Exception {
 		esClient.updateByQuery(u->u
-				.index(IndicesFCH.CashIndex)
+				.index(IndicesNames.CASH)
 				.query(q->q.bool(b->b
 						.must(m->m.range(r->r.field("spendHeight").gt(JsonData.of(lastHeight))))
 						.must(m1->m1.range(r1->r1.field("birthHeight").lte(JsonData.of(lastHeight))))))
@@ -382,40 +382,40 @@ public class RollBacker {
 	}
 
 	private void deleteOpReturns(ElasticsearchClient esClient, long lastHeight) throws Exception {
-		deleteHeigherThan(esClient, IndicesFCH.OpReturnIndex,"height",lastHeight);
+		deleteHeigherThan(esClient, IndicesNames.OPRETURN,"height",lastHeight);
 	}
 
 	private void deleteBlocks(ElasticsearchClient esClient, long lastHeight) throws Exception {
-		deleteHeigherThan(esClient, IndicesFCH.BlockIndex,"height",lastHeight);
+		deleteHeigherThan(esClient, IndicesNames.BLOCK,"height",lastHeight);
 	}
 
 	private void deleteBlockHas(ElasticsearchClient esClient, long lastHeight) throws Exception {
-		deleteHeigherThan(esClient, IndicesFCH.BlockHasIndex,"height",lastHeight);
+		deleteHeigherThan(esClient, IndicesNames.BLOCK_HAS,"height",lastHeight);
 	}
 
 	private void deleteTxHas(ElasticsearchClient esClient, long lastHeight) throws Exception {
-		deleteHeigherThan(esClient, IndicesFCH.TxHasIndex,"height",lastHeight);
+		deleteHeigherThan(esClient, IndicesNames.TX_HAS,"height",lastHeight);
 	}
 
 	private void deleteTxs(ElasticsearchClient esClient, long lastHeight) throws Exception {
-		deleteHeigherThan(esClient, IndicesFCH.TxIndex,"height",lastHeight);
+		deleteHeigherThan(esClient, IndicesNames.TX,"height",lastHeight);
 	}
 
 	private void deleteUtxos(ElasticsearchClient esClient, long lastHeight) throws Exception {
-		deleteHeigherThan(esClient, IndicesFCH.CashIndex,"birthHeight",lastHeight);
+		deleteHeigherThan(esClient, IndicesNames.CASH,"birthHeight",lastHeight);
 	}
 
 	private void deleteNewAddresses(ElasticsearchClient esClient, long lastHeight) throws Exception {
-		deleteHeigherThan(esClient, IndicesFCH.AddressIndex,"birthHeight",lastHeight);
+		deleteHeigherThan(esClient, IndicesNames.ADDRESS,"birthHeight",lastHeight);
 	}
 
 	private void deleteNewP2sh(ElasticsearchClient esClient, long lastHeight) throws Exception {
-		deleteHeigherThan(esClient, IndicesFCH.P2SHIndex,"birthHeight",lastHeight);
+		deleteHeigherThan(esClient, IndicesNames.P2SH,"birthHeight",lastHeight);
 	}
 
 	private void deleteBlockMarks(ElasticsearchClient esClient, long lastHeight) throws IOException {
 		esClient.deleteByQuery(d->d
-				.index(IndicesFCH.BlockMarkIndex)
+				.index(IndicesNames.BLOCK_MARK)
 				.query(q->q
 						.bool(b->b
 								.should(s->s
@@ -443,12 +443,12 @@ public class RollBacker {
 
 	private void recordInOpReturnFile(long lastHeight) throws IOException {
 
-		String fileName = ChainParser.OpRefileName;
+		String fileName = Constants.OPRETURN_FILE_NAME;
 		File opFile;
 		FileOutputStream opos;
 
 		while(true) {
-			opFile = new File(fileName);
+			opFile = new File(Constants.OPRETURN_FILE_DIR,fileName);
 			if(opFile.length()>251658240) {
 				fileName =  OpReFileTools.getNextFile(fileName);
 			}else break;

@@ -7,6 +7,7 @@ import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import constants.IndicesNames;
 import construct.*;
 import fcTools.ParseTools;
 import identity.CidHist;
@@ -155,70 +156,70 @@ public class FileParser {
 					CidHist identityHist = cidParser.makeCid(opre,feip);
 					if(identityHist==null)break;
 					isValid = cidParser.parseCidInfo(esClient,identityHist);
-					if(isValid)esClient.index(i->i.index(IndicesFEIP.CidHistIndex).id(identityHist.getTxId()).document(identityHist));
+					if(isValid)esClient.index(i->i.index(IndicesNames.CID_HISTORY).id(identityHist.getTxId()).document(identityHist));
 					break;
 				case ABANDON:
 					System.out.println("abandon.");
 					CidHist identityHist4 = cidParser.makeNobody(opre,feip);
 					if(identityHist4==null)break;
 					isValid = cidParser.parseCidInfo(esClient,identityHist4);
-					if(isValid)esClient.index(i->i.index(IndicesFEIP.CidHistIndex).id(identityHist4.getTxId()).document(identityHist4));
+					if(isValid)esClient.index(i->i.index(IndicesNames.CID_HISTORY).id(identityHist4.getTxId()).document(identityHist4));
 					break;
 				case MASTER:
 					System.out.println("master.");
 					CidHist identityHist1 = cidParser.makeMaster(opre,feip);
 					if(identityHist1==null)break;
 					isValid = cidParser.parseCidInfo(esClient,identityHist1);
-					if(isValid)esClient.index(i->i.index(IndicesFEIP.CidHistIndex).id(identityHist1.getTxId()).document(identityHist1));
+					if(isValid)esClient.index(i->i.index(IndicesNames.CID_HISTORY).id(identityHist1.getTxId()).document(identityHist1));
 					break;
 				case HOMEPAGE:
 					System.out.println("homepage.");
 					CidHist identityHist2 = cidParser.makeHomepage(opre,feip);
 					if(identityHist2==null)break;
 					isValid = cidParser.parseCidInfo(esClient,identityHist2);
-					if(isValid)esClient.index(i->i.index(IndicesFEIP.CidHistIndex).id(identityHist2.getTxId()).document(identityHist2));
+					if(isValid)esClient.index(i->i.index(IndicesNames.CID_HISTORY).id(identityHist2.getTxId()).document(identityHist2));
 					break;
 				case NOTICE_FEE:
 					System.out.println("notice fee.");
 					CidHist identityHist3 = cidParser.makeNoticeFee(opre,feip);
 					if(identityHist3==null)break;
 					isValid = cidParser.parseCidInfo(esClient,identityHist3);
-					if(isValid)esClient.index(i->i.index(IndicesFEIP.CidHistIndex).id(identityHist3.getTxId()).document(identityHist3));
+					if(isValid)esClient.index(i->i.index(IndicesNames.CID_HISTORY).id(identityHist3.getTxId()).document(identityHist3));
 					break;
 				case REPUTATION:
 					System.out.println("reputation.");
 					RepuHist repuHist = cidParser.makeReputation(opre,feip);
 					if(repuHist==null)break;
 					isValid = cidParser.parseReputation(esClient,repuHist);
-					if(isValid)esClient.index(i->i.index(IndicesFEIP.RepuHistIndex).id(repuHist.getTxId()).document(repuHist));
+					if(isValid)esClient.index(i->i.index(IndicesNames.REPUTATION_HISTORY).id(repuHist.getTxId()).document(repuHist));
 					break;
 				case PROTOCOL:
 					System.out.println("Protocol.");
 					ProtocolHistory freeProtocolHist = constructParser.makeProtocol(opre,feip);
 					if(freeProtocolHist==null)break;
 					isValid = constructParser.parseFreeProtocol(esClient,freeProtocolHist);
-					if(isValid)esClient.index(i->i.index(IndicesFEIP.ProtocolHistIndex).id(freeProtocolHist.getTxId()).document(freeProtocolHist));
+					if(isValid)esClient.index(i->i.index(IndicesNames.PROTOCOL_HISTORY).id(freeProtocolHist.getTxId()).document(freeProtocolHist));
 					break;
 				case SERVICE:
 					System.out.println("Service.");
 					ServiceHistory serviceHist = constructParser.makeService(opre,feip);
 					if(serviceHist==null)break;
 					isValid = constructParser.parseService(esClient,serviceHist);
-					if(isValid)esClient.index(i->i.index(IndicesFEIP.ServiceHistIndex).id(serviceHist.getTxId()).document(serviceHist));
+					if(isValid)esClient.index(i->i.index(IndicesNames.SERVICE_HISTORY).id(serviceHist.getTxId()).document(serviceHist));
 					break;
 				case APP:
 					System.out.println("APP.");
 					AppHistory appHist = constructParser.makeApp(opre,feip);
 					if(appHist==null)break;
 					isValid = constructParser.parseApp(esClient,appHist);
-					if(isValid)esClient.index(i->i.index(IndicesFEIP.AppHistIndex).id(appHist.getTxId()).document(appHist));
+					if(isValid)esClient.index(i->i.index(IndicesNames.APP_HISTORY).id(appHist.getTxId()).document(appHist));
 					break;
 				case CODE:
 					System.out.println("Code.");
 					CodeHistory codeHist = constructParser.makeCode(opre,feip);
 					if(codeHist==null)break;
 					isValid = constructParser.parseCode(esClient,codeHist);
-					if(isValid)esClient.index(i->i.index(IndicesFEIP.CodeHistIndex).id(codeHist.getTxId()).document(codeHist));
+					if(isValid)esClient.index(i->i.index(IndicesNames.CODE_HISTORY).id(codeHist.getTxId()).document(codeHist));
 					break;
 				case NID:
 					System.out.println("Nid.");
@@ -245,28 +246,28 @@ public class FileParser {
 					GroupHistory groupHist = organizationParser.makeGroup(opre,feip);
 					if(groupHist==null)break;
 					isValid = organizationParser.parseGroup(esClient,groupHist);
-					if(isValid)esClient.index(i->i.index(IndicesFEIP.GroupHistIndex).id(groupHist.getTxId()).document(groupHist));
+					if(isValid)esClient.index(i->i.index(IndicesNames.GROUP_HISTORY).id(groupHist.getTxId()).document(groupHist));
 					break;
 				case TEAM:
 					System.out.println("Team.");
 					TeamHistory teamHist = organizationParser.makeTeam(opre,feip);
 					if(teamHist==null)break;
 					isValid = organizationParser.parseTeam(esClient,teamHist);
-					if(isValid)esClient.index(i->i.index(IndicesFEIP.TeamHistIndex).id(teamHist.getTxId()).document(teamHist));
+					if(isValid)esClient.index(i->i.index(IndicesNames.TEAM_HISTORY).id(teamHist.getTxId()).document(teamHist));
 					break;
 				case BOX:
 					System.out.println("Box.");
 					BoxHistory boxHist = personalParser.makeBox(opre,feip);
 					if(boxHist==null)break;
 					isValid = personalParser.parseBox(esClient,boxHist);
-					if(isValid)esClient.index(i->i.index(IndicesFEIP.BoxHistIndex).id(boxHist.getTxId()).document(boxHist));
+					if(isValid)esClient.index(i->i.index(IndicesNames.BOX_HISTORY).id(boxHist.getTxId()).document(boxHist));
 					break;
 				case PROOF:
 					System.out.println("Proof.");
 					ProofHistory proofHist = publishParser.makeProof(opre,feip);
 					if(proofHist==null)break;
 					isValid = publishParser.parseProof(esClient,proofHist);
-					if(isValid)esClient.index(i->i.index(IndicesFEIP.ProofHistIndex).id(proofHist.getTxId()).document(proofHist));
+					if(isValid)esClient.index(i->i.index(IndicesNames.PROOF_HISTORY).id(proofHist.getTxId()).document(proofHist));
 					break;
 				default:
 					break;
@@ -287,7 +288,7 @@ public class FileParser {
 		parseMark.setLastIndex(lastIndex);
 		parseMark.setLastId(lastId);
 
-		esClient.index(i->i.index(IndicesFEIP.ParseMarkIndex).id(parseMark.getLastId()).document(parseMark));
+		esClient.index(i->i.index(IndicesNames.FEIP_MARK).id(parseMark.getLastId()).document(parseMark));
 	}
 
 	private FileInputStream openFile() throws FileNotFoundException {
@@ -400,69 +401,69 @@ public class FileParser {
 
 		if(idList==null || idList.isEmpty())return;
 		switch (index) {
-			case IndicesFEIP.CidIndex:
-				EsTools.bulkDeleteList(esClient, IndicesFEIP.CidIndex, (ArrayList<String>) idList);
+			case IndicesNames.CID:
+				EsTools.bulkDeleteList(esClient, IndicesNames.CID, (ArrayList<String>) idList);
 				TimeUnit.SECONDS.sleep(2);
 
-				ArrayList<CidHist> reparseCidList = getReparseHistList(esClient, IndicesFEIP.CidHistIndex,idList,"signer", CidHist.class);
+				ArrayList<CidHist> reparseCidList = getReparseHistList(esClient, IndicesNames.CID_HISTORY,idList,"signer", CidHist.class);
 
 				for(CidHist idHist: reparseCidList) {
 					new IdentityParser().parseCidInfo(esClient,idHist);
 				}
 				new IdentityRollbacker().reviseCidRepuAndHot(esClient, (ArrayList<String>) idList);
 				break;
-			case IndicesFEIP.ProtocolIndex:
-				EsTools.bulkDeleteList(esClient, IndicesFEIP.ProtocolIndex, (ArrayList<String>) idList);
+			case IndicesNames.PROTOCOL:
+				EsTools.bulkDeleteList(esClient, IndicesNames.PROTOCOL, (ArrayList<String>) idList);
 				TimeUnit.SECONDS.sleep(2);
 
-				ArrayList<ProtocolHistory> reparseFreeProtocolList = getReparseHistList(esClient, IndicesFEIP.ProtocolHistIndex,idList,"pid", ProtocolHistory.class);
+				ArrayList<ProtocolHistory> reparseFreeProtocolList = getReparseHistList(esClient, IndicesNames.PROTOCOL_HISTORY,idList,"pid", ProtocolHistory.class);
 
 				for(ProtocolHistory idHist: reparseFreeProtocolList) {
 					new ConstructParser().parseFreeProtocol(esClient, idHist);
 				}
 				break;
-			case IndicesFEIP.CodeIndex:
-				EsTools.bulkDeleteList(esClient, IndicesFEIP.CodeIndex, (ArrayList<String>) idList);
+			case IndicesNames.CODE:
+				EsTools.bulkDeleteList(esClient, IndicesNames.CODE, (ArrayList<String>) idList);
 				TimeUnit.SECONDS.sleep(2);
 
-				ArrayList<CodeHistory> reparseCodeList = getReparseHistList(esClient, IndicesFEIP.CodeHistIndex,idList,"coid",CodeHistory.class);
+				ArrayList<CodeHistory> reparseCodeList = getReparseHistList(esClient, IndicesNames.CODE_HISTORY,idList,"coid",CodeHistory.class);
 
 				for(CodeHistory idHist: reparseCodeList) {
 					new ConstructParser().parseCode(esClient, idHist);
 				}
 				break;
-			case IndicesFEIP.AppIndex:
-				EsTools.bulkDeleteList(esClient, IndicesFEIP.AppIndex, (ArrayList<String>) idList);
+			case IndicesNames.APP:
+				EsTools.bulkDeleteList(esClient, IndicesNames.APP, (ArrayList<String>) idList);
 				TimeUnit.SECONDS.sleep(2);
 
-				ArrayList<AppHistory> reparseAppList = getReparseHistList(esClient, IndicesFEIP.AppHistIndex,idList,"aid",AppHistory.class);
+				ArrayList<AppHistory> reparseAppList = getReparseHistList(esClient, IndicesNames.APP_HISTORY,idList,"aid",AppHistory.class);
 
 				for(AppHistory idHist: reparseAppList) {
 					new ConstructParser().parseApp(esClient, idHist);
 				}
 				break;
-			case IndicesFEIP.ServiceIndex:
-				EsTools.bulkDeleteList(esClient, IndicesFEIP.ServiceIndex, (ArrayList<String>) idList);
+			case IndicesNames.SERVICE:
+				EsTools.bulkDeleteList(esClient, IndicesNames.SERVICE, (ArrayList<String>) idList);
 				TimeUnit.SECONDS.sleep(2);
-				ArrayList<ServiceHistory> reparseServiceList = getReparseHistList(esClient, IndicesFEIP.ServiceHistIndex,idList,"sid",ServiceHistory.class);
+				ArrayList<ServiceHistory> reparseServiceList = getReparseHistList(esClient, IndicesNames.SERVICE_HISTORY,idList,"sid",ServiceHistory.class);
 
 				for(ServiceHistory idHist: reparseServiceList) {
 					new ConstructParser().parseService(esClient, idHist);
 				}
 				break;
-			case IndicesFEIP.GroupIndex:
-				EsTools.bulkDeleteList(esClient, IndicesFEIP.GroupIndex, (ArrayList<String>) idList);
+			case IndicesNames.GROUP:
+				EsTools.bulkDeleteList(esClient, IndicesNames.GROUP, (ArrayList<String>) idList);
 				TimeUnit.SECONDS.sleep(2);
-				ArrayList<GroupHistory> reparseGroupList = getReparseHistList(esClient, IndicesFEIP.GroupHistIndex,idList,"gid",GroupHistory.class);
+				ArrayList<GroupHistory> reparseGroupList = getReparseHistList(esClient, IndicesNames.GROUP_HISTORY,idList,"gid",GroupHistory.class);
 
 				for(GroupHistory idHist: reparseGroupList) {
 					new OrganizationParser().parseGroup(esClient, idHist);
 				}
 				break;
-			case IndicesFEIP.TeamIndex:
-				EsTools.bulkDeleteList(esClient, IndicesFEIP.TeamIndex, (ArrayList<String>) idList);
+			case IndicesNames.TEAM:
+				EsTools.bulkDeleteList(esClient, IndicesNames.TEAM, (ArrayList<String>) idList);
 				TimeUnit.SECONDS.sleep(2);
-				ArrayList<TeamHistory> reparseTeamList = getReparseHistList(esClient, IndicesFEIP.TeamHistIndex,idList,"tid",TeamHistory.class);
+				ArrayList<TeamHistory> reparseTeamList = getReparseHistList(esClient, IndicesNames.TEAM_HISTORY,idList,"tid",TeamHistory.class);
 
 				for(TeamHistory idHist: reparseTeamList) {
 					new OrganizationParser().parseTeam(esClient, idHist);

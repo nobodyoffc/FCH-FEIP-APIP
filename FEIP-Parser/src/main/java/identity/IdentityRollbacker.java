@@ -8,9 +8,9 @@ import co.elastic.clients.elasticsearch.core.BulkRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
+import constants.IndicesNames;
 import fcTools.ParseTools;
 import servers.EsTools;
-import startFEIP.IndicesFEIP;
 
 import java.io.IOException;
 import java.util.*;
@@ -43,11 +43,11 @@ public class IdentityRollbacker {
 		
 		deleteEffectedCids(esClient, signerList);
 		
-		deleteRolledHists(esClient, IndicesFEIP.CidHistIndex,histIdList);
+		deleteRolledHists(esClient, IndicesNames.CID_HISTORY,histIdList);
 		
 		TimeUnit.SECONDS.sleep(3);
 		
-		List<CidHist>reparseList = 	EsTools.getHistsForReparse(esClient, IndicesFEIP.CidHistIndex,"signer",signerList, CidHist.class);
+		List<CidHist>reparseList = 	EsTools.getHistsForReparse(esClient, IndicesNames.CID_HISTORY,"signer",signerList, CidHist.class);
 		
 		reparse(esClient,reparseList);
 		
@@ -58,7 +58,7 @@ public class IdentityRollbacker {
 		// TODO Auto-generated method stub
 		
 		SearchResponse<CidHist> resultSearch = esClient.search(s->s
-				.index(IndicesFEIP.CidHistIndex)
+				.index(IndicesNames.CID_HISTORY)
 				.query(q->q
 						.range(r->r
 								.field("height")
@@ -84,7 +84,7 @@ public class IdentityRollbacker {
 
 	private void deleteEffectedCids(ElasticsearchClient esClient, ArrayList<String> signerList) throws Exception {
 		// TODO Auto-generated method stub
-		EsTools.bulkDeleteList(esClient, IndicesFEIP.CidIndex, signerList);
+		EsTools.bulkDeleteList(esClient, IndicesNames.CID, signerList);
 		
 	}
 
@@ -112,7 +112,7 @@ public class IdentityRollbacker {
 		
 		if(rateeList==null || rateeList.isEmpty())return error;
 		
-		deleteRolledHists(esClient, IndicesFEIP.RepuHistIndex, histIdList);
+		deleteRolledHists(esClient, IndicesNames.REPUTATION_HISTORY, histIdList);
 		
 		reviseCidRepuAndHot(esClient,rateeList);
 		
@@ -125,7 +125,7 @@ public class IdentityRollbacker {
 	private Map<String, ArrayList<String>> getEffectedCidAndRepuHistory(ElasticsearchClient esClient, long height) throws ElasticsearchException, IOException {
 		// TODO Auto-generated method stub
 		SearchResponse<RepuHist> resultSearch = esClient.search(s->s
-				.index(IndicesFEIP.RepuHistIndex)
+				.index(IndicesNames.REPUTATION_HISTORY)
 				.query(q->q
 						.range(r->r
 								.field("height")
@@ -178,7 +178,7 @@ public class IdentityRollbacker {
 		}
 		
 		SearchResponse<Void> response = esClient.search(s->s
-				.index(IndicesFEIP.RepuHistIndex)
+				.index(IndicesNames.REPUTATION_HISTORY)
 				.size(0)
 				.aggregations("rateeFilter",a->a
 						.filter(f->f
@@ -222,7 +222,7 @@ public class IdentityRollbacker {
 		for(String ratee:rateeSet) {
 			br.operations(o->o
 					.update(u->u
-							.index(IndicesFEIP.CidIndex)
+							.index(IndicesNames.CID)
 							.id(ratee)
 							.action(a->a
 									.doc(reviseMapMap.get(ratee)))));

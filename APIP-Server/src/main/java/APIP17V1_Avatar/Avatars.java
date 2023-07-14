@@ -2,8 +2,10 @@ package APIP17V1_Avatar;
 
 import APIP0V1_OpenAPI.*;
 import APIP1V1_FCDSL.Fcdsl;
+import constants.ApiNames;
+import constants.ReplyInfo;
 import initial.Initiator;
-import startAPIP.RedisKeys;
+import constants.Strings;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -18,10 +20,10 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
-import static api.Constant.*;
+import static constants.Strings.CONFIG;
 
 
-@WebServlet(APIP17V1Path +AvatarsAPI)
+@WebServlet(ApiNames.APIP17V1Path + ApiNames.AvatarsAPI)
 public class Avatars extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -29,7 +31,7 @@ public class Avatars extends HttpServlet {
         Replier replier = new Replier();
         PrintWriter writer = response.getWriter();
 
-        RequestChecker requestChecker = new RequestChecker(request,response);
+        RequestChecker requestChecker = new RequestChecker(request,response, replier);
 
         DataCheckResult dataCheckResult = requestChecker.checkDataRequest();
         
@@ -42,23 +44,22 @@ public class Avatars extends HttpServlet {
         //Check API
         String[] addrs = checkBody(requestBody);
         if(addrs==null){
-            response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
             writer.write(replier.reply1012BadQuery(addr));
             return;
         }
+        String avatarBasePath = Initiator.jedis0Common.hget(CONFIG,Strings.AVATAR_BASE_PATH);
+        String avatarPngPath = Initiator.jedis0Common.hget(CONFIG,Strings.AVATAR_PNG_PATH);
 
-        String avatarBasePath = Initiator.jedis0Common.get(RedisKeys.AvatarBasePath);
-        String avatarFilePath = Initiator.jedis0Common.get(RedisKeys.AvatarPngPath);
-
-        if(!avatarFilePath.endsWith("/"))avatarFilePath  = avatarFilePath+"/";
+        if(!avatarPngPath.endsWith("/"))avatarPngPath  = avatarPngPath+"/";
         if(!avatarBasePath.endsWith("/"))avatarBasePath = avatarBasePath+"/";
 
-        AvatarMaker.getAvatars(addrs,avatarBasePath,avatarFilePath);
+        AvatarMaker.getAvatars(addrs,avatarBasePath,avatarPngPath);
 
         Base64.Encoder encoder = Base64.getEncoder();
         Map<String,String> addrPngBase64Map = new HashMap<>();
         for(String addr1 : addrs){
-            File file = new File(avatarFilePath+addr1+".png");
+            File file = new File(avatarPngPath+addr1+".png");
             FileInputStream fis = new FileInputStream(file);
             String pngStr = encoder.encodeToString(fis.readAllBytes());
             addrPngBase64Map.put(addr1,pngStr);
@@ -69,13 +70,13 @@ public class Avatars extends HttpServlet {
         replier.setData(addrPngBase64Map);
         replier.setGot(addrPngBase64Map.size());
         replier.setTotal(addrPngBase64Map.size());
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", AvatarsAPI));
-        response.setHeader(CodeInHeader, String.valueOf(Code0Success));
+        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.AvatarsAPI));
+        response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code0Success));
         String reply = replier.reply0Success(addr,nPrice);
         if(reply==null)return;
         String sign = DataRequestHandler.symSign(reply,dataCheckResult.getSessionKey());
         if(sign==null)return;
-        response.setHeader(SignInHeader,sign);
+        response.setHeader(ReplyInfo.SignInHeader,sign);
 
         writer.write(reply);
         return;

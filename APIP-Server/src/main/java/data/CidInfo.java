@@ -1,19 +1,20 @@
 package data;
 
-import FchClass.Address;
+import fchClass.Address;
 import co.elastic.clients.elasticsearch.core.MgetResponse;
 import co.elastic.clients.elasticsearch.core.mget.MultiGetResponseItem;
-import FeipClass.Cid;
+import feipClass.Cid;
 import initial.Initiator;
 import parser.WeightMethod;
-import startFEIP.IndicesFEIP;
-import startFCH.IndicesFCH;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static constants.IndicesNames.ADDRESS;
+import static constants.IndicesNames.CID;
 
 public class CidInfo {
     private String fid;    //fch address
@@ -131,7 +132,7 @@ public class CidInfo {
     public static List<Address> getAddrList(List<String> addrIdList) throws IOException {
 
         MgetResponse<Address> result = Initiator.esClient.mget(m -> m
-                .index(IndicesFCH.AddressIndex)
+                .index(ADDRESS)
                 .ids(addrIdList), Address.class);
         List<MultiGetResponseItem<Address>> itemList = result.docs();
 
@@ -149,7 +150,7 @@ public class CidInfo {
     public static List<Cid> getCidList(List<String> addrIdList) throws IOException {
 
         MgetResponse<Cid> result = Initiator.esClient.mget(m -> m
-                .index(IndicesFEIP.CidIndex)
+                .index(CID)
                 .ids(addrIdList), Cid.class);
         List<MultiGetResponseItem<Cid>> itemList = result.docs();
 

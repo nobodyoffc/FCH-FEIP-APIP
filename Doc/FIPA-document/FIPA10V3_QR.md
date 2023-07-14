@@ -1,5 +1,6 @@
 二维码协议
 
+
 {
     "meta":"FC",
     "op":<sign,veri,encr,decr,show,go>,
@@ -25,6 +26,34 @@ sum
 
 签名：fid，msg，alg----alg，pubKey，fid，sign
 验证：
+
+{
+"meta":"FV",
+"op":"sign",
+"data":{
+"msg":{
+"url":<string. 用户提交登录信息访问的url>,
+"nonce":<int. 置0，防止重放攻击和识别登录用户>,
+"time":<long. 置0，由用户端填入长度13的时间戳>,
+"pubKey":<string. 置空串，由用户端填入hex公钥>
+},
+"sign":<string. 置空串，由用户端填入签名>
+}
+}
+
+{
+"meta": "FV",
+"op": "sign",
+"data": {
+"msg": {
+"url": "https://cid.cash/explorer/signin",
+"nonce": 0,
+"time": 0,
+"pubKey": ""
+},
+"sign": ""
+}
+}
 
 
 1. 检查op，成功则获取sign,veri,encr,decr之一：

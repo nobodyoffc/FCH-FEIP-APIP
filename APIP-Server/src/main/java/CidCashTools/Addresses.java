@@ -1,7 +1,10 @@
 package CidCashTools;
 
 import APIP0V1_OpenAPI.*;
-import FchClass.Address;
+import constants.ApiNames;
+import constants.IndicesNames;
+import constants.ReplyInfo;
+import fchClass.Address;
 import co.elastic.clients.elasticsearch.core.GetResponse;
 import initial.Initiator;
 import keyTools.KeyTools;
@@ -16,10 +19,10 @@ import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
-import static api.Constant.*;
+import static constants.Constants.*;
 import static initial.Initiator.esClient;
 
-@WebServlet(ToolsPath +AddressesAPI)
+@WebServlet(ToolsPath + ApiNames.AddressesAPI)
 public class Addresses extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, RuntimeException {
         response.setContentType("application/json");
@@ -27,7 +30,7 @@ public class Addresses extends HttpServlet {
         Replier replier = new Replier();
         PrintWriter writer = response.getWriter();
 
-        RequestChecker requestChecker = new RequestChecker(request,response);
+        RequestChecker requestChecker = new RequestChecker(request,response, replier);
 
         DataCheckResult dataCheckResult = requestChecker.checkDataRequest();
 
@@ -35,11 +38,13 @@ public class Addresses extends HttpServlet {
 
         String addr = dataCheckResult.getAddr();
 
+        if (RequestChecker.checkPublicSessionKey(response, replier, writer, addr)) return;
+
         DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
         replier.setNonce(requestBody.getNonce());
         //Check API
         if(!isThisApiRequest(requestBody)){
-            response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
             writer.write(replier.reply1012BadQuery(addr));
             return;
         }
@@ -49,10 +54,10 @@ public class Addresses extends HttpServlet {
         Map<String, String> addrMap = new HashMap<>();
         String pubKey = null;
         if(input.startsWith("F")){
-            GetResponse<Address> result = esClient.get(g -> g.index(Indices.address.name()).id(input), Address.class);
+            GetResponse<Address> result = esClient.get(g -> g.index(IndicesNames.ADDRESS).id(input), Address.class);
 
             if(!result.found()){
-                response.setHeader(CodeInHeader, String.valueOf(Code1020OtherError));
+                response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1020OtherError));
                 replier.setData("This FID has never seen on blockchain of Freecash.");
                 writer.write(replier.reply1020OtherError(addr));
                 return;
@@ -61,7 +66,7 @@ public class Addresses extends HttpServlet {
         }else if (input.startsWith("02")||input.startsWith("03")){
             pubKey = input;
         }else{
-            response.setHeader(CodeInHeader, String.valueOf(Code1020OtherError));
+            response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1020OtherError));
             replier.setData("FID or Public Key are needed.");
             writer.write(replier.reply1020OtherError(addr));
             return;
@@ -77,13 +82,13 @@ public class Addresses extends HttpServlet {
         replier.setData(addrMap);
         replier.setGot(1);
         replier.setTotal(1);
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", AddressesAPI));
-        response.setHeader(CodeInHeader, String.valueOf(Code0Success));
+        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.AddressesAPI));
+        response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code0Success));
         String reply = replier.reply0Success(addr,nPrice);
         if(reply==null)return;
         String sign = DataRequestHandler.symSign(reply,dataCheckResult.getSessionKey());
         if(sign==null)return;
-        response.setHeader(SignInHeader,sign);
+        response.setHeader(ReplyInfo.SignInHeader,sign);
 
         writer.write(reply);
     }

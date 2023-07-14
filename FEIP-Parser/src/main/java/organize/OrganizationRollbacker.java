@@ -5,9 +5,9 @@ import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
+import constants.IndicesNames;
 import fcTools.ParseTools;
 import servers.EsTools;
-import startFEIP.IndicesFEIP;
 
 import java.io.IOException;
 import java.util.*;
@@ -36,13 +36,13 @@ public class OrganizationRollbacker {
 		if(itemIdList==null||itemIdList.isEmpty())return error;
 		System.out.println("If Rollbacking is interrupted, reparse all effected ids of index 'group': ");
 		ParseTools.gsonPrint(itemIdList);
-		deleteEffectedItems(esClient, IndicesFEIP.GroupIndex, itemIdList);
+		deleteEffectedItems(esClient, IndicesNames.GROUP, itemIdList);
 		if(histIdList==null||histIdList.isEmpty())return error;
-		deleteRolledHists(esClient, IndicesFEIP.GroupHistIndex,histIdList);
+		deleteRolledHists(esClient, IndicesNames.GROUP_HISTORY,histIdList);
 		
 		TimeUnit.SECONDS.sleep(3);
 		
-		List<GroupHistory>reparseHistList = EsTools.getHistsForReparse(esClient, IndicesFEIP.GroupHistIndex,"gid",itemIdList, GroupHistory.class);
+		List<GroupHistory>reparseHistList = EsTools.getHistsForReparse(esClient, IndicesNames.GROUP_HISTORY,"gid",itemIdList, GroupHistory.class);
 		
 		reparseGroup(esClient,reparseHistList);
 		
@@ -52,7 +52,7 @@ public class OrganizationRollbacker {
 	private Map<String, ArrayList<String>> getEffectedGroups(ElasticsearchClient esClient,long height) throws ElasticsearchException, IOException {
 		// TODO Auto-generated method stub
 		SearchResponse<GroupHistory> resultSearch = esClient.search(s->s
-				.index(IndicesFEIP.GroupHistIndex)
+				.index(IndicesNames.GROUP_HISTORY)
 				.query(q->q
 						.range(r->r
 								.field("height")
@@ -103,13 +103,13 @@ public class OrganizationRollbacker {
 		
 		TimeUnit.SECONDS.sleep(10);
 		
-		deleteEffectedItems(esClient, IndicesFEIP.TeamIndex, itemIdList);
+		deleteEffectedItems(esClient, IndicesNames.TEAM, itemIdList);
 		if(histIdList==null||histIdList.isEmpty())return error;
-		deleteRolledHists(esClient, IndicesFEIP.TeamHistIndex,histIdList);
+		deleteRolledHists(esClient, IndicesNames.TEAM_HISTORY,histIdList);
 
 		TimeUnit.SECONDS.sleep(3);
 		
-		List<TeamHistory>reparseHistList = EsTools.getHistsForReparse(esClient, IndicesFEIP.TeamHistIndex,"tid",itemIdList, TeamHistory.class);
+		List<TeamHistory>reparseHistList = EsTools.getHistsForReparse(esClient, IndicesNames.TEAM_HISTORY,"tid",itemIdList, TeamHistory.class);
 		
 		reparseTeam(esClient,reparseHistList);
 		
@@ -119,7 +119,7 @@ public class OrganizationRollbacker {
 	private Map<String, ArrayList<String>> getEffectedTeams(ElasticsearchClient esClient,long height) throws ElasticsearchException, IOException {
 		// TODO Auto-generated method stub
 		SearchResponse<TeamHistory> resultSearch = esClient.search(s->s
-				.index(IndicesFEIP.TeamHistIndex)
+				.index(IndicesNames.TEAM_HISTORY)
 				.query(q->q
 						.range(r->r
 								.field("height")

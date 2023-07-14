@@ -12,10 +12,10 @@ import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
 import co.elastic.clients.elasticsearch.core.mget.MultiGetResponseItem;
 import co.elastic.clients.elasticsearch.core.search.Hit;
-import FchClass.Address;
-import servers.ConfigBase;
+import constants.IndicesNames;
+import fchClass.Address;
+import config.ConfigBase;
 import servers.EsTools;
-import startFCH.IndicesFCH;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -44,7 +44,7 @@ public class AddrAggs {
         int size = EsTools.READ_MAX;
         System.out.println("begin...");
         SearchResponse<Address> response = esClient.search(
-                s -> s.index(IndicesFCH.AddressIndex).size(size).sort(sort -> sort.field(f -> f.field("id").order(SortOrder.Asc))),
+                s -> s.index(IndicesNames.ADDRESS).size(size).sort(sort -> sort.field(f -> f.field("id").order(SortOrder.Asc))),
                 Address.class);
         int hitSize = response.hits().hits().size();
         List<String> last = response.hits().hits().get(hitSize-1).sort();
@@ -56,7 +56,7 @@ public class AddrAggs {
         while (hitSize>=size) {
             List<String> finalLast = last;
             response = esClient.search(
-                    s -> s.index(IndicesFCH.AddressIndex).size(size).sort(sort -> sort.field(f -> f.field("id").order(SortOrder.Asc))).searchAfter(finalLast),
+                    s -> s.index(IndicesNames.ADDRESS).size(size).sort(sort -> sort.field(f -> f.field("id").order(SortOrder.Asc))).searchAfter(finalLast),
                     Address.class);
             hitSize = response.hits().hits().size();
             last = response.hits().hits().get(hitSize-1).sort();
@@ -71,7 +71,7 @@ public class AddrAggs {
         System.out.println("Make all balance of Addresses...");
 
         SearchResponse<Address> response = esClient.search(
-                s -> s.index(IndicesFCH.AddressIndex).size(EsTools.READ_MAX).sort(sort -> sort.field(f -> f.field("id"))),
+                s -> s.index(IndicesNames.ADDRESS).size(EsTools.READ_MAX).sort(sort -> sort.field(f -> f.field("id"))),
                 Address.class);
 
         ArrayList<Address> addrOldList = getResultAddrList(response);
@@ -89,7 +89,7 @@ public class AddrAggs {
                 break;
             Hit<Address> last = response.hits().hits().get(response.hits().hits().size() - 1);
             String lastId = last.id();
-            response = esClient.search(s -> s.index(IndicesFCH.AddressIndex).size(EsTools.READ_MAX)
+            response = esClient.search(s -> s.index(IndicesNames.ADDRESS).size(EsTools.READ_MAX)
                     .sort(sort -> sort.field(f -> f.field("id"))).searchAfter(lastId), Address.class);
 
             addrOldList = getResultAddrList(response);
@@ -107,7 +107,7 @@ public class AddrAggs {
 
     private static void checkBalance(ElasticsearchClient esClient, Map<String, Long> addrNewMap) throws IOException {
         ArrayList<String> addrList = new ArrayList<>(addrNewMap.keySet());
-        MgetResponse<Address> result = esClient.mget(m -> m.index(IndicesFCH.AddressIndex).ids(addrList), Address.class);
+        MgetResponse<Address> result = esClient.mget(m -> m.index(IndicesNames.ADDRESS).ids(addrList), Address.class);
         List<MultiGetResponseItem<Address>> docs = result.docs();
         for(MultiGetResponseItem<Address> doc:docs){
             if(doc.result().source().getBalance()!= addrNewMap.get(doc.result().source().getFid())){
@@ -125,7 +125,7 @@ public class AddrAggs {
         for (String addr : addrSet) {
             Map<String, Long> updateMap = new HashMap<String, Long>();
             updateMap.put("balance", addrNewMap.get(addr));
-            br.operations(o -> o.update(u -> u.index(IndicesFCH.AddressIndex).id(addr).action(a -> a.doc(updateMap))));
+            br.operations(o -> o.update(u -> u.index(IndicesNames.ADDRESS).id(addr).action(a -> a.doc(updateMap))));
         }
         BulkResponse result = EsTools.bulkWithBuilder(esClient, br);
         for(BulkResponseItem r : result.items()){
@@ -142,7 +142,7 @@ public class AddrAggs {
         }
 
         SearchResponse<Address> response = esClient.search(
-                s -> s.index(IndicesFCH.CashIndex).size(0).query(q -> q.term(t -> t.field("valid").value(true)))
+                s -> s.index(IndicesNames.CASH).size(0).query(q -> q.term(t -> t.field("valid").value(true)))
                         .aggregations("filterByAddr",
                                 a -> a.filter(f -> f.terms(t -> t.field("addr").terms(t1 -> t1.value(fieldValueList))))
                                         .aggregations("termByAddr",

@@ -5,14 +5,16 @@ import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch.core.BulkRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
-import FchClass.Block;
-import FchClass.BlockMark;
+import constants.Constants;
+import fchClass.Block;
+import fchClass.BlockMark;
+import fileTools.BlockFileTools;
+import fileTools.OpReFileTools;
 import javaTools.BytesTools;
 import cryptoTools.SHA;
 import fcTools.ParseTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import startFCH.IndicesFCH;
 import writeEs.*;
 
 import java.io.ByteArrayInputStream;
@@ -23,6 +25,9 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+import static constants.IndicesNames.BLOCK;
+import static constants.IndicesNames.BLOCK_MARK;
+
 public class ChainParser {
 
 	public static final int FILE_END = -1;
@@ -30,8 +35,6 @@ public class ChainParser {
 	public static final int HEADER_FORK = -3;
 	public static final int REPEAT = -4;
 	public static final int WAIT_MORE = 0;
-	public static final String MAGIC = "f9beb4d9";
-	public static final  String OpRefileName = "opreturn0.byte";
 
 	private static final Logger log = LoggerFactory.getLogger(ChainParser.class);
 
@@ -39,7 +42,7 @@ public class ChainParser {
 
 	public static Block getBestBlock(ElasticsearchClient esClient) throws ElasticsearchException, IOException {
 		SearchResponse<Block> result = esClient.search(s->s
-						.index(IndicesFCH.BlockIndex)
+						.index(BLOCK)
 						.size(1)
 						.sort(so->so.field(f->f.field("height").order(SortOrder.Desc)))
 				, Block.class);
@@ -162,7 +165,7 @@ public class ChainParser {
 
 		b4 = Arrays.copyOfRange(b8, 0, 4);
 		String magic = BytesTools.bytesToHexStringBE(b4) ;
-		if(!magic.equals(MAGIC)) {
+		if(!magic.equals(Constants.MAGIC)) {
 			checkResult.setBlockLength(WRONG);
 			return checkResult;
 		}
@@ -209,7 +212,7 @@ public class ChainParser {
 		//Check valid header fork
 		b4 = Arrays.copyOfRange(blockBodyBytes, 0, 4);
 		String b4Hash = BytesTools.bytesToHexStringBE(b4) ;
-		if(b4Hash.equals(MAGIC)) {
+		if(b4Hash.equals(Constants.MAGIC)) {
 			System.out.println("Found valid header fork. Pointer: "+Preparer.Pointer);
 			log.info("Found valid header fork. Pointer: {}",Preparer.Pointer);
 			checkResult.setBlockLength(HEADER_FORK);
@@ -283,7 +286,7 @@ public class ChainParser {
 
 	private void writeBlockMark(ElasticsearchClient esClient,BlockMark blockMark) throws ElasticsearchException, IOException {
 		esClient.index(i->i
-				.index(IndicesFCH.BlockMarkIndex).id(blockMark.getBlockId()).document(blockMark));
+				.index(BLOCK_MARK).id(blockMark.getBlockId()).document(blockMark));
 	}
 
 	private boolean isForkOverMain(BlockMark blockMark) {
@@ -370,7 +373,7 @@ public class ChainParser {
 			bm.setStatus(Preparer.FORK);
 			Preparer.forkList.add(bm);
 			br.operations(op->op.index(in->in
-					.index(IndicesFCH.BlockMarkIndex)
+					.index(BLOCK_MARK)
 					.id(bm.getBlockId())
 					.document(bm)));
 		}

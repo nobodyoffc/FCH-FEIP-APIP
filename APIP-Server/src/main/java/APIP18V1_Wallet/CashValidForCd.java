@@ -1,9 +1,11 @@
 package APIP18V1_Wallet;
 
 import APIP0V1_OpenAPI.*;
-import FchClass.Cash;
+import constants.ApiNames;
+import constants.IndicesNames;
+import constants.ReplyInfo;
+import fchClass.Cash;
 import initial.Initiator;
-import startFCH.IndicesFCH;
 import tools.WalletTools;
 
 import javax.servlet.ServletException;
@@ -15,10 +17,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
-import static api.Constant.*;
 
-
-@WebServlet(APIP18V1Path + CashValidForCdAPI)
+@WebServlet(ApiNames.APIP18V1Path + ApiNames.CashValidForCdAPI)
 public class CashValidForCd extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -27,7 +27,7 @@ public class CashValidForCd extends HttpServlet {
         Replier replier = new Replier();
         PrintWriter writer = response.getWriter();
 
-        RequestChecker requestChecker = new RequestChecker(request, response);
+        RequestChecker requestChecker = new RequestChecker(request, response, replier);
 
         DataCheckResult dataCheckResult = requestChecker.checkDataRequest();
 
@@ -39,26 +39,26 @@ public class CashValidForCd extends HttpServlet {
         replier.setNonce(requestBody.getNonce());
         //Check API
         if (!isThisApiRequest(requestBody)) {
-            response.setHeader(CodeInHeader, String.valueOf(Code1012BadQuery));
+            response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1012BadQuery));
             writer.write(replier.reply1012BadQuery(addr));
             return;
         }
 
         //Request
-        String index = IndicesFCH.CashIndex;
+        String index = IndicesNames.CASH;
         String addrRequested = requestBody.getFcdsl().getQuery().getTerms().getValues()[0];
 
         long cd = 0;
         try {
             cd = Long.parseLong((String)requestBody.getFcdsl().getOther());
             if(cd<=0){
-                response.setHeader(CodeInHeader, String.valueOf(Code1020OtherError));
+                response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1020OtherError));
                 replier.setData("cd <= 0");
                 writer.write(replier.reply1020OtherError(addr));
                 return;
             }
         } catch (Exception e) {
-            response.setHeader(CodeInHeader, String.valueOf(Code1020OtherError));
+            response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1020OtherError));
             replier.setData(e);
             writer.write(replier.reply1020OtherError(addr));
             return;
@@ -79,12 +79,12 @@ public class CashValidForCd extends HttpServlet {
         List<Cash> meetList = WalletTools.getCashForCd(replier, addrRequested, cd);
 
         if(meetList==null){
-            response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
             writer.write(replier.reply1012BadQuery(addr));
             return;
         }
         if(meetList.size()==0){
-            response.setHeader(CodeInHeader,String.valueOf(Code1011DataNotFound));
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1011DataNotFound));
             writer.write(replier.reply1011DataNotFound(addr));
             return;
         }
@@ -92,7 +92,7 @@ public class CashValidForCd extends HttpServlet {
         //response
         replier.setData(meetList);
         replier.setGot(meetList.size());
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", CashValidForCdAPI));
+        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.CashValidForCdAPI));
         esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
     }
 

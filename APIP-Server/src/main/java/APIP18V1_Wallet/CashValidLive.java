@@ -1,11 +1,13 @@
 package APIP18V1_Wallet;
 
 import APIP0V1_OpenAPI.*;
-import FchClass.Cash;
+import constants.ApiNames;
+import constants.IndicesNames;
+import constants.ReplyInfo;
+import fchClass.Cash;
 import APIP1V1_FCDSL.Fcdsl;
 import APIP1V1_FCDSL.Sort;
 import initial.Initiator;
-import startFCH.IndicesFCH;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -17,11 +19,10 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static api.Constant.*;
 import static tools.WalletTools.checkUnconfirmed;
 
 
-@WebServlet(APIP18V1Path + CashValidLiveAPI)
+@WebServlet(ApiNames.APIP18V1Path + ApiNames.CashValidLiveAPI)
 public class CashValidLive extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -30,7 +31,7 @@ public class CashValidLive extends HttpServlet {
         Replier replier = new Replier();
         PrintWriter writer = response.getWriter();
 
-        RequestChecker requestChecker = new RequestChecker(request,response);
+        RequestChecker requestChecker = new RequestChecker(request,response, replier);
 
         DataCheckResult dataCheckResult = requestChecker.checkDataRequest();
 
@@ -42,7 +43,7 @@ public class CashValidLive extends HttpServlet {
         replier.setNonce(requestBody.getNonce());
         //Check API
         if(!isThisApiRequest(requestBody)){
-            response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
             writer.write(replier.reply1012BadQuery(addr));
             return;
         }
@@ -56,7 +57,7 @@ public class CashValidLive extends HttpServlet {
         requestBody.getFcdsl().setFilterTerms("valid","true");
 
         //Request
-        String index = IndicesFCH.CashIndex;
+        String index = IndicesNames.CASH;
 
         DataRequestHandler esRequest = new DataRequestHandler(dataCheckResult.getAddr(),requestBody,response,replier);
         List<Cash> meetList;
@@ -68,7 +69,7 @@ public class CashValidLive extends HttpServlet {
             checkUnconfirmed(requestBody.getFcdsl().getQuery().getTerms().getValues()[0],meetList);
         } catch (Exception e) {
             e.printStackTrace();
-            response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
             writer.write(replier.reply1012BadQuery(addr));
             return;
         }
@@ -76,7 +77,7 @@ public class CashValidLive extends HttpServlet {
         //response
         replier.setData(meetList);
         replier.setGot(meetList.size());
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", CashValidLiveAPI));
+        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.CashValidLiveAPI));
         esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
     }
 

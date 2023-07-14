@@ -1,12 +1,14 @@
 package APIP11V1_Contact;
 
 import APIP0V1_OpenAPI.*;
-import FeipClass.Contact;
+import constants.ApiNames;
+import constants.IndicesNames;
+import constants.ReplyInfo;
+import feipClass.Contact;
 import APIP1V1_FCDSL.Fcdsl;
 import APIP1V1_FCDSL.Filter;
 import APIP1V1_FCDSL.Terms;
 import initial.Initiator;
-import startFEIP.IndicesFEIP;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -19,10 +21,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import APIP1V1_FCDSL.Sort;
-import static api.Constant.*;
 
 
-@WebServlet(APIP11V1Path +ContactsAPI)
+@WebServlet(ApiNames.APIP11V1Path + ApiNames.ContactsAPI)
 public class Contacts extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -31,7 +32,7 @@ public class Contacts extends HttpServlet {
         Replier replier = new Replier();
         PrintWriter writer = response.getWriter();
 
-        RequestChecker requestChecker = new RequestChecker(request,response);
+        RequestChecker requestChecker = new RequestChecker(request,response, replier);
 
         DataCheckResult dataCheckResult = requestChecker.checkDataRequest();
 
@@ -39,11 +40,13 @@ public class Contacts extends HttpServlet {
 
         String addr = dataCheckResult.getAddr();
 
+        if (RequestChecker.checkPublicSessionKey(response, replier, writer, addr)) return;
+
         DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
 
         //Check API
         if(!isThisApiRequest(requestBody)){
-            response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
             writer.write(replier.reply1012BadQuery(addr));
             return;
         }
@@ -74,7 +77,7 @@ public class Contacts extends HttpServlet {
         requestBody.setFcdsl(fcdsl);
 
         //Request
-        String index = IndicesFEIP.ContactIndex;
+        String index = IndicesNames.CONTACT;
 
         DataRequestHandler esRequest = new DataRequestHandler(dataCheckResult.getAddr(),requestBody,response,replier);
         List<Contact> meetList;
@@ -85,7 +88,7 @@ public class Contacts extends HttpServlet {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
             writer.write(replier.reply1012BadQuery(addr));
             return;
         }
@@ -96,7 +99,7 @@ public class Contacts extends HttpServlet {
         replier.setNonce(requestBody.getNonce());
         replier.setData(meetList);
         replier.setGot(meetList.size());
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ContactsAPI));
+        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.ContactsAPI));
         esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
 
     }

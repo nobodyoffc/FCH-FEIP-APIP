@@ -1,12 +1,13 @@
 package APIP3V1_CidInfo;
 
 import APIP0V1_OpenAPI.*;
-import FchClass.Address;
+import constants.ApiNames;
+import constants.IndicesNames;
+import constants.ReplyInfo;
+import fchClass.Address;
 import data.CidInfo;
-import FeipClass.Cid;
+import feipClass.Cid;
 import initial.Initiator;
-import startFCH.IndicesFCH;
-import startFEIP.IndicesFEIP;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -19,19 +20,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static api.Constant.*;
-
-@WebServlet(APIP3V1Path + CidInfoByIdsAPI)
+@WebServlet(ApiNames.APIP3V1Path + ApiNames.CidInfoByIdsAPI)
 public class CidInfoByIds extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
+        response.setHeader("Access-Control-Allow-Origin", "*");
         Replier replier = new Replier();
         PrintWriter writer = response.getWriter();
 
-        RequestChecker requestChecker = new RequestChecker(request,response);
+        RequestChecker requestChecker = new RequestChecker(request,response, replier);
 
         DataCheckResult dataCheckResult = requestChecker.checkDataRequest();
 
@@ -42,7 +42,7 @@ public class CidInfoByIds extends HttpServlet {
         DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
 
         if(!isThisApiRequest(requestBody)){
-            response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
             writer.write(replier.reply1012BadQuery(addr));
             return;
         }
@@ -52,16 +52,16 @@ public class CidInfoByIds extends HttpServlet {
         List<Address> meetAddrList;
 
         try {
-            meetCidList = esRequest.doRequest(IndicesFEIP.CidIndex,null, Cid.class);
+            meetCidList = esRequest.doRequest(IndicesNames.CID,null, Cid.class);
             if(meetCidList==null ){
-                response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
+                response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
                 writer.write(replier.reply1012BadQuery(addr));
                 return;
             }
 
-            meetAddrList = esRequest.doRequest(IndicesFCH.AddressIndex, null,Address.class);
+            meetAddrList = esRequest.doRequest(IndicesNames.ADDRESS, null,Address.class);
             if(meetAddrList==null){
-                response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
+                response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
                 writer.write(replier.reply1012BadQuery(addr));
                 return;
             }
@@ -69,7 +69,7 @@ public class CidInfoByIds extends HttpServlet {
 
         } catch (Exception e) {
             e.printStackTrace();
-            response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
             writer.write(replier.reply1012BadQuery(addr));
             return;
         }
@@ -77,7 +77,7 @@ public class CidInfoByIds extends HttpServlet {
         List<CidInfo> cidInfoList = CidInfo.mergeCidInfoList(meetCidList,meetAddrList);
 
         if(cidInfoList.size() == 0){
-            response.setHeader(CodeInHeader,String.valueOf(Code1011DataNotFound));
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1011DataNotFound));
             writer.write(replier.reply1011DataNotFound(addr));
             return;
         }
@@ -95,7 +95,7 @@ public class CidInfoByIds extends HttpServlet {
         replier.setGot(meetMap.size());
         replier.setTotal(meetMap.size());
         replier.setData(meetMap);
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", CidInfoByIdsAPI));
+        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.CidInfoByIdsAPI));
         esRequest.writeSuccess(dataCheckResult.getSessionKey(),nPrice);
 
     }

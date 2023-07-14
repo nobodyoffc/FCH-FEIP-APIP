@@ -1,9 +1,8 @@
 package test;
 
 import APIP0V1_OpenAPI.*;
-import FchClass.Tx;
+import fchClass.Tx;
 import APIP1V1_FCDSL.Sort;
-import startFCH.IndicesFCH;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -14,6 +13,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static constants.IndicesNames.TX;
+
 @WebServlet("/apip3/v1/exists")
 public class Exists extends HttpServlet {
     @Override
@@ -23,7 +24,7 @@ public class Exists extends HttpServlet {
         response.reset();
         response.setContentType("application/json;charset=utf-8");
 
-        RequestChecker requestChecker = new RequestChecker(request,response);
+        RequestChecker requestChecker = new RequestChecker(request,response, replier);
 
         DataCheckResult dataCheckResult = requestChecker.checkDataRequest();
 
@@ -40,7 +41,7 @@ public class Exists extends HttpServlet {
         sort.add(sort0);
 
         try {
-            meetList = esRequest.doRequest(IndicesFCH.TxIndex,sort, Tx.class);
+            meetList = esRequest.doRequest(TX,sort, Tx.class);
         } catch (Exception e) {
             e.printStackTrace();
         }

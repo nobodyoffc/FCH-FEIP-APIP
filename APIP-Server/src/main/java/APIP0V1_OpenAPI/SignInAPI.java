@@ -1,12 +1,14 @@
 package APIP0V1_OpenAPI;
 
 import EccAes256K1P7.EccAes256K1P7;
+import constants.ApiNames;
+import constants.ReplyInfo;
 import service.ApipService;
 import javaTools.BytesTools;
 import initial.Initiator;
 import redis.clients.jedis.Jedis;
 import service.Params;
-import startAPIP.RedisKeys;
+import constants.Strings;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -16,12 +18,15 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.security.*;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
 
-import static api.Constant.SignInAPI;
-import static api.Constant.*;
+import static constants.ApiNames.SignInAPI;
+import static constants.Strings.*;
 
 
 /**
@@ -47,7 +52,16 @@ import static api.Constant.*;
  *    所有响应均按照service公布的pricePerRequest扣除fid所对应的balance。
  * */
 
-@WebServlet(APIP0V1Path + SignInAPI)
+/**
+ * 简化登录
+ * 0. 采用https传输，无需加密直接返回sessionKey，请求时不再提供公钥，改为FID。
+ * 1. FID = 用户签名中的fid、addr或address项的值
+ *    Sign = 用户签名中的sign或signature项的值
+ * 2. Request body：严格等于展示给用户签名的信息
+ * 3. 加入mode项，值为renew时，用新sessionKey取代旧的，否则返回sessionKey。
+ */
+
+@WebServlet(ApiNames.APIP0V1Path + SignInAPI)
 public class SignInAPI extends HttpServlet {
     private static final Jedis jedis1 = Initiator.jedis1Session;
     private static final Jedis jedis0 = Initiator.jedis0Common;
@@ -61,38 +75,60 @@ public class SignInAPI extends HttpServlet {
 
         PrintWriter writer = response.getWriter();
 
-        RequestChecker requestChecker = new RequestChecker(request, response);
+        RequestChecker requestChecker = new RequestChecker(request, response,replier);
 
         SignInCheckResult signInCheckResult;
         try {
-            signInCheckResult = requestChecker.checkSignInRequest(replier);
+            signInCheckResult = requestChecker.checkSignInRequest();
         } catch (SignatureException e) {
             e.printStackTrace();
             return;
         }
 
+        if(signInCheckResult==null) return;
+
         fid = signInCheckResult.getFid();
-        pubKey = signInCheckResult.getPubKey();
 
-        SignInReplyData signInReplyData;
+        SignInReplyData signInReplyData = new SignInReplyData();
 
-        try {
-            signInReplyData = makeSession();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return;
+        String mode = signInCheckResult.getSignInRequestBody().getMode();
+
+        if((!jedis0.hexists(FID_SESSION_NAME, fid)) || "renew".equals(mode)){
+            try {
+                signInReplyData = makeSession();
+            } catch (Exception e) {
+                response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1020OtherError));
+                replier.setData("Some thing wrong when making sessionKey.\n"+e.getMessage());
+                writer.write(replier.reply1020OtherError(fid));
+                return;
+            }
+        }else{
+            String sessionName = jedis0.hget(FID_SESSION_NAME, fid);
+            signInReplyData.setSessionKey(jedis1.hget(sessionName, SESSION_KEY));
+
+            long expireMilliSed = jedis1.ttl(sessionName);
+            if(expireMilliSed<0){
+                response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1020OtherError));
+                replier.setData("Expire time is wrong.");
+                writer.write(replier.reply1020OtherError(fid));
+                return;
+            }
+            long expireTime =System.currentTimeMillis()+expireMilliSed*1000;
+            signInReplyData.setExpireTime(expireTime);
         }
-        response.setHeader(CodeInHeader,String.valueOf(Code0Success));
+
+        response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code0Success));
         replier.setGot(1);
         replier.setTotal(1);
         replier.setData(signInReplyData);
         writer.write(replier.reply0Success(fid));
+        replier.setData(null);
     }
+
 
     private SignInReplyData makeSession() throws Exception {
 
         String sessionKey = genSessionKey();
-        String sessionKeyEncrypted = encryptSessionKey(sessionKey,pubKey);
         String sessionName = makeSessionName(sessionKey);
         SignInReplyData data = new SignInReplyData();
 
@@ -101,26 +137,32 @@ public class SignInAPI extends HttpServlet {
         sessionMap.put("fid", fid);
 
         //Delete the old session of the requester.
-        String name = jedis0.hget(RedisKeys.AddrSessionName,fid);
-        if(name!=null)jedis1.del(name);
+        String oldSessionName = jedis0.hget(Strings.FID_SESSION_NAME,fid);
+        if(oldSessionName!=null)jedis1.del(oldSessionName);
 
         //Set the new session
         jedis1.hmset(sessionName,sessionMap);
         Params params = service.getParams();
-        jedis1.expire(sessionName,Long.parseLong(params.getSessionDays())*86400);
+        long lifeSeconds = Long.parseLong(params.getSessionDays()) * 86400;
+        jedis1.expire(sessionName,lifeSeconds);
 
-        data.setSessionKeyEncrypted(sessionKeyEncrypted);
-        data.setSessionDays(Integer.parseInt(params.getSessionDays()));
-        data.setStartTime(System.currentTimeMillis());
+        data.setSessionKey(sessionKey);
+        long expireTime = System.currentTimeMillis()+(lifeSeconds*1000);
+        data.setExpireTime(expireTime);
 
-        String oldSessionName = jedis0.hget(RedisKeys.AddrSessionName, fid);
-        if(oldSessionName!=null) {
-            jedis1.del(oldSessionName);
-        }
-        jedis0.hset(RedisKeys.AddrSessionName, fid,sessionName);
+        jedis0.hset(Strings.FID_SESSION_NAME, fid,sessionName);
 
         return data;
     }
+
+    public static String millisecondToDataTime(long milliTime) {
+
+        Instant instant = Instant.ofEpochMilli(milliTime);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy-MM-dd HH:mm:ss").withZone(ZoneId.systemDefault());
+
+        return formatter.format(instant);
+    }
+
     private String genSessionKey() {
         SecureRandom random = new SecureRandom();
 

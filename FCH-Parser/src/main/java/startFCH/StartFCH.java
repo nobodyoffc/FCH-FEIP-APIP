@@ -1,18 +1,23 @@
 package startFCH;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import FchClass.Block;
+import constants.Constants;
+import fchClass.Block;
+import config.ConfigFCH;
 import menu.Menu;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import parser.ChainParser;
-import parser.OpReFileTools;
+import fileTools.OpReFileTools;
 import parser.Preparer;
 import servers.NewEsClient;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 public class StartFCH {
@@ -27,6 +32,8 @@ public class StartFCH {
 
         log.debug("FchParser is start...");
 
+        checkOpReturnFile();
+
         ConfigFCH configFCH = new ConfigFCH();
         while (true) {
             configFCH= configFCH.getClassInstanceFromFile(br, ConfigFCH.class);
@@ -34,7 +41,8 @@ public class StartFCH {
 
             String path = configFCH.getBlockFilePath();
 
-            esClient = newEsClient.checkEsClient(esClient, configFCH);
+            esClient = newEsClient.getElasticSearchClient(br, configFCH, null);
+
             if (esClient == null) {
                 log.debug("Creating ES client failed.");
                 newEsClient.shutdownClient();
@@ -130,93 +138,32 @@ public class StartFCH {
         }
     }
 
+    private static void checkOpReturnFile() {
+
+        Path path = Paths.get(Constants.OPRETURN_FILE_DIR);
+
+        // Check if the directory exists
+        if (!Files.exists(path)) {
+            try {
+                // Create the directory
+                Files.createDirectories(path);
+            } catch (Exception e) {
+                log.error("Error creating opreturn directory: " + e.getMessage());
+            }
+        }
+    }
+
     private static void deleteOpReFiles() {
 
-        String fileName = ChainParser.OpRefileName;
+        String fileName = Constants.OPRETURN_FILE_NAME;
         File file;
 
         while (true) {
-            file = new File(fileName);
+            file = new File(Constants.OPRETURN_FILE_DIR,fileName);
             if (file.exists()) {
                 file.delete();
                 fileName = OpReFileTools.getNextFile(fileName);
             } else break;
         }
     }
-//
-//
-//
-//	private static ElasticsearchClient creatClient(StartClient startMyEsClient) {
-//
-//		ElasticsearchClient esClient.esClient = startMyEsClient.getEsClient();
-//
-//		if(esClient.esClient!=null) {
-//			System.out.println("There has been a client:"+esClient.esClient.toString()+"\nPress any key return...");
-//			sc.nextLine();
-//			return null;
-//		}
-//		if(startMyEsClient.getHost()==null) {
-//			System.out.println("No IP. Choose 6 to config first. Press any key return...");
-//			sc.nextLine();
-//			return null;
-//		}
-//		if(startMyEsClient.getPort()==0) {
-//			System.out.println("No port. Choose 6 to config first. Press any key return...\"");
-//			sc.nextLine();
-//			return null;
-//		}
-//
-//		try {
-//			esClient.esClient = startMyEsClient.getClientHttp();
-//			System.out.println("ES client for HTTP created.");
-//			return esClient.esClient;
-//		} catch (ElasticsearchException e) {
-//			log.error("Create esClient.esClient failed.",e);
-//			System.out.println("Create esClient.esClient failed. See log...\n");
-//			return null;
-//		} catch (IOException e) {
-//			log.error("Create esClient.esClient failed.",e);
-//			System.out.println("Create esClient.esClient failed. See log...\n");
-//			return null;
-//		}
-//	}
-//	private static ElasticsearchClient creatSslClient(StartClient startMyEsClient) {
-//
-//		ElasticsearchClient esClient.esClient = startMyEsClient.getEsClient();
-//
-//		if(esClient.esClient!=null) {
-//			System.out.println("There has been a client:"+esClient.esClient.toString()+"\nPress any key return...");
-//			sc.nextLine();
-//			return null;
-//		}
-//		if(startMyEsClient.getHost()==null) {
-//			System.out.println("No IP. Choose 6 to config first. Press any key return...");
-//			sc.nextLine();
-//			return null;
-//		}
-//		if(startMyEsClient.getPort()==0) {
-//			System.out.println("No port. Choose 6 to config first. Press any key return...\"");
-//			sc.nextLine();
-//			return null;
-//		}
-//		if(startMyEsClient.getUsername()==null) {
-//			System.out.println("No userName. Choose 6 to config first. Press any key return...\"");
-//			sc.nextLine();
-//			return null;
-//		}
-//
-//		System.out.println("Input the password:");
-//		String password = sc.next();
-//
-//		try {
-//			esClient.esClient = startMyEsClient.getClientHttps(password);
-//		} catch (KeyManagementException | ElasticsearchException | NoSuchAlgorithmException | IOException e) {
-//			log.error("Create esClient.esClient failed.",e);
-//			System.out.println("Create esClient.esClient failed. See log...\n");
-//		}
-//		return esClient.esClient;
-//
-//	}
-//
-
 }

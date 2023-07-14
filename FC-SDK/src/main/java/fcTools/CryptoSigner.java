@@ -1,6 +1,6 @@
 package fcTools;
 
-import FchClass.Cash;
+import fchClass.Cash;
 import com.google.gson.Gson;
 
 import java.util.List;

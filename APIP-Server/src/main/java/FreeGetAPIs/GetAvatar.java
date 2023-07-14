@@ -1,8 +1,9 @@
 package FreeGetAPIs;
 
 import APIP17V1_Avatar.AvatarMaker;
+import constants.ApiNames;
 import initial.Initiator;
-import startAPIP.RedisKeys;
+import constants.Strings;
 
 import javax.imageio.ImageIO;
 import javax.servlet.ServletException;
@@ -16,21 +17,21 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import static api.Constant.*;
+import static constants.Strings.CONFIG;
 
-@WebServlet(FreeGet + GetAvatarAPI)
+@WebServlet(ApiNames.FreeGet + ApiNames.GetAvatarAPI)
 public class GetAvatar extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        if (!Initiator.isFreeGetAllowed(response.getWriter())) return;
+        if (Initiator.isFreeGetForbidden(response.getWriter())) return;
 
         String fidRequested = request.getParameter("fid");
 
         if(!(fidRequested.substring(0,1).equals("F") || fidRequested.substring(0,1).equals("3")))return;
 
-        String avatarBasePath = Initiator.jedis0Common.get(RedisKeys.AvatarBasePath);
-        String avatarPngPath = Initiator.jedis0Common.get(RedisKeys.AvatarPngPath);
+        String avatarBasePath = Initiator.jedis0Common.hget(CONFIG,Strings.AVATAR_BASE_PATH);
+        String avatarPngPath = Initiator.jedis0Common.hget(CONFIG,Strings.AVATAR_PNG_PATH);
         if(!avatarPngPath.endsWith("/"))avatarPngPath  = avatarPngPath+"/";
         if(!avatarBasePath.endsWith("/"))avatarBasePath = avatarBasePath+"/";
 

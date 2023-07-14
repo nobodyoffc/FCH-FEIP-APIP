@@ -1,8 +1,8 @@
 package data;
 
-import FchClass.Block;
-import FchClass.BlockHas;
-import FchClass.TxMark;
+import fchClass.Block;
+import fchClass.BlockHas;
+import fchClass.TxMark;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -12,4 +12,15 @@
     <load-on-startup>5</load-on-startup>
   </servlet>
 
+  <filter>
+    <filter-name>CorsFilter</filter-name>
+    <filter-class>initial.CorsFilter</filter-class>
+  </filter>
+
+  <filter-mapping>
+    <filter-name>CorsFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
+
 </web-app>

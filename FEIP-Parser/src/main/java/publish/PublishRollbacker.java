@@ -5,9 +5,9 @@ import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
+import constants.IndicesNames;
 import fcTools.ParseTools;
 import servers.EsTools;
-import startFEIP.IndicesFEIP;
 
 import java.io.IOException;
 import java.util.*;
@@ -27,8 +27,8 @@ public class PublishRollbacker {
 	public boolean rollbackStatementAndNid(ElasticsearchClient esClient, long lastHeight) throws ElasticsearchException, IOException, InterruptedException {
 		// TODO Auto-generated method stub
 		List<String> indexList = new ArrayList<String>();
-		indexList.add(IndicesFEIP.StatementIndex);
-		indexList.add(IndicesFEIP.NidIndex);
+		indexList.add(IndicesNames.STATEMENT);
+		indexList.add(IndicesNames.NID);
 
 		esClient.deleteByQuery(d->d.index(indexList).query(q->q.range(r->r.field("birthHeight").gt(JsonData.of(lastHeight)))));
 		
@@ -48,13 +48,13 @@ public class PublishRollbacker {
 		if(itemIdList==null||itemIdList.isEmpty())return error;
 		System.out.println("If Rollbacking is interrupted, reparse all effected ids of index 'proof': ");
 		ParseTools.gsonPrint(itemIdList);
-		deleteEffectedItems(esClient, IndicesFEIP.ProofIndex, itemIdList);
+		deleteEffectedItems(esClient, IndicesNames.PROOF, itemIdList);
 		if(histIdList==null||histIdList.isEmpty())return error;
-		deleteRolledHists(esClient, IndicesFEIP.ProofHistIndex,histIdList);
+		deleteRolledHists(esClient, IndicesNames.PROOF_HISTORY,histIdList);
 
 		TimeUnit.SECONDS.sleep(3);
 
-		List<ProofHistory>reparseHistList = EsTools.getHistsForReparse(esClient, IndicesFEIP.ProofHistIndex,"gid",itemIdList, ProofHistory.class);
+		List<ProofHistory>reparseHistList = EsTools.getHistsForReparse(esClient, IndicesNames.PROOF_HISTORY,"gid",itemIdList, ProofHistory.class);
 
 		reparseProof(esClient,reparseHistList);
 
@@ -64,7 +64,7 @@ public class PublishRollbacker {
 	private Map<String, ArrayList<String>> getEffectedProofs(ElasticsearchClient esClient,long height) throws ElasticsearchException, IOException {
 		// TODO Auto-generated method stub
 		SearchResponse<ProofHistory> resultSearch = esClient.search(s->s
-				.index(IndicesFEIP.ProofHistIndex)
+				.index(IndicesNames.PROOF_HISTORY)
 				.query(q->q
 						.range(r->r
 								.field("height")

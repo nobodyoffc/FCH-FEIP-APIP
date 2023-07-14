@@ -1,8 +1,9 @@
 package publish;
 
-import FeipClass.Proof;
-import FeipClass.Nid;
-import FeipClass.Statement;
+import constants.IndicesNames;
+import feipClass.Proof;
+import feipClass.Nid;
+import feipClass.Statement;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import co.elastic.clients.elasticsearch.core.GetResponse;
@@ -11,7 +12,6 @@ import fcTools.Hash;
 import opReturn.Feip;
 import opReturn.OpReturn;
 import servers.EsTools;
-import startFEIP.IndicesFEIP;
 import startFEIP.StartFEIP;
 
 import java.io.IOException;
@@ -123,7 +123,7 @@ public class PublishParser {
         statement.setBirthTime(opre.getTime());
         statement.setBirthHeight(opre.getHeight());
 
-        esClient.index(i->i.index(IndicesFEIP.StatementIndex).id(statement.getStatementId()).document(statement));
+        esClient.index(i->i.index(IndicesNames.STATEMENT).id(statement.getStatementId()).document(statement));
         isValid = true;
 
         return isValid;
@@ -135,7 +135,7 @@ public class PublishParser {
         Proof proof;
         switch(proofHist.getOp()) {
             case "issue":
-                proof = EsTools.getById(esClient, IndicesFEIP.ProofIndex, proofHist.getProofId(), Proof.class);
+                proof = EsTools.getById(esClient, IndicesNames.PROOF, proofHist.getProofId(), Proof.class);
                 if(proof!=null)return false;
 
                 proof = new Proof();
@@ -173,12 +173,12 @@ public class PublishParser {
 
                 Proof proof1=proof;
 
-                esClient.index(i->i.index(IndicesFEIP.ProofIndex).id(proofHist.getProofId()).document(proof1));
+                esClient.index(i->i.index(IndicesNames.PROOF).id(proofHist.getProofId()).document(proof1));
                 return true;
 
             case "sign":
 
-                proof = EsTools.getById(esClient, IndicesFEIP.ProofIndex, proofHist.getProofId(), Proof.class);
+                proof = EsTools.getById(esClient, IndicesNames.PROOF, proofHist.getProofId(), Proof.class);
 
                 if(proof==null) return false;
 
@@ -209,7 +209,7 @@ public class PublishParser {
                         proof.setLastTime(proofHist.getTime());
                         proof.setLastHeight(proofHist.getHeight());
                         Proof finalProof = proof;
-                        esClient.index(i->i.index(IndicesFEIP.ProofIndex).id(proofHist.getProofId()).document(finalProof));
+                        esClient.index(i->i.index(IndicesNames.PROOF).id(proofHist.getProofId()).document(finalProof));
                         return true;
                     }
                 }
@@ -217,7 +217,7 @@ public class PublishParser {
 
             case "transfer":
 
-                proof = EsTools.getById(esClient, IndicesFEIP.ProofIndex, proofHist.getProofId(), Proof.class);
+                proof = EsTools.getById(esClient, IndicesNames.PROOF, proofHist.getProofId(), Proof.class);
 
                 if(proof==null) return false;
 
@@ -230,12 +230,12 @@ public class PublishParser {
                 proof.setOwner(proofHist.getRecipient());
 
                 Proof finalProof1 = proof;
-                esClient.index(i->i.index(IndicesFEIP.ProofIndex).id(proofHist.getProofId()).document(finalProof1));
+                esClient.index(i->i.index(IndicesNames.PROOF).id(proofHist.getProofId()).document(finalProof1));
                 return  true;
 
             case "destroy":
 
-                proof = EsTools.getById(esClient, IndicesFEIP.ProofIndex, proofHist.getProofId(), Proof.class);
+                proof = EsTools.getById(esClient, IndicesNames.PROOF, proofHist.getProofId(), Proof.class);
 
                 if(proof==null) return false;
 
@@ -247,7 +247,7 @@ public class PublishParser {
                 proof.setActive(false);
 
                 Proof finalProof2 = proof;
-                esClient.index(i->i.index(IndicesFEIP.ProofIndex).id(proofHist.getProofId()).document(finalProof2));
+                esClient.index(i->i.index(IndicesNames.PROOF).id(proofHist.getProofId()).document(finalProof2));
                 return  true;
         }
         return false;
@@ -290,7 +290,7 @@ public class PublishParser {
 
                 Nid nid0 = nid;
 
-                esClient.index(i->i.index(IndicesFEIP.NidIndex).id(nid0.getNameId()).document(nid0));
+                esClient.index(i->i.index(IndicesNames.NID).id(nid0.getNameId()).document(nid0));
                 isValid = true;
                 break;
 
@@ -300,7 +300,7 @@ public class PublishParser {
                 String nameId = Hash.Sha256x2(nidRaw.getName()+opre.getSigner());
                 height = opre.getHeight();
 
-                GetResponse<Nid> result = esClient.get(g->g.index(IndicesFEIP.NidIndex).id(nameId), Nid.class);
+                GetResponse<Nid> result = esClient.get(g->g.index(IndicesNames.NID).id(nameId), Nid.class);
 
                 if(!result.found())return false;
 
@@ -313,7 +313,7 @@ public class PublishParser {
                 nid.setLastHeight(height);
 
                 Nid nid2 = nid;
-                esClient.index(i->i.index(IndicesFEIP.NidIndex).id(nid2.getNameId()).document(nid2));
+                esClient.index(i->i.index(IndicesNames.NID).id(nid2.getNameId()).document(nid2));
 
                 isValid = true;
                 break;
@@ -323,7 +323,7 @@ public class PublishParser {
                 String nameId1 = Hash.Sha256x2(nidRaw.getName()+opre.getSigner());
                 height = opre.getHeight();
 
-                GetResponse<Nid> result1 = esClient.get(g->g.index(IndicesFEIP.NidIndex).id(nameId1), Nid.class);
+                GetResponse<Nid> result1 = esClient.get(g->g.index(IndicesNames.NID).id(nameId1), Nid.class);
 
                 if(!result1.found())return false;
 
@@ -336,7 +336,7 @@ public class PublishParser {
                 nid.setLastHeight(height);
 
                 Nid nid3 = nid;
-                esClient.index(i->i.index(IndicesFEIP.NidIndex).id(nid3.getNameId()).document(nid3));
+                esClient.index(i->i.index(IndicesNames.NID).id(nid3.getNameId()).document(nid3));
 
                 isValid = true;
                 break;

@@ -3,10 +3,10 @@ package writeEs;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import co.elastic.clients.elasticsearch.core.GetResponse;
-import FchClass.Cash;
+import constants.IndicesNames;
+import fchClass.Cash;
 import javaTools.BytesTools;
 import keyTools.KeyTools;
-import startFCH.IndicesFCH;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -51,7 +51,7 @@ public class P2SH {
 		*/
 		String script = input.getUnlockScript();
 
-		GetResponse<P2SH> resultGetP2SH = esClient.get(g->g.index(IndicesFCH.P2SHIndex).id(input.getFid()), P2SH.class);
+		GetResponse<P2SH> resultGetP2SH = esClient.get(g->g.index(IndicesNames.P2SH).id(input.getFid()), P2SH.class);
 
 		if(resultGetP2SH.found())return;
 
@@ -126,7 +126,7 @@ public class P2SH {
 		this.setBirthTime(input.getSpendTime());
 		this.setBirthTxId(input.getBirthTxId());
 
-		esClient.index(i->i.index(IndicesFCH.P2SHIndex).id(this.getFid()).document(this));
+		esClient.index(i->i.index(IndicesNames.P2SH).id(this.getFid()).document(this));
 	}
 
 	public String getFid() {

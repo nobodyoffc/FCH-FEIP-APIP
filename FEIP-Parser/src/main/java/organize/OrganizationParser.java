@@ -1,15 +1,15 @@
 package organize;
 
-import FeipClass.Group;
-import FeipClass.Team;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import com.google.gson.Gson;
-import FeipClass.Cid;
+import constants.IndicesNames;
+import feipClass.Cid;
+import feipClass.Group;
+import feipClass.Team;
 import opReturn.Feip;
 import opReturn.OpReturn;
 import servers.EsTools;
-import startFEIP.IndicesFEIP;
 import startFEIP.StartFEIP;
 
 import java.io.IOException;
@@ -106,7 +106,7 @@ public class OrganizationParser {
 
 		switch(groupHist.getOp()) {
 			case "create":
-				group = EsTools.getById(esClient, IndicesFEIP.GroupIndex, groupHist.getGid(), Group.class);
+				group = EsTools.getById(esClient, IndicesNames.GROUP, groupHist.getGid(), Group.class);
 				if(group==null) {
 					group = new Group();
 					group.setGid(groupHist.getTxId());
@@ -134,7 +134,7 @@ public class OrganizationParser {
 					group.settCdd(group.gettCdd()+groupHist.getCdd());
 
 					Group group1=group;
-					esClient.index(i->i.index(IndicesFEIP.GroupIndex).id(groupHist.getGid()).document(group1));
+					esClient.index(i->i.index(IndicesNames.GROUP).id(groupHist.getGid()).document(group1));
 					isValid = true;
 				}else {
 					isValid = false;
@@ -144,7 +144,7 @@ public class OrganizationParser {
 
 			case "join":
 
-				group = EsTools.getById(esClient, IndicesFEIP.GroupIndex, groupHist.getGid(), Group.class);
+				group = EsTools.getById(esClient, IndicesNames.GROUP, groupHist.getGid(), Group.class);
 
 				if(group==null) {
 					isValid = false;
@@ -171,14 +171,14 @@ public class OrganizationParser {
 
 				Group group2 = group;
 
-				esClient.index(i->i.index(IndicesFEIP.GroupIndex).id(groupHist.getGid()).document(group2));
+				esClient.index(i->i.index(IndicesNames.GROUP).id(groupHist.getGid()).document(group2));
 
 				isValid = true;
 				break;
 
 			case "update":
 
-				group = EsTools.getById(esClient, IndicesFEIP.GroupIndex, groupHist.getGid(), Group.class);
+				group = EsTools.getById(esClient, IndicesNames.GROUP, groupHist.getGid(), Group.class);
 
 				if(group==null) {
 					isValid = false;
@@ -216,13 +216,13 @@ public class OrganizationParser {
 
 				Group group3 = group;
 
-				esClient.index(i->i.index(IndicesFEIP.GroupIndex).id(groupHist.getGid()).document(group3));
+				esClient.index(i->i.index(IndicesNames.GROUP).id(groupHist.getGid()).document(group3));
 				isValid = true;
 				break;
 
 			case "leave":
 
-				group = EsTools.getById(esClient, IndicesFEIP.GroupIndex, groupHist.getGid(), Group.class);
+				group = EsTools.getById(esClient, IndicesNames.GROUP, groupHist.getGid(), Group.class);
 
 				if(group==null) {
 					isValid = false;
@@ -248,9 +248,9 @@ public class OrganizationParser {
 				//TODO Important: If no one is in this group, delete the group and its history.
 				if(activeMembers1.length==0){
 					Group finalGroup = group;
-					esClient.delete(d->d.index(IndicesFEIP.GroupIndex).id(finalGroup.getGid()));
+					esClient.delete(d->d.index(IndicesNames.GROUP).id(finalGroup.getGid()));
 					Group finalGroup1 = group;
-					esClient.deleteByQuery(d->d.index(IndicesFEIP.GroupHistIndex).query(q->q.term(t->t.field("gid").value(finalGroup1.getGid()))));
+					esClient.deleteByQuery(d->d.index(IndicesNames.GROUP_HISTORY).query(q->q.term(t->t.field("gid").value(finalGroup1.getGid()))));
 					isValid = false;
 					return isValid;
 				}
@@ -263,7 +263,7 @@ public class OrganizationParser {
 
 				Group group4 = group;
 
-				esClient.index(i->i.index(IndicesFEIP.GroupIndex).id(groupHist.getGid()).document(group4));
+				esClient.index(i->i.index(IndicesNames.GROUP).id(groupHist.getGid()).document(group4));
 
 				isValid = true;
 				break;
@@ -493,7 +493,7 @@ public class OrganizationParser {
 		boolean found = false;
 		switch(teamHist.getOp()) {
 			case "create":
-				team = EsTools.getById(esClient, IndicesFEIP.TeamIndex, teamHist.getTid(), Team.class);
+				team = EsTools.getById(esClient, IndicesNames.TEAM, teamHist.getTid(), Team.class);
 				if(team==null) {
 					team = new Team();
 					team.setTid(teamHist.getTxId());
@@ -522,7 +522,7 @@ public class OrganizationParser {
 					team.setActive(true);
 
 					Team team1=team;
-					esClient.index(i->i.index(IndicesFEIP.TeamIndex).id(teamHist.getTid()).document(team1));
+					esClient.index(i->i.index(IndicesNames.TEAM).id(teamHist.getTid()).document(team1));
 					isValid = true;
 				}else {
 					isValid = false;
@@ -531,7 +531,7 @@ public class OrganizationParser {
 
 			case "disband":
 
-				team = EsTools.getById(esClient, IndicesFEIP.TeamIndex, teamHist.getTid(), Team.class);
+				team = EsTools.getById(esClient, IndicesNames.TEAM, teamHist.getTid(), Team.class);
 
 				if(team==null) {
 					isValid = false;
@@ -552,14 +552,14 @@ public class OrganizationParser {
 				team.setActive(false);
 
 				Team team2 = team;
-				esClient.index(i->i.index(IndicesFEIP.TeamIndex).id(teamHist.getTid()).document(team2));
+				esClient.index(i->i.index(IndicesNames.TEAM).id(teamHist.getTid()).document(team2));
 				isValid = true;
 
 				break;
 
 			case "transfer":
 
-				team = EsTools.getById(esClient, IndicesFEIP.TeamIndex, teamHist.getTid(), Team.class);
+				team = EsTools.getById(esClient, IndicesNames.TEAM, teamHist.getTid(), Team.class);
 
 				if(team==null) {
 					isValid = false;
@@ -572,7 +572,7 @@ public class OrganizationParser {
 				}
 
 				if(! team.getOwner().equals(teamHist.getSigner())) {
-					Cid resultCid = EsTools.getById(esClient, IndicesFEIP.CidIndex, teamHist.getSigner(), Cid.class);
+					Cid resultCid = EsTools.getById(esClient, IndicesNames.CID, teamHist.getSigner(), Cid.class);
 					if(resultCid.getMaster()!=null) {
 						if(! resultCid.getMaster().equals(teamHist.getSigner())) {
 							isValid = false;
@@ -594,14 +594,14 @@ public class OrganizationParser {
 
 				Team team3 = team;
 
-				esClient.index(i->i.index(IndicesFEIP.TeamIndex).id(teamHist.getTid()).document(team3));
+				esClient.index(i->i.index(IndicesNames.TEAM).id(teamHist.getTid()).document(team3));
 				isValid = true;
 
 				break;
 
 			case "take over":
 
-				team = EsTools.getById(esClient, IndicesFEIP.TeamIndex, teamHist.getTid(), Team.class);
+				team = EsTools.getById(esClient, IndicesNames.TEAM, teamHist.getTid(), Team.class);
 
 				if(team==null) {
 					isValid = false;
@@ -643,14 +643,14 @@ public class OrganizationParser {
 
 					Team team4 = team;
 
-					esClient.index(i->i.index(IndicesFEIP.TeamIndex).id(teamHist.getTid()).document(team4));
+					esClient.index(i->i.index(IndicesNames.TEAM).id(teamHist.getTid()).document(team4));
 					isValid = true;
 					break;
 				}
 				break;
 
 			case "update":
-				team = EsTools.getById(esClient, IndicesFEIP.TeamIndex, teamHist.getTid(), Team.class);
+				team = EsTools.getById(esClient, IndicesNames.TEAM, teamHist.getTid(), Team.class);
 
 				if(team==null) {
 					isValid = false;
@@ -708,13 +708,13 @@ public class OrganizationParser {
 
 				Team team5 = team;
 
-				esClient.index(i->i.index(IndicesFEIP.TeamIndex).id(teamHist.getTid()).document(team5));
+				esClient.index(i->i.index(IndicesNames.TEAM).id(teamHist.getTid()).document(team5));
 				isValid = true;
 				break;
 
 			case "agree consensus":
 
-				team = EsTools.getById(esClient, IndicesFEIP.TeamIndex, teamHist.getTid(), Team.class);
+				team = EsTools.getById(esClient, IndicesNames.TEAM, teamHist.getTid(), Team.class);
 
 				if(team==null) {
 					isValid = false;
@@ -757,7 +757,7 @@ public class OrganizationParser {
 
 					Team team6 = team;
 
-					esClient.index(i->i.index(IndicesFEIP.TeamIndex).id(teamHist.getTid()).document(team6));
+					esClient.index(i->i.index(IndicesNames.TEAM).id(teamHist.getTid()).document(team6));
 					isValid = true;
 					break;
 				}else {
@@ -767,7 +767,7 @@ public class OrganizationParser {
 
 			case "invite":
 
-				team = EsTools.getById(esClient, IndicesFEIP.TeamIndex, teamHist.getTid(), Team.class);
+				team = EsTools.getById(esClient, IndicesNames.TEAM, teamHist.getTid(), Team.class);
 
 				if(team==null) {
 					isValid = false;
@@ -803,7 +803,7 @@ public class OrganizationParser {
 
 							Team team7 = team;
 
-							esClient.index(i->i.index(IndicesFEIP.TeamIndex).id(teamHist.getTid()).document(team7));
+							esClient.index(i->i.index(IndicesNames.TEAM).id(teamHist.getTid()).document(team7));
 							isValid = true;
 							break;
 						}
@@ -813,7 +813,7 @@ public class OrganizationParser {
 
 			case "withdraw invitation":
 
-				team = EsTools.getById(esClient, IndicesFEIP.TeamIndex, teamHist.getTid(), Team.class);
+				team = EsTools.getById(esClient, IndicesNames.TEAM, teamHist.getTid(), Team.class);
 
 				if(team==null) {
 					isValid = false;
@@ -844,7 +844,7 @@ public class OrganizationParser {
 
 							Team team7 = team;
 
-							esClient.index(i->i.index(IndicesFEIP.TeamIndex).id(teamHist.getTid()).document(team7));
+							esClient.index(i->i.index(IndicesNames.TEAM).id(teamHist.getTid()).document(team7));
 							isValid = true;
 							break;
 						}
@@ -854,7 +854,7 @@ public class OrganizationParser {
 
 			case "join":
 
-				team = EsTools.getById(esClient, IndicesFEIP.TeamIndex, teamHist.getTid(), Team.class);
+				team = EsTools.getById(esClient, IndicesNames.TEAM, teamHist.getTid(), Team.class);
 
 				if(team==null) {
 					isValid = false;
@@ -917,7 +917,7 @@ public class OrganizationParser {
 
 							Team team7 = team;
 
-							esClient.index(i->i.index(IndicesFEIP.TeamIndex).id(teamHist.getTid()).document(team7));
+							esClient.index(i->i.index(IndicesNames.TEAM).id(teamHist.getTid()).document(team7));
 							isValid = true;
 							break;
 						}
@@ -927,7 +927,7 @@ public class OrganizationParser {
 
 			case "leave":
 
-				team = EsTools.getById(esClient, IndicesFEIP.TeamIndex, teamHist.getTid(), Team.class);
+				team = EsTools.getById(esClient, IndicesNames.TEAM, teamHist.getTid(), Team.class);
 
 				if(team==null) {
 					isValid = false;
@@ -984,7 +984,7 @@ public class OrganizationParser {
 
 					Team team7 = team;
 
-					esClient.index(i->i.index(IndicesFEIP.TeamIndex).id(teamHist.getTid()).document(team7));
+					esClient.index(i->i.index(IndicesNames.TEAM).id(teamHist.getTid()).document(team7));
 					isValid = true;
 					break;
 				}
@@ -992,7 +992,7 @@ public class OrganizationParser {
 
 			case "dismiss":
 
-				team = EsTools.getById(esClient, IndicesFEIP.TeamIndex, teamHist.getTid(), Team.class);
+				team = EsTools.getById(esClient, IndicesNames.TEAM, teamHist.getTid(), Team.class);
 
 				if(team==null) {
 					isValid = false;
@@ -1060,7 +1060,7 @@ public class OrganizationParser {
 
 						Team team7 = team;
 
-						esClient.index(i->i.index(IndicesFEIP.TeamIndex).id(teamHist.getTid()).document(team7));
+						esClient.index(i->i.index(IndicesNames.TEAM).id(teamHist.getTid()).document(team7));
 						isValid = true;
 						break;
 					}
@@ -1069,7 +1069,7 @@ public class OrganizationParser {
 
 			case "appoint":
 
-				team = EsTools.getById(esClient, IndicesFEIP.TeamIndex, teamHist.getTid(), Team.class);
+				team = EsTools.getById(esClient, IndicesNames.TEAM, teamHist.getTid(), Team.class);
 
 				if(team==null) {
 					isValid = false;
@@ -1114,12 +1114,12 @@ public class OrganizationParser {
 
 				Team team7 = team;
 
-				esClient.index(i->i.index(IndicesFEIP.TeamIndex).id(teamHist.getTid()).document(team7));
+				esClient.index(i->i.index(IndicesNames.TEAM).id(teamHist.getTid()).document(team7));
 				isValid = true;
 				break;
 
 			case "cancel appointment":
-				team = EsTools.getById(esClient, IndicesFEIP.TeamIndex, teamHist.getTid(), Team.class);
+				team = EsTools.getById(esClient, IndicesNames.TEAM, teamHist.getTid(), Team.class);
 
 				if(team==null) {
 					isValid = false;
@@ -1161,12 +1161,12 @@ public class OrganizationParser {
 
 				Team team8 = team;
 
-				esClient.index(i->i.index(IndicesFEIP.TeamIndex).id(teamHist.getTid()).document(team8));
+				esClient.index(i->i.index(IndicesNames.TEAM).id(teamHist.getTid()).document(team8));
 				isValid = true;
 				break;
 
 			case "rate":
-				team = EsTools.getById(esClient, IndicesFEIP.TeamIndex, teamHist.getTid(), Team.class);
+				team = EsTools.getById(esClient, IndicesNames.TEAM, teamHist.getTid(), Team.class);
 
 				if(team==null) {
 					isValid = false;
@@ -1194,7 +1194,7 @@ public class OrganizationParser {
 
 				Team team9 = team;
 
-				esClient.index(i->i.index(IndicesFEIP.TeamIndex).id(teamHist.getTid()).document(team9));
+				esClient.index(i->i.index(IndicesNames.TEAM).id(teamHist.getTid()).document(team9));
 				isValid = true;
 				break;
 			default:

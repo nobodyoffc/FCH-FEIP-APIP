@@ -3,6 +3,8 @@ package APIP18V1_Wallet;
 import APIP0V1_OpenAPI.*;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import constants.ApiNames;
+import constants.ReplyInfo;
 import initial.Initiator;
 
 import javax.servlet.ServletException;
@@ -17,9 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static api.Constant.*;
-
-@WebServlet(APIP18V1Path +UnconfirmedAPI)
+@WebServlet(ApiNames.APIP18V1Path + ApiNames.UnconfirmedAPI)
 public class Unconfirmed extends HttpServlet {
 
     private String SpendCount = "spendCount";
@@ -34,7 +34,7 @@ public class Unconfirmed extends HttpServlet {
         Replier replier = new Replier();
         PrintWriter writer = response.getWriter();
 
-        RequestChecker requestChecker = new RequestChecker(request,response);
+        RequestChecker requestChecker = new RequestChecker(request,response, replier);
 
         DataCheckResult dataCheckResult = requestChecker.checkDataRequest();
 
@@ -46,7 +46,7 @@ public class Unconfirmed extends HttpServlet {
         replier.setNonce(requestBody.getNonce());
         //Check API
         if(!isThisApiRequest(requestBody)){
-            response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
             writer.write(replier.reply1012BadQuery(addr));
             return;
         }
@@ -59,7 +59,7 @@ public class Unconfirmed extends HttpServlet {
                 resultMap = Initiator.jedis3Mempool.hgetAll(id);
 
                 if(resultMap == null||resultMap.size()==0){
-                    response.setHeader(CodeInHeader, String.valueOf(Code1011DataNotFound));
+                    response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1011DataNotFound));
                     writer.write(replier.reply1011DataNotFound(addr));
                     return;
                 }
@@ -89,7 +89,7 @@ public class Unconfirmed extends HttpServlet {
             meetList.add(info);
         }
         if(meetList.size()==0){
-            response.setHeader(CodeInHeader, String.valueOf(Code1011DataNotFound));
+            response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1011DataNotFound));
             writer.write(replier.reply1011DataNotFound(addr));
             return;
         }
@@ -97,13 +97,13 @@ public class Unconfirmed extends HttpServlet {
         replier.setData(meetList);
         replier.setGot(meetList.size());
         replier.setTotal(meetList.size());
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", UnconfirmedAPI));
-        response.setHeader(CodeInHeader, String.valueOf(Code0Success));
+        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.UnconfirmedAPI));
+        response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code0Success));
         String reply = replier.reply0Success(addr,nPrice);
         if(reply==null)return;
         String sign = DataRequestHandler.symSign(reply,dataCheckResult.getSessionKey());
         if(sign==null)return;
-        response.setHeader(SignInHeader,sign);
+        response.setHeader(ReplyInfo.SignInHeader,sign);
 
         writer.write(reply);
 

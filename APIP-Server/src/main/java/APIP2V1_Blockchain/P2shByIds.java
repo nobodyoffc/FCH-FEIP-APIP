@@ -1,7 +1,9 @@
 package APIP2V1_Blockchain;
 
 import APIP0V1_OpenAPI.*;
-import startFCH.IndicesFCH;
+import constants.ApiNames;
+import constants.IndicesNames;
+import constants.ReplyInfo;
 import writeEs.P2SH;
 
 import javax.servlet.ServletException;
@@ -15,9 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static api.Constant.*;
-
-@WebServlet(APIP2V1Path + P2shByIdsAPI)
+@WebServlet(ApiNames.APIP2V1Path + ApiNames.P2shByIdsAPI)
 public class P2shByIds extends HttpServlet {
 
     @Override
@@ -27,7 +27,7 @@ public class P2shByIds extends HttpServlet {
         Replier replier = new Replier();
         PrintWriter writer = response.getWriter();
 
-        RequestChecker requestChecker = new RequestChecker(request,response);
+        RequestChecker requestChecker = new RequestChecker(request,response, replier);
 
         DataCheckResult dataCheckResult = requestChecker.checkDataRequest();
 
@@ -39,7 +39,7 @@ public class P2shByIds extends HttpServlet {
         replier.setNonce(requestBody.getNonce());
         //Check API
         if(!isThisApiRequest(requestBody)){
-            response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
             writer.write(replier.reply1012BadQuery(addr));
             return;
         }
@@ -48,13 +48,13 @@ public class P2shByIds extends HttpServlet {
         DataRequestHandler esRequest = new DataRequestHandler(dataCheckResult.getAddr(),requestBody,response,replier);
         List<P2SH> meetList;
         try {
-            meetList = esRequest.doRequest(IndicesFCH.P2SHIndex, null, P2SH.class);
+            meetList = esRequest.doRequest(IndicesNames.P2SH, null, P2SH.class);
             if(meetList==null){
                 return;
             }
         } catch (Exception e) {
             e.printStackTrace();
-            response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
             writer.write(replier.reply1012BadQuery(addr));
             return;
         }
@@ -67,7 +67,7 @@ public class P2shByIds extends HttpServlet {
         //response
         replier.setData(meetMap);
         replier.setGot(meetMap.size());
-        int nPrice = Integer.parseInt(initial.Initiator.jedis0Common.hget("nPrice", P2shByIdsAPI));
+        int nPrice = Integer.parseInt(initial.Initiator.jedis0Common.hget("nPrice", ApiNames.P2shByIdsAPI));
         esRequest.writeSuccess(dataCheckResult.getSessionKey(),nPrice);
     }
 

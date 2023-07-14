@@ -1,7 +1,7 @@
 package parser;
 
-import FchClass.Cash;
-import FchClass.Tx;
+import fchClass.Cash;
+import fchClass.Tx;
 
 import java.util.ArrayList;
 

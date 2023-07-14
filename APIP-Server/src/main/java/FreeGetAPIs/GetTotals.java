@@ -3,6 +3,7 @@ package FreeGetAPIs;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.cat.IndicesResponse;
 import co.elastic.clients.elasticsearch.cat.indices.IndicesRecord;
+import constants.ApiNames;
 import fcTools.ParseTools;
 import initial.Initiator;
 
@@ -17,9 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static api.Constant.*;
-
-@WebServlet(FreeGet + GetTotalsAPI)
+@WebServlet(ApiNames.FreeGet + ApiNames.GetTotalsAPI)
 public class GetTotals extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -29,7 +28,7 @@ public class GetTotals extends HttpServlet {
 
         PrintWriter writer = response.getWriter();
 
-        if (!Initiator.isFreeGetAllowed(writer)) return;
+        if (Initiator.isFreeGetForbidden(writer)) return;
 
         ElasticsearchClient esClient = Initiator.esClient;
 

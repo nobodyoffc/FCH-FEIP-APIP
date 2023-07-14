@@ -1,9 +1,10 @@
 package personal;
 
-import FeipClass.Box;
-import FeipClass.Contact;
-import FeipClass.Mail;
-import FeipClass.Secret;
+import constants.IndicesNames;
+import feipClass.Box;
+import feipClass.Contact;
+import feipClass.Mail;
+import feipClass.Secret;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import co.elastic.clients.elasticsearch.core.GetResponse;
@@ -11,7 +12,6 @@ import com.google.gson.Gson;
 import opReturn.Feip;
 import opReturn.OpReturn;
 import servers.EsTools;
-import startFEIP.IndicesFEIP;
 import startFEIP.StartFEIP;
 
 import java.io.IOException;
@@ -51,7 +51,7 @@ public class PersonalParser {
 				contact.setActive(true);
 
 				Contact contact1 = contact;
-				esClient.index(i->i.index(IndicesFEIP.ContactIndex).id(contact1.getContactId()).document(contact1));
+				esClient.index(i->i.index(IndicesNames.CONTACT).id(contact1.getContactId()).document(contact1));
 				isValid = true;
 				break;
 			case "delete":
@@ -59,7 +59,7 @@ public class PersonalParser {
 				height = opre.getHeight();
 				ContactRaw contactRaw1 = contactRaw;
 
-				GetResponse<Contact> result = esClient.get(g->g.index(IndicesFEIP.ContactIndex).id(contactRaw1.getContactId()), Contact.class);
+				GetResponse<Contact> result = esClient.get(g->g.index(IndicesNames.CONTACT).id(contactRaw1.getContactId()), Contact.class);
 
 				if(!result.found())return isValid;
 
@@ -71,7 +71,7 @@ public class PersonalParser {
 				contact.setLastHeight(height);
 
 				Contact contact2 = contact;
-				esClient.index(i->i.index(IndicesFEIP.ContactIndex).id(contact2.getContactId()).document(contact2));
+				esClient.index(i->i.index(IndicesNames.CONTACT).id(contact2.getContactId()).document(contact2));
 
 				isValid = true;
 				break;
@@ -81,7 +81,7 @@ public class PersonalParser {
 
 				ContactRaw contactRaw2 = contactRaw;
 
-				GetResponse<Contact> result1 = esClient.get(g->g.index(IndicesFEIP.ContactIndex).id(contactRaw2.getContactId()), Contact.class);
+				GetResponse<Contact> result1 = esClient.get(g->g.index(IndicesNames.CONTACT).id(contactRaw2.getContactId()), Contact.class);
 
 				if(!result1.found())return isValid;
 
@@ -93,7 +93,7 @@ public class PersonalParser {
 				contact.setLastHeight(height);
 
 				Contact contact3 = contact;
-				esClient.index(i->i.index(IndicesFEIP.ContactIndex).id(contact3.getContactId()).document(contact3));
+				esClient.index(i->i.index(IndicesNames.CONTACT).id(contact3.getContactId()).document(contact3));
 
 				isValid = true;
 				break;
@@ -135,7 +135,7 @@ public class PersonalParser {
 			mail.setActive(true);
 
 			Mail mail1 = mail;
-			esClient.index(i->i.index(IndicesFEIP.MailIndex).id(mail1.getMailId()).document(mail1));
+			esClient.index(i->i.index(IndicesNames.MAIL).id(mail1.getMailId()).document(mail1));
 
 			isValid = true;
 			return isValid;
@@ -175,7 +175,7 @@ public class PersonalParser {
 					mail.setActive(true);
 
 					Mail mail0 = mail;
-					esClient.index(i->i.index(IndicesFEIP.MailIndex).id(mail0.getMailId()).document(mail0));
+					esClient.index(i->i.index(IndicesNames.MAIL).id(mail0.getMailId()).document(mail0));
 					isValid = true;
 					break;
 				case "delete":
@@ -183,7 +183,7 @@ public class PersonalParser {
 					height = opre.getHeight();
 					MailRaw mailRaw1 = mailRaw;
 
-					GetResponse<Mail> result = esClient.get(g->g.index(IndicesFEIP.MailIndex).id(mailRaw1.getMailId()), Mail.class);
+					GetResponse<Mail> result = esClient.get(g->g.index(IndicesNames.MAIL).id(mailRaw1.getMailId()), Mail.class);
 
 					if(!result.found())return isValid;
 
@@ -195,7 +195,7 @@ public class PersonalParser {
 					mail.setLastHeight(height);
 
 					Mail mail2 = mail;
-					esClient.index(i->i.index(IndicesFEIP.MailIndex).id(mail2.getMailId()).document(mail2));
+					esClient.index(i->i.index(IndicesNames.MAIL).id(mail2.getMailId()).document(mail2));
 
 					isValid = true;
 					break;
@@ -204,7 +204,7 @@ public class PersonalParser {
 					height = opre.getHeight();
 					MailRaw mailRaw2 = mailRaw;
 
-					GetResponse<Mail> result1 = esClient.get(g->g.index(IndicesFEIP.MailIndex).id(mailRaw2.getMailId()), Mail.class);
+					GetResponse<Mail> result1 = esClient.get(g->g.index(IndicesNames.MAIL).id(mailRaw2.getMailId()), Mail.class);
 
 					if(!result1.found())return isValid;
 
@@ -216,7 +216,7 @@ public class PersonalParser {
 					mail.setLastHeight(height);
 
 					Mail mail3 = mail;
-					esClient.index(i->i.index(IndicesFEIP.MailIndex).id(mail3.getMailId()).document(mail3));
+					esClient.index(i->i.index(IndicesNames.MAIL).id(mail3.getMailId()).document(mail3));
 
 					isValid = true;
 					break;
@@ -267,7 +267,7 @@ public class PersonalParser {
 
 				Secret safe0 = secret;
 
-				esClient.index(i->i.index(IndicesFEIP.SecretIndex).id(safe0.getSecretId()).document(safe0));
+				esClient.index(i->i.index(IndicesNames.SECRET).id(safe0.getSecretId()).document(safe0));
 				isValid = true;
 				break;
 
@@ -276,7 +276,7 @@ public class PersonalParser {
 				height = opre.getHeight();
 				SecretRaw safeRaw1 = secretRaw;
 
-				GetResponse<Secret> result = esClient.get(g->g.index(IndicesFEIP.SecretIndex).id(safeRaw1.getSecretId()), Secret.class);
+				GetResponse<Secret> result = esClient.get(g->g.index(IndicesNames.SECRET).id(safeRaw1.getSecretId()), Secret.class);
 
 				if(!result.found())return isValid;
 
@@ -288,7 +288,7 @@ public class PersonalParser {
 				secret.setLastHeight(height);
 
 				Secret safe2 = secret;
-				esClient.index(i->i.index(IndicesFEIP.SecretIndex).id(safe2.getSecretId()).document(safe2));
+				esClient.index(i->i.index(IndicesNames.SECRET).id(safe2.getSecretId()).document(safe2));
 
 				isValid = true;
 				break;
@@ -297,7 +297,7 @@ public class PersonalParser {
 				height = opre.getHeight();
 				SecretRaw safeRaw2 = secretRaw;
 
-				GetResponse<Secret> result1 = esClient.get(g->g.index(IndicesFEIP.SecretIndex).id(safeRaw2.getSecretId()), Secret.class);
+				GetResponse<Secret> result1 = esClient.get(g->g.index(IndicesNames.SECRET).id(safeRaw2.getSecretId()), Secret.class);
 
 				if(!result1.found())return isValid;
 
@@ -309,7 +309,7 @@ public class PersonalParser {
 				secret.setLastHeight(height);
 
 				Secret safe3 = secret;
-				esClient.index(i->i.index(IndicesFEIP.SecretIndex).id(safe3.getSecretId()).document(safe3));
+				esClient.index(i->i.index(IndicesNames.SECRET).id(safe3.getSecretId()).document(safe3));
 
 				isValid = true;
 				break;
@@ -397,7 +397,7 @@ public class PersonalParser {
 		Box box;
 		switch(boxHist.getOp()) {
 			case "create":
-				box = EsTools.getById(esClient, IndicesFEIP.BoxIndex, boxHist.getBid(), Box.class);
+				box = EsTools.getById(esClient, IndicesNames.BOX, boxHist.getBid(), Box.class);
 				if(box==null) {
 					box = new Box();
 					box.setBid(boxHist.getTxId());
@@ -418,7 +418,7 @@ public class PersonalParser {
 					box.setActive(true);
 
 					Box box1=box;
-					esClient.index(i->i.index(IndicesFEIP.BoxIndex).id(boxHist.getBid()).document(box1));
+					esClient.index(i->i.index(IndicesNames.BOX).id(boxHist.getBid()).document(box1));
 					isValid = true;
 				}else {
 					isValid = false;
@@ -427,7 +427,7 @@ public class PersonalParser {
 
 			case "drop":
 
-				box = EsTools.getById(esClient, IndicesFEIP.BoxIndex, boxHist.getBid(), Box.class);
+				box = EsTools.getById(esClient, IndicesNames.BOX, boxHist.getBid(), Box.class);
 
 				if(box==null) {
 					isValid = false;
@@ -445,7 +445,7 @@ public class PersonalParser {
 					box2.setLastTxId(boxHist.getTxId());
 					box2.setLastTime(boxHist.getTime());
 					box2.setLastHeight(boxHist.getHeight());
-					esClient.index(i->i.index(IndicesFEIP.BoxIndex).id(boxHist.getBid()).document(box2));
+					esClient.index(i->i.index(IndicesNames.BOX).id(boxHist.getBid()).document(box2));
 					isValid = true;
 				}else isValid = false;
 
@@ -453,7 +453,7 @@ public class PersonalParser {
 
 			case "recover":
 
-				box = EsTools.getById(esClient, IndicesFEIP.BoxIndex, boxHist.getBid(), Box.class);
+				box = EsTools.getById(esClient, IndicesNames.BOX, boxHist.getBid(), Box.class);
 
 				if(box==null) {
 					isValid = false;
@@ -471,14 +471,14 @@ public class PersonalParser {
 					box2.setLastTxId(boxHist.getTxId());
 					box2.setLastTime(boxHist.getTime());
 					box2.setLastHeight(boxHist.getHeight());
-					esClient.index(i->i.index(IndicesFEIP.BoxIndex).id(boxHist.getBid()).document(box2));
+					esClient.index(i->i.index(IndicesNames.BOX).id(boxHist.getBid()).document(box2));
 					isValid = true;
 				}else isValid = false;
 
 				break;
 
 			case "update":
-				box = EsTools.getById(esClient, IndicesFEIP.BoxIndex, boxHist.getBid(), Box.class);
+				box = EsTools.getById(esClient, IndicesNames.BOX, boxHist.getBid(), Box.class);
 
 				if(box==null) {
 					isValid = false;
@@ -508,7 +508,7 @@ public class PersonalParser {
 
 				Box box2 = box;
 
-				esClient.index(i->i.index(IndicesFEIP.BoxIndex).id(boxHist.getBid()).document(box2));
+				esClient.index(i->i.index(IndicesNames.BOX).id(boxHist.getBid()).document(box2));
 				isValid = true;
 				break;
 			default:

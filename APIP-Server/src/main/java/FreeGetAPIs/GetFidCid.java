@@ -1,16 +1,16 @@
 package FreeGetAPIs;
 
-import FchClass.Address;
+import constants.ApiNames;
+import constants.IndicesNames;
+import fchClass.Address;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.GetResponse;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import data.CidInfo;
 import fcTools.ParseTools;
-import FeipClass.Cid;
+import feipClass.Cid;
 import initial.Initiator;
-import startFCH.IndicesFCH;
-import startFEIP.IndicesFEIP;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -21,10 +21,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
-import static api.Constant.*;
 import static data.CidInfo.mergeCidInfo;
 
-@WebServlet(FreeGet + GetFidCidAPI)
+@WebServlet(ApiNames.FreeGet + ApiNames.GetFidCidAPI)
 public class GetFidCid extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -32,11 +31,11 @@ public class GetFidCid extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
         String idRequested = request.getParameter("id");
         PrintWriter writer = response.getWriter();
-        if (!Initiator.isFreeGetAllowed(writer)) return;
+        if (Initiator.isFreeGetForbidden(writer)) return;
         ElasticsearchClient esClient = Initiator.esClient;
 
         if(idRequested.contains("_")){
-            SearchResponse<Cid> result = esClient.search(s -> s.index(IndicesFEIP.CidIndex)
+            SearchResponse<Cid> result = esClient.search(s -> s.index(IndicesNames.CID)
                             .query(q -> q
                                     .term(t -> t.field("usedCids").value(idRequested)))
                     , Cid.class);
@@ -50,7 +49,7 @@ public class GetFidCid extends HttpServlet {
                 return;
             }
             Cid cid = hitList.get(0).source();
-            GetResponse<Address> fidResult = esClient.get(g -> g.index(IndicesFCH.AddressIndex).id(cid.getFid()), Address.class);
+            GetResponse<Address> fidResult = esClient.get(g -> g.index(IndicesNames.ADDRESS).id(cid.getFid()), Address.class);
             Address fid = fidResult.source();
 
             CidInfo cidInfo = mergeCidInfo(cid,fid);
@@ -58,10 +57,10 @@ public class GetFidCid extends HttpServlet {
             writer.write(ParseTools.gsonString(cidInfo));
 
         }else if(idRequested.charAt(0) == 'F' || idRequested.charAt(0) == '3'){
-            GetResponse<Address> fidResult = esClient.get(g -> g.index(IndicesFCH.AddressIndex).id(idRequested), Address.class);
+            GetResponse<Address> fidResult = esClient.get(g -> g.index(IndicesNames.ADDRESS).id(idRequested), Address.class);
             Address addr = fidResult.source();
             if(addr!=null && addr.getFid()!=null){
-                GetResponse<Cid> cidResult = esClient.get(g -> g.index(IndicesFEIP.CidIndex).id(addr.getFid()), Cid.class);
+                GetResponse<Cid> cidResult = esClient.get(g -> g.index(IndicesNames.CID).id(addr.getFid()), Cid.class);
                 Cid cid = cidResult.source();
                 if(cid ==null){
                     writer.write(ParseTools.gsonString(addr));

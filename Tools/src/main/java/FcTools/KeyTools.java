@@ -7,10 +7,19 @@ import org.bitcoinj.core.ECKey;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HexFormat;
 import java.util.Map;
 
 
 public class KeyTools {
+
+    public static final String FCH_ADDR = "fchAddr";
+    public static final String BTC_ADDR = "btcAddr";
+    public static final String ETH_ADDR = "ethAddr";
+    public static final String LTC_ADDR = "ltcAddr";
+    public static final String DOGE_ADDR = "dogeAddr";
+    public static final String TRX_ADDR = "trxAddr";
+
     public static boolean isValidFchAddr(String addr) {
         // TODO Auto-generated method stub
 
@@ -34,21 +43,21 @@ public class KeyTools {
     }
 
     public static Map<String, String> pubKeyToAddresses(String pubkey) {
-        String fchAddr = KeyTools.pubKeyToFchAddr(pubkey);
-        String btcAddr = KeyTools.pubKeyToBtcAddr(pubkey);
-        String ethAddr = KeyTools.pubKeyToEthAddr(pubkey);
-        String ltcAddr = KeyTools.pubKeyToLtcAddr(pubkey);
-        String dogeAddr = KeyTools.pubKeyToDogeAddr(pubkey);
-        String trxAddr = KeyTools.pubKeyToTrxAddr(pubkey);
+        String fchAddr = pubKeyToFchAddr(pubkey);
+        String btcAddr = pubKeyToBtcAddr(pubkey);
+        String ethAddr = pubKeyToEthAddr(pubkey);
+        String ltcAddr = pubKeyToLtcAddr(pubkey);
+        String dogeAddr = pubKeyToDogeAddr(pubkey);
+        String trxAddr = pubKeyToTrxAddr(pubkey);
 
         Map<String, String> map = new HashMap<String, String>();
-        map.put("fchAddr", fchAddr);
-        map.put("btcAddr", btcAddr);
-        map.put("ethAddr", ethAddr);
-        map.put("ltcAddr", ltcAddr);
-        map.put("dogeAddr", dogeAddr);
-        map.put("trxAddr", trxAddr);
 
+        map.put(FCH_ADDR, fchAddr);
+        map.put(BTC_ADDR, btcAddr);
+        map.put(ETH_ADDR, ethAddr);
+        map.put(LTC_ADDR, ltcAddr);
+        map.put(DOGE_ADDR, dogeAddr);
+        map.put(TRX_ADDR, trxAddr);
         return map;
     }
 
@@ -65,7 +74,6 @@ public class KeyTools {
     }
 
     public static String recoverPK33ToPK65(String PK33) {
-
         BigInteger p = new BigInteger("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F", 16);
         BigInteger e = new BigInteger("3", 16);
         BigInteger one = new BigInteger("1", 16);
@@ -76,7 +84,6 @@ public class KeyTools {
 
         if (prefix.equals("02") || prefix.equals("03")) {
             BigInteger x = new BigInteger(PK33.substring(2), 16);
-
             BigInteger ySq = (x.modPow(e, p).add(seven)).mod(p);
             BigInteger y = ySq.modPow(p.add(one).divide(four), p);
 
@@ -84,9 +91,22 @@ public class KeyTools {
                 y = p.subtract(y);
             }
 
-            return "04" + PK33.substring(2) + BytesTools.bytesToHexStringBE(y.toByteArray());
-        } else return null;
+            byte[] yByteArray = y.toByteArray();
+
+            // Ensuring y is always exactly 32 bytes
+            byte[] yBytes = new byte[32];
+            if (yByteArray.length == 33) {
+                System.arraycopy(yByteArray, 1, yBytes, 0, 32);
+            } else {
+                System.arraycopy(yByteArray, 0, yBytes, 32 - yByteArray.length, yByteArray.length);
+            }
+
+            return "04" + PK33.substring(2) + HexFormat.of().formatHex(yBytes);
+        } else {
+            return null;
+        }
     }
+
 
     public static byte[] recoverPK33ToPK65(byte[] PK33) {
         String str = BytesTools.bytesToHexStringBE(PK33);
@@ -377,11 +397,12 @@ public class KeyTools {
             pubKey65 = recoverPK33ToPK65(a);
         }
 
-        String pubKey63 = pubKey65.substring(2);
+        assert pubKey65 != null;
+        String pubKey64 = pubKey65.substring(2);
 
-        byte[] pubKey63Bytes = BytesTools.hexToByteArray(pubKey63);
-        byte[] pukHash63Hash = Hash.sha3(pubKey63Bytes);
-        String fullHash = BytesTools.bytesToHexStringBE(pukHash63Hash);
+        byte[] pubKey64Bytes = BytesTools.hexToByteArray(pubKey64);
+        byte[] pukHash64Hash = Hash.sha3(pubKey64Bytes);
+        String fullHash = BytesTools.bytesToHexStringBE(pukHash64Hash);
         String address = "0x" + fullHash.substring(24);
 
         return address;
@@ -689,7 +710,6 @@ public class KeyTools {
         }
         return false;
     }
-
 }
 
 

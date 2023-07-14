@@ -1,7 +1,9 @@
 package APIP2V1_Blockchain;
 
 import APIP0V1_OpenAPI.*;
-import startFCH.IndicesFCH;
+import constants.ApiNames;
+import constants.IndicesNames;
+import constants.ReplyInfo;
 import writeEs.P2SH;
 import initial.Initiator;
 
@@ -16,10 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import APIP1V1_FCDSL.Sort;
-import static api.Constant.*;
 
 
-@WebServlet(APIP2V1Path + P2shSearchAPI)
+@WebServlet(ApiNames.APIP2V1Path + ApiNames.P2shSearchAPI)
 public class P2shSearch extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -28,7 +29,7 @@ public class P2shSearch extends HttpServlet {
         Replier replier = new Replier();
         PrintWriter writer = response.getWriter();
 
-        RequestChecker requestChecker = new RequestChecker(request,response);
+        RequestChecker requestChecker = new RequestChecker(request,response, replier);
 
         DataCheckResult dataCheckResult = requestChecker.checkDataRequest();
 
@@ -46,7 +47,7 @@ public class P2shSearch extends HttpServlet {
         //Add condition
 
         //Request
-        String index = IndicesFCH.P2SHIndex;
+        String index = IndicesNames.P2SH;
 
         DataRequestHandler esRequest = new DataRequestHandler(dataCheckResult.getAddr(),requestBody,response,replier);
         List<P2SH> meetList;
@@ -57,7 +58,7 @@ public class P2shSearch extends HttpServlet {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
             writer.write(replier.reply1012BadQuery(addr));
             return;
         }
@@ -66,7 +67,7 @@ public class P2shSearch extends HttpServlet {
         replier.setNonce(requestBody.getNonce());
         replier.setData(meetList);
         replier.setGot(meetList.size());
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", P2shSearchAPI));
+        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.P2shSearchAPI));
         esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
 
     }

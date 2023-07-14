@@ -1,6 +1,6 @@
 package parser;
 
-import FchClass.*;
+import fchClass.*;
 import javaTools.BytesTools;
 import cryptoTools.SHA;
 import keyTools.KeyTools;

@@ -6,20 +6,22 @@ import co.elastic.clients.elasticsearch.core.InfoResponse;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
-import FchClass.Cash;
+import fchClass.Cash;
 import javaTools.BytesTools;
 import fcTools.ParseTools;
 import APIP1V1_FCDSL.Sort;
 import org.bitcoinj.core.ECKey;
 import org.junit.Test;
+import redis.clients.jedis.Jedis;
 import servers.EsTools;
 import servers.NewEsClient;
-import startAPIP.ConfigAPIP;
-import startFCH.IndicesFCH;
+import config.ConfigAPIP;
 
 import java.io.IOException;
 import java.security.SignatureException;
 import java.util.*;
+
+import static constants.IndicesNames.CASH;
 
 public class mainTest {
     public static void main(String[] args) throws IOException {
@@ -29,7 +31,7 @@ public class mainTest {
         try {
             configAPIP = configAPIP.getClassInstanceFromFile(ConfigAPIP.class);
             if (configAPIP.getEsIp() == null||configAPIP.getEsPort()==0) System.out.println("Es IP is null. Config first.");
-            esClient = newEsClient.checkEsClient(esClient, configAPIP);
+            esClient = newEsClient.getEsClientSilent(configAPIP,new Jedis());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -43,7 +45,7 @@ public class mainTest {
     private static ArrayList<String> readEffectedAddresses(ElasticsearchClient esClient, long lastHeight) throws IOException {
         Set<String> addrSet = new HashSet<>();
         int size = EsTools.READ_MAX;
-        SearchResponse<Cash> response = esClient.search(s -> s.index(IndicesFCH.CashIndex)
+        SearchResponse<Cash> response = esClient.search(s -> s.index(CASH)
                         .size(size)
                         .sort(s1 -> s1.field(f -> f.field("id").order(SortOrder.Asc)))
                         .trackTotalHits(t->t.enabled(true))
@@ -65,7 +67,7 @@ public class mainTest {
         last= response.hits().hits().get(hitSize - 1).sort();
         while(hitSize>=size){
             List<String> finalLast = last;
-            response = esClient.search(s -> s.index(IndicesFCH.CashIndex)
+            response = esClient.search(s -> s.index(CASH)
                             .size(size)
                             .sort(s1 -> s1.field(f -> f.field("id").order(SortOrder.Asc)))
                             .searchAfter(finalLast)

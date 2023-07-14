@@ -5,9 +5,9 @@ import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
+import constants.IndicesNames;
 import fcTools.ParseTools;
 import servers.EsTools;
-import startFEIP.IndicesFEIP;
 
 import java.io.IOException;
 import java.util.*;
@@ -36,13 +36,13 @@ public class ConstructRollbacker {
 		if(itemIdList==null||itemIdList.isEmpty())return error;
 		System.out.println("If rolling back is interrupted, reparse all effected ids of index 'protocol': ");
 		ParseTools.gsonPrint(itemIdList);
-		deleteEffectedItems(esClient, IndicesFEIP.ProtocolIndex, itemIdList);
+		deleteEffectedItems(esClient, IndicesNames.PROTOCOL, itemIdList);
 		if(histIdList==null||histIdList.isEmpty())return error;
-		deleteRolledHists(esClient, IndicesFEIP.ProtocolHistIndex,histIdList);
+		deleteRolledHists(esClient, IndicesNames.PROTOCOL_HISTORY,histIdList);
 		
 		TimeUnit.SECONDS.sleep(2);
 		
-		List<ProtocolHistory>reparseHistList = EsTools.getHistsForReparse(esClient, IndicesFEIP.ProtocolHistIndex,"pid",itemIdList, ProtocolHistory.class);
+		List<ProtocolHistory>reparseHistList = EsTools.getHistsForReparse(esClient, IndicesNames.PROTOCOL_HISTORY,"pid",itemIdList, ProtocolHistory.class);
 
 		reparseFreeProtocol(esClient,reparseHistList);
 		
@@ -52,7 +52,7 @@ public class ConstructRollbacker {
 	private Map<String, ArrayList<String>> getEffectedFreeProtocols(ElasticsearchClient esClient,long height) throws ElasticsearchException, IOException {
 		// TODO Auto-generated method stub
 		SearchResponse<ProtocolHistory> resultSearch = esClient.search(s->s
-				.index(IndicesFEIP.ProtocolHistIndex)
+				.index(IndicesNames.PROTOCOL_HISTORY)
 				.query(q->q
 						.range(r->r
 								.field("height")
@@ -110,12 +110,12 @@ public class ConstructRollbacker {
 		if(itemIdList==null||itemIdList.isEmpty())return error;
 		System.out.println("If rolling back is interrupted, reparse all effected ids of index 'service': ");
 		ParseTools.gsonPrint(itemIdList);
-		deleteEffectedItems(esClient, IndicesFEIP.ServiceIndex,itemIdList);
+		deleteEffectedItems(esClient, IndicesNames.SERVICE,itemIdList);
 		if(histIdList==null||histIdList.isEmpty())return error;
-		deleteRolledHists(esClient, IndicesFEIP.ServiceHistIndex,histIdList);
+		deleteRolledHists(esClient, IndicesNames.SERVICE_HISTORY,histIdList);
 		TimeUnit.SECONDS.sleep(2);
 		
-		List<ServiceHistory>reparseHistList = EsTools.getHistsForReparse(esClient, IndicesFEIP.ServiceHistIndex,"sid",itemIdList,ServiceHistory.class);
+		List<ServiceHistory>reparseHistList = EsTools.getHistsForReparse(esClient, IndicesNames.SERVICE_HISTORY,"sid",itemIdList,ServiceHistory.class);
 
 		reparseService(esClient,reparseHistList);
 		
@@ -125,7 +125,7 @@ public class ConstructRollbacker {
 	private Map<String, ArrayList<String>> getEffectedServices(ElasticsearchClient esClient, long lastHeight) throws ElasticsearchException, IOException {
 		// TODO Auto-generated method stub
 		SearchResponse<ServiceHistory> resultSearch = esClient.search(s->s
-				.index(IndicesFEIP.ServiceHistIndex)
+				.index(IndicesNames.SERVICE_HISTORY)
 				.query(q->q
 						.range(r->r
 								.field("height")
@@ -173,12 +173,12 @@ public class ConstructRollbacker {
 		if(itemIdList==null||itemIdList.isEmpty())return error;
 		System.out.println("If rolling back is interrupted, reparse all effected ids of index 'app': ");
 		ParseTools.gsonPrint(itemIdList);
-		deleteEffectedItems(esClient, IndicesFEIP.AppIndex,itemIdList);
+		deleteEffectedItems(esClient, IndicesNames.APP,itemIdList);
 		if(histIdList==null||histIdList.isEmpty())return error;
-		deleteRolledHists(esClient, IndicesFEIP.AppHistIndex,histIdList);
+		deleteRolledHists(esClient, IndicesNames.APP_HISTORY,histIdList);
 		TimeUnit.SECONDS.sleep(2);
 		
-		List<AppHistory>reparseHistList = EsTools.getHistsForReparse(esClient, IndicesFEIP.AppHistIndex,"aid",itemIdList,AppHistory.class);
+		List<AppHistory>reparseHistList = EsTools.getHistsForReparse(esClient, IndicesNames.APP_HISTORY,"aid",itemIdList,AppHistory.class);
 
 		reparseApp(esClient,reparseHistList);
 		
@@ -188,7 +188,7 @@ public class ConstructRollbacker {
 	private Map<String, ArrayList<String>> getEffectedApps(ElasticsearchClient esClient, long lastHeight) throws ElasticsearchException, IOException {
 		// TODO Auto-generated method stub
 		SearchResponse<AppHistory> resultSearch = esClient.search(s->s
-				.index(IndicesFEIP.AppHistIndex)
+				.index(IndicesNames.APP_HISTORY)
 				.query(q->q
 						.range(r->r
 								.field("height")
@@ -236,12 +236,12 @@ public class ConstructRollbacker {
 		if(itemIdList==null||itemIdList.isEmpty())return error;
 		System.out.println("If rolling back is interrupted, reparse all effected ids of index 'code': ");
 		ParseTools.gsonPrint(itemIdList);
-		deleteEffectedItems(esClient, IndicesFEIP.CodeIndex,itemIdList);
+		deleteEffectedItems(esClient, IndicesNames.CODE,itemIdList);
 		if(histIdList==null||histIdList.isEmpty())return error;
-		deleteRolledHists(esClient, IndicesFEIP.CodeHistIndex,histIdList);
+		deleteRolledHists(esClient, IndicesNames.CODE_HISTORY,histIdList);
 		TimeUnit.SECONDS.sleep(2);
 		
-		List<CodeHistory>reparseHistList = EsTools.getHistsForReparse(esClient, IndicesFEIP.CodeHistIndex,"codeId",itemIdList,CodeHistory.class);
+		List<CodeHistory>reparseHistList = EsTools.getHistsForReparse(esClient, IndicesNames.CODE_HISTORY,"codeId",itemIdList,CodeHistory.class);
 
 		reparseCode(esClient,reparseHistList);
 		
@@ -251,7 +251,7 @@ public class ConstructRollbacker {
 	private Map<String, ArrayList<String>> getEffectedCodes(ElasticsearchClient esClient, long lastHeight) throws ElasticsearchException, IOException {
 		// TODO Auto-generated method stub
 		SearchResponse<CodeHistory> resultSearch = esClient.search(s->s
-				.index(IndicesFEIP.CodeHistIndex)
+				.index(IndicesNames.CODE_HISTORY)
 				.query(q->q
 						.range(r->r
 								.field("height")

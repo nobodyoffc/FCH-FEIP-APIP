@@ -4,8 +4,7 @@ import APIP0V1_OpenAPI.DataCheckResult;
 import APIP0V1_OpenAPI.DataRequestHandler;
 import APIP0V1_OpenAPI.Replier;
 import APIP0V1_OpenAPI.RequestChecker;
-import FchClass.Address;
-import startFCH.IndicesFCH;
+import fchClass.Address;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -15,6 +14,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
+import static constants.IndicesNames.ADDRESS;
+
 @WebServlet("/apip3/v1/all")
 public class All extends HttpServlet {
     @Override
@@ -23,7 +24,7 @@ public class All extends HttpServlet {
         Replier replier = new Replier();
         response.setContentType("application/json;charset=utf-8");
 
-        RequestChecker requestChecker = new RequestChecker(request,response);
+        RequestChecker requestChecker = new RequestChecker(request,response, replier);
 
         DataCheckResult dataCheckResult = requestChecker.checkDataRequest();
 
@@ -32,7 +33,7 @@ public class All extends HttpServlet {
         List<Address> meetList = null;
 
         try {
-            meetList = esRequest.doRequest(IndicesFCH.AddressIndex,null, Address.class);
+            meetList = esRequest.doRequest(ADDRESS,null, Address.class);
         } catch (Exception e) {
             e.printStackTrace();
         }

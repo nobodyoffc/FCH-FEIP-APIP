@@ -1,6 +1,6 @@
 package writeEs;
 
-import FchClass.*;
+import fchClass.*;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import keyTools.KeyTools;
 import fcTools.ParseTools;
@@ -8,9 +8,11 @@ import parser.ReadyBlock;
 import parser.WeightMethod;
 import servers.EsTools;
 import servers.EsTools.MgetResult;
-import startFCH.IndicesFCH;
 
 import java.util.*;
+
+import static constants.IndicesNames.ADDRESS;
+import static constants.IndicesNames.CASH;
 
 public class BlockMaker {
 
@@ -57,7 +59,7 @@ public class BlockMaker {
 			outMap.put(out.getCashId(), out);
 		}
 
-		MgetResult<Cash> inMgetResult = EsTools.getMultiByIdList(esClient, IndicesFCH.CashIndex, inStrList, Cash.class);
+		MgetResult<Cash> inMgetResult = EsTools.getMultiByIdList(esClient, CASH, inStrList, Cash.class);
 		ArrayList<Cash> inOldList = (ArrayList<Cash>) inMgetResult.getResultList();
 		List<String> inNewIdList = inMgetResult.getMissList();
 
@@ -358,7 +360,7 @@ public class BlockMaker {
 
 	private ArrayList<Address> readAddrListFromEs(ElasticsearchClient esClient, List<String> addrStrList)
 			throws Exception {
-		MgetResult<Address> addrMgetResult = EsTools.getMultiByIdList(esClient, IndicesFCH.AddressIndex, addrStrList,
+		MgetResult<Address> addrMgetResult = EsTools.getMultiByIdList(esClient, ADDRESS, addrStrList,
 				Address.class);
 
 		ArrayList<Address> addrOldList = (ArrayList<Address>) addrMgetResult.getResultList();

@@ -545,7 +545,7 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
 ### data in response body
 
 ```
-<string. the json string of the raw tx or an error message from RPC of freecash full node.>
+<string. the json string of the raw tx or an error message from freecashRPC of freecash full node.>
 
 ```
 ### 示例
@@ -601,7 +601,7 @@ API需求方可以按照APIP协议,从遵循该协议的任何一个API服务方
 ### data in response body
 
 ```
-<string. the txid or error message from RPC of freecash full node.>
+<string. the txid or error message from freecashRPC of freecash full node.>
 
 ```
 ### 示例

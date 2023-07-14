@@ -9,24 +9,22 @@ import co.elastic.clients.elasticsearch.core.BulkRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
-import FchClass.Address;
-import FchClass.Cash;
-import FchClass.OpReturn;
+import constants.Constants;
+import constants.IndicesNames;
+import fchClass.Address;
+import fchClass.Cash;
+import fchClass.OpReturn;
 import javaTools.BytesTools;
 import fcTools.ParseTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import parser.ChainParser;
-import parser.OpReFileTools;
-import servers.ConfigBase;
+import fileTools.OpReFileTools;
+import config.ConfigBase;
 import servers.EsTools;
 import servers.NewEsClient;
-import startFCH.IndicesFCH;
 import writeEs.RollBacker;
 
 import java.io.*;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -130,11 +128,11 @@ public class TestRollback {
     }
 
     public static long getBestHeight(ElasticsearchClient esClient) throws ElasticsearchException, IOException {
-        SearchResponse<Void> response = esClient.search(s->s.index(IndicesFCH.BlockIndex).aggregations("bestHeight", a->a.max(m->m.field("height"))), void.class);
+        SearchResponse<Void> response = esClient.search(s->s.index(IndicesNames.BLOCK).aggregations("bestHeight", a->a.max(m->m.field("height"))), void.class);
         long bestHeight = (long)response.aggregations().get("bestHeight").max().value();
         return bestHeight;
     }
-    public static ElasticsearchClient getEsClient(ConfigBase config) throws IOException, NoSuchAlgorithmException, KeyManagementException {
+    public static ElasticsearchClient getEsClient(ConfigBase config) throws Exception {
         ElasticsearchClient esClient = null;
         NewEsClient newEsClient = new NewEsClient();
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -147,7 +145,7 @@ public class TestRollback {
         config.writeConfigToFile();
         String path = config.getBlockFilePath();
 
-        esClient = newEsClient.checkEsClient(esClient, config);
+        esClient = newEsClient.getElasticSearchClient(br, config, null);
         if (esClient == null) {
             newEsClient.shutdownClient();
             return null;
@@ -172,7 +170,7 @@ public class TestRollback {
     private static ArrayList<String> readEffectedAddresses(ElasticsearchClient esClient, long lastHeight) throws IOException {
         Set<String> addrSet = new HashSet<>();
         int size = EsTools.READ_MAX;
-        SearchResponse<Cash> response = esClient.search(s -> s.index(IndicesFCH.CashIndex)
+        SearchResponse<Cash> response = esClient.search(s -> s.index(IndicesNames.CASH)
                         .size(size)
                         .sort(s1 -> s1.field(f -> f.field("id").order(SortOrder.Asc)))
                         .query(q -> q.bool(b -> b
@@ -188,7 +186,7 @@ public class TestRollback {
         List<String> last = response.hits().hits().get(hitSize - 1).sort();
         while(hitSize>=size){
             List<String> finalLast = last;
-            response = esClient.search(s -> s.index(IndicesFCH.CashIndex)
+            response = esClient.search(s -> s.index(IndicesNames.CASH)
                             .size(size)
                             .sort(s1 -> s1.field(f -> f.field("id").order(SortOrder.Asc)))
                             .searchAfter(finalLast)
@@ -211,7 +209,7 @@ public class TestRollback {
         int size = EsTools.READ_MAX;
 
         SearchResponse<Address> response = esClient.search(s -> s
-                        .index(IndicesFCH.AddressIndex)
+                        .index(IndicesNames.ADDRESS)
                         .size(size)
                         .sort(s1 -> s1.field(f -> f.field("id").order(SortOrder.Asc)))
                         .query(q -> q.range(r -> r.field("lastHeight").gt(JsonData.of(lastHeight))))
@@ -224,7 +222,7 @@ public class TestRollback {
         }
         while (hitList.size() >= size) {
             response = esClient.search(s -> s
-                            .index(IndicesFCH.AddressIndex)
+                            .index(IndicesNames.ADDRESS)
                             .size(size)
                             .sort(s1 -> s1.field(f -> f.field("id").order(SortOrder.Asc)))
                             .searchAfter(addrAllList.get(addrAllList.size() - 1))
@@ -247,7 +245,7 @@ public class TestRollback {
             fieldValueList.add(FieldValue.of(iter.next()));
 
         SearchResponse<Void> response = esClient.search(s->s
-                        .index(IndicesFCH.CashIndex)
+                        .index(IndicesNames.CASH)
 //                        .query(q->q.bool(b->b
 //                                .should(m->m.range(r->r.field("spendHeight").lte(JsonData.of(lastHeight))))
 //                                .should(m1->m1.range(r1->r1.field("birthHeight").lte(JsonData.of(lastHeight)))))
@@ -392,7 +390,7 @@ public class TestRollback {
 
             updateMap.put("lastHeight",lastHeight);
             br.operations(o1->o1.update(u->u
-                    .index(IndicesFCH.AddressIndex)
+                    .index(IndicesNames.ADDRESS)
                     .id(addr)
                     .action(a->a
                             .doc(updateMap)))
@@ -404,7 +402,7 @@ public class TestRollback {
 
     private static void recoverStxoToUtxo(ElasticsearchClient esClient, long lastHeight) throws Exception {
         esClient.updateByQuery(u->u
-                .index(IndicesFCH.CashIndex)
+                .index(IndicesNames.CASH)
                 .query(q->q.bool(b->b
                         .must(m->m.range(r->r.field("spendHeight").gt(JsonData.of(lastHeight))))
                         .must(m1->m1.range(r1->r1.field("birthHeight").lte(JsonData.of(lastHeight))))))
@@ -423,29 +421,29 @@ public class TestRollback {
     }
 
     private static void deleteOpReturns(ElasticsearchClient esClient, long lastHeight) throws Exception {
-        deleteHeigherThan(esClient, IndicesFCH.OpReturnIndex,"height",lastHeight);
+        deleteHeigherThan(esClient, IndicesNames.OPRETURN,"height",lastHeight);
     }
     private static void deleteBlocks(ElasticsearchClient esClient, long lastHeight) throws Exception {
-        deleteHeigherThan(esClient, IndicesFCH.BlockIndex,"height",lastHeight);
+        deleteHeigherThan(esClient, IndicesNames.BLOCK,"height",lastHeight);
     }
     private static void deleteBlockHas(ElasticsearchClient esClient, long lastHeight) throws Exception {
-        deleteHeigherThan(esClient, IndicesFCH.BlockHasIndex,"height",lastHeight);
+        deleteHeigherThan(esClient, IndicesNames.BLOCK_HAS,"height",lastHeight);
     }
     private static void deleteTxHas(ElasticsearchClient esClient, long lastHeight) throws Exception {
-        deleteHeigherThan(esClient, IndicesFCH.TxHasIndex,"height",lastHeight);
+        deleteHeigherThan(esClient, IndicesNames.TX_HAS,"height",lastHeight);
     }
     private static void deleteTxs(ElasticsearchClient esClient, long lastHeight) throws Exception {
-        deleteHeigherThan(esClient, IndicesFCH.TxIndex,"height",lastHeight);
+        deleteHeigherThan(esClient, IndicesNames.TX,"height",lastHeight);
     }
     private static void deleteUtxos(ElasticsearchClient esClient, long lastHeight) throws Exception {
-        deleteHeigherThan(esClient, IndicesFCH.CashIndex,"birthHeight",lastHeight);
+        deleteHeigherThan(esClient, IndicesNames.CASH,"birthHeight",lastHeight);
     }
     private static void deleteNewAddresses(ElasticsearchClient esClient, long lastHeight) throws Exception {
-        deleteHeigherThan(esClient, IndicesFCH.AddressIndex,"birthHeight",lastHeight);
+        deleteHeigherThan(esClient, IndicesNames.ADDRESS,"birthHeight",lastHeight);
     }
     private static void deleteBlockMarks(ElasticsearchClient esClient, long lastHeight) throws IOException {
         esClient.deleteByQuery(d->d
-                .index(IndicesFCH.BlockMarkIndex)
+                .index(IndicesNames.BLOCK_MARK)
                 .query(q->q
                         .bool(b->b
                                 .should(s->s
@@ -472,12 +470,12 @@ public class TestRollback {
 
     private static void recordInOpReturnFile(long lastHeight) throws IOException {
 
-        String fileName = ChainParser.OpRefileName;
+        String fileName = Constants.OPRETURN_FILE_NAME;
         File opFile;
         FileOutputStream opos;
 
         while(true) {
-            opFile = new File(fileName);
+            opFile = new File(Constants.OPRETURN_FILE_DIR,fileName);
             if(opFile.length()>251658240) {
                 fileName =  OpReFileTools.getNextFile(fileName);
             }else break;
@@ -506,7 +504,7 @@ public class TestRollback {
 //        int size = EsTools.READ_MAX;
 //
 //        SearchResponse<Address> response = esClient.search(s -> s
-//                        .index(IndicesFCH.AddressIndex)
+//                        .index(AddressIndex)
 //                        .size(size)
 //                        .sort(s1 -> s1.field(f -> f.field("id").order(SortOrder.Asc)))
 //                        .query(q -> q.range(r -> r.field("lastHeight").gt(JsonData.of(lastHeight))))
@@ -520,7 +518,7 @@ public class TestRollback {
 //        while (true) {
 //            if (hitList.size() < size) break;
 //            response = esClient.search(s -> s
-//                            .index(IndicesFCH.AddressIndex)
+//                            .index(AddressIndex)
 //                            .size(size)
 //                            .sort(s1 -> s1.field(f -> f.field("id").order(SortOrder.Asc)))
 //                            .searchAfter(addrAllList.get(addrAllList.size() - 1))
@@ -543,7 +541,7 @@ public class TestRollback {
 //            fieldValueList.add(FieldValue.of(iter.next()));
 //
 //        SearchResponse<Void> response = esClient.search(s->s
-//                        .index(IndicesFCH.CashIndex)
+//                        .index(CashIndex)
 ////                        .query(q->q.bool(b->b
 ////                                .should(m->m.range(r->r.field("spendHeight").lte(JsonData.of(lastHeight))))
 ////                                .should(m1->m1.range(r1->r1.field("birthHeight").lte(JsonData.of(lastHeight)))))
@@ -686,7 +684,7 @@ public class TestRollback {
 //            }
 //
 //            br.operations(o1->o1.update(u->u
-//                    .index(IndicesFCH.AddressIndex)
+//                    .index(AddressIndex)
 //                    .id(addr)
 //                    .action(a->a
 //                            .doc(updateMap)))

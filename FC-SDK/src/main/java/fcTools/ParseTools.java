@@ -117,6 +117,42 @@ public class ParseTools {
         return;
     }
 
+    public static void waitForNewItemInDirectory(String directoryPathStr) {
+        try {
+            Path directory = Paths.get(directoryPathStr);
+
+            try (WatchService watchService = FileSystems.getDefault().newWatchService()) {
+                directory.register(watchService, StandardWatchEventKinds.ENTRY_CREATE,
+                        StandardWatchEventKinds.ENTRY_DELETE,
+                        StandardWatchEventKinds.ENTRY_MODIFY);
+
+                while (true) {
+                    WatchKey key = watchService.take();
+                    for (WatchEvent<?> event : key.pollEvents()) {
+                        WatchEvent.Kind<?> kind = event.kind();
+
+                        if (kind != StandardWatchEventKinds.OVERFLOW) {
+                            WatchEvent<Path> ev = (WatchEvent<Path>) event;
+
+                            //Path changedFilePath = directory.resolve(ev.context());
+                            //System.out.printf("Event kind: %s. File affected: %s.%n", kind, changedFilePath);
+                        }
+                    }
+
+                    boolean valid = key.reset();
+                    if (!valid) {
+                        break;
+                    }
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Error while watching directory: " + e.getMessage());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            System.err.println("Waiting for directory interrupted: " + e.getMessage());
+        }
+    }
+
     public static void waitForNewItemInFile(String filePathStr) {
         try {
             Path filePath = Paths.get(filePathStr);
@@ -156,6 +192,7 @@ public class ParseTools {
             System.err.println("Waiting for file interrupted: " + e.getMessage());
         }
     }
+
     public static void waitForNewItemInFileOld(String filePathStr) {
         try {
             Path filePath = Paths.get(filePathStr);

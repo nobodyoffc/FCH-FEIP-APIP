@@ -7,7 +7,16 @@ public class DataRequestBody{
     private String url;
     private long time;
     private long nonce;
+    private String via;
     private Fcdsl fcdsl;
+
+    public String getVia() {
+        return via;
+    }
+
+    public void setVia(String via) {
+        this.via = via;
+    }
 
     public Fcdsl getFcdsl() {
         return fcdsl;

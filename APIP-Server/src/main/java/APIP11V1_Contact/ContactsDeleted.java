@@ -4,9 +4,11 @@ import APIP0V1_OpenAPI.*;
 import APIP1V1_FCDSL.Fcdsl;
 import APIP1V1_FCDSL.Filter;
 import APIP1V1_FCDSL.Terms;
+import constants.ApiNames;
+import constants.IndicesNames;
+import constants.ReplyInfo;
 import initial.Initiator;
-import FeipClass.Contact;
-import startFEIP.IndicesFEIP;
+import feipClass.Contact;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -19,10 +21,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import APIP1V1_FCDSL.Sort;
-import static api.Constant.*;
 
 
-@WebServlet(APIP11V1Path +ContactsDeletedAPI)
+@WebServlet(ApiNames.APIP11V1Path + ApiNames.ContactsDeletedAPI)
 public class ContactsDeleted extends HttpServlet {
 
 
@@ -32,7 +33,7 @@ public class ContactsDeleted extends HttpServlet {
         Replier replier = new Replier();
         PrintWriter writer = response.getWriter();
 
-        RequestChecker requestChecker = new RequestChecker(request,response);
+        RequestChecker requestChecker = new RequestChecker(request,response, replier);
 
         DataCheckResult dataCheckResult = requestChecker.checkDataRequest();
 
@@ -40,11 +41,13 @@ public class ContactsDeleted extends HttpServlet {
 
         String addr = dataCheckResult.getAddr();
 
+        if (RequestChecker.checkPublicSessionKey(response, replier, writer, addr)) return;
+
         DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
 
         //Check API
         if(!isThisApiRequest(requestBody)){
-            response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
             writer.write(replier.reply1012BadQuery(addr));
             return;
         }
@@ -75,7 +78,7 @@ public class ContactsDeleted extends HttpServlet {
         requestBody.setFcdsl(fcdsl);
 
         //Request
-        String index = IndicesFEIP.ContactIndex;
+        String index = IndicesNames.CONTACT;
 
         DataRequestHandler esRequest = new DataRequestHandler(dataCheckResult.getAddr(),requestBody,response,replier);
         List<Contact> meetList;
@@ -86,7 +89,7 @@ public class ContactsDeleted extends HttpServlet {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
             writer.write(replier.reply1012BadQuery(addr));
             return;
         }
@@ -97,7 +100,7 @@ public class ContactsDeleted extends HttpServlet {
         replier.setNonce(requestBody.getNonce());
         replier.setData(meetList);
         replier.setGot(meetList.size());
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ContactsAPI));
+        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.ContactsAPI));
         esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
 
     }

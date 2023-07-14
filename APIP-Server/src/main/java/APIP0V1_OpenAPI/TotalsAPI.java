@@ -3,6 +3,7 @@ package APIP0V1_OpenAPI;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.cat.IndicesResponse;
 import co.elastic.clients.elasticsearch.cat.indices.IndicesRecord;
+import constants.ApiNames;
 import initial.Initiator;
 
 import javax.servlet.ServletException;
@@ -16,9 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static api.Constant.*;
-
-@WebServlet(APIP0V1Path + TotalsAPI)
+@WebServlet(ApiNames.APIP0V1Path + ApiNames.TotalsAPI)
 public class TotalsAPI extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -28,7 +27,7 @@ public class TotalsAPI extends HttpServlet {
         Replier replier = new Replier();
         PrintWriter writer = response.getWriter();
 
-        RequestChecker requestChecker = new RequestChecker(request,response);
+        RequestChecker requestChecker = new RequestChecker(request,response, replier);
 
         DataCheckResult dataCheckResult = requestChecker.checkDataRequest();
 
@@ -53,7 +52,7 @@ public class TotalsAPI extends HttpServlet {
         replier.setGot(allSumMap.size());
         replier.setTotal(allSumMap.size());
 
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", TotalsAPI));
+        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.TotalsAPI));
         esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
     }
 }

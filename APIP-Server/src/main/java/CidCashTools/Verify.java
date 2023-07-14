@@ -2,7 +2,8 @@ package CidCashTools;
 
 import APIP0V1_OpenAPI.*;
 import com.google.gson.Gson;
-import data.VerifyIn;
+import constants.ApiNames;
+import constants.ReplyInfo;
 import fcTools.ParseTools;
 import initial.Initiator;
 import org.bitcoinj.core.ECKey;
@@ -16,8 +17,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.security.SignatureException;
 
-import static api.Constant.*;
-@WebServlet(ToolsPath +VerifyAPI)
+import static constants.Constants.*;
+@WebServlet(ToolsPath + ApiNames.VerifyAPI)
 public class Verify extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("application/json");
@@ -25,7 +26,7 @@ public class Verify extends HttpServlet {
         Replier replier = new Replier();
         PrintWriter writer = response.getWriter();
 
-        RequestChecker requestChecker = new RequestChecker(request,response);
+        RequestChecker requestChecker = new RequestChecker(request,response, replier);
 
         DataCheckResult dataCheckResult = requestChecker.checkDataRequest();
 
@@ -33,11 +34,13 @@ public class Verify extends HttpServlet {
 
         String addr = dataCheckResult.getAddr();
 
+        if (RequestChecker.checkPublicSessionKey(response, replier, writer, addr)) return;
+
         DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
         replier.setNonce(requestBody.getNonce());
         //Check API
         if(!isThisApiRequest(requestBody)){
-            response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
             writer.write(replier.reply1012BadQuery(addr));
             return;
         }
@@ -59,7 +62,7 @@ public class Verify extends HttpServlet {
                 signShort = gson.fromJson(inputJson,SignShort.class);
             }
         }catch (Exception e){
-            response.setHeader(CodeInHeader, String.valueOf(Code1020OtherError));
+            response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1020OtherError));
             replier.setData("Can't get parameters correctly from Json string.");
             writer.write(replier.reply1020OtherError(addr));
             return;
@@ -74,7 +77,7 @@ public class Verify extends HttpServlet {
                     isGoodSign=true;
                 }
             } catch (SignatureException e) {
-                response.setHeader(CodeInHeader, String.valueOf(Code1020OtherError));
+                response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1020OtherError));
                 replier.setData("Something wrong when checking signature.");
                 writer.write(replier.reply1020OtherError(addr));
                 return;
@@ -84,13 +87,13 @@ public class Verify extends HttpServlet {
         replier.setData(isGoodSign);
         replier.setGot(1);
         replier.setTotal(1);
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", VerifyAPI));
-        response.setHeader(CodeInHeader, String.valueOf(Code0Success));
+        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.VerifyAPI));
+        response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code0Success));
         String reply = replier.reply0Success(addr,nPrice);
         if(reply==null)return;
         String sign = DataRequestHandler.symSign(reply,dataCheckResult.getSessionKey());
         if(sign==null)return;
-        response.setHeader(SignInHeader,sign);
+        response.setHeader(ReplyInfo.SignInHeader,sign);
 
         writer.write(reply);
     }

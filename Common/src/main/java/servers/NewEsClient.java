@@ -1,48 +1,179 @@
 package servers;
 
+import EccAes256K1P7.Aes256CbcP7;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
+import config.ConfigBase;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.elasticsearch.client.RestClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import redis.clients.jedis.Jedis;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
+import java.security.*;
+
+import static constants.Strings.ES_PASSWORD_CIPHER;
 
 public class NewEsClient {
 
     ElasticsearchClient esClient;
     RestClient restClient;
     RestClientTransport transport;
+    private static final Logger log = LoggerFactory.getLogger(NewEsClient.class);
 
-    public ElasticsearchClient checkEsClient(ElasticsearchClient esClient, ConfigBase configBase) throws IOException, KeyManagementException, NoSuchAlgorithmException {
+    public ElasticsearchClient getElasticSearchClient(BufferedReader br,  ConfigBase config, Jedis jedis) throws Exception {
 
-        if (esClient == null) {
-            if (configBase.getEsUsername() == null) {
-                return getClientHttp(configBase.getEsIp(), configBase.getEsPort());
-            } else {
-                System.out.println("Input the password of " + configBase.getEsUsername() + ". Press 'h' to start a HTTP client:");
-                BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-                String password = br.readLine();
-                if ("".equals(password) || "h".equals(password))
-                    return getClientHttp(configBase.getEsIp(), configBase.getEsPort());
-                try {
-                    return getClientHttps(configBase.getEsIp(), configBase.getEsPort(), configBase.getEsUsername(), password);
-                } catch (Exception e) {
-                    System.out.println("Create SSL ES client failed.");
-                    e.printStackTrace();
-                    return null;
+        boolean isSSL = true;
+
+        //Check ES username
+        String username=config.getEsUsername();
+        if(username==null){
+            System.out.println("Create ES client without SSL? 'y' to confirm:");
+            String input = br.readLine();
+            if("y".equals(input)) {
+                isSSL = false;
+            }else{
+                System.out.println("Input ES username: ");
+                input = br.readLine();
+                if(!"".equals(input))config.setEsUsername(input);
+            }
+        }else{
+            System.out.println("ES username is: "+ username+". " +
+                    "\nEnter to get client with it. " +
+                    "\n'q' to quit. " +
+                    "\n'r' to reset the user. " +
+                    "\n'd' to delete it and get client without SSL:");
+            String input = br.readLine();
+            if("q".equals(input))return null;
+            if("r".equals(input)){
+                input = br.readLine();
+                if(!"".equals(input))config.setEsUsername(input);
+            }else if("d".equals(input)){
+                config.setEsUsername((String) null);
+                isSSL=false;
+            }
+        }
+
+        //Check ES password
+        String password = null;
+        if(isSSL) {
+            if (jedis != null) {
+                password = getEsPassword(config, jedis);
+            }
+            if (password == null) {
+                System.out.println("Input the password of " + config.getEsUsername() + " 'n' to create without SSL:");
+                password = br.readLine();
+                if ("n".equals(password)) {
+                    config.setEsUsername((String) null);
+                    isSSL=false;
                 }
             }
         }
+
+        //Create client
+        try {
+            if (isSSL) {
+                esClient = getClientHttps(config.getEsIp(), config.getEsPort(), config.getEsUsername(), password);
+            }else esClient = getClientHttp(config.getEsIp(), config.getEsPort());
+
+            //Save encrypted password if there is a jedis
+            if (esClient != null) {
+                if (isSSL && password!= null && jedis!=null) {
+                    setEncryptedEsPassword(password, config, jedis);
+                    config.writeConfigToFile();
+                }
+            } else {
+                log.debug("Create SSL ES client failed. Check ES and Config.json.");
+                return null;
+            }
+        } catch (Exception e) {
+            log.debug("Create SSL ES client failed. ");
+            e.printStackTrace();
+            return null;
+        }
+
+        return esClient;
+    }
+
+    public String getEsPassword(ConfigBase config, Jedis jedis) throws Exception {
+        String passwordCipher;
+        try{
+            passwordCipher = jedis.get(ES_PASSWORD_CIPHER);
+            if(passwordCipher==null)return null;
+        }catch (Exception e){
+            return null;
+        }
+        String password;
+        try {
+            password = Aes256CbcP7.decrypt(passwordCipher, config.getRandomSymKeyHex());
+        }catch (Exception e){
+            log.debug("Decrypt ES password wrong.");
+            return null;
+        }
+        return password;
+    }
+    public void setEncryptedEsPassword(String password, ConfigBase config,Jedis jedis) throws IOException, InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException, NoSuchProviderException {
+
+        if(config.getRandomSymKeyHex()==null){
+            config.setSymKey();
+            config.writeConfigToFile();
+        }
+
+        String esPasswordCipher = Aes256CbcP7.encrypt(password,config.getRandomSymKeyHex());
+
+        jedis.set(ES_PASSWORD_CIPHER,esPasswordCipher);
+        System.out.println("Your ES password is encrypted and saved locally.");
+        log.debug("ES password is encrypted and saved locally.");
+    }
+
+    public ElasticsearchClient getEsClientSilent(ConfigBase config,Jedis jedis) throws Exception {
+
+        boolean isSSL = true;
+
+        //Check ES username
+        String username=config.getEsUsername();
+        if(username==null){
+            isSSL=false;
+        }
+
+        //Check ES password
+        String password = null;
+        if(isSSL) {
+            if (jedis != null) {
+                password = getEsPassword(config, jedis);
+            }
+            if (password == null) {
+                isSSL=false;
+            }
+        }
+
+        //Create client
+        try {
+            if (isSSL) {
+                esClient = getClientHttps(config.getEsIp(), config.getEsPort(), config.getEsUsername(), password);
+            }else esClient = getClientHttp(config.getEsIp(), config.getEsPort());
+
+            if (esClient == null) {
+                log.debug("Create SSL ES client failed. Check ES and Config.json.");
+                return null;
+            }
+        } catch (Exception e) {
+            log.debug("Create SSL ES client failed. ");
+            e.printStackTrace();
+            return null;
+        }
+
         return esClient;
     }
 
@@ -58,7 +189,7 @@ public class NewEsClient {
                         return requestConfigBuilder.setConnectTimeout(5000 * 1000) // 连接超时（默认为1秒）
                                 .setSocketTimeout(6000 * 1000);// 套接字超时（默认为30秒）//更改客户端的超时限制默认30秒现在改为100*1000分钟
                     })
-                    .build();
+                     .build();
             // Create the transport with a Jackson mapper
             transport = new RestClientTransport(
                     restClient, new JacksonJsonpMapper());

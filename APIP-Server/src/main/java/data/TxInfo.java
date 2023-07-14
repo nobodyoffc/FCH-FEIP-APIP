@@ -1,8 +1,8 @@
 package data;
 
-import FchClass.CashMark;
-import FchClass.Tx;
-import FchClass.TxHas;
+import fchClass.CashMark;
+import fchClass.Tx;
+import fchClass.TxHas;
 
 import java.util.ArrayList;
 import java.util.HashMap;

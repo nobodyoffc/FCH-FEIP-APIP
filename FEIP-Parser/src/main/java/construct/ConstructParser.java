@@ -1,17 +1,17 @@
 package construct;
 
-import FeipClass.App;
-import FeipClass.Code;
-import FeipClass.Protocol;
-import FeipClass.Service;
+import constants.IndicesNames;
+import feipClass.App;
+import feipClass.Code;
+import feipClass.Protocol;
+import feipClass.Service;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import com.google.gson.Gson;
-import FeipClass.Cid;
+import feipClass.Cid;
 import opReturn.Feip;
 import opReturn.OpReturn;
 import servers.EsTools;
-import startFEIP.IndicesFEIP;
 import startFEIP.StartFEIP;
 
 import java.io.IOException;
@@ -476,7 +476,7 @@ public class ConstructParser {
 		Protocol protocol;
 		switch(freeProtocolHist.getOp()) {
 		case "publish":			
-			protocol = EsTools.getById(esClient, IndicesFEIP.ProtocolIndex, freeProtocolHist.getPid(), Protocol.class);
+			protocol = EsTools.getById(esClient, IndicesNames.PROTOCOL, freeProtocolHist.getPid(), Protocol.class);
 			if(protocol ==null) {
 				protocol = new Protocol();
 				protocol.setPid(freeProtocolHist.getPid());
@@ -506,7 +506,7 @@ public class ConstructParser {
 				
 				Protocol protocol1 = protocol;
 				
-				esClient.index(i->i.index(IndicesFEIP.ProtocolIndex).id(freeProtocolHist.getPid()).document(protocol1));
+				esClient.index(i->i.index(IndicesNames.PROTOCOL).id(freeProtocolHist.getPid()).document(protocol1));
 				isValid = true;
 			}else {
 				isValid = false;
@@ -515,7 +515,7 @@ public class ConstructParser {
 			
 		case "stop":
 			
-			protocol = EsTools.getById(esClient, IndicesFEIP.ProtocolIndex, freeProtocolHist.getPid(), Protocol.class);
+			protocol = EsTools.getById(esClient, IndicesNames.PROTOCOL, freeProtocolHist.getPid(), Protocol.class);
 			
 			if(protocol ==null) {
 				isValid = false;
@@ -538,7 +538,7 @@ public class ConstructParser {
 				protocol1.setLastTxId(freeProtocolHist.getTxId());
 				protocol1.setLastTime(freeProtocolHist.getTime());
 				protocol1.setLastHeight(freeProtocolHist.getHeight());
-				esClient.index(i->i.index(IndicesFEIP.ProtocolIndex).id(freeProtocolHist.getPid()).document(protocol1));
+				esClient.index(i->i.index(IndicesNames.PROTOCOL).id(freeProtocolHist.getPid()).document(protocol1));
 				isValid = true;
 			}else isValid = false;
 
@@ -546,7 +546,7 @@ public class ConstructParser {
 			
 		case "recover":
 			
-			protocol = EsTools.getById(esClient, IndicesFEIP.ProtocolIndex, freeProtocolHist.getPid(), Protocol.class);
+			protocol = EsTools.getById(esClient, IndicesNames.PROTOCOL, freeProtocolHist.getPid(), Protocol.class);
 			
 			if(protocol ==null) {
 				isValid = false;
@@ -569,12 +569,12 @@ public class ConstructParser {
 				protocol1.setLastTxId(freeProtocolHist.getTxId());
 				protocol1.setLastTime(freeProtocolHist.getTime());
 				protocol1.setLastHeight(freeProtocolHist.getHeight());
-				esClient.index(i->i.index(IndicesFEIP.ProtocolIndex).id(freeProtocolHist.getPid()).document(protocol1));
+				esClient.index(i->i.index(IndicesNames.PROTOCOL).id(freeProtocolHist.getPid()).document(protocol1));
 				isValid = true;
 			}else isValid = false;
 			break;	
 		case "update":	
-			protocol = EsTools.getById(esClient, IndicesFEIP.ProtocolIndex, freeProtocolHist.getPid(), Protocol.class);
+			protocol = EsTools.getById(esClient, IndicesNames.PROTOCOL, freeProtocolHist.getPid(), Protocol.class);
 			
 			if(protocol ==null) {
 				isValid = false;
@@ -615,13 +615,13 @@ public class ConstructParser {
 			
 			Protocol protocol2 = protocol;
 			
-			esClient.index(i->i.index(IndicesFEIP.ProtocolIndex).id(freeProtocolHist.getPid()).document(protocol2));
+			esClient.index(i->i.index(IndicesNames.PROTOCOL).id(freeProtocolHist.getPid()).document(protocol2));
 			isValid = true;
 			break;
 		
 		case "close":	
 			
-			protocol = EsTools.getById(esClient, IndicesFEIP.ProtocolIndex, freeProtocolHist.getPid(), Protocol.class);
+			protocol = EsTools.getById(esClient, IndicesNames.PROTOCOL, freeProtocolHist.getPid(), Protocol.class);
 			
 			if(protocol ==null) {
 				isValid = false;
@@ -634,7 +634,7 @@ public class ConstructParser {
 			}
 			
 			if(! protocol.getOwner().equals(freeProtocolHist.getSigner())) {
-				Cid resultCid = EsTools.getById(esClient, IndicesFEIP.CidIndex, freeProtocolHist.getSigner(), Cid.class);
+				Cid resultCid = EsTools.getById(esClient, IndicesNames.CID, freeProtocolHist.getSigner(), Cid.class);
 				if(resultCid.getMaster()!=null) {
 					if(! resultCid.getMaster().equals(freeProtocolHist.getSigner())) {
 					isValid = false;
@@ -653,11 +653,11 @@ public class ConstructParser {
 			protocol1.setLastTxId(freeProtocolHist.getTxId());
 			protocol1.setLastTime(freeProtocolHist.getTime());
 			protocol1.setLastHeight(freeProtocolHist.getHeight());
-			esClient.index(i->i.index(IndicesFEIP.ProtocolIndex).id(freeProtocolHist.getPid()).document(protocol1));
+			esClient.index(i->i.index(IndicesNames.PROTOCOL).id(freeProtocolHist.getPid()).document(protocol1));
 			isValid = true;
 			break;
 		case "rate":
-			protocol = EsTools.getById(esClient, IndicesFEIP.ProtocolIndex, freeProtocolHist.getPid(), Protocol.class);
+			protocol = EsTools.getById(esClient, IndicesNames.PROTOCOL, freeProtocolHist.getPid(), Protocol.class);
 			if(protocol ==null) {
 				isValid = false;
 				break;
@@ -680,7 +680,7 @@ public class ConstructParser {
 			protocol.setLastHeight(freeProtocolHist.getHeight());
 			
 			Protocol protocol3 = protocol;
-			esClient.index(i->i.index(IndicesFEIP.ProtocolIndex).id(freeProtocolHist.getPid()).document(protocol3));
+			esClient.index(i->i.index(IndicesNames.PROTOCOL).id(freeProtocolHist.getPid()).document(protocol3));
 			isValid = true;
 			
 			TimeUnit.SECONDS.sleep(10);
@@ -696,7 +696,7 @@ public class ConstructParser {
 		Service service;
 		switch(serviceHist.getOp()) {
 		case "publish":
-			service = EsTools.getById(esClient, IndicesFEIP.ServiceIndex, serviceHist.getSid(), Service.class);
+			service = EsTools.getById(esClient, IndicesNames.SERVICE, serviceHist.getSid(), Service.class);
 			if(service==null) {
 				service = new Service();
 				service.setSid(serviceHist.getTxId());
@@ -720,14 +720,14 @@ public class ConstructParser {
 				service.setActive(true);
 				
 				Service service1 = service;
-				esClient.index(i->i.index(IndicesFEIP.ServiceIndex).id(serviceHist.getSid()).document(service1));
+				esClient.index(i->i.index(IndicesNames.SERVICE).id(serviceHist.getSid()).document(service1));
 				isValid = true;
 			}else {
 				isValid=false;
 			}
 			break;
 		case "stop":
-			service = EsTools.getById(esClient, IndicesFEIP.ServiceIndex, serviceHist.getSid(), Service.class);
+			service = EsTools.getById(esClient, IndicesNames.SERVICE, serviceHist.getSid(), Service.class);
 			
 			if(service==null) {
 				isValid = false;
@@ -750,14 +750,14 @@ public class ConstructParser {
 				service2.setLastTxId(serviceHist.getTxId());
 				service2.setLastTime(serviceHist.getTime());
 				service2.setLastHeight(serviceHist.getHeight());
-				esClient.index(i->i.index(IndicesFEIP.ServiceIndex).id(serviceHist.getSid()).document(service2));
+				esClient.index(i->i.index(IndicesNames.SERVICE).id(serviceHist.getSid()).document(service2));
 				isValid = true;
 			}else isValid = false;
 
 			break;
 			
 		case "recover":
-			service = EsTools.getById(esClient, IndicesFEIP.ServiceIndex, serviceHist.getSid(), Service.class);
+			service = EsTools.getById(esClient, IndicesNames.SERVICE, serviceHist.getSid(), Service.class);
 			
 			if(service==null) {
 				isValid = false;
@@ -781,14 +781,14 @@ public class ConstructParser {
 				service3.setLastTxId(serviceHist.getTxId());
 				service3.setLastTime(serviceHist.getTime());
 				service3.setLastHeight(serviceHist.getHeight());
-				esClient.index(i->i.index(IndicesFEIP.ServiceIndex).id(serviceHist.getSid()).document(service3));
+				esClient.index(i->i.index(IndicesNames.SERVICE).id(serviceHist.getSid()).document(service3));
 				isValid = true;
 			}else isValid = false;
 
 			break;
 			
 		case "update":
-			service = EsTools.getById(esClient, IndicesFEIP.ServiceIndex, serviceHist.getSid(), Service.class);
+			service = EsTools.getById(esClient, IndicesNames.SERVICE, serviceHist.getSid(), Service.class);
 			
 			if(service==null) {
 				isValid = false;
@@ -820,13 +820,13 @@ public class ConstructParser {
 			
 			Service service4 = service;
 
-			esClient.index(i->i.index(IndicesFEIP.ServiceIndex).id(serviceHist.getSid()).document(service4));
+			esClient.index(i->i.index(IndicesNames.SERVICE).id(serviceHist.getSid()).document(service4));
 			isValid = true;
 
 			break;
 			
 		case "close":	
-			service = EsTools.getById(esClient, IndicesFEIP.ServiceIndex, serviceHist.getSid(), Service.class);
+			service = EsTools.getById(esClient, IndicesNames.SERVICE, serviceHist.getSid(), Service.class);
 			
 			if(service==null) {
 				isValid = false;
@@ -839,7 +839,7 @@ public class ConstructParser {
 			}
 			
 			if(! service.getOwner().equals(serviceHist.getSigner())) {
-				Cid resultCid = EsTools.getById(esClient, IndicesFEIP.CidIndex, serviceHist.getSigner(), Cid.class);
+				Cid resultCid = EsTools.getById(esClient, IndicesNames.CID, serviceHist.getSigner(), Cid.class);
 				if(resultCid.getMaster()!=null) {
 					if(! resultCid.getMaster().equals(serviceHist.getSigner())) {
 					isValid = false;
@@ -858,12 +858,12 @@ public class ConstructParser {
 			service1.setLastTxId(serviceHist.getTxId());
 			service1.setLastTime(serviceHist.getTime());
 			service1.setLastHeight(serviceHist.getHeight());
-			esClient.index(i->i.index(IndicesFEIP.ServiceIndex).id(serviceHist.getSid()).document(service1));
+			esClient.index(i->i.index(IndicesNames.SERVICE).id(serviceHist.getSid()).document(service1));
 			isValid = true;
 
 			break;
 		case "rate":
-			service = EsTools.getById(esClient, IndicesFEIP.ServiceIndex, serviceHist.getSid(), Service.class);
+			service = EsTools.getById(esClient, IndicesNames.SERVICE, serviceHist.getSid(), Service.class);
 
 			if(service==null) {
 				isValid = false;
@@ -890,7 +890,7 @@ public class ConstructParser {
 			
 			Service service5 = service;
 			
-			esClient.index(i->i.index(IndicesFEIP.ServiceIndex).id(serviceHist.getSid()).document(service5));
+			esClient.index(i->i.index(IndicesNames.SERVICE).id(serviceHist.getSid()).document(service5));
 			isValid = true;
 
 			break;
@@ -903,7 +903,7 @@ public class ConstructParser {
 		App app;
 		switch(appHist.getOp()) {
 		case "publish":
-			app = EsTools.getById(esClient, IndicesFEIP.AppIndex, appHist.getAid(), App.class);
+			app = EsTools.getById(esClient, IndicesNames.APP, appHist.getAid(), App.class);
 			if(app==null) {
 				app = new App();
 				app.setAid(appHist.getTxId());
@@ -927,7 +927,7 @@ public class ConstructParser {
 				app.setActive(true);
 				
 				App app1=app;
-				esClient.index(i->i.index(IndicesFEIP.AppIndex).id(appHist.getAid()).document(app1));
+				esClient.index(i->i.index(IndicesNames.APP).id(appHist.getAid()).document(app1));
 				isValid = true;
 			}else {
 				isValid = false;
@@ -936,7 +936,7 @@ public class ConstructParser {
 			
 		case "stop":
 			
-			app = EsTools.getById(esClient, IndicesFEIP.AppIndex, appHist.getAid(), App.class);
+			app = EsTools.getById(esClient, IndicesNames.APP, appHist.getAid(), App.class);
 			
 			if(app==null) {
 				isValid = false;
@@ -959,7 +959,7 @@ public class ConstructParser {
 				app2.setLastTxId(appHist.getTxId());
 				app2.setLastTime(appHist.getTime());
 				app2.setLastHeight(appHist.getHeight());
-				esClient.index(i->i.index(IndicesFEIP.AppIndex).id(appHist.getAid()).document(app2));
+				esClient.index(i->i.index(IndicesNames.APP).id(appHist.getAid()).document(app2));
 				isValid = true;
 			}else isValid = false;
 
@@ -967,7 +967,7 @@ public class ConstructParser {
 			
 		case "recover":
 			
-			app = EsTools.getById(esClient, IndicesFEIP.AppIndex, appHist.getAid(), App.class);
+			app = EsTools.getById(esClient, IndicesNames.APP, appHist.getAid(), App.class);
 			
 			if(app==null) {
 				isValid = false;
@@ -990,14 +990,14 @@ public class ConstructParser {
 				app2.setLastTxId(appHist.getTxId());
 				app2.setLastTime(appHist.getTime());
 				app2.setLastHeight(appHist.getHeight());
-				esClient.index(i->i.index(IndicesFEIP.AppIndex).id(appHist.getAid()).document(app2));
+				esClient.index(i->i.index(IndicesNames.APP).id(appHist.getAid()).document(app2));
 				isValid = true;
 			}else isValid = false;
 
 			break;
 			
 		case "update":	
-			app = EsTools.getById(esClient, IndicesFEIP.AppIndex, appHist.getAid(), App.class);
+			app = EsTools.getById(esClient, IndicesNames.APP, appHist.getAid(), App.class);
 			
 			if(app==null) {
 				isValid = false;
@@ -1035,12 +1035,12 @@ public class ConstructParser {
 			
 			App app2 = app;
 			
-			esClient.index(i->i.index(IndicesFEIP.AppIndex).id(appHist.getAid()).document(app2));
+			esClient.index(i->i.index(IndicesNames.APP).id(appHist.getAid()).document(app2));
 			isValid = true;
 			break;
 			
 		case "close":	
-			app = EsTools.getById(esClient, IndicesFEIP.AppIndex, appHist.getAid(), App.class);
+			app = EsTools.getById(esClient, IndicesNames.APP, appHist.getAid(), App.class);
 			
 			if(app==null) {
 				isValid = false;
@@ -1053,7 +1053,7 @@ public class ConstructParser {
 			}
 			
 			if(! app.getOwner().equals(appHist.getSigner())) {
-				Cid resultCid = EsTools.getById(esClient, IndicesFEIP.CidIndex, appHist.getSigner(), Cid.class);
+				Cid resultCid = EsTools.getById(esClient, IndicesNames.CID, appHist.getSigner(), Cid.class);
 				if(resultCid.getMaster()!=null) {
 					if(! resultCid.getMaster().equals(appHist.getSigner())) {
 					isValid = false;
@@ -1072,13 +1072,13 @@ public class ConstructParser {
 			app1.setLastTxId(appHist.getTxId());
 			app1.setLastTime(appHist.getTime());
 			app1.setLastHeight(appHist.getHeight());
-			esClient.index(i->i.index(IndicesFEIP.AppIndex).id(appHist.getAid()).document(app1));
+			esClient.index(i->i.index(IndicesNames.APP).id(appHist.getAid()).document(app1));
 			isValid = true;
 
 			break;
 			
 		case "rate":
-			app = EsTools.getById(esClient, IndicesFEIP.AppIndex, appHist.getAid(), App.class);
+			app = EsTools.getById(esClient, IndicesNames.APP, appHist.getAid(), App.class);
 			
 			if(app==null) {
 				isValid = false;
@@ -1105,7 +1105,7 @@ public class ConstructParser {
 			
 			App app3 = app;
 			
-			esClient.index(i->i.index(IndicesFEIP.AppIndex).id(appHist.getAid()).document(app3));
+			esClient.index(i->i.index(IndicesNames.APP).id(appHist.getAid()).document(app3));
 			isValid = true;
 			break;
 		}
@@ -1117,7 +1117,7 @@ public class ConstructParser {
 		Code code;
 		switch(codeHist.getOp()) {
 		case "publish":
-			code = EsTools.getById(esClient, IndicesFEIP.CodeIndex, codeHist.getCodeId(), Code.class);
+			code = EsTools.getById(esClient, IndicesNames.CODE, codeHist.getCodeId(), Code.class);
 			if(code==null) {
 				code = new Code();
 				code.setCodeId(codeHist.getTxId());
@@ -1141,7 +1141,7 @@ public class ConstructParser {
 				code.setActive(true);
 				
 				Code code1=code;
-				esClient.index(i->i.index(IndicesFEIP.CodeIndex).id(codeHist.getCodeId()).document(code1));
+				esClient.index(i->i.index(IndicesNames.CODE).id(codeHist.getCodeId()).document(code1));
 				isValid = true;
 			}else {
 				isValid = false;
@@ -1150,7 +1150,7 @@ public class ConstructParser {
 			
 		case "stop":
 			
-			code = EsTools.getById(esClient, IndicesFEIP.CodeIndex, codeHist.getCodeId(), Code.class);
+			code = EsTools.getById(esClient, IndicesNames.CODE, codeHist.getCodeId(), Code.class);
 			
 			if(code==null) {
 				isValid = false;
@@ -1173,7 +1173,7 @@ public class ConstructParser {
 				app2.setLastTxId(codeHist.getTxId());
 				app2.setLastTime(codeHist.getTime());
 				app2.setLastHeight(codeHist.getHeight());
-				esClient.index(i->i.index(IndicesFEIP.CodeIndex).id(codeHist.getCodeId()).document(app2));
+				esClient.index(i->i.index(IndicesNames.CODE).id(codeHist.getCodeId()).document(app2));
 				isValid = true;
 			}else isValid = false;
 
@@ -1181,7 +1181,7 @@ public class ConstructParser {
 			
 		case "recover":
 			
-			code = EsTools.getById(esClient, IndicesFEIP.CodeIndex, codeHist.getCodeId(), Code.class);
+			code = EsTools.getById(esClient, IndicesNames.CODE, codeHist.getCodeId(), Code.class);
 			
 			if(code==null) {
 				isValid = false;
@@ -1204,14 +1204,14 @@ public class ConstructParser {
 				code2.setLastTxId(codeHist.getTxId());
 				code2.setLastTime(codeHist.getTime());
 				code2.setLastHeight(codeHist.getHeight());
-				esClient.index(i->i.index(IndicesFEIP.CodeIndex).id(codeHist.getCodeId()).document(code2));
+				esClient.index(i->i.index(IndicesNames.CODE).id(codeHist.getCodeId()).document(code2));
 				isValid = true;
 			}else isValid = false;
 
 			break;
 			
 		case "update":	
-			code = EsTools.getById(esClient, IndicesFEIP.CodeIndex, codeHist.getCodeId(), Code.class);
+			code = EsTools.getById(esClient, IndicesNames.CODE, codeHist.getCodeId(), Code.class);
 			
 			if(code==null) {
 				isValid = false;
@@ -1249,11 +1249,11 @@ public class ConstructParser {
 			
 			Code app2 = code;
 			
-			esClient.index(i->i.index(IndicesFEIP.CodeIndex).id(codeHist.getCodeId()).document(app2));
+			esClient.index(i->i.index(IndicesNames.CODE).id(codeHist.getCodeId()).document(app2));
 			isValid = true;
 			break;
 		case "close":	
-			code = EsTools.getById(esClient, IndicesFEIP.CodeIndex, codeHist.getCodeId(), Code.class);
+			code = EsTools.getById(esClient, IndicesNames.CODE, codeHist.getCodeId(), Code.class);
 			
 			if(code==null) {
 				isValid = false;
@@ -1266,7 +1266,7 @@ public class ConstructParser {
 			}
 			
 			if(! code.getOwner().equals(codeHist.getSigner())) {
-				Cid resultCid = EsTools.getById(esClient, IndicesFEIP.CidIndex, codeHist.getSigner(), Cid.class);
+				Cid resultCid = EsTools.getById(esClient, IndicesNames.CID, codeHist.getSigner(), Cid.class);
 				if(resultCid.getMaster()!=null) {
 					if(! resultCid.getMaster().equals(codeHist.getSigner())) {
 					isValid = false;
@@ -1284,12 +1284,12 @@ public class ConstructParser {
 			code1.setLastTxId(codeHist.getTxId());
 			code1.setLastTime(codeHist.getTime());
 			code1.setLastHeight(codeHist.getHeight());
-			esClient.index(i->i.index(IndicesFEIP.CodeIndex).id(codeHist.getCodeId()).document(code1));
+			esClient.index(i->i.index(IndicesNames.CODE).id(codeHist.getCodeId()).document(code1));
 			isValid = true;
 			
 			break;
 		case "rate":
-			code = EsTools.getById(esClient, IndicesFEIP.CodeIndex, codeHist.getCodeId(), Code.class);
+			code = EsTools.getById(esClient, IndicesNames.CODE, codeHist.getCodeId(), Code.class);
 			
 			if(code==null) {
 				isValid = false;
@@ -1316,7 +1316,7 @@ public class ConstructParser {
 			
 			Code code3 = code;
 			
-			esClient.index(i->i.index(IndicesFEIP.CodeIndex).id(codeHist.getCodeId()).document(code3));
+			esClient.index(i->i.index(IndicesNames.CODE).id(codeHist.getCodeId()).document(code3));
 			isValid = true;
 			break;
 		}

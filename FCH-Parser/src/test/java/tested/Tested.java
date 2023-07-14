@@ -10,7 +10,7 @@ import co.elastic.clients.elasticsearch.core.*;
 import co.elastic.clients.elasticsearch.core.mget.MultiGetResponseItem;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
-import FchClass.Address;
+import fchClass.Address;
 import javaTools.BytesTools;
 import keyTools.KeyTools;
 import org.junit.Test;
@@ -19,12 +19,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import servers.EsTools;
 import servers.EsTools.MgetResult;
-import startFCH.IndicesFCH;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+
+import static constants.IndicesNames.ADDRESS;
+import static constants.IndicesNames.CASH;
 
 public class Tested {
 	private static final Logger log = LoggerFactory.getLogger(Tested.class);
@@ -50,7 +52,7 @@ public class Tested {
 		UpdateByQueryResponse response = esClient.updateByQuery(u -> u
 				.conflicts(Conflicts.Proceed)
 				.timeout(Time.of(t->t.time("1800s")))
-				.index(IndicesFCH.CashIndex)
+				.index(CASH)
 				.query(q -> q.bool(b -> b
 						.filter(f -> f.term(t -> t.field("utxo").value(true)))))
 				.script(s -> s.inline(i1 -> i1.source(
@@ -72,7 +74,7 @@ public class Tested {
 
 		for (int i = 0;; i += 5000) {
 			long fromHeight = i;
-			esClient.updateByQuery(u -> u.index(IndicesFCH.CashIndex)
+			esClient.updateByQuery(u -> u.index(CASH)
 					.query(q -> q.bool(b -> b.filter(f -> f.term(t -> t.field("utxo").value(true)))
 							.must(m -> m.range(r -> r.field("birthHeight").gte(JsonData.of(fromHeight))
 									.lt(JsonData.of(fromHeight + 5000))))))
@@ -88,7 +90,7 @@ public class Tested {
 	
 	public static void makeAddrCd(ElasticsearchClient esClient) throws Exception {
 		SearchResponse<Address> response = esClient.search(
-				s -> s.index(IndicesFCH.AddressIndex).size(EsTools.READ_MAX).sort(sort -> sort.field(f -> f.field("id"))),
+				s -> s.index(ADDRESS).size(EsTools.READ_MAX).sort(sort -> sort.field(f -> f.field("id"))),
 				Address.class);
 
 		ArrayList<Address> addrOldList = getResultAddrList(response);
@@ -100,7 +102,7 @@ public class Tested {
 				break;
 			Hit<Address> last = response.hits().hits().get(response.hits().hits().size() - 1);
 			String lastId = last.id();
-			response = esClient.search(s -> s.index(IndicesFCH.AddressIndex).size(5000)
+			response = esClient.search(s -> s.index(ADDRESS).size(5000)
 					.sort(sort -> sort.field(f -> f.field("id"))).searchAfter(lastId), Address.class);
 
 			addrOldList = getResultAddrList(response);
@@ -129,7 +131,7 @@ public class Tested {
 		}
 
 		SearchResponse<Address> response = esClient.search(
-				s -> s.index(IndicesFCH.CashIndex).size(0).query(q -> q.term(t -> t.field("utxo").value(true)))
+				s -> s.index(CASH).size(0).query(q -> q.term(t -> t.field("utxo").value(true)))
 						.aggregations("filterByAddr",
 								a -> a.filter(f -> f.terms(t -> t.field("addr").terms(t1 -> t1.value(fieldValueList))))
 										.aggregations("termByAddr",
@@ -158,7 +160,7 @@ public class Tested {
 		for (String addr : addrSet) {
 			Map<String, Long> updateMap = new HashMap<String, Long>();
 			updateMap.put("cd", addrNewMap.get(addr));
-			br.operations(o -> o.update(u -> u.index(IndicesFCH.AddressIndex).id(addr).action(a -> a.doc(updateMap))));
+			br.operations(o -> o.update(u -> u.index(ADDRESS).id(addr).action(a -> a.doc(updateMap))));
 		}
 		EsTools.bulkWithBuilder(esClient, br);
 	}
@@ -252,7 +254,7 @@ public class Tested {
 //		////////////////////
 //
 //		try {
-//			DeleteIndexResponse req = esClient.indices().delete(c -> c.index(IndicesFCH.BlockMarkIndex));
+//			DeleteIndexResponse req = esClient.indices().delete(c -> c.index(BlockMarkIndex));
 //
 //			if (req.acknowledged()) {
 //				log.info("Index  block_Mark deleted.");
@@ -262,7 +264,7 @@ public class Tested {
 //		}
 //
 //		try {
-//			DeleteIndexResponse req = esClient.indices().delete(c -> c.index(IndicesFCH.BlockIndex));
+//			DeleteIndexResponse req = esClient.indices().delete(c -> c.index(BlockIndex));
 //
 //			if (req.acknowledged()) {
 //				log.info("Index  block deleted.");
@@ -272,7 +274,7 @@ public class Tested {
 //		}
 //
 //		try {
-//			DeleteIndexResponse req = esClient.indices().delete(c -> c.index(IndicesFCH.TxIndex));
+//			DeleteIndexResponse req = esClient.indices().delete(c -> c.index(TxIndex));
 //			if (req.acknowledged()) {
 //				log.info("Index tx deleted.");
 //			}
@@ -281,7 +283,7 @@ public class Tested {
 //		}
 //
 //		try {
-//			DeleteIndexResponse req = esClient.indices().delete(c -> c.index(IndicesFCH.CashIndex));
+//			DeleteIndexResponse req = esClient.indices().delete(c -> c.index(CashIndex));
 //			if (req.acknowledged()) {
 //				log.info("Index txo delted.");
 //			}
@@ -290,7 +292,7 @@ public class Tested {
 //		}
 //
 //		try {
-//			DeleteIndexResponse req = esClient.indices().delete(c -> c.index(IndicesFCH.AddressIndex));
+//			DeleteIndexResponse req = esClient.indices().delete(c -> c.index(AddressIndex));
 //			if (req.acknowledged()) {
 //				log.info("Index address deleted.");
 //			}
@@ -299,7 +301,7 @@ public class Tested {
 //		}
 //
 //		try {
-//			DeleteIndexResponse req = esClient.indices().delete(c -> c.index(IndicesFCH.BlockHasIndex));
+//			DeleteIndexResponse req = esClient.indices().delete(c -> c.index(BlockHasIndex));
 //			if (req.acknowledged()) {
 //				log.info("Index block_has deleted.");
 //			}
@@ -308,7 +310,7 @@ public class Tested {
 //		}
 //
 //		try {
-//			DeleteIndexResponse req = esClient.indices().delete(c -> c.index(IndicesFCH.TxHasIndex));
+//			DeleteIndexResponse req = esClient.indices().delete(c -> c.index(TxHasIndex));
 //			if (req.acknowledged()) {
 //				log.info("Index tx_has deleted.");
 //			}
@@ -317,7 +319,7 @@ public class Tested {
 //		}
 //
 //		try {
-//			DeleteIndexResponse req = esClient.indices().delete(c -> c.index(IndicesFCH.OpReturnIndex));
+//			DeleteIndexResponse req = esClient.indices().delete(c -> c.index(OpReturnIndex));
 //			if (req.acknowledged()) {
 //				log.info("Index opreturn deleted.");
 //			}
@@ -361,7 +363,7 @@ public class Tested {
 //
 //		try {
 //			CreateIndexResponse req = esClient.indices()
-//					.create(c -> c.index(IndicesFCH.BlockMarkIndex).withJson(blockMarkJsonStrIs));
+//					.create(c -> c.index(BlockMarkIndex).withJson(blockMarkJsonStrIs));
 //			blockMarkJsonStrIs.close();
 //			if (req.acknowledged()) {
 //				log.info("Index  block_mark created.");
@@ -373,7 +375,7 @@ public class Tested {
 //
 //		try {
 //			CreateIndexResponse req = esClient.indices()
-//					.create(c -> c.index(IndicesFCH.BlockIndex).withJson(blockJsonStrIs));
+//					.create(c -> c.index(BlockIndex).withJson(blockJsonStrIs));
 //			blockJsonStrIs.close();
 //			if (req.acknowledged()) {
 //				log.info("Index  block created.");
@@ -385,7 +387,7 @@ public class Tested {
 //
 //		try {
 //			CreateIndexResponse req = esClient.indices()
-//					.create(c -> c.index(IndicesFCH.BlockHasIndex).withJson(blockHasJsonStrIs));
+//					.create(c -> c.index(BlockHasIndex).withJson(blockHasJsonStrIs));
 //			blockHasJsonStrIs.close();
 //
 //			if (req.acknowledged()) {
@@ -400,7 +402,7 @@ public class Tested {
 //		}
 //
 //		try {
-//			CreateIndexResponse req = esClient.indices().create(c -> c.index(IndicesFCH.TxIndex).withJson(txJsonStrIs));
+//			CreateIndexResponse req = esClient.indices().create(c -> c.index(TxIndex).withJson(txJsonStrIs));
 //			txJsonStrIs.close();
 //
 //			if (req.acknowledged()) {
@@ -413,7 +415,7 @@ public class Tested {
 //
 //		try {
 //			CreateIndexResponse req = esClient.indices()
-//					.create(c -> c.index(IndicesFCH.TxHasIndex).withJson(txHasJsonStrIs));
+//					.create(c -> c.index(TxHasIndex).withJson(txHasJsonStrIs));
 //			txHasJsonStrIs.close();
 //
 //			if (req.acknowledged()) {
@@ -425,7 +427,7 @@ public class Tested {
 //		}
 //
 //		try {
-//			CreateIndexResponse req = esClient.indices().create(c -> c.index(IndicesFCH.CashIndex).withJson(txoJsonStrIs));
+//			CreateIndexResponse req = esClient.indices().create(c -> c.index(CashIndex).withJson(txoJsonStrIs));
 //			txoJsonStrIs.close();
 //
 //			if (req.acknowledged()) {
@@ -438,7 +440,7 @@ public class Tested {
 //
 //		try {
 //			CreateIndexResponse req = esClient.indices()
-//					.create(c -> c.index(IndicesFCH.AddressIndex).withJson(addressJsonIs));
+//					.create(c -> c.index(AddressIndex).withJson(addressJsonIs));
 //			addressJsonIs.close();
 //
 //			if (req.acknowledged()) {
@@ -451,7 +453,7 @@ public class Tested {
 //
 //		try {
 //			CreateIndexResponse req = esClient.indices()
-//					.create(c -> c.index(IndicesFCH.OpReturnIndex).withJson(opreturnJsonStrIs));
+//					.create(c -> c.index(OpReturnIndex).withJson(opreturnJsonStrIs));
 //			opreturnJsonStrIs.close();
 //			if (req.acknowledged()) {
 //				log.info("Index opreturn created.");
@@ -486,7 +488,7 @@ public class Tested {
 //			fieldValueList.add(FieldValue.of(iter.next()));
 //
 //		SearchResponse<Void> response = esClient.search(
-//				s -> s.index(IndicesFCH.CashIndex)
+//				s -> s.index(CashIndex)
 //						.query(q -> q.bool(b -> b
 //								.must(m -> m.range(r -> r.field("spentHeight").lte(JsonData.of(lastHeight))))
 //								.must(m1 -> m1.range(r1 -> r1.field("birthHeight").lte(JsonData.of(lastHeight))))))
@@ -728,7 +730,7 @@ public class Tested {
 //	public ArrayList<BlockMark> readForkList(ElasticsearchClient esClient, long bestHeight) throws ElasticsearchException, IOException {
 //		// TODO Auto-generated method stub
 //		//, MARK_FORK, "height",REOTG_PROTECT
-//		SearchResponse<BlockMark> response = esClient.search(s->s.index(IndicesFCH.BlockMarkIndex)
+//		SearchResponse<BlockMark> response = esClient.search(s->s.index(BlockMarkIndex)
 //				.query(q->q
 //						.range(r->r
 //								.field("height")
@@ -753,7 +755,7 @@ public class Tested {
 //	}
 //	public ArrayList<BlockMark> readOrPhanList(ElasticsearchClient esClient) throws ElasticsearchException, IOException {
 //		// TODO Auto-generated method stub
-//		SearchResponse<BlockMark> response = esClient.search(s->s.index(IndicesFCH.BlockMarkIndex)
+//		SearchResponse<BlockMark> response = esClient.search(s->s.index(BlockMarkIndex)
 //				.query(q->q
 //						.term(t->t
 //								.field("status")
@@ -780,7 +782,7 @@ public class Tested {
 //	}
 //	public ArrayList<BlockMark> readMainList(ElasticsearchClient esClient) throws ElasticsearchException, IOException {
 //		// TODO Auto-generated method stub
-//		SearchResponse<BlockMark> response = esClient.search(s->s.index(IndicesFCH.BlockMarkIndex)
+//		SearchResponse<BlockMark> response = esClient.search(s->s.index(BlockMarkIndex)
 //				.query(q->q
 //						.term(t->t
 //								.field("status")

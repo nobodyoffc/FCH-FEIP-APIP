@@ -2,9 +2,11 @@ package APIP9V1_Team;
 
 import APIP0V1_OpenAPI.*;
 import APIP1V1_FCDSL.Fcdsl;
+import constants.ApiNames;
+import constants.IndicesNames;
+import constants.ReplyInfo;
 import initial.Initiator;
 import organize.TeamHistory;
-import startFEIP.IndicesFEIP;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -17,10 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import APIP1V1_FCDSL.Sort;
-import static api.Constant.*;
 
 
-@WebServlet(APIP9V1Path +TeamRateHistoryAPI)
+@WebServlet(ApiNames.APIP9V1Path + ApiNames.TeamRateHistoryAPI)
 public class TeamRateHistory extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -29,7 +30,7 @@ public class TeamRateHistory extends HttpServlet {
         Replier replier = new Replier();
         PrintWriter writer = response.getWriter();
 
-        RequestChecker requestChecker = new RequestChecker(request,response);
+        RequestChecker requestChecker = new RequestChecker(request,response, replier);
 
         DataCheckResult dataCheckResult = requestChecker.checkDataRequest();
 
@@ -50,7 +51,7 @@ public class TeamRateHistory extends HttpServlet {
 
 
         //Request
-        String index = IndicesFEIP.TeamHistIndex;
+        String index = IndicesNames.TEAM_HISTORY;
 
         DataRequestHandler esRequest = new DataRequestHandler(dataCheckResult.getAddr(),requestBody,response,replier);
         List<TeamHistory> meetList;
@@ -61,7 +62,7 @@ public class TeamRateHistory extends HttpServlet {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            response.setHeader(CodeInHeader,String.valueOf(Code1012BadQuery));
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
             writer.write(replier.reply1012BadQuery(addr));
             return;
         }
@@ -69,7 +70,7 @@ public class TeamRateHistory extends HttpServlet {
         //response
         replier.setData(meetList);
         replier.setGot(meetList.size());
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", TeamRateHistoryAPI));
+        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.TeamRateHistoryAPI));
         esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
     }
 

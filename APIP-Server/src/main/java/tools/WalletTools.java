@@ -1,10 +1,11 @@
 package tools;
 
 import APIP0V1_OpenAPI.Replier;
-import FchClass.Cash;
-import RPC.FcRpcMethods;
-import RPC.NewFcRpcClient;
-import RPC.SignResult;
+import constants.IndicesNames;
+import fchClass.Cash;
+import freecashRPC.FcRpcMethods;
+import freecashRPC.NewFcRpcClient;
+import freecashRPC.SignResult;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
@@ -17,7 +18,6 @@ import javaTools.BytesTools;
 import fcTools.ParseTools;
 import redis.clients.jedis.Jedis;
 import servers.NewEsClient;
-import startFCH.IndicesFCH;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -70,7 +70,7 @@ public class WalletTools {
             String password = "password";
             System.out.println("Create FcRpcClient.");
             NewFcRpcClient newFcRpcClient = new NewFcRpcClient(rpcIp, rpcPort,rpcUser,password);
-            fcClient = newFcRpcClient.getClient();
+            fcClient = newFcRpcClient.getClientSilent();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -351,7 +351,7 @@ public class WalletTools {
     }
     private static Cash getCdFromOneCash(String addrRequested, long cd, Replier replier) throws IOException {
         ElasticsearchClient esClient = Initiator.esClient;
-        String index = IndicesFCH.CashIndex;
+        String index = IndicesNames.CASH;
         SearchResponse<Cash> result = esClient.search(s -> s.index(index)
                 .query(q ->q.bool(b->b
                                 .must(m->m.term(t -> t.field("fid").value(addrRequested)))
@@ -375,7 +375,7 @@ public class WalletTools {
     }
     private static List<Cash> getCdfromCashList(long cd, String addrRequested, Replier replier) throws IOException {
         ElasticsearchClient esClient = Initiator.esClient;
-        String index = IndicesFCH.CashIndex;
+        String index = IndicesNames.CASH;
 
         SearchResponse<Cash> result = esClient.search(s -> s.index(index)
                 .query(q ->q.bool(b->b
@@ -435,7 +435,7 @@ public class WalletTools {
 
     public static List<Cash> getCashListForPay(long value, String addrRequested, Replier replier) throws IOException {
         ElasticsearchClient esClient = Initiator.esClient;
-        String index = IndicesFCH.CashIndex;
+        String index = IndicesNames.CASH;
 
         SearchResponse<Cash> result = esClient.search(s -> s.index(index)
                 .query(q ->q.bool(b->b
