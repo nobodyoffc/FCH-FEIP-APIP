@@ -6,6 +6,7 @@ import com.google.gson.reflect.TypeToken;
 import constants.ApiNames;
 import constants.ReplyInfo;
 import initial.Initiator;
+import redis.clients.jedis.Jedis;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -53,10 +54,12 @@ public class Unconfirmed extends HttpServlet {
 
         List<UnconfirmedInfo> meetList = new ArrayList<>();
 
+        Jedis jedis = new Jedis();
+        jedis.select(3);
         for(String id: dataCheckResult.getDataRequestBody().getFcdsl().getIds()) {
             Map<String, String> resultMap = null;
             try {
-                resultMap = Initiator.jedis3Mempool.hgetAll(id);
+                resultMap = jedis.hgetAll(id);
 
                 if(resultMap == null||resultMap.size()==0){
                     response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1011DataNotFound));
@@ -88,6 +91,7 @@ public class Unconfirmed extends HttpServlet {
             info.net = info.incomeValue -info.spendValue;
             meetList.add(info);
         }
+        jedis.close();
         if(meetList.size()==0){
             response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1011DataNotFound));
             writer.write(replier.reply1011DataNotFound(addr));
@@ -97,9 +101,9 @@ public class Unconfirmed extends HttpServlet {
         replier.setData(meetList);
         replier.setGot(meetList.size());
         replier.setTotal(meetList.size());
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.UnconfirmedAPI));
+
         response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code0Success));
-        String reply = replier.reply0Success(addr,nPrice);
+        String reply = replier.reply0Success(addr);
         if(reply==null)return;
         String sign = DataRequestHandler.symSign(reply,dataCheckResult.getSessionKey());
         if(sign==null)return;

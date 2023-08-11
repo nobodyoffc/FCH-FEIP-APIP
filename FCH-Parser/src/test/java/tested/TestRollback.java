@@ -20,8 +20,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import fileTools.OpReFileTools;
 import config.ConfigBase;
-import servers.EsTools;
-import servers.NewEsClient;
+import esTools.EsTools;
+import esTools.NewEsClient;
 import writeEs.RollBacker;
 
 import java.io.*;

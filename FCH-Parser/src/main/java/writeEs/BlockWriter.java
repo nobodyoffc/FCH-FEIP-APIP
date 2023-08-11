@@ -12,7 +12,7 @@ import fileTools.OpReFileTools;
 import parser.Preparer;
 import parser.ReadyBlock;
 import redis.clients.jedis.Jedis;
-import servers.EsTools;
+import esTools.EsTools;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 public class BlockWriter {
 
 	private static final Logger log = LoggerFactory.getLogger(BlockWriter.class);
-	private static Jedis jedis = new Jedis();
+	private static final Jedis jedis = new Jedis();
 
 	public void writeIntoEs(ElasticsearchClient esClient, ReadyBlock readyBlock1,OpReFileTools opReFile) throws Exception {
 		ReadyBlock readyBlock = readyBlock1;	

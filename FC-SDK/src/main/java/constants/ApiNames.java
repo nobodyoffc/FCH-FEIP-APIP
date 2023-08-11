@@ -1,5 +1,7 @@
 package constants;
 
+import org.checkerframework.checker.units.qual.A;
+
 import java.util.ArrayList;
 
 public class ApiNames {
@@ -118,6 +120,17 @@ public class ApiNames {
     public static final String OffLineTxAPI = "offLineTx";
     public static final String OffLineTxByCdAPI = "offLineTxByCd";
     public static final String AddressesAPI = "addresses";
+    public static ArrayList<String> freeApiList = new ArrayList<>();
+    static {
+        freeApiList.add(ApiNames.GetFreeServiceAPI);
+        freeApiList.add(ApiNames.GetAvatarAPI);
+        freeApiList.add(ApiNames.GetTotalsAPI);
+        freeApiList.add(ApiNames.GetAppsAPI);
+        freeApiList.add(ApiNames.GetCashesAPI);
+        freeApiList.add(ApiNames.GetFidCidAPI);
+        freeApiList.add(ApiNames.GetServicesAPI);
+    }
+
     public static ArrayList<String> apiList = new ArrayList<String>();
 
     static {

@@ -2,7 +2,7 @@ package APIP3V1_CidInfo;
 
 import APIP0V1_OpenAPI.*;
 import APIP1V1_FCDSL.Fcdsl;
-import APIP1V1_FCDSL.Sort;
+import esTools.Sort;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
@@ -67,7 +67,6 @@ public class Nobodys extends HttpServlet {
         //response
         replier.setData(meetList);
         replier.setGot(meetList.size());
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.NobodysAPI));
-        esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
+        esRequest.writeSuccess(dataCheckResult.getSessionKey());
     }
 }

@@ -1,12 +1,14 @@
 package APIP0V1_OpenAPI;
 
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import constants.ReplyInfo;
 import initial.Initiator;
+import initial.ServerParamsInRedis;
 import order.Order;
+import redis.clients.jedis.Jedis;
 import redisTools.ReadRedis;
-import service.ApipService;
-import service.Params;
 import constants.Strings;
 
 import java.util.HashMap;
@@ -25,17 +27,12 @@ public class Replier {
     private long bestHeight;
     private Object data;
     private String via;
-
-
-
     private String[] last;
-
-    public String reply(String userAddr,int nPrice) {
-        return replyBase(userAddr,nPrice);
-    }
+    private transient ServerParamsInRedis paramsInRedis;
+    private transient final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     public String reply(String userAddr) {
-        return replyBase(userAddr,1);
+        return replyBase(userAddr);
     }
 
     public String reply() {
@@ -43,69 +40,58 @@ public class Replier {
     }
 
     public String replyBase() {
-        bestHeight = redisTools.ReadRedis.readLong(jedis0Common, Strings.BEST_HEIGHT);
-
-        return Initiator.gson.toJson(this);
+        if(paramsInRedis!=null) bestHeight = paramsInRedis.getBestHeight();
+        return gson.toJson(this);
     }
 
-    public String replyBase(String userAddr, int nPrice) {
+    public String replyBase(String userAddr) {
 
-        String replyJson = Initiator.gson.toJson(this);
-        long price = readPrice();
+        String replyJson = gson.toJson(this);
+        long price = paramsInRedis.getPrice();
+        balance = paramsInRedis.getBalance();
+        bestHeight = paramsInRedis.getBestHeight();
+        Integer nPrice = paramsInRedis.getnPrice();
 
-        balance = ReadRedis.readHashLong(jedis0Common, Strings.USER, userAddr);
         double cost = 0;
-        if(isPricePerKBytes){
-            cost = price * nPrice * (Math.ceil((double) replyJson.getBytes().length / 1024));
-            balance =  balance - (long)cost;
-        }else if(isPricePerRequest) {
+        if (paramsInRedis.isPricePerRequest()) {
             balance = balance - (nPrice * price);
+        } else if (isPricePerRequest) {
+            if(nPrice ==null) nPrice =0;
+            cost = price * nPrice * (Math.ceil((double) replyJson.getBytes().length / 1024));
+            balance = balance - (long) cost;
         }
 
-        if(balance<=0) {
-            jedis0Common.hdel(Strings.USER, userAddr);
-            jedis0Common.hdel(Strings.FID_SESSION_NAME, userAddr);
-            code = ReplyInfo.Code1004InsufficientBalance;
-            message = ReplyInfo.Msg1004InsufficientBalance;
-            got = 0;
-            Map<String,Object> d = new HashMap<>();
+        try(Jedis jedis0Common = Initiator.jedisPool.getResource()) {
+            if (balance <= 0) {
+                jedis0Common.hdel(Initiator.serviceName+"_"+Strings.FID_BALANCE, userAddr);
+                jedis0Common.hdel(Initiator.serviceName+"_"+Strings.FID_SESSION_NAME, userAddr);
+                code = ReplyInfo.Code1004InsufficientBalance;
+                message = ReplyInfo.Msg1004InsufficientBalance;
+                got = 0;
+                Map<String, Object> d = new HashMap<>();
 
-            String serviceStr = jedis0Common.get(Initiator.serviceName+Strings.SERVICE);
-            if(serviceStr==null){
-                data= "Can't read service from Redis. Set it with ApipManager.jar.";
-                return Initiator.gson.toJson(this);
-            }
-            ApipService service1 = gson.fromJson(serviceStr, ApipService.class);
-            Params params = service1.getParams();
+                d.put("currency", params.getCurrency());
+                d.put("sendFrom", userAddr);
+                d.put("sendTo", params.getAccount());
+                d.put("minimumPay", params.getMinPayment());
+                d.put("writeInOpReturn", gson.toJson(Order.getJsonBuyOrder(Initiator.service.getSid())));
+                d.put("note", "When writing OpReturn, remove the escape character!");
 
-            d.put("currency",params.getCurrency());
-            d.put("sendFrom",userAddr);
-            d.put("sendTo",params.getAccount());
-            d.put("minimumPay",params.getMinPayment());
-            d.put("writeInOpReturn",gson.toJson(Order.getJsonBuyOrder(service.getSid())));
-            d.put("note","When writing OpReturn, remove the escape character!");
-
-            data = d;
-            last = null;
-            balance = 0;
-            return Initiator.gson.toJson(this);
-        }else{
-            jedis0Common.hset(Strings.USER, userAddr, String.valueOf(balance));
-            if(this.via!=null){
-                long viaT = ReadRedis.readHashLong(jedis0Common, Strings.CONSUME_VIA, this.via);
-                jedis0Common.hset(Strings.CONSUME_VIA, this.via, String.valueOf(viaT+(long)cost));
+                data = d;
+                last = null;
+                balance = 0;
+                jedis0Common.close();
+                return gson.toJson(this);
+            } else {
+                jedis0Common.hset(Initiator.serviceName+"_"+Strings.FID_BALANCE, userAddr, String.valueOf(balance));
+                if (this.via != null) {
+                    long viaT = ReadRedis.readHashLong(jedis0Common, Initiator.serviceName+"_"+Strings.CONSUME_VIA, this.via);
+                    jedis0Common.hset(Initiator.serviceName+"_"+Strings.CONSUME_VIA, this.via, String.valueOf(viaT + (long) cost));
+                }
             }
         }
 
-        bestHeight = redisTools.ReadRedis.readLong(jedis0Common, Strings.BEST_HEIGHT);
-
-        return Initiator.gson.toJson(this);
-    }
-
-    public String reply0Success(String addr,int nPrice){
-        code = ReplyInfo.Code0Success;
-        message = ReplyInfo.Msg0Success;
-        return reply(addr,nPrice);
+        return gson.toJson(this);
     }
 
     public String reply0Success(String addr){
@@ -208,6 +194,12 @@ public class Replier {
         message = ReplyInfo.Msg1015FidMissed;
         return reply();
     }
+    public String reply1016IllegalUrl() {
+        code = ReplyInfo.Code1016IllegalUrl;
+        message = ReplyInfo.Msg1016IllegalUrl;
+        return reply();
+    }
+
     public String reply1020OtherError (String addr){
         code = ReplyInfo.Code1020OtherError;
         message = ReplyInfo.Msg1020OtherError;
@@ -298,5 +290,13 @@ public class Replier {
 
     public void setVia(String via) {
         this.via = via;
+    }
+
+    public ServerParamsInRedis getParamsInRedis() {
+        return paramsInRedis;
+    }
+
+    public void setParamsInRedis(ServerParamsInRedis paramsInRedis) {
+        this.paramsInRedis = paramsInRedis;
     }
 }

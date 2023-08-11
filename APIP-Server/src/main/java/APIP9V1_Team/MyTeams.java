@@ -17,7 +17,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import APIP1V1_FCDSL.Sort;
+import esTools.Sort;
 
 
 @WebServlet(ApiNames.APIP9V1Path + ApiNames.MyTeamsAPI)
@@ -85,8 +85,7 @@ public class MyTeams extends HttpServlet {
         //response
         replier.setData(dataList);
         replier.setGot(dataList.size());
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.MyTeamsAPI));
-        esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
+        esRequest.writeSuccess(dataCheckResult.getSessionKey());
 
         return;
     }

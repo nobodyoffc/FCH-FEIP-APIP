@@ -5,6 +5,7 @@ import constants.ApiNames;
 import constants.Strings;
 import fcTools.ParseTools;
 import initial.Initiator;
+import redis.clients.jedis.Jedis;
 import service.ApipService;
 import service.Params;
 
@@ -28,25 +29,38 @@ public class GetFreeService  extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
 
         PrintWriter writer = response.getWriter();
-        if (Initiator.isFreeGetForbidden(writer)) return;
+        ApipService service;
+        try (Jedis jedis = Initiator.jedisPool.getResource()) {
+            if (Initiator.isFreeGetForbidden(writer)) return;
+            service = new Gson().fromJson(jedis.get(Initiator.serviceName +"_"+ Strings.SERVICE), ApipService.class);
+            Map<String, String> data = new HashMap<>();
 
-        ApipService service = new Gson().fromJson(Initiator.jedis0Common.get(Initiator.serviceName+ Strings.SERVICE),ApipService.class);
+            data.put(SID, service.getSid());
+            data.put(SERVICE_NAME, service.getStdName());
+            data.put(OWNER, service.getOwner());
+            data.put(WAITER, service.getWaiters()[0]);
+            Params params = service.getParams();
 
-        Map<String,String> data = new HashMap<>();
-        data.put(SID,service.getSid());
-        data.put(SERVICE_NAME,service.getStdName());
-        data.put(OWNER,service.getOwner());
-        Params params = service.getParams();
-        data.put(URL_HEAD,params.getUrlHead());
-        data.put(CURRENCY,params.getCurrency());
-        data.put(ACCOUNT,params.getAccount());
-        data.put(WAITER,service.getWaiters()[0]);
-        data.put(MIN_PAYMENT,params.getMinPayment());
-        data.put(PRICE_PER_K_BYTES,params.getPricePerKBytes());
-        data.put(PRICE_PER_REQUEST,params.getPricePerRequest());
-        String publicSessionKey = Initiator.jedis1Session.hget(Initiator.jedis0Common.hget(FID_SESSION_NAME,PUBLIC),SESSION_KEY);
-        data.put(SESSION_KEY,publicSessionKey);
+            if(params.getUrlHead()!=null)data.put(URL_HEAD, params.getUrlHead());
+            if(params.getCurrency()!=null)data.put(CURRENCY, params.getCurrency());
+            if(params.getAccount()!=null)data.put(ACCOUNT, params.getAccount());
+            if(params.getMinPayment()!=null)data.put(MIN_PAYMENT, params.getMinPayment());
+            if(params.getPricePerKBytes()!=null)data.put(PRICE_PER_K_BYTES, params.getPricePerKBytes());
+            if(params.getPricePerRequest()!=null)data.put(PRICE_PER_REQUEST, params.getPricePerRequest());
+            if(params.getConsumeViaShare()!=null)data.put(CONSUME_VIA_SHARE,params.getConsumeViaShare());
+            if(params.getOrderViaShare()!=null)data.put(ORDER_VIA_SHARE,params.getOrderViaShare());
 
-        writer.write(ParseTools.gsonString(data));
+            String publicSessionKey;
+            try {
+                String key = jedis.hget(Initiator.serviceName+"_"+Strings.FID_SESSION_NAME, PUBLIC);
+                jedis.select(1);
+                publicSessionKey = jedis.hget(key, SESSION_KEY);
+                data.put(SESSION_KEY, publicSessionKey);
+                writer.write(ParseTools.gsonString(data));
+            }catch (Exception e){
+                data.put("Error", "Can't get free sessionKey.");
+                writer.write(ParseTools.gsonString(data));
+            }
+        }
     }
 }

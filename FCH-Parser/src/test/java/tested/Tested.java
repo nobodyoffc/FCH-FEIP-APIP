@@ -17,8 +17,8 @@ import org.junit.Test;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import servers.EsTools;
-import servers.EsTools.MgetResult;
+import esTools.EsTools;
+import esTools.EsTools.MgetResult;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

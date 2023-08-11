@@ -1,5 +1,7 @@
 package opReturn;
 
+import fchClass.OpReturn;
+
 public class opReReadResult {
 	private OpReturn opReturn;
 	private int length;

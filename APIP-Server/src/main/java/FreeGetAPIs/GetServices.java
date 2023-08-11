@@ -28,6 +28,7 @@ public class GetServices extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
 
         PrintWriter writer = response.getWriter();
+
         if (Initiator.isFreeGetForbidden(writer)) return;
         ElasticsearchClient esClient = Initiator.esClient;
 

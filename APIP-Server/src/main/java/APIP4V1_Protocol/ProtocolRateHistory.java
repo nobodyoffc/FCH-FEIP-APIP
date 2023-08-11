@@ -2,7 +2,7 @@ package APIP4V1_Protocol;
 
 import APIP0V1_OpenAPI.*;
 import APIP1V1_FCDSL.Fcdsl;
-import APIP1V1_FCDSL.Sort;
+import esTools.Sort;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
@@ -69,8 +69,7 @@ public class ProtocolRateHistory extends HttpServlet {
         //response
         replier.setData(meetList);
         replier.setGot(meetList.size());
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.ProtocolRateHistoryAPI));
-        esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
+        esRequest.writeSuccess(dataCheckResult.getSessionKey());
 
     }
 }

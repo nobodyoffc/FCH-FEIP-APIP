@@ -60,9 +60,7 @@ public class GeneralAPI extends HttpServlet {
         replier.setData(meetList);
         replier.setGot(meetList.size());
         if(replier.getTotal()==0)replier.setTotal(meetList.size());
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.GroupByIdsAPI));
-        esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
-
+        esRequest.writeSuccess(dataCheckResult.getSessionKey());
     }
     private boolean isThisApiRequest(DataRequestBody requestBody) {
         if(requestBody.getFcdsl()==null)

@@ -17,7 +17,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import APIP1V1_FCDSL.Sort;
+import esTools.Sort;
 
 
 @WebServlet(ApiNames.APIP2V1Path + ApiNames.P2shSearchAPI)
@@ -67,8 +67,7 @@ public class P2shSearch extends HttpServlet {
         replier.setNonce(requestBody.getNonce());
         replier.setData(meetList);
         replier.setGot(meetList.size());
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.P2shSearchAPI));
-        esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
+        esRequest.writeSuccess(dataCheckResult.getSessionKey());
 
     }
 }

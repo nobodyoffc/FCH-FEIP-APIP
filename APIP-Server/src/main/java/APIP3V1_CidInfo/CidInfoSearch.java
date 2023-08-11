@@ -21,7 +21,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import APIP1V1_FCDSL.Sort;
+import esTools.Sort;
 
 @WebServlet(ApiNames.APIP3V1Path + ApiNames.CidInfoSearchAPI)
 public class CidInfoSearch extends HttpServlet {
@@ -87,8 +87,6 @@ public class CidInfoSearch extends HttpServlet {
         //response
         replier.setData(cidInfoList);
         replier.setGot(cidInfoList.size());
-        replier.setTotal(cidInfoList.size());
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.CidInfoSearchAPI));
-        esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
+        esRequest.writeSuccess(dataCheckResult.getSessionKey());
     }
 }

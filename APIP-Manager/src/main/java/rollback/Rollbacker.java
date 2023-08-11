@@ -1,12 +1,11 @@
 package rollback;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import constants.IndicesNames;
 import fchClass.Block;
 import order.Order;
 import redis.clients.jedis.Jedis;
 import redisTools.ReadRedis;
-import servers.EsTools;
+import esTools.EsTools;
 import constants.Strings;
 import startAPIP.StartAPIP;
 
@@ -16,6 +15,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import static constants.IndicesNames.ORDER;
+import static constants.Strings.ORDER_LAST_HEIGHT;
 import static fileTools.BlockFileTools.getBlockByHeight;
 
 public class Rollbacker {
@@ -43,14 +43,14 @@ public class Rollbacker {
     public static void rollback(ElasticsearchClient esClient, Jedis jedis,long height)  {
         ArrayList<Order> orderList = null;
         try {
-            String index = StartAPIP.getIndexOfService(jedis,ORDER);
+            String index = StartAPIP.getNameOfService(jedis,ORDER);
             orderList= EsTools.getListSinceHeight(esClient, index,"height",height,Order.class);
 
             if(orderList==null || orderList.size()==0)return;
             minusFromBalance(esClient,orderList);
 
             Jedis jedis0Common = new Jedis();
-            jedis0Common.set(Strings.ORDER_LAST_HEIGHT, String.valueOf(height));
+            jedis0Common.set(StartAPIP.serviceName+"_"+ORDER_LAST_HEIGHT, String.valueOf(height));
             Block block = getBlockByHeight(esClient, height);
             jedis0Common.set(Strings.ORDER_LAST_BLOCK_ID, block.getBlockId());
             jedis0Common.close();
@@ -64,12 +64,12 @@ public class Rollbacker {
         Jedis jedis = new Jedis();
         for(Order order: orderList){
             String addr = order.getFromFid();
-            long balance = ReadRedis.readHashLong(jedis, Strings.USER, addr);
-            jedis.hset(Strings.USER,addr, String.valueOf(balance-order.getAmount()));
+            long balance = ReadRedis.readHashLong(jedis, StartAPIP.serviceName+"_"+Strings.FID_BALANCE, addr);
+            jedis.hset(StartAPIP.serviceName+"_"+Strings.FID_BALANCE,addr, String.valueOf(balance-order.getAmount()));
 
-            idList.add(order.getCashId());
+            idList.add(order.getOrderId());
         }
-        String index = StartAPIP.getIndexOfService(jedis,ORDER);
+        String index = StartAPIP.getNameOfService(jedis,ORDER);
         EsTools.bulkDeleteList(esClient, index, idList);
     }
 

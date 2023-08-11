@@ -74,10 +74,7 @@ public class GroupMembers extends HttpServlet {
         //Response
         replier.setData(dataMap);
         replier.setGot(dataMap.size());
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.GroupMembersAPI));
-        esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
-
-        return;
+        esRequest.writeSuccess(dataCheckResult.getSessionKey());
     }
 
     private boolean isThisApiRequest(DataRequestBody requestBody) {

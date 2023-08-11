@@ -1,5 +1,6 @@
 package opReturn;
 
+import fchClass.OpReturn;
 import javaTools.BytesTools;
 
 import java.io.File;

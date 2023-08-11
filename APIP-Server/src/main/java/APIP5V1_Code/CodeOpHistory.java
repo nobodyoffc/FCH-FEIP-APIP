@@ -6,7 +6,7 @@ import constants.IndicesNames;
 import constants.ReplyInfo;
 import construct.CodeHistory;
 import APIP1V1_FCDSL.Fcdsl;
-import APIP1V1_FCDSL.Sort;
+import esTools.Sort;
 import initial.Initiator;
 
 import javax.servlet.ServletException;
@@ -68,8 +68,7 @@ public class CodeOpHistory extends HttpServlet {
         //response
         replier.setData(meetList);
         replier.setGot(meetList.size());
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.CodeOpHistoryAPI));
-        esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
+        esRequest.writeSuccess(dataCheckResult.getSessionKey());
 
     }
 }

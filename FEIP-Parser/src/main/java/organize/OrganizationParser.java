@@ -7,9 +7,9 @@ import constants.IndicesNames;
 import feipClass.Cid;
 import feipClass.Group;
 import feipClass.Team;
-import opReturn.Feip;
-import opReturn.OpReturn;
-import servers.EsTools;
+import feipClass.Feip;
+import fchClass.OpReturn;
+import esTools.EsTools;
 import startFEIP.StartFEIP;
 
 import java.io.IOException;

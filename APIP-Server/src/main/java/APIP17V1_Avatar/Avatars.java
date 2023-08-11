@@ -4,8 +4,10 @@ import APIP0V1_OpenAPI.*;
 import APIP1V1_FCDSL.Fcdsl;
 import constants.ApiNames;
 import constants.ReplyInfo;
-import initial.Initiator;
 import constants.Strings;
+import initial.Initiator;
+import keyTools.KeyTools;
+import redis.clients.jedis.Jedis;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -16,12 +18,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
 import static constants.Strings.CONFIG;
-
 
 @WebServlet(ApiNames.APIP17V1Path + ApiNames.AvatarsAPI)
 public class Avatars extends HttpServlet {
@@ -41,16 +43,29 @@ public class Avatars extends HttpServlet {
 
         DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
         replier.setNonce(requestBody.getNonce());
+
         //Check API
-        String[] addrs = checkBody(requestBody);
-        if(addrs==null){
-            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
-            writer.write(replier.reply1012BadQuery(addr));
+        String[] addrsRow = checkBody(requestBody);
+        ArrayList<String> addrList = new ArrayList<>();
+        for(String fid : addrsRow){
+            if(KeyTools.isValidFchAddr(fid)){
+                addrList.add(fid);
+            }
+        }
+        String [] addrs = addrList.toArray(new String[0]);
+        if(addrs.length==0){
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1020OtherError));
+            replier.setData("No qualified FID.");
+            writer.write(replier.reply1020OtherError(addr));
             return;
         }
-        String avatarBasePath = Initiator.jedis0Common.hget(CONFIG,Strings.AVATAR_BASE_PATH);
-        String avatarPngPath = Initiator.jedis0Common.hget(CONFIG,Strings.AVATAR_PNG_PATH);
 
+        String avatarBasePath = null;
+        String avatarPngPath= null;
+        try(Jedis jedis = Initiator.jedisPool.getResource()) {
+            avatarBasePath = jedis.hget(CONFIG, Strings.AVATAR_BASE_PATH);
+            avatarPngPath = jedis.hget(CONFIG, Strings.AVATAR_PNG_PATH);
+        }
         if(!avatarPngPath.endsWith("/"))avatarPngPath  = avatarPngPath+"/";
         if(!avatarBasePath.endsWith("/"))avatarBasePath = avatarBasePath+"/";
 
@@ -70,16 +85,15 @@ public class Avatars extends HttpServlet {
         replier.setData(addrPngBase64Map);
         replier.setGot(addrPngBase64Map.size());
         replier.setTotal(addrPngBase64Map.size());
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.AvatarsAPI));
+
         response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code0Success));
-        String reply = replier.reply0Success(addr,nPrice);
+        String reply = replier.reply0Success(addr);
         if(reply==null)return;
         String sign = DataRequestHandler.symSign(reply,dataCheckResult.getSessionKey());
         if(sign==null)return;
         response.setHeader(ReplyInfo.SignInHeader,sign);
 
         writer.write(reply);
-        return;
     }
 
     private String[] checkBody(DataRequestBody requestBody) {

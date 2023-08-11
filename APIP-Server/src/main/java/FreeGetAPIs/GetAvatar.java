@@ -4,6 +4,7 @@ import APIP17V1_Avatar.AvatarMaker;
 import constants.ApiNames;
 import initial.Initiator;
 import constants.Strings;
+import redis.clients.jedis.Jedis;
 
 import javax.imageio.ImageIO;
 import javax.servlet.ServletException;
@@ -16,22 +17,30 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import static constants.Strings.CONFIG;
+import static initial.Initiator.jedisPool;
+
 
 @WebServlet(ApiNames.FreeGet + ApiNames.GetAvatarAPI)
 public class GetAvatar extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String fidRequested;
+        String avatarBasePath = null;
+        String avatarPngPath = null;
+        PrintWriter writer = response.getWriter();
 
-        if (Initiator.isFreeGetForbidden(response.getWriter())) return;
-
-        String fidRequested = request.getParameter("fid");
-
-        if(!(fidRequested.substring(0,1).equals("F") || fidRequested.substring(0,1).equals("3")))return;
-
-        String avatarBasePath = Initiator.jedis0Common.hget(CONFIG,Strings.AVATAR_BASE_PATH);
-        String avatarPngPath = Initiator.jedis0Common.hget(CONFIG,Strings.AVATAR_PNG_PATH);
+        if (Initiator.isFreeGetForbidden(writer)) return;
+        fidRequested = request.getParameter("fid");
+        if (!(fidRequested.charAt(0) == 'F' || fidRequested.charAt(0) == '3')) return;
+        try(Jedis jedis0Common= jedisPool.getResource()) {
+            avatarBasePath = jedis0Common.hget(CONFIG, Strings.AVATAR_BASE_PATH);
+            avatarPngPath = jedis0Common.hget(CONFIG, Strings.AVATAR_PNG_PATH);
+        }catch (Exception e){
+             e.printStackTrace();
+        }
         if(!avatarPngPath.endsWith("/"))avatarPngPath  = avatarPngPath+"/";
         if(!avatarBasePath.endsWith("/"))avatarBasePath = avatarBasePath+"/";
 

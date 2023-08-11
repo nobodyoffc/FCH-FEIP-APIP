@@ -2,10 +2,7 @@ package APIP0V1_OpenAPI;
 
 import APIP1V1_FCDSL.*;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch._types.FieldSort;
 import co.elastic.clients.elasticsearch._types.FieldValue;
-import co.elastic.clients.elasticsearch._types.SortOptions;
-import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.query_dsl.*;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.MgetResponse;
@@ -19,7 +16,7 @@ import constants.Constants;
 import constants.ReplyInfo;
 import javaTools.BytesTools;
 import cryptoTools.SHA;
-import APIP1V1_FCDSL.Sort;
+import esTools.Sort;
 import initial.Initiator;
 
 import javax.servlet.http.HttpServletResponse;
@@ -114,7 +111,7 @@ public class DataRequestHandler {
             }
             if(sort!=null) {
                 if (sort.size() > 0) {
-                    builder.sort(getSortList(sort));
+                    builder.sort(Sort.getSortList(sort));
                 }
             }
             if(fcdsl.getAfter()!=null){
@@ -128,8 +125,6 @@ public class DataRequestHandler {
         builder.trackTotalHits(tb.build());
         searchRequest = builder.build();
 
-//        //TODO
-//        ParseTools.gsonPrint(searchRequest);
         SearchResponse<T> result;
         try {
             result = esClient.search(searchRequest, tClass);
@@ -268,12 +263,14 @@ public class DataRequestHandler {
 
     private BoolQuery getMatchQuery(Match match) {
         BoolQuery.Builder bBuilder = new BoolQuery.Builder();
+
         if(match.getValue()==null)return null;
         if(match.getFields()==null || match.getFields().length==0)return null;
 
         List<Query> queryList = new ArrayList<>();
 
         for(String field: match.getFields()){
+            if(field.isBlank())continue;
             MatchQuery.Builder mBuilder = new MatchQuery.Builder();
             mBuilder.field(field);
             mBuilder.query(match.getValue());
@@ -288,6 +285,7 @@ public class DataRequestHandler {
         BoolQuery.Builder ebBuilder = new BoolQuery.Builder();
         List<Query> eQueryList = new ArrayList<>();
         for(String e: exists) {
+            if(e.isBlank())continue;
             ExistsQuery.Builder eBuilder = new ExistsQuery.Builder();
             eBuilder.queryName("exists");
             eBuilder.field(e);
@@ -300,6 +298,7 @@ public class DataRequestHandler {
         BoolQuery.Builder ueBuilder = new BoolQuery.Builder();
         List<Query> queryList = new ArrayList<>();
         for(String e: unexist) {
+            if(e.isBlank())continue;
             ExistsQuery.Builder eBuilder = new ExistsQuery.Builder();
             eBuilder.queryName("exist");
             eBuilder.field(e);
@@ -315,6 +314,7 @@ public class DataRequestHandler {
 
         List<FieldValue> valueList = new ArrayList<>();
         for(String str: equals.getValues()){
+            if(str.isBlank())continue;
             if(str.contains(".")){
                 try {
                     valueList.add(FieldValue.of(Double.parseDouble(str)));
@@ -353,6 +353,7 @@ public class DataRequestHandler {
         List<Query> queryList = new ArrayList<>();
 
         for(String field : fields){
+            if(field.isBlank())continue;
             RangeQuery.Builder rangeBuider = new RangeQuery.Builder();
             rangeBuider.field(field);
 
@@ -395,6 +396,7 @@ public class DataRequestHandler {
 
         List<Query> queryList = new ArrayList<>();
         for(String field:part.getFields()){
+            if(field.isBlank())continue;
             WildcardQuery wQuery = WildcardQuery.of(w -> w
                     .field(field)
                     .caseInsensitive(isCaseInSensitive)
@@ -406,30 +408,12 @@ public class DataRequestHandler {
         return partBoolBuilder.build();
     }
 
-    public List<SortOptions> getSortList(ArrayList<Sort> sortList) {
-        List<SortOptions> soList = new ArrayList<>();
-        for(Sort sort1: sortList){
-            SortOrder order;
-            if(sort1.getOrder().equals("asc")){
-                order = SortOrder.Asc;
-            }else if(sort1.getOrder().equals("desc")){
-                order = SortOrder.Desc;
-            }else {
-                order = null;
-                return null;
-            }
-            FieldSort fs = FieldSort.of(f->f.field(sort1.getField()).order(order));
-            SortOptions so = SortOptions.of(s->s.field(fs));
-            soList.add(so);
-        }
-        return soList;
-    }
-
     private BoolQuery getTermsQuery(Terms terms) {
         BoolQuery.Builder termsBoolBuider;
 
         List<FieldValue> valueList = new ArrayList<>();
         for(String value : terms.getValues()){
+            if(value.isBlank())continue;
             valueList.add(FieldValue.of(value));
         }
 
@@ -461,15 +445,16 @@ public class DataRequestHandler {
         return queryBuilder.build();
     }
 
-    public void writeSuccess(String sessionKey, int nPrice) {
-        response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code0Success));
-        String reply = replier.reply0Success(addr,nPrice);
-        if(reply==null)return;
-        String sign = symSign(reply,sessionKey);
-        if(sign==null)return;
-        response.setHeader(ReplyInfo.SignInHeader,sign);
-        writer.write(reply);
-    }
+//    public void writeSuccess(String sessionKey, int nPrice) {
+//
+//        response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code0Success));
+//        String reply = replier.reply0Success(addr,nPrice);
+//        if(reply==null)return;
+//        String sign = symSign(reply,sessionKey);
+//        if(sign==null)return;
+//        response.setHeader(ReplyInfo.SignInHeader,sign);
+//        writer.write(reply);
+//    }
 
     public void writeSuccess(String sessionKey) {
         response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code0Success));

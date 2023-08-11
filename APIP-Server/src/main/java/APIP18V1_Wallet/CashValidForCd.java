@@ -6,7 +6,8 @@ import constants.IndicesNames;
 import constants.ReplyInfo;
 import fchClass.Cash;
 import initial.Initiator;
-import tools.WalletTools;
+import walletTools.CashListReturn;
+import walletTools.WalletTools;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -76,7 +77,8 @@ public class CashValidForCd extends HttpServlet {
 //            sortOptionsList = esRequest.getSortList(defaultSort);
 //        }
 
-        List<Cash> meetList = WalletTools.getCashForCd(replier, addrRequested, cd);
+        CashListReturn cashListReturn = WalletTools.getCashForCd(addrRequested, cd,Initiator.esClient);
+        List<Cash> meetList = cashListReturn.getCashList();
 
         if(meetList==null){
             response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
@@ -92,8 +94,9 @@ public class CashValidForCd extends HttpServlet {
         //response
         replier.setData(meetList);
         replier.setGot(meetList.size());
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.CashValidForCdAPI));
-        esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
+        replier.setTotal(cashListReturn.getTotal());
+        esRequest.writeSuccess(dataCheckResult.getSessionKey());
+
     }
 
     private boolean isThisApiRequest(DataRequestBody requestBody) {

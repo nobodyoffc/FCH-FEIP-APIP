@@ -9,8 +9,15 @@ import javaTools.BytesTools;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.*;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Map;
+
+import static constants.Constants.FchToSatoshi;
 
 public class ParseTools {
 
@@ -112,12 +119,12 @@ public class ParseTools {
         return gson.toJson(ob);
     }
 
-    public static void gsonPrint(Object ob) {
+    public static void  gsonPrint(Object ob) {
         System.out.println("***********\n" + ob.getClass().toString() + ": " + gsonString(ob) + "\n***********");
         return;
     }
 
-    public static void waitForNewItemInDirectory(String directoryPathStr) {
+    public static void waitForNewItemInDirectory(String directoryPathStr, Boolean running) {
         try {
             Path directory = Paths.get(directoryPathStr);
 
@@ -126,16 +133,13 @@ public class ParseTools {
                         StandardWatchEventKinds.ENTRY_DELETE,
                         StandardWatchEventKinds.ENTRY_MODIFY);
 
-                while (true) {
+                while (running) {
                     WatchKey key = watchService.take();
                     for (WatchEvent<?> event : key.pollEvents()) {
                         WatchEvent.Kind<?> kind = event.kind();
 
                         if (kind != StandardWatchEventKinds.OVERFLOW) {
                             WatchEvent<Path> ev = (WatchEvent<Path>) event;
-
-                            //Path changedFilePath = directory.resolve(ev.context());
-                            //System.out.printf("Event kind: %s. File affected: %s.%n", kind, changedFilePath);
                         }
                     }
 
@@ -246,8 +250,64 @@ public class ParseTools {
         return goodStr;
     }
 
+    public static double roundDouble8(double raw){
+        long i = 0;
+        i = (long) (raw*FchToSatoshi);
+        return (double) i/FchToSatoshi;
+    }
+
+    public static double roundDouble4(double raw){
+        long i = 0;
+        i = (long) (raw*10000);
+        double j = (double) i / 10000;
+        System.out.println(raw + " is rounded to "+ j);
+        return j;
+    }
+
+    public static boolean isGoodShare(String consumeViaShare) {
+        int index = consumeViaShare.indexOf('.');
+        String str = consumeViaShare.substring(index+1);
+        return str.length() <= 4;
+    }
+
+    public static boolean isGoodShareMap(Map<String, String> map) {
+        long sum = 0;
+        for(String key: map.keySet()){
+            String valueStr = map.get(key);
+            Double valueDb;
+            try{
+                valueDb = Double.parseDouble(valueStr);
+                if(valueDb>1){
+                    System.out.println("Share can't bigger than 1. "+key+"="+valueDb+ "Reset this share map.");
+                    return false;
+                }
+                valueDb = roundDouble8(valueDb);
+                sum += ((long)(valueDb*100));
+            }catch (Exception ignore){}
+        }
+        System.out.println("The sum of shares is "+sum +"%");
+        if(sum!=100){
+            System.out.println("Builder shares didn't sum up to 100%. Reset it.");
+            return false;
+        }
+        return true;
+    }
+
     public static class VarintResult {
         public long number;
         public byte[] rawBytes;
+    }
+
+    public static String convertTimestampToDate(long timestamp) {
+        if(timestamp<10000000000L){
+            timestamp=timestamp*1000;
+        }
+        LocalDateTime dateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.systemDefault());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        return dateTime.format(formatter);
+    }
+
+    public static String formatString(String str, int length) {
+        return String.format("%-" + length + "s", str);
     }
 }

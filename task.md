@@ -1,5 +1,29 @@
 # 备忘任务
 
+    private EccAesType type;
+
+    private String alg;
+    private byte[] msg;
+    private byte[] symKey;
+    private byte[] password;
+    private byte[] pubKeyA;
+
+    private byte[] pubKeyB;
+    private byte[] priKeyA;
+    private byte[] priKeyB;
+    private byte[] iv;
+    private byte[] sum;
+    private byte[] cipher;
+
+
+
+[ ] 定制incomeT的reward
+[ ] 展示未支付
+[ ] 测试 获取lasOrderId，unpaidReward
+* debug
+  [ ] jedisPool  
+  [ ] jedis内部化，close
+
 * 逻辑
   * 分配
     * 分配类型

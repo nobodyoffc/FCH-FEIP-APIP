@@ -52,7 +52,6 @@ public class TotalsAPI extends HttpServlet {
         replier.setGot(allSumMap.size());
         replier.setTotal(allSumMap.size());
 
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.TotalsAPI));
-        esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
+        esRequest.writeSuccess(dataCheckResult.getSessionKey());
     }
 }

@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import parser.TxInMempool;
 import redis.clients.jedis.Jedis;
-import servers.NewEsClient;
 import config.ConfigAPIP;
 
 import java.io.IOException;
@@ -31,7 +30,7 @@ import static parser.RawTxParser.parseMempoolTx;
 public class MempoolScanner implements Runnable {
     private volatile boolean running = true;
     private static final Logger log = LoggerFactory.getLogger(MempoolScanner.class);
-    private final Jedis jedis = new Jedis();
+    private Jedis jedis = new Jedis();
     private final long IntervalSeconds = 5;
     private ElasticsearchClient esClient;
 
@@ -56,7 +55,6 @@ public class MempoolScanner implements Runnable {
             throw new RuntimeException(e);
         }
 
-
         String rpcIp = configAPIP.getRpcIp();
         int rpcPort = configAPIP.getRpcPort();
         String rpcUser = configAPIP.getRpcUser();
@@ -74,7 +72,7 @@ public class MempoolScanner implements Runnable {
 
     public void run() {
         jedis.select(3);
-        log.debug("Scanning mempool...");
+        log.debug("Scanning mempool. Any key to continue...");
         while (running) {
             String[] txIds;
 
@@ -260,7 +258,14 @@ public class MempoolScanner implements Runnable {
     }
     public void shutdown() {
         jedis.close();
-        esClient.shutdown();
         running = false;
+    }
+    public void restart(){
+        jedis = new Jedis();
+        running = true;
+    }
+
+    public boolean isRunning() {
+        return running;
     }
 }

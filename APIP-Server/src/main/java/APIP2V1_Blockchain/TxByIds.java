@@ -4,6 +4,7 @@ import APIP0V1_OpenAPI.*;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
+import esTools.EsTools;
 import fchClass.Tx;
 import fchClass.TxHas;
 import data.TxInfo;
@@ -71,7 +72,7 @@ public class TxByIds extends HttpServlet {
 
         List<Tx> txList = null;
         try {
-            txList = servers.EsTools.getMultiByIdList(Initiator.esClient, IndicesNames.TX, idList, Tx.class).getResultList();
+            txList = EsTools.getMultiByIdList(Initiator.esClient, IndicesNames.TX, idList, Tx.class).getResultList();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -83,8 +84,7 @@ public class TxByIds extends HttpServlet {
         replier.setData(meetList);
         replier.setGot(meetList.size());
         replier.setTotal(meetList.size());
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.TxByIdsAPI));
-        esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
+        esRequest.writeSuccess(dataCheckResult.getSessionKey());
 
         return;
     }

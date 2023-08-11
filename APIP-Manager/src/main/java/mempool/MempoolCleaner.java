@@ -14,7 +14,7 @@ import static constants.Strings.CONFIG_FILE_PATH;
 
 public class MempoolCleaner implements Runnable {
     private volatile boolean running = true;
-    private final Jedis jedis = new Jedis();
+    private Jedis jedis = new Jedis();
     private String blockFilePath;
     private static final Logger log = LoggerFactory.getLogger(MempoolCleaner.class);
     public MempoolCleaner(String blockFilePath) {
@@ -40,8 +40,7 @@ public class MempoolCleaner implements Runnable {
         System.out.println("MempoolCleaner running...");
         try {
             while (running) {
-                String lastBlockFileName = BlockFileTools.getLastBlockFileName(blockFilePath);
-                ParseTools.waitForNewItemInFile(blockFilePath+lastBlockFileName);
+                ParseTools.waitForNewItemInDirectory(blockFilePath,running);
                 jedis.flushDB();
             }
         }catch (Exception e){
@@ -50,6 +49,12 @@ public class MempoolCleaner implements Runnable {
     }
 
     public void shutdown() {
+        jedis.close();
         running = false;
+    }
+
+    public void restart(){
+        jedis = new Jedis();
+        running = true;
     }
 }

@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.ArrayList;
-import APIP1V1_FCDSL.Sort;
+import esTools.Sort;
 
 
 @WebServlet(ApiNames.APIP13V1Path + ApiNames.MailsDeletedAPI)
@@ -97,8 +97,7 @@ public class MailsDeleted extends HttpServlet {
         //response
         replier.setData(meetList);
         replier.setGot(meetList.size());
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.MailsDeletedAPI));
-        esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
+        esRequest.writeSuccess(dataCheckResult.getSessionKey());
     }
 
     private boolean isThisApiRequest(DataRequestBody requestBody) {

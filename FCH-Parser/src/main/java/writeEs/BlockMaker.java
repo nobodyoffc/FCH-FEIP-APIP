@@ -6,8 +6,8 @@ import keyTools.KeyTools;
 import fcTools.ParseTools;
 import parser.ReadyBlock;
 import parser.WeightMethod;
-import servers.EsTools;
-import servers.EsTools.MgetResult;
+import esTools.EsTools;
+import esTools.EsTools.MgetResult;
 
 import java.util.*;
 

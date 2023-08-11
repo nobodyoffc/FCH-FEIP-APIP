@@ -10,7 +10,7 @@ public class CorsFilter implements Filter {
         HttpServletResponse response = (HttpServletResponse) res;
         HttpServletRequest request= (HttpServletRequest) req;
 
-        System.out.println("Applying CORS filter");
+//        System.out.println("Applying CORS filter");
 
         response.setHeader("Access-Control-Allow-Origin", "*");
         response.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, OPTIONS, DELETE");

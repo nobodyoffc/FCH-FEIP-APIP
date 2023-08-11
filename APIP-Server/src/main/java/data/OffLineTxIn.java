@@ -1,6 +1,6 @@
 package data;
 
-import fcTools.SendTo;
+import walletTools.SendTo;
 
 public class OffLineTxIn {
     private String fid;

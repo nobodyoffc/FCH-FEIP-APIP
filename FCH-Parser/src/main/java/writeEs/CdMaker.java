@@ -11,10 +11,13 @@ import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.UpdateByQueryResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
+import fcTools.ParseTools;
 import fchClass.Address;
 import fchClass.Block;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import parser.WeightMethod;
-import servers.EsTools;
+import esTools.EsTools;
 
 import java.io.IOException;
 import java.util.*;
@@ -23,6 +26,7 @@ import static constants.IndicesNames.ADDRESS;
 import static constants.IndicesNames.CASH;
 
 public class CdMaker {
+	private static final Logger log = LoggerFactory.getLogger(CdMaker.class);
 
 	public void makeUtxoCd(ElasticsearchClient esClient, Block bestBlock)
 			throws ElasticsearchException, IOException, InterruptedException {
@@ -30,6 +34,7 @@ public class CdMaker {
 		long bestBlockTime = bestBlock.getTime();
 
 		System.out.println("Make all cd of UTXOs...");
+		log.debug("Make all cd of UTXOs...");
 
 		UpdateByQueryResponse response = esClient.updateByQuery(u -> u
 				.conflicts(Conflicts.Proceed)
@@ -40,7 +45,7 @@ public class CdMaker {
 				.script(s -> s.inline(i1 -> i1.source(
 								"ctx._source.cd = (long)(((long)((params.bestBlockTime - ctx._source.birthTime)/86400)*ctx._source.value)/100000000)")
 						.params("bestBlockTime", JsonData.of(bestBlockTime)))));
-		System.out.println(
+		log.debug(
 				response.updated()
 						+" utxo updated within "
 						+response.took()/1000
@@ -48,9 +53,12 @@ public class CdMaker {
 						+response.versionConflicts());
 	}
 
+
 	public void makeAddrCd(ElasticsearchClient esClient) throws Exception {
 
 		System.out.println("Make all cd of Addresses...");
+
+		long count = 0;
 
 		SearchResponse<Address> response = esClient.search(
 				s -> s.index(ADDRESS).size(EsTools.READ_MAX).sort(sort -> sort.field(f -> f.field("fid"))),
@@ -62,13 +70,13 @@ public class CdMaker {
 			addrOldMap.put(addr.getFid(),addr);
 		}
 
-		Map<String,Long> addrNewCdMap = makeAddrCdList(esClient, addrOldList);
+		Map<String,Long> addrNewCdMap = makeAddrCdMap(esClient, addrOldList);
 		Map<String, Long> addrNewWeightMap = makeWeight(addrNewCdMap, addrOldMap);
 		updateAddrMap(esClient, addrNewCdMap, addrNewWeightMap);
+		count+=response.hits().hits().size();
 
-		while (true) {
-			if (response.hits().hits().size() < EsTools.READ_MAX)
-				break;
+		while (response.hits().hits().size() >= EsTools.READ_MAX) {
+
 			Hit<Address> last = response.hits().hits().get(response.hits().hits().size() - 1);
 			String lastId = last.id();
 			response = esClient.search(s -> s.index(ADDRESS).size(EsTools.READ_MAX)
@@ -76,14 +84,18 @@ public class CdMaker {
 
 			addrOldList = getResultAddrList(response);
 			addrOldMap = new HashMap<>();
-			for(Address addr : addrOldList){
-				addrOldMap.put(addr.getFid(),addr);
+			for (Address addr : addrOldList) {
+				addrOldMap.put(addr.getFid(), addr);
 			}
 
-			addrNewCdMap = makeAddrCdList(esClient, addrOldList);
+			addrNewCdMap = makeAddrCdMap(esClient, addrOldList);
 			addrNewWeightMap = makeWeight(addrNewCdMap, addrOldMap);
 			updateAddrMap(esClient, addrNewCdMap, addrNewWeightMap);
+			count+=response.hits().hits().size();
 		}
+		String time = ParseTools.convertTimestampToDate(System.currentTimeMillis());
+		log.debug(time+": Made cd values of all "+count+" address.");
+		System.out.println(time+": Made cd values of all "+count+" address.");
 	}
 
 	private Map<String, Long> makeWeight(Map<String, Long> addrNewCdMap, Map<String, Address> addrOldMap) {
@@ -110,7 +122,7 @@ public class CdMaker {
 		return addrList;
 	}
 
-	private Map<String, Long> makeAddrCdList(ElasticsearchClient esClient, ArrayList<Address> addrOldList)
+	private Map<String, Long> makeAddrCdMap(ElasticsearchClient esClient, ArrayList<Address> addrOldList)
 			throws ElasticsearchException, IOException {
 
 		List<FieldValue> fieldValueList = new ArrayList<FieldValue>();
@@ -121,9 +133,9 @@ public class CdMaker {
 		SearchResponse<Address> response = esClient.search(
 				s -> s.index(CASH).size(0).query(q -> q.term(t -> t.field("valid").value(true)))
 						.aggregations("filterByAddr",
-								a -> a.filter(f -> f.terms(t -> t.field("addr").terms(t1 -> t1.value(fieldValueList))))
+								a -> a.filter(f -> f.terms(t -> t.field("fid").terms(t1 -> t1.value(fieldValueList))))
 										.aggregations("termByAddr",
-												a1 -> a1.terms(t3 -> t3.field("addr").size(addrOldList.size()))
+												a1 -> a1.terms(t3 -> t3.field("fid").size(addrOldList.size()))
 														.aggregations("cdSum", a2 -> a2.sum(su -> su.field("cd"))))),
 				Address.class);
 

@@ -29,7 +29,6 @@ public class GetTotals extends HttpServlet {
         PrintWriter writer = response.getWriter();
 
         if (Initiator.isFreeGetForbidden(writer)) return;
-
         ElasticsearchClient esClient = Initiator.esClient;
 
         IndicesResponse result = esClient.cat().indices();

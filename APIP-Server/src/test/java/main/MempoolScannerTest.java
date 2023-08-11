@@ -9,8 +9,8 @@ import fcTools.ParseTools;
 import fcTools.ParseTools.VarintResult;
 import org.junit.Test;
 import redis.clients.jedis.Jedis;
-import servers.EsTools;
-import servers.NewEsClient;
+import esTools.EsTools;
+import esTools.NewEsClient;
 import config.ConfigAPIP;
 
 import java.io.ByteArrayInputStream;

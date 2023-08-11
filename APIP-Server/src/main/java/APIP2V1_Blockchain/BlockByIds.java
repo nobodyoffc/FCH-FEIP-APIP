@@ -4,6 +4,7 @@ import APIP0V1_OpenAPI.*;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
+import esTools.EsTools;
 import fchClass.Block;
 import fchClass.BlockHas;
 import data.BlockInfo;
@@ -70,7 +71,7 @@ public class BlockByIds extends HttpServlet {
 
         List<Block> blockList = null;
         try {
-            blockList = servers.EsTools.getMultiByIdList(Initiator.esClient, IndicesNames.BLOCK, idList, Block.class).getResultList();
+            blockList = EsTools.getMultiByIdList(Initiator.esClient, IndicesNames.BLOCK, idList, Block.class).getResultList();
             if(blockList==null||blockList.size()==0){
                 return;
             }
@@ -92,9 +93,7 @@ public class BlockByIds extends HttpServlet {
         replier.setData(meetMap);
         replier.setGot(meetMap.size());
         replier.setTotal(meetMap.size());
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.BlockByIdsAPI));
-        esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
-
+        esRequest.writeSuccess(dataCheckResult.getSessionKey());
         return;
     }
 

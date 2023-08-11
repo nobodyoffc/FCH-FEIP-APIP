@@ -1,7 +1,7 @@
 package order;
 
 public class Order {
-    private String cashId;//cash id
+    private String orderId;//cash id
     private String fromFid;
     private String toFid;
     private String via;
@@ -33,12 +33,12 @@ public class Order {
         this.via = via;
     }
 
-    public String getCashId() {
-        return cashId;
+    public String getOrderId() {
+        return orderId;
     }
 
-    public void setCashId(String cashId) {
-        this.cashId = cashId;
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
     }
 
     public long getTxIndex() {

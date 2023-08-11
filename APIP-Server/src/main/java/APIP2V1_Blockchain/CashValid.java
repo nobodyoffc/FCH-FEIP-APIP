@@ -20,7 +20,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import APIP1V1_FCDSL.Sort;
+import esTools.Sort;
 
 
 @WebServlet(ApiNames.APIP2V1Path + ApiNames.CashValidAPI)
@@ -96,9 +96,7 @@ public class CashValid extends HttpServlet {
 
         replier.setData(meetList);
         replier.setGot(meetList.size());
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.CashValidAPI));
-        esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
-
+        esRequest.writeSuccess(dataCheckResult.getSessionKey());
     }
 
     private boolean isThisApiRequest(DataRequestBody requestBody) {

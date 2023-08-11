@@ -6,7 +6,7 @@ import constants.IndicesNames;
 import constants.ReplyInfo;
 import fchClass.Cash;
 import APIP1V1_FCDSL.Fcdsl;
-import APIP1V1_FCDSL.Sort;
+import esTools.Sort;
 import initial.Initiator;
 
 import javax.servlet.ServletException;
@@ -19,7 +19,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static tools.WalletTools.checkUnconfirmed;
+import static walletTools.WalletTools.checkUnconfirmed;
 
 
 @WebServlet(ApiNames.APIP18V1Path + ApiNames.CashValidLiveAPI)
@@ -77,8 +77,8 @@ public class CashValidLive extends HttpServlet {
         //response
         replier.setData(meetList);
         replier.setGot(meetList.size());
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.CashValidLiveAPI));
-        esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
+        esRequest.writeSuccess(dataCheckResult.getSessionKey());
+
     }
 
     private boolean isThisApiRequest(DataRequestBody requestBody) {

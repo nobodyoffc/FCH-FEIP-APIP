@@ -1,7 +1,7 @@
 ```
-ProtocolType: BBP
-SerialNumber: 19
-ProtocolName: Group
+ProtocolType: FBBP
+SerialNumber: 2
+ProtocolName: Maker
 Version: 1
 Description : Group related actions on Freecash blockchain. 
 Authors: C_armX, Deisler-JJ_Sboy

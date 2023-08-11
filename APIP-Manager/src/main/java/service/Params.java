@@ -9,6 +9,8 @@ public class Params {
 	private String pricePerRequest;
 	private String minPayment;
 	private String sessionDays;
+	private String consumeViaShare;
+	private String orderViaShare;
 
 	public String getPricePerKBytes() {
 		return pricePerKBytes;
@@ -55,5 +57,21 @@ public class Params {
 
 	public void setSessionDays(String sessionDays) {
 		this.sessionDays = sessionDays;
+	}
+
+	public String getConsumeViaShare() {
+		return consumeViaShare;
+	}
+
+	public void setConsumeViaShare(String consumeViaShare) {
+		this.consumeViaShare = consumeViaShare;
+	}
+
+	public String getOrderViaShare() {
+		return orderViaShare;
+	}
+
+	public void setOrderViaShare(String orderViaShare) {
+		this.orderViaShare = orderViaShare;
 	}
 }

@@ -6,6 +6,7 @@ import constants.ApiNames;
 import constants.ReplyInfo;
 import initial.Initiator;
 import constants.Strings;
+import redis.clients.jedis.Jedis;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -19,6 +20,8 @@ import java.io.PrintWriter;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
+
+import static constants.Strings.CONFIG;
 
 
 @WebServlet(ApiNames.APIP17V1Path + ApiNames.AvatarsAPI)
@@ -46,19 +49,21 @@ public class Avatars extends HttpServlet {
             writer.write(replier.reply1012BadQuery(addr));
             return;
         }
-
-        String avatarBasePath = Initiator.jedis0Common.get(Strings.AVATAR_BASE_PATH);
-        String avatarFilePath = Initiator.jedis0Common.get(Strings.AVATAR_PNG_PATH);
-
-        if(!avatarFilePath.endsWith("/"))avatarFilePath  = avatarFilePath+"/";
+        String avatarBasePath;
+        String avatarPngPath;
+        try(Jedis jedis = Initiator.jedisPool.getResource()) {
+            avatarBasePath = jedis.hget(CONFIG, Strings.AVATAR_BASE_PATH);
+            avatarPngPath = jedis.hget(CONFIG, Strings.AVATAR_PNG_PATH);
+        }
+        if(!avatarPngPath.endsWith("/"))avatarPngPath  = avatarPngPath+"/";
         if(!avatarBasePath.endsWith("/"))avatarBasePath = avatarBasePath+"/";
 
-        AvatarMaker.getAvatars(addrs,avatarBasePath,avatarFilePath);
+        AvatarMaker.getAvatars(addrs,avatarBasePath,avatarPngPath);
 
         Base64.Encoder encoder = Base64.getEncoder();
         Map<String,String> addrPngBase64Map = new HashMap<>();
         for(String addr1 : addrs){
-            File file = new File(avatarFilePath+addr1+".png");
+            File file = new File(avatarPngPath+addr1+".png");
             FileInputStream fis = new FileInputStream(file);
             String pngStr = encoder.encodeToString(fis.readAllBytes());
             addrPngBase64Map.put(addr1,pngStr);
@@ -69,9 +74,9 @@ public class Avatars extends HttpServlet {
         replier.setData(addrPngBase64Map);
         replier.setGot(addrPngBase64Map.size());
         replier.setTotal(addrPngBase64Map.size());
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.AvatarsAPI));
+
         response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code0Success));
-        String reply = replier.reply0Success(addr,nPrice);
+        String reply = replier.reply0Success(addr);
         if(reply==null)return;
         String sign = DataRequestHandler.symSign(reply,dataCheckResult.getSessionKey());
         if(sign==null)return;

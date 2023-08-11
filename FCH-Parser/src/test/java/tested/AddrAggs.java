@@ -15,7 +15,7 @@ import co.elastic.clients.elasticsearch.core.search.Hit;
 import constants.IndicesNames;
 import fchClass.Address;
 import config.ConfigBase;
-import servers.EsTools;
+import esTools.EsTools;
 
 import java.io.BufferedReader;
 import java.io.IOException;

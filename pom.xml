@@ -12,7 +12,6 @@
   <modules>
     <module>FCH-Parser</module>
     <module>FC-SDK</module>
-    <module>Common</module>
     <module>FEIP-Parser</module>
     <module>APIP-Manager</module>
     <module>APIP-Server</module>
@@ -60,13 +59,6 @@
       <version>2.0.3</version>
     </dependency>
 
-<!--    <dependency>-->
-<!--      <groupId>org.slf4j</groupId>-->
-<!--      <artifactId>slf4j-log4j12</artifactId>-->
-<!--      <version>2.0.3</version>-->
-<!--      <type>pom</type>-->
-<!--    </dependency>-->
-
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
@@ -83,12 +75,30 @@
       <groupId>org.bitcoinj</groupId>
       <artifactId>bitcoinj-core</artifactId>
       <version>0.16.1</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.bouncycastle</groupId>
+          <artifactId>bcprov-jdk15to18</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcprov-ext-jdk18on</artifactId>
+      <version>1.76</version>
     </dependency>
 
     <dependency>
       <groupId>com.xwc1125.chain5j</groupId>
       <artifactId>eth-core</artifactId>
       <version>4.3.9</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.bouncycastle</groupId>
+          <artifactId>bcprov-jdk15on</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -102,6 +112,7 @@
       <artifactId>Base58</artifactId>
       <version>2022.01.17</version>
     </dependency>
+
     <dependency>
       <groupId>com.github.briandilley.jsonrpc4j</groupId>
       <artifactId>jsonrpc4j</artifactId>
@@ -115,6 +126,16 @@
       <version>8.4.1</version>
     </dependency>
 
-
   </dependencies>
+
+<!--  <dependencyManagement>-->
+<!--    <dependencies>-->
+<!--      <dependency>-->
+<!--        <groupId>org.bouncycastle</groupId>-->
+<!--        <artifactId>bcprov-ext-jdk18on</artifactId>-->
+<!--        <version>1.76</version>-->
+<!--      </dependency>-->
+<!--    </dependencies>-->
+<!--  </dependencyManagement>-->
+
 </project>

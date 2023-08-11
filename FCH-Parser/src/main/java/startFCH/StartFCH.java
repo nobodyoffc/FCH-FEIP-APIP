@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import parser.ChainParser;
 import fileTools.OpReFileTools;
 import parser.Preparer;
-import servers.NewEsClient;
+import esTools.NewEsClient;
 
 import java.io.BufferedReader;
 import java.io.File;

@@ -1,6 +1,5 @@
 package APIP0V1_OpenAPI;
 
-import EccAes256K1P7.EccAes256K1P7;
 import constants.ApiNames;
 import constants.ReplyInfo;
 import service.ApipService;
@@ -63,18 +62,15 @@ import static constants.Strings.*;
 
 @WebServlet(ApiNames.APIP0V1Path + SignInAPI)
 public class SignInAPI extends HttpServlet {
-    private static final Jedis jedis1 = Initiator.jedis1Session;
-    private static final Jedis jedis0 = Initiator.jedis0Common;
+//    private static final Jedis jedis1 = Initiator.jedis1Session;
     private static final ApipService service = Initiator.service;
     private String fid = null;
-    private String pubKey = null;
     private final Replier replier = new Replier();
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         PrintWriter writer = response.getWriter();
-
         RequestChecker requestChecker = new RequestChecker(request, response,replier);
 
         SignInCheckResult signInCheckResult;
@@ -82,10 +78,14 @@ public class SignInAPI extends HttpServlet {
             signInCheckResult = requestChecker.checkSignInRequest();
         } catch (SignatureException e) {
             e.printStackTrace();
+            
             return;
         }
 
-        if(signInCheckResult==null) return;
+        if(signInCheckResult==null) {
+            
+            return;
+        }
 
         fid = signInCheckResult.getFid();
 
@@ -93,36 +93,41 @@ public class SignInAPI extends HttpServlet {
 
         String mode = signInCheckResult.getSignInRequestBody().getMode();
 
-        if((!jedis0.hexists(FID_SESSION_NAME, fid)) || "renew".equals(mode)){
-            try {
-                signInReplyData = makeSession();
-            } catch (Exception e) {
-                response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1020OtherError));
-                replier.setData("Some thing wrong when making sessionKey.\n"+e.getMessage());
-                writer.write(replier.reply1020OtherError(fid));
-                return;
-            }
-        }else{
-            String sessionName = jedis0.hget(FID_SESSION_NAME, fid);
-            signInReplyData.setSessionKey(jedis1.hget(sessionName, SESSION_KEY));
+        try(Jedis jedis = Initiator.jedisPool.getResource()) {
+            if ((!jedis.hexists(Initiator.serviceName+"_"+Strings.FID_SESSION_NAME, fid)) || "renew".equals(mode)) {
+                try {
+                    signInReplyData = makeSession();
+                } catch (Exception e) {
+                    response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1020OtherError));
+                    replier.setData("Some thing wrong when making sessionKey.\n" + e.getMessage());
+                    writer.write(replier.reply1020OtherError(fid));
 
-            long expireMilliSed = jedis1.ttl(sessionName);
-            if(expireMilliSed<0){
-                response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1020OtherError));
-                replier.setData("Expire time is wrong.");
-                writer.write(replier.reply1020OtherError(fid));
-                return;
+                    return;
+                }
+            } else {
+                String sessionName = jedis.hget(Initiator.serviceName+"_"+Strings.FID_SESSION_NAME, fid);
+                jedis.select(1);
+                signInReplyData.setSessionKey(jedis.hget(sessionName, SESSION_KEY));
+
+                long expireMilliSed = jedis.ttl(sessionName);
+                if (expireMilliSed < 0) {
+                    response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1020OtherError));
+                    replier.setData("Expire time is wrong.");
+                    writer.write(replier.reply1020OtherError(fid));
+
+                    return;
+                }
+                long expireTime = System.currentTimeMillis() + expireMilliSed * 1000;
+                signInReplyData.setExpireTime(expireTime);
             }
-            long expireTime =System.currentTimeMillis()+expireMilliSed*1000;
-            signInReplyData.setExpireTime(expireTime);
         }
-
         response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code0Success));
         replier.setGot(1);
         replier.setTotal(1);
         replier.setData(signInReplyData);
         writer.write(replier.reply0Success(fid));
         replier.setData(null);
+        
     }
 
 
@@ -137,21 +142,26 @@ public class SignInAPI extends HttpServlet {
         sessionMap.put("fid", fid);
 
         //Delete the old session of the requester.
-        String oldSessionName = jedis0.hget(Strings.FID_SESSION_NAME,fid);
-        if(oldSessionName!=null)jedis1.del(oldSessionName);
+        try(Jedis jedis = Initiator.jedisPool.getResource()) {
+            String oldSessionName = jedis.hget(Initiator.serviceName+"_"+Strings.FID_SESSION_NAME, fid);
 
-        //Set the new session
-        jedis1.hmset(sessionName,sessionMap);
-        Params params = service.getParams();
-        long lifeSeconds = Long.parseLong(params.getSessionDays()) * 86400;
-        jedis1.expire(sessionName,lifeSeconds);
+            jedis.select(1);
+            if (oldSessionName != null) jedis.del(oldSessionName);
 
-        data.setSessionKey(sessionKey);
-        long expireTime = System.currentTimeMillis()+(lifeSeconds*1000);
-        data.setExpireTime(expireTime);
+            //Set the new session
+            jedis.hmset(sessionName, sessionMap);
+            Params params = service.getParams();
+            long lifeSeconds = Long.parseLong(params.getSessionDays()) * 86400;
+            jedis.expire(sessionName, lifeSeconds);
+            jedis.close();
 
-        jedis0.hset(Strings.FID_SESSION_NAME, fid,sessionName);
+            data.setSessionKey(sessionKey);
+            long expireTime = System.currentTimeMillis() + (lifeSeconds * 1000);
+            data.setExpireTime(expireTime);
 
+            jedis.select(0);
+            jedis.hset(Initiator.serviceName+"_"+Strings.FID_SESSION_NAME, fid, sessionName);
+        }
         return data;
     }
 
@@ -172,10 +182,6 @@ public class SignInAPI extends HttpServlet {
     }
     private String makeSessionName(String sessionKey) {
         return sessionKey.substring(0,12);
-    }
-    private String encryptSessionKey(String sessionKey, String pubKey) throws Exception {
-        EccAes256K1P7 ecc = new EccAes256K1P7();
-        return ecc.encrypt(sessionKey,pubKey);
     }
 
     @Override

@@ -18,24 +18,26 @@ public class KeyTools {
 
     public static boolean isValidFchAddr(String addr) {
         // TODO Auto-generated method stub
+        try {
+            byte[] addrBytes = Base58.decode(addr);
 
-        byte[] addrBytes = Base58.decode(addr);
+            byte[] suffix = new byte[4];
+            byte[] addrNaked = new byte[21];
 
-        byte[] suffix = new byte[4];
-        byte[] addrNaked = new byte[21];
+            System.arraycopy(addrBytes, 0, addrNaked, 0, 21);
+            System.arraycopy(addrBytes, 21, suffix, 0, 4);
 
-        System.arraycopy(addrBytes, 0, addrNaked, 0, 21);
-        System.arraycopy(addrBytes, 21, suffix, 0, 4);
+            byte[] hash = SHA.Sha256x2(addrNaked);
 
-        byte[] hash = SHA.Sha256x2(addrNaked);
+            byte[] hash4 = new byte[4];
+            System.arraycopy(hash, 0, hash4, 0, 4);
 
-        byte[] hash4 = new byte[4];
-        System.arraycopy(hash, 0, hash4, 0, 4);
-
-        if (addrNaked[0] == (byte) 0x23 && Arrays.equals(suffix, hash4)) {
-            return true;
+            if (addrNaked[0] == (byte) 0x23 && Arrays.equals(suffix, hash4)) {
+                return true;
+            }else return false;
+        }catch (Exception ignore){
+            return  false;
         }
-        return false;
     }
 
     public static Map<String, String> pubKeyToAddresses(String pubkey) {
@@ -422,8 +424,7 @@ public class KeyTools {
     public static String pubKeyToAtomAddr(String a) {
         byte[] sha256 = SHA.Sha256(HexFormat.of().parseHex(a));
         byte[] ripemd160 = SHA.Ripemd160(sha256);
-        String bech32Addr = Bech32.encode("cosmos", ripemd160);
-        return bech32Addr;
+        return Bech32.encode("cosmos", ripemd160);
     }
 
     public static String scriptToMultiAddr(String script) {

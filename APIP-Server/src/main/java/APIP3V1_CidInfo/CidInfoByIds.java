@@ -95,9 +95,7 @@ public class CidInfoByIds extends HttpServlet {
         replier.setGot(meetMap.size());
         replier.setTotal(meetMap.size());
         replier.setData(meetMap);
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.CidInfoByIdsAPI));
-        esRequest.writeSuccess(dataCheckResult.getSessionKey(),nPrice);
-
+        esRequest.writeSuccess(dataCheckResult.getSessionKey());
     }
 
     private boolean isThisApiRequest(DataRequestBody requestBody) {

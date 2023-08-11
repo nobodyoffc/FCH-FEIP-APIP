@@ -1,8 +1,8 @@
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import config.ConfigAPIP;
-import order.BalanceInfo;
+import balance.BalanceInfo;
 import redis.clients.jedis.Jedis;
-import servers.NewEsClient;
+import esTools.NewEsClient;
 
 import java.io.IOException;
 

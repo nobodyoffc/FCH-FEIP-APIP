@@ -1,28 +1,25 @@
 package APIP0V1_OpenAPI;
 
-        import EccAes256K1P7.EccAes256K1P7;
-        import constants.ApiNames;
-        import constants.ReplyInfo;
-        import service.ApipService;
-        import javaTools.BytesTools;
-        import initial.Initiator;
-        import redis.clients.jedis.Jedis;
-        import service.Params;
-        import constants.Strings;
+import eccAes256K1P7.EccAes256K1P7;
+import eccAes256K1P7.EccAesType;
+import eccAes256K1P7.EccAesData;
+import constants.ReplyInfo;
+import service.ApipService;
+import javaTools.BytesTools;
+import initial.Initiator;
+import redis.clients.jedis.Jedis;
+import service.Params;
+import constants.Strings;
 
-        import javax.servlet.ServletException;
-        import javax.servlet.annotation.WebServlet;
-        import javax.servlet.http.HttpServlet;
-        import javax.servlet.http.HttpServletRequest;
-        import javax.servlet.http.HttpServletResponse;
-        import java.io.IOException;
-        import java.io.PrintWriter;
-        import java.security.*;
-        import java.util.HashMap;
-        import java.util.Map;
-
-
-        import static constants.ApiNames.SignInAPI;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.security.*;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -50,11 +47,10 @@ package APIP0V1_OpenAPI;
 
 //@WebServlet(ApiNames.APIP0V1Path + SignInAPI)
 public class SignInPKAPI extends HttpServlet {
-    private static final Jedis jedis1 = Initiator.jedis1Session;
-    private static final Jedis jedis0 = Initiator.jedis0Common;
+//    private static final Jedis jedis1 = Initiator.jedis1Session;
     private static final ApipService service = Initiator.service;
     private String fid = null;
-    private String pubKey = null;
+    private char[] pubKey = null;
     private final Replier replier = new Replier();
 
     @Override
@@ -102,23 +98,28 @@ public class SignInPKAPI extends HttpServlet {
         sessionMap.put("fid", fid);
 
         //Delete the old session of the requester.
-        String name = jedis0.hget(Strings.FID_SESSION_NAME,fid);
-        if(name!=null)jedis1.del(name);
+        try(Jedis jedis = Initiator.jedisPool.getResource()) {
 
-        //Set the new session
-        jedis1.hmset(sessionName,sessionMap);
-        Params params = service.getParams();
-        jedis1.expire(sessionName,Long.parseLong(params.getSessionDays())*86400);
+            String name = jedis.hget(Initiator.serviceName+"_"+Strings.FID_SESSION_NAME, fid);
+            jedis.select(1);
+            if (name != null) jedis.del(name);
 
-        data.setSessionKey(sessionKeyEncrypted);
+            //Set the new session
+            jedis.hmset(sessionName, sessionMap);
+            Params params = service.getParams();
+            jedis.expire(sessionName, Long.parseLong(params.getSessionDays()) * 86400);
 
+            data.setSessionKey(sessionKeyEncrypted);
 
-        String oldSessionName = jedis0.hget(Strings.FID_SESSION_NAME, fid);
-        if(oldSessionName!=null) {
-            jedis1.del(oldSessionName);
+            jedis.select(0);
+            String oldSessionName = jedis.hget(Initiator.serviceName+"_"+Strings.FID_SESSION_NAME, fid);
+            if (oldSessionName != null) {
+                jedis.select(1);
+                jedis.del(oldSessionName);
+            }
+            jedis.select(0);
+            jedis.hset(Initiator.serviceName+"_"+Strings.FID_SESSION_NAME, fid, sessionName);
         }
-        jedis0.hset(Strings.FID_SESSION_NAME, fid,sessionName);
-
         return data;
     }
     private String genSessionKey() {
@@ -131,9 +132,11 @@ public class SignInPKAPI extends HttpServlet {
     private String makeSessionName(String sessionKey) {
         return sessionKey.substring(0,12);
     }
-    private String encryptSessionKey(String sessionKey, String pubKey) throws Exception {
+    private String encryptSessionKey(String sessionKey, char[] pubKey) throws Exception {
         EccAes256K1P7 ecc = new EccAes256K1P7();
-        return ecc.encrypt(sessionKey,pubKey);
+        EccAesData eccAesData= new EccAesData(EccAesType.AsyOneWay, sessionKey,pubKey);
+        ecc.encrypt(eccAesData);
+        return eccAesData.getCipher();
     }
 
     @Override

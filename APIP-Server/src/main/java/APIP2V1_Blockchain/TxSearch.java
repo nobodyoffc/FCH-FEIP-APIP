@@ -4,6 +4,7 @@ import APIP0V1_OpenAPI.*;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
+import esTools.EsTools;
 import fchClass.Tx;
 import fchClass.TxHas;
 import data.TxInfo;
@@ -19,7 +20,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import APIP1V1_FCDSL.Sort;
+import esTools.Sort;
 
 @WebServlet(ApiNames.APIP2V1Path + ApiNames.TxSearchAPI)
 public class TxSearch extends HttpServlet {
@@ -69,7 +70,7 @@ public class TxSearch extends HttpServlet {
 
         List<Tx> txList = null;
         try {
-            txList = servers.EsTools.getMultiByIdList(Initiator.esClient, IndicesNames.TX, idList, Tx.class).getResultList();
+            txList = EsTools.getMultiByIdList(Initiator.esClient, IndicesNames.TX, idList, Tx.class).getResultList();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -79,8 +80,7 @@ public class TxSearch extends HttpServlet {
         //response
         replier.setData(meetList);
         replier.setGot(meetList.size());
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.TxSearchAPI));
-        esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
+        esRequest.writeSuccess(dataCheckResult.getSessionKey());
 
     }
 

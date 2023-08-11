@@ -67,8 +67,7 @@ public class P2shByIds extends HttpServlet {
         //response
         replier.setData(meetMap);
         replier.setGot(meetMap.size());
-        int nPrice = Integer.parseInt(initial.Initiator.jedis0Common.hget("nPrice", ApiNames.P2shByIdsAPI));
-        esRequest.writeSuccess(dataCheckResult.getSessionKey(),nPrice);
+        esRequest.writeSuccess(dataCheckResult.getSessionKey());
     }
 
     private boolean isThisApiRequest(DataRequestBody requestBody) {

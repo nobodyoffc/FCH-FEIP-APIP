@@ -4,11 +4,11 @@ import APIP0V1_OpenAPI.*;
 import constants.ApiNames;
 import constants.ReplyInfo;
 import fchClass.Cash;
-import fcTools.CryptoSigner;
-import fcTools.DataForOffLineTx;
-import fcTools.FcConstant;
-import fcTools.SendTo;
+import walletTools.CryptoSigner;
+import walletTools.DataForOffLineTx;
+import walletTools.SendTo;
 import initial.Initiator;
+import walletTools.CashListReturn;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -20,8 +20,8 @@ import java.io.PrintWriter;
 import java.util.List;
 
 import static constants.Constants.*;
-import static fcTools.CryptoSigner.parseDataForOffLineTxFromOther;
-import static tools.WalletTools.getCashListForPay;
+import static walletTools.CryptoSigner.parseDataForOffLineTxFromOther;
+import static walletTools.WalletTools.getCashListForPay;
 
 
 @WebServlet(ToolsPath + ApiNames.OffLineTxAPI)
@@ -66,7 +66,7 @@ public class OffLineTx extends HttpServlet {
                     writer.write(replier.reply1020OtherError(addr));
                     return;
                 }
-                amount += (long) (sendTo.getAmount() * FcConstant.FchToSatoshi);
+                amount += (long) (sendTo.getAmount() * FchToSatoshi);
             }
         }
 
@@ -87,7 +87,10 @@ public class OffLineTx extends HttpServlet {
         DataRequestHandler esRequest = new DataRequestHandler(dataCheckResult.getAddr(),requestBody,response,replier);
 
         //response
-        List<Cash> meetList = getCashListForPay(amount,addrRequested,replier);
+        List<Cash> meetList;
+        CashListReturn cashListReturn = getCashListForPay(amount,addrRequested,Initiator.esClient);
+        meetList = cashListReturn.getCashList();
+
         if(meetList==null){
             response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1020OtherError));
             writer.write(replier.reply1020OtherError(addr));
@@ -99,8 +102,8 @@ public class OffLineTx extends HttpServlet {
         replier.setData(rawTxForCs);
         replier.setGot(1);
         replier.setTotal(1);
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.OffLineTxAPI));
-        esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
+
+        esRequest.writeSuccess(dataCheckResult.getSessionKey());
     }
 
 }

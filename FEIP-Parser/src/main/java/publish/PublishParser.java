@@ -9,9 +9,9 @@ import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import co.elastic.clients.elasticsearch.core.GetResponse;
 import com.google.gson.Gson;
 import fcTools.Hash;
-import opReturn.Feip;
-import opReturn.OpReturn;
-import servers.EsTools;
+import feipClass.Feip;
+import fchClass.OpReturn;
+import esTools.EsTools;
 import startFEIP.StartFEIP;
 
 import java.io.IOException;

@@ -14,9 +14,9 @@ import identity.CidHist;
 import identity.IdentityParser;
 import identity.IdentityRollbacker;
 import identity.RepuHist;
-import opReturn.Feip;
+import feipClass.Feip;
 import opReturn.OpReFileTools;
-import opReturn.OpReturn;
+import fchClass.OpReturn;
 import opReturn.opReReadResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +30,7 @@ import personal.PersonalRollbacker;
 import publish.ProofHistory;
 import publish.PublishParser;
 import publish.PublishRollbacker;
-import servers.EsTools;
+import esTools.EsTools;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -51,6 +51,21 @@ public class FileParser {
 	private long lastHeight = 0;
 	private int lastIndex = 0;
 	private String lastId = null;
+
+	public static Feip parseFeip(OpReturn opre) {
+
+		if(opre.getOpReturn()==null)return null;
+
+		String protStr = ParseTools.strToJson(opre.getOpReturn());
+
+		Feip feip = null;
+		try {
+			feip = new Gson().fromJson(protStr, Feip.class);
+		}catch(JsonSyntaxException e) {
+			System.out.println("Invalid opReturn content. Check the JSON string of FEIP:\n"+opre.getOpReturn());
+		}
+		return  feip;
+	}
 
 	enum FEIP_NAME{
 		CID,ABANDON,MASTER,HOMEPAGE,NOTICE_FEE,REPUTATION,SERVICE,PROTOCOL,APP,CODE,NID, CONTACT,MAIL,SAFE,STATEMENT,GROUP,TEAM, BOX,PROOF
@@ -295,21 +310,6 @@ public class FileParser {
 
 		File file = new File(path,fileName);
 		return new FileInputStream(file);
-	}
-
-	private Feip parseFeip(OpReturn opre) {
-
-		if(opre.getOpReturn()==null)return null;
-
-		String protStr = ParseTools.strToJson(opre.getOpReturn());
-
-		Feip feip = null;
-		try {
-			feip = new Gson().fromJson(protStr, Feip.class);
-		}catch(JsonSyntaxException e) {
-			System.out.println("Invalid opReturn content. Check the JSON string of FEIP:\n"+opre.getOpReturn());
-		}
-		return  feip;
 	}
 
 	private FEIP_NAME checkFeipSn(Feip feip) {

@@ -21,6 +21,7 @@
       <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
+
     <dependency>
       <groupId>fc</groupId>
       <artifactId>FC-SDK</artifactId>
@@ -28,4 +29,5 @@
       <scope>compile</scope>
     </dependency>
   </dependencies>
+
 </project>

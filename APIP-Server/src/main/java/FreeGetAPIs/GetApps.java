@@ -31,9 +31,7 @@ public class GetApps extends HttpServlet {
         PrintWriter writer = response.getWriter();
 
         if (Initiator.isFreeGetForbidden(writer)) return;
-
         ElasticsearchClient esClient = Initiator.esClient;
-
 
         SearchResponse<App> cashResult = esClient.search(s -> s.index(IndicesNames.APP)
                 .query(q -> q.term(t -> t.field("active").value(true)))

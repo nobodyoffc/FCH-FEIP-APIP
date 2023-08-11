@@ -9,13 +9,13 @@ public class Address {
 	private String pubKey;		//public key
 	private long balance;		//value of fch in satoshi
 	private long income;		//total amount of fch received in satoshi
-	private long expend;		//total amount of fch payed in satoshi
+	private long expend;		//total amount of fch paid in satoshi
 	private String guide;	//the address of the address which sent the first fch to this address
 	private long birthHeight;	//the height where this address got its first fch
 	private long lastHeight; 	//the height where this address info changed latest. If roll back happened, lastHei point to the lastHeight before fork.
 	private long cdd;		//the total amount of coindays destroyed
 	private long cd;		//CoinDays
-	private long weight;  // Caculated from cd, cdd and reputation
+	private long weight;  // Calculated from cd, cdd and reputation
 	private long cash;		//Count of UTXO
 	private String btcAddr;	//the btc address 
 	private String ethAddr;	//the eth address

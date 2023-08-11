@@ -3,6 +3,9 @@ package javaTools;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 
@@ -17,6 +20,91 @@ public class BytesTools {
         byte[] result = Arrays.copyOf(bytes, bytes.length + 1);
         result[result.length - 1] = b;
         return result;
+    }
+
+    public static char[] byteArrayToCharArray(byte[] bytes,Charset charset) {
+        ByteBuffer byteBuffer = ByteBuffer.wrap(bytes);
+        CharBuffer charBuffer = charset.decode(byteBuffer);
+        char[] chars = Arrays.copyOfRange(charBuffer.array(),
+                charBuffer.position(), charBuffer.limit());
+        Arrays.fill(byteBuffer.array(), (byte) 0); // Clear sensitive data
+        return chars;
+    }
+
+    public static byte[] charArrayToByteArray(char[] chars,Charset charset) {
+        CharBuffer charBuffer = CharBuffer.wrap(chars);
+        ByteBuffer byteBuffer = charset.encode(charBuffer);
+        byte[] bytes = Arrays.copyOfRange(byteBuffer.array(),
+                byteBuffer.position(), byteBuffer.limit());
+        Arrays.fill(charBuffer.array(), '\0'); // Clear sensitive data
+        return bytes;
+    }
+
+    public static char[] byteArrayToUtf8CharArray(byte[] bytes) {
+        Charset charset = StandardCharsets.UTF_8;
+        ByteBuffer byteBuffer = ByteBuffer.wrap(bytes);
+        CharBuffer charBuffer = charset.decode(byteBuffer);
+        char[] chars = Arrays.copyOfRange(charBuffer.array(),
+                charBuffer.position(), charBuffer.limit());
+        Arrays.fill(byteBuffer.array(), (byte) 0); // Clear sensitive data
+        return chars;
+    }
+
+    public static byte[] utf8CharArrayToByteArray(char[] chars) {
+        Charset charset = StandardCharsets.UTF_8;
+        CharBuffer charBuffer = CharBuffer.wrap(chars);
+        ByteBuffer byteBuffer = charset.encode(charBuffer);
+        byte[] bytes = Arrays.copyOfRange(byteBuffer.array(),
+                byteBuffer.position(), byteBuffer.limit());
+        Arrays.fill(charBuffer.array(), '\0'); // Clear sensitive data
+        return bytes;
+    }
+
+    public static byte[] hexCharArrayToByteArray(char[] hex) {
+        int length = hex.length;
+        byte[] byteArray = new byte[length / 2];
+        for (int i = 0; i < length; i += 2) {
+            int high = Character.digit(hex[i], 16) << 4;
+            int low = Character.digit(hex[i + 1], 16);
+            byteArray[i / 2] = (byte) (high | low);
+        }
+        return byteArray;
+    }
+
+    public static boolean isHexCharArray(char[] charArray) {
+        for (char c : charArray) {
+            if (Character.digit(c, 16) == -1) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static char[] byteArrayToHexCharArray(byte[] byteArray) {
+        char[] hexChars = new char[byteArray.length * 2];
+        for (int i = 0; i < byteArray.length; i++) {
+            int v = byteArray[i] & 0xFF;
+            hexChars[i * 2] = Character.forDigit((v >>> 4) & 0x0F, 16);
+            hexChars[i * 2 + 1] = Character.forDigit(v & 0x0F, 16);
+        }
+        return hexChars;
+    }
+
+    public static char[] byteArrayToBase64CharArray(byte[] byteArray) {
+        byte[] base64Bytes = Base64.getEncoder().encode(byteArray);
+        char[] base64Chars = new char[base64Bytes.length];
+        for (int i = 0; i < base64Bytes.length; i++) {
+            base64Chars[i] = (char) (base64Bytes[i] & 0xFF);
+        }
+        return base64Chars;
+    }
+
+    public static byte[] base64CharArrayToByteArray(char[] base64Chars) {
+        byte[] base64Bytes = new byte[base64Chars.length];
+        for (int i = 0; i < base64Chars.length; i++) {
+            base64Bytes[i] = (byte) base64Chars[i];
+        }
+        return Base64.getDecoder().decode(base64Bytes);
     }
 
     /**

@@ -5,8 +5,9 @@ import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
 import fchClass.Cash;
-import APIP1V1_FCDSL.Sort;
+import esTools.Sort;
 import initial.Initiator;
+import walletTools.CashListReturn;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -18,7 +19,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static tools.WalletTools.getCashListForPay;
+import static walletTools.WalletTools.getCashListForPay;
 
 
 @WebServlet(ApiNames.APIP18V1Path + ApiNames.CashValidForPayAPI)
@@ -73,15 +74,20 @@ public class CashValidForPay extends HttpServlet {
         DataRequestHandler esRequest = new DataRequestHandler(dataCheckResult.getAddr(),requestBody,response,replier);
 
         //response
-        List<Cash> meetList = getCashListForPay(amount,addrRequested,replier);
-        if(meetList==null){
+        CashListReturn cashListReturn = getCashListForPay(amount,addrRequested,Initiator.esClient);
+
+        if(cashListReturn.getCode()!=0){
             response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1020OtherError));
+            replier.setData(cashListReturn.getMsg());
             writer.write(replier.reply1020OtherError(addr));
         }
+
+        List<Cash> meetList = cashListReturn.getCashList();
         replier.setData(meetList);
         replier.setGot(meetList.size());
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.CashValidForPayAPI));
-        esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
+        replier.setTotal(cashListReturn.getTotal());
+        esRequest.writeSuccess(dataCheckResult.getSessionKey());
+
     }
 
     private boolean isThisApiRequest(DataRequestBody requestBody) {

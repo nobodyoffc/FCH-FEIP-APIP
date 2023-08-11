@@ -75,8 +75,7 @@ public class TeamExMembers extends HttpServlet {
         replier.setData(dataMap);
         replier.setGot(dataMap.size());
         replier.setTotal(dataMap.size());
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.TeamExMembersAPI));
-        esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
+        esRequest.writeSuccess(dataCheckResult.getSessionKey());
 
         return;
     }

@@ -1,5 +1,6 @@
 package APIP17V1_Avatar;
 
+        import keyTools.KeyTools;
         import net.coobird.thumbnailator.Thumbnails;
         import net.coobird.thumbnailator.geometry.Positions;
         import javax.imageio.ImageIO;
@@ -74,6 +75,7 @@ public class AvatarMaker {
 
 
     public static String[] getAvatars(String[] addrArray,String basePath,String filePath) throws IOException {
+
         if(!filePath.endsWith("/"))filePath  = filePath+"/";
         if(!basePath.endsWith("/"))basePath = basePath+"/";
 
@@ -86,6 +88,7 @@ public class AvatarMaker {
     }
 
     private static String getAvatar(String addr,String basePath,String filePath) throws IOException {
+
         String[] keys = getPathByAddress(addr);
 
         File fileFile = new File(filePath);

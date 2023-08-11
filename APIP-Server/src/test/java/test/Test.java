@@ -4,8 +4,8 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.*;
 import fcTools.ParseTools;
 import identity.CidHist;
-import servers.EsTools;
-import servers.NewEsClient;
+import esTools.EsTools;
+import esTools.NewEsClient;
 
 import java.io.IOException;
 import java.util.ArrayList;

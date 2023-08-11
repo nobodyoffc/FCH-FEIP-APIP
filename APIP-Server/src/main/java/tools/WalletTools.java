@@ -2,6 +2,7 @@ package tools;
 
 import APIP0V1_OpenAPI.Replier;
 import constants.IndicesNames;
+import esTools.NewEsClient;
 import fchClass.Cash;
 import freecashRPC.FcRpcMethods;
 import freecashRPC.NewFcRpcClient;
@@ -17,7 +18,7 @@ import initial.Initiator;
 import javaTools.BytesTools;
 import fcTools.ParseTools;
 import redis.clients.jedis.Jedis;
-import servers.NewEsClient;
+
 
 import java.io.BufferedReader;
 import java.io.IOException;

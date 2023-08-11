@@ -7,7 +7,7 @@ import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
 import constants.IndicesNames;
 import fcTools.ParseTools;
-import servers.EsTools;
+import esTools.EsTools;
 
 import java.io.IOException;
 import java.util.*;

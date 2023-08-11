@@ -1,15 +1,13 @@
 package CidCashTools;
 
 import APIP0V1_OpenAPI.*;
-import EccAes256K1P7.EccAes256K1P7;
 import com.google.gson.Gson;
 import constants.ReplyInfo;
 import data.EncryptIn;
-import initial.Initiator;
+import eccAes256K1P7.EccAes256K1P7;
+import eccAes256K1P7.EccAesData;
+import eccAes256K1P7.EccAesType;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -17,13 +15,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 
 import static constants.ApiNames.EncryptAPI;
-import static constants.Constants.*;
+import static constants.Constants.ToolsPath;
 
 @WebServlet(ToolsPath +EncryptAPI)
 public class EncryptAPI extends HttpServlet {
@@ -63,23 +57,21 @@ public class EncryptAPI extends HttpServlet {
             return;
         }
         EccAes256K1P7 eccAes = new EccAes256K1P7();
-        String cipher = null;
-        try {
-            if(encryptIn.getSymKey()!=null){
-                    cipher = eccAes.encryptWithSymKey(encryptIn.getSymKey(),encryptIn.getSymKey());
-            }else if (encryptIn.getPubKey()!=null){
-                cipher = eccAes.encrypt(encryptIn.getMsg(), encryptIn.getPubKey());
-            }else{
-                response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1020OtherError));
-                replier.setData("No symKey or pubKey.");
-                writer.write(replier.reply1020OtherError(addr));
-                return;
-            }
-        } catch (InvalidAlgorithmParameterException | InvalidKeyException | NoSuchProviderException |
-                 BadPaddingException | NoSuchAlgorithmException | IllegalBlockSizeException |
-                 NoSuchPaddingException e) {
+        EccAesData eccAesData;
+        String cipher;
+        if(encryptIn.getSymKey()!=null){
+            eccAesData = new EccAesData(EccAesType.SymKey, encryptIn.getMsg(), encryptIn.getSymKey());
+            eccAes.encrypt(eccAesData);
+            cipher = eccAesData.getCipher();
+        }else if (encryptIn.getPubKey()!=null){
+            eccAesData = new EccAesData(EccAesType.AsyOneWay,encryptIn.getMsg(),encryptIn.getPubKey().toCharArray());
+            eccAesData.setPubKeyB(encryptIn.getPubKey());
+            eccAes.encrypt(eccAesData);
+            eccAesData.clearAllSensitiveData();
+            cipher = eccAesData.getCipher();
+        }else{
             response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1020OtherError));
-            replier.setData("Something wrong when encrypting message.");
+            replier.setData("No symKey or pubKey.");
             writer.write(replier.reply1020OtherError(addr));
             return;
         }
@@ -87,9 +79,9 @@ public class EncryptAPI extends HttpServlet {
         replier.setData(cipher);
         replier.setGot(1);
         replier.setTotal(1);
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", EncryptAPI));
+
         response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code0Success));
-        String reply = replier.reply0Success(addr,nPrice);
+        String reply = replier.reply0Success(addr);
         if(reply==null)return;
         String sign = DataRequestHandler.symSign(reply,dataCheckResult.getSessionKey());
         if(sign==null)return;

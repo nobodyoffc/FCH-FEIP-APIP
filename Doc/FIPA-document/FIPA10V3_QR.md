@@ -1,28 +1,41 @@
 二维码协议
 
+描述：relation
+行动：op
 
 {
-    "meta":"FC",
-    "op":<sign,veri,encr,decr,show,go>,
-    "fid":<>,
-    "oid":<>,
-    "data":<>,
-    "url":<增加fc://fvl>
+    "meta":"FV",
+    "op":<sign,verify,encrypt,decrypt,show,goto,pay,gain,buy,sell...>,
+    "relation":<master,own,include,equal...>
+    "fidA":<>,
+    "oidA":<>,
+    "fidB":<>,
+    "oidB":<>,
+    "data":<Object>
 }
 
+signTx
+    data:
+    {
+        alg
+        cashList
+        sendToList
+        msg
+    }
 
-data:
-{
-alg
-to
-from
 sign
-msg
-pubKey
-cipher
-iv
-sum
-}
+    data:
+    {
+            alg
+            to
+            from
+            sign
+            msg
+            pubKey
+            cipher
+            iv
+            sum
+    }
 
 签名：fid，msg，alg----alg，pubKey，fid，sign
 验证：

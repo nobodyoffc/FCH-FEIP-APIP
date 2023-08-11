@@ -18,19 +18,7 @@ UpdateDate: 2023-05-07
 
 [Consensuses of this protocol](#consensuses-of-this-protocol)
 
-[Publish](#publish)
 
-[Update](#update)
-
-[Stop](#stop)
-
-[Recover](#recover)
-
-[Close](#close)
-
-[Rate](#rate)
-
-[QR code](#qr-code)
 
 ## Consensuses of FIPA
 
@@ -78,11 +66,10 @@ eid：entity identify
           * sid
           * ...
         * NID
+          * EccAes256K1P7@C_armX
         * IID 
           * #cidByIds/Request-body@(pid)00000000000
-          * #ECC256/encrypt/String-String-String@(codeId)00000000
-
-
+          * #ECC256/encrypt/String-String-String@EccAes256K1P7@C_armX
 
 ## FVN  名称 可读身份
 

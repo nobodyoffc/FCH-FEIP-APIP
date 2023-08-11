@@ -1,7 +1,7 @@
 package APIP19V1_Nid;
 
 import APIP0V1_OpenAPI.*;
-import APIP1V1_FCDSL.Sort;
+import esTools.Sort;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
@@ -65,9 +65,6 @@ public class NidSearch extends HttpServlet {
         //response
         replier.setData(meetList);
         replier.setGot(meetList.size());
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.NidSearchAPI));
-        esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
-
-        return;
+        esRequest.writeSuccess(dataCheckResult.getSessionKey());
     }
 }

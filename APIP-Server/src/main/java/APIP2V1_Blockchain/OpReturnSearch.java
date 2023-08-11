@@ -5,7 +5,7 @@ import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
 import fchClass.OpReturn;
-import APIP1V1_FCDSL.Sort;
+import esTools.Sort;
 import initial.Initiator;
 
 import javax.servlet.ServletException;
@@ -66,9 +66,6 @@ public class OpReturnSearch extends HttpServlet {
 
         replier.setData(meetList);
         replier.setGot(meetList.size());
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.OpReturnSearchAPI));
-        esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
-
-        return;
+        esRequest.writeSuccess(dataCheckResult.getSessionKey());
     }
 }

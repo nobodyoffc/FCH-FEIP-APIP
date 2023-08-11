@@ -28,7 +28,7 @@ public class ReplyInfo {
     public static final int Code1008BadSign = 1008;
     public static final String Msg1008BadSign = "Failed to verify signature.";
     public static final int Code1009SessionTimeExpired = 1009;
-    public static final String Msg1009SessionTimeExpired = "NO such sessionName or it was expired, please sign in again.";
+    public static final String Msg1009SessionTimeExpired = "NO such sessionName or it was expired. Please sign in again.";
     public static final int Code1010TooMuchData = 1010;
     public static final String Msg1010TooMuchData = "Too much data to be requested.";
     public static final int Code1011DataNotFound = 1011;
@@ -41,6 +41,8 @@ public class ReplyInfo {
     public static final String Msg1014ApiSuspended  = "The API is suspended";
     public static final int Code1015FidMissed = 1015;
     public static final String Msg1015FidMissed  = "FID missed in request header.";
+    public static final int Code1016IllegalUrl = 1016;
+    public static final String Msg1016IllegalUrl  = "Illegal URL.";
     public static final int Code1020OtherError = 1020;
     public static final String Msg1020OtherError = "Other error，please contact the service provider.";
 }

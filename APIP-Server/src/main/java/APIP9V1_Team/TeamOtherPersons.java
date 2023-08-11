@@ -77,10 +77,7 @@ public class TeamOtherPersons extends HttpServlet {
         replier.setData(dataMap);
         replier.setGot(1);
         replier.setTotal(1);
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.TeamOtherPersonsAPI));
-        esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
-
-        return;
+        esRequest.writeSuccess(dataCheckResult.getSessionKey());
     }
 
     private boolean isThisApiRequest(DataRequestBody requestBody) {

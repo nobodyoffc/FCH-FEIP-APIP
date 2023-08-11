@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import APIP1V1_FCDSL.Sort;
+import esTools.Sort;
 
 @WebServlet(ApiNames.APIP3V1Path + ApiNames.FidCidSeekAPI)
 public class CidFidSeek extends HttpServlet {
@@ -79,8 +79,7 @@ public class CidFidSeek extends HttpServlet {
         }
         replier.setGot(cidAddrMap.size());
         replier.setData(cidAddrMap);
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.AddressSearchAPI));
-        esRequest.writeSuccess(dataCheckResult.getSessionKey(),nPrice);
+        esRequest.writeSuccess(dataCheckResult.getSessionKey());
     }
 
     private boolean isThisApiRequest(DataRequestBody requestBody) {

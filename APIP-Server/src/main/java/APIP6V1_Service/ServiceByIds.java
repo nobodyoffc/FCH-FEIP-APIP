@@ -73,8 +73,7 @@ public class ServiceByIds extends HttpServlet {
         replier.setData(meetMap);
         replier.setGot(meetMap.size());
         replier.setTotal(meetMap.size());
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.ServiceByIdsAPI));
-        esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
+        esRequest.writeSuccess(dataCheckResult.getSessionKey());
     }
 
     private boolean isThisApiRequest(DataRequestBody requestBody) {

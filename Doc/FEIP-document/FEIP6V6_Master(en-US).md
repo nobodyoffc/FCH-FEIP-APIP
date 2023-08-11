@@ -74,7 +74,7 @@ Update date：2023-05-06
         "master":"FTqiqAyXHnK7uDTXzMap3acvqADK4ZGzts",
         "promise":"The master owns all my rights.",
         "cipherPriKey":"The master owns all my rights.",
-        "alg":"EccAes256K1P7@No1_NrC7"
+        "alg":"eccAes256K1P7@No1_NrC7"
     }
 }
 ```

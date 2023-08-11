@@ -5,7 +5,7 @@ import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
 import fchClass.Block;
-import APIP1V1_FCDSL.Sort;
+import esTools.Sort;
 import initial.Initiator;
 
 import javax.servlet.ServletException;
@@ -63,7 +63,6 @@ public class BlockSearch extends HttpServlet {
 
         replier.setData(meetList);
         replier.setGot(meetList.size());
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.BlockSearchAPI));
-        esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
+        esRequest.writeSuccess(dataCheckResult.getSessionKey());
     }
 }

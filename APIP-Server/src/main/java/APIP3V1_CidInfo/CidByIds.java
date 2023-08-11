@@ -5,7 +5,6 @@ import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
 import feipClass.Cid;
-import initial.Initiator;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -32,7 +31,9 @@ public class CidByIds extends HttpServlet {
 
         DataCheckResult dataCheckResult = requestChecker.checkDataRequest();
 
-        if(dataCheckResult==null)return;
+        if(dataCheckResult==null){
+            return;
+        }
 
         String addr = dataCheckResult.getAddr();
 
@@ -44,14 +45,14 @@ public class CidByIds extends HttpServlet {
             return;
         }
 
-        DataRequestHandler esRequest = new DataRequestHandler(dataCheckResult.getAddr(),requestBody,response,replier);
+        DataRequestHandler dataRequestHandler = new DataRequestHandler(dataCheckResult.getAddr(),requestBody,response,replier);
 
         Map<String, String> fidCidMap = new HashMap<>();
 
         List<Cid> meetList;
 
         try {
-            meetList = esRequest.doRequest(IndicesNames.CID, null, Cid.class);
+            meetList = dataRequestHandler.doRequest(IndicesNames.CID, null, Cid.class);
             if(meetList==null){
                 return;
             }
@@ -77,8 +78,8 @@ public class CidByIds extends HttpServlet {
         replier.setData(fidCidMap);
         replier.setGot(fidCidMap.size());
         replier.setTotal(fidCidMap.size());
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.CidByIdsAPI));
-        esRequest.writeSuccess(dataCheckResult.getSessionKey(),nPrice);
+
+        dataRequestHandler.writeSuccess(dataCheckResult.getSessionKey());
     }
 
     private boolean isThisApiRequest(DataRequestBody requestBody) {

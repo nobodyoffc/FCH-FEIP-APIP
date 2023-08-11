@@ -86,8 +86,7 @@ public class TeamByIds extends HttpServlet {
         replier.setData(meetMap);
         replier.setGot(meetMap.size());
         replier.setTotal(meetMap.size());
-        int nPrice = Integer.parseInt(Initiator.jedis0Common.hget("nPrice", ApiNames.TeamByIdsAPI));
-        esRequest.writeSuccess(dataCheckResult.getSessionKey(), nPrice);
+        esRequest.writeSuccess(dataCheckResult.getSessionKey());
 
         return;
     }

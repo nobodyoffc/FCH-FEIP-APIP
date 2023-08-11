@@ -2,16 +2,17 @@ package initial;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import com.google.gson.Gson;
+
 import config.ConfigAPIP;
 import constants.Strings;
+import esTools.NewEsClient;
 import fcTools.ParseTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
-import mempool.MempoolCleaner;
-import mempool.MempoolScanner;
-import order.OrderScanner;
-import servers.NewEsClient;
+
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisPoolConfig;
 import service.ApipService;
 import service.Params;
 
@@ -21,126 +22,104 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Serial;
+import java.util.HashMap;
+import java.util.Map;
 
-import static constants.Constants.Million;
 import static constants.Strings.*;
+
 
 public class Initiator extends HttpServlet {
     @Serial
     private static final long serialVersionUID = 1L;
-    public static  String serviceName;
-    public static Jedis jedis0Common = new Jedis();
-    public static Jedis jedis1Session = new Jedis();
-    public static Jedis jedis2Nonce = new Jedis();
-    public static Jedis jedis3Mempool = new Jedis();
-
-    static {
-        jedis1Session.select(1);
-    }
-
-    static {
-        jedis2Nonce.select(2);
-    }
-
-    static {
-        jedis3Mempool.select(3);
-    }
-
-    public static ElasticsearchClient esClient= null;
-    public static ApipService service = new ApipService();
-    public static Gson gson = new Gson();
-
-    //TODO remove this
-    public static Long price = 0L;
-    public static long windowTime = 0;
-    public static boolean isPricePerKBytes;
-    public static boolean isPricePerRequest;
     private static final Logger log = LoggerFactory.getLogger(Initiator.class);
+    public static  String serviceName;
+    public static ElasticsearchClient esClient= null;
+    public static JedisPool jedisPool;
 
-    public static boolean isFreeGetForbidden(PrintWriter writer) {
+    //Can be changed:
+    public static ApipService service;
+    public static Params params;
 
-        boolean forbidFreeGet = Boolean.parseBoolean(jedis0Common.hget(CONFIG,FORBID_FREE_GET));
-        if(forbidFreeGet){
-            writer.write("Sorry, the freeGet APIs were closed.");
-            return true;
-        }
-        return false;
+    public static boolean isPricePerRequest;
+    public static boolean forbidFreeGet;
+
+    @Override
+    public void destroy(){
+        jedisPool.close();
+        esClient.shutdown();
+        log.debug("APIP server is stopped.");
     }
-
-    public static long readPrice() {
-        Jedis jedis = new Jedis();
-        long price = 0;
-        try {
-            if (jedis.hexists(CONFIG, PRICE_PER_K_BYTES)) {
-                price = (long) Double.parseDouble(jedis.hget(CONFIG, PRICE_PER_K_BYTES)) * Million;
-            } else {
-                price = (long) Double.parseDouble(jedis.hget(CONFIG, PRICE_PER_REQUEST)) * Million;
-            }
-        }catch (Exception e){
-            jedis.close();
-            log.error("Read price from jedis wrong. ",e);
-            return 0;
-        }
-        return price;
-    }
-
     @Override
     public void init(ServletConfig config) {
         log.debug("init starting...");
         NewEsClient newEsClient = new NewEsClient();
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
+        createJedisPools();
+
         //Get config.json
         ConfigAPIP configAPIP = new ConfigAPIP();
-        configAPIP.setConfigFilePath(jedis0Common.hget(CONFIG,CONFIG_FILE_PATH));
-        log.debug("Load config.json from "+configAPIP.getConfigFilePath());
+        Gson gson = new Gson();
 
-        //Get ES client
-        log.debug("Create esClient for "+this.getClass()+"...");
+        try(Jedis jedis = jedisPool.getResource()) {
+            configAPIP.setConfigFilePath(jedis.hget(CONFIG, CONFIG_FILE_PATH));
+            log.debug("Load config.json from " + configAPIP.getConfigFilePath());
 
-        try {
-            configAPIP = configAPIP.getClassInstanceFromFile(br,ConfigAPIP.class);
-            if (configAPIP.getEsIp() == null||configAPIP.getEsPort()==0||configAPIP.getConfigFilePath()==null ) {
-                log.debug("Config is not ready when initiating APIP web.");
+            //Get ES client
+            log.debug("Create esClient for " + this.getClass() + "...");
+
+            boolean failed = false;
+            try {
+                configAPIP = configAPIP.getClassInstanceFromFile(br, ConfigAPIP.class);
+                if (configAPIP.getEsIp() == null || configAPIP.getEsPort() == 0 || configAPIP.getConfigFilePath() == null) {
+                    log.debug("Config is not ready when initiating APIP web.");
+                    failed = true;
+                }
+                esClient = newEsClient.getEsClientSilent(configAPIP, jedis);
+                if (esClient == null) {
+                    newEsClient.shutdownClient();
+                    log.error("Creating ES client failed when initiating APIP web.");
+                    failed = true;
+                }
+            } catch (Exception e) {
+                log.error("Initiating ApipServer failed. \n" + e.getMessage());
+                failed = true;
             }
-
-            esClient = newEsClient.getEsClientSilent(configAPIP,jedis0Common);
-
-            if (esClient == null) {
-                newEsClient.shutdownClient();
-                log.error("Creating ES client failed when initiating APIP web.");
+            if(failed){
+                jedis.close();
+                jedisPool.close();
                 return;
             }
-        } catch (Exception e) {
-            log.error("Initiating ApipServer failed. \n"+e.getMessage());
-            return;
+
+            forbidFreeGet = configAPIP.isForbidFreeGet();
+            serviceName = configAPIP.getServiceName();
+            try {
+                service = gson.fromJson(jedis.get(serviceName +"_" + Strings.SERVICE), ApipService.class);
+//                sid = service.getSid();
+
+                if(service ==null )log.error("Reading service from redis failed.");
+
+                log.debug("Service: "+ ParseTools.gsonString(service));
+
+                params = service.getParams();
+
+//                Map<String, String> nPriceMapStr = jedis.hgetAll(N_PRICE);
+//                nPriceMap = makeStrMapToIntegerMap(nPriceMapStr);
+
+
+            }catch (Exception e){
+                log.error("Get service or nPrice from redis wrong.");
+                jedis.close();
+                jedisPool.close();
+                return;
+            }
         }
 
-        serviceName = configAPIP.getServiceName()+"_";
 
-        service = gson.fromJson(jedis0Common.get(serviceName+Strings.SERVICE), ApipService.class);
-
-        if(service ==null )log.error("Reading service from redis failed.");
-
-        log.debug("Service: "+ ParseTools.gsonString(service));
-
-        Params params = service.getParams();
-
-        if(params.getPricePerRequest()!=null) {
-            price = (long)(Double.parseDouble(params.getPricePerRequest())*100000000);
-            isPricePerRequest = true;
-
-            log.debug("PricePerRequest: "+ true);
-        }
-
-        if(params.getPricePerKBytes()!=null) {
-            price = (long)(Double.parseDouble(params.getPricePerKBytes())*100000000);
-            isPricePerKBytes = true;
-
-            log.debug("PricePerKBytes: "+ true);
-        }
 
         log.debug("APIP server initiated successfully.");
+
+
 
 //        if (configAPIP.isScanMempool()) {
 //            log.debug("Clean mempool data in Redis...");
@@ -167,4 +146,39 @@ public class Initiator extends HttpServlet {
 //        log.debug("Order scanner is running.");
     }
 
+    public static Map<String, Integer> makeStrMapToIntegerMap(Map<String, String> nPriceMapStr) {
+        Map<String,Integer> nPriceMap = new HashMap<>();
+        if(nPriceMapStr !=null){
+            for(String key: nPriceMapStr.keySet()){
+                try{
+                    nPriceMap.put(key, Integer.parseInt(nPriceMapStr.get(key)));
+                }catch (Exception ignore){}
+            }
+        }
+        return nPriceMap;
+    }
+
+    private static void createJedisPools() {
+        try {
+            log.debug("Create jedis pool.......");
+            JedisPoolConfig jedisConfig = new JedisPoolConfig();
+//            jedisConfig.setMaxTotal(128);
+//            jedisConfig.setMaxIdle(64);
+//            jedisConfig.setMinIdle(32);
+//            jedisConfig.setTestOnBorrow(true);
+//            jedisConfig.setTestOnReturn(true);
+//            jedisConfig.setTestWhileIdle(true);
+            jedisPool = new JedisPool(jedisConfig, "localhost",6379,10000);
+            log.debug("Jedis pool created.");
+        }catch (Exception e){
+            log.debug("Create jedisPool or jedis wrong. ",e);
+        }
+    }
+    public static boolean isFreeGetForbidden(PrintWriter writer) {
+        if(forbidFreeGet){
+            writer.write("Sorry, the freeGet APIs were closed.");
+            return true;
+        }
+        return false;
+    }
 }

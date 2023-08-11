@@ -3,6 +3,7 @@ package APIP17V1_Avatar;
 import constants.ApiNames;
 import initial.Initiator;
 import constants.Strings;
+import redis.clients.jedis.Jedis;
 
 import javax.imageio.ImageIO;
 import javax.servlet.ServletException;
@@ -25,11 +26,12 @@ public class getAvatar extends HttpServlet {
 
         String fidRequested = request.getParameter("fid");
 
-        if(!(fidRequested.substring(0,1).equals("F") || fidRequested.substring(0,1).equals("3")))return;
-
-        String avatarBasePath = Initiator.jedis0Common.hget(CONFIG,Strings.AVATAR_BASE_PATH);
-        String avatarPngPath = Initiator.jedis0Common.hget(CONFIG,Strings.AVATAR_PNG_PATH);
-
+        String avatarBasePath;
+        String avatarPngPath;
+        try(Jedis jedis = Initiator.jedisPool.getResource()) {
+            avatarBasePath = jedis.hget(CONFIG, Strings.AVATAR_BASE_PATH);
+            avatarPngPath = jedis.hget(CONFIG, Strings.AVATAR_PNG_PATH);
+        }
         if(!avatarPngPath.endsWith("/"))avatarPngPath  = avatarPngPath+"/";
         if(!avatarBasePath.endsWith("/"))avatarBasePath = avatarBasePath+"/";
 

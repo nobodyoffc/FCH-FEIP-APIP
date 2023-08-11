@@ -28,7 +28,9 @@ public class GetCashes extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
         String idRequested = request.getParameter("fid");
         PrintWriter writer = response.getWriter();
+
         if (Initiator.isFreeGetForbidden(writer)) return;
+
         if (idRequested==null){
             writer.write("Fid is null.");
             return;

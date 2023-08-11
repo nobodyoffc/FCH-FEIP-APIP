@@ -18,7 +18,7 @@ UpdateDate: 2023-06-15
 4. FeipParser: [https://cid.cash/download/FeipParser.jar](https://cid.cash/download/FeipParser.jar)
 5. ApipManager: [https://cid.cash/download/ApipManager.jar](https://cid.cash/download/ApipManager.jar)
 6. ApipServer: [https://cid.cash/download/APIP.war](https://cid.cash/download/APIP.war)
-7. FcTools: [https://cid.cash/download/FcTools.jar](https://cid.cash/download/FcTools.jar)
+7. fcTools: [https://cid.cash/download/FcTools.jar](https://cid.cash/download/FcTools.jar)
 
 ## 1. System
 
