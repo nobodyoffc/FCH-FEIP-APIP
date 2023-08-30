@@ -15,6 +15,7 @@
     <module>FEIP-Parser</module>
     <module>APIP-Manager</module>
     <module>APIP-Server</module>
+      <module>Maker-manager</module>
   </modules>
 
   <properties>

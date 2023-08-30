@@ -43,7 +43,7 @@ public class CidInfoSearch extends HttpServlet {
         DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
 
         //Set default sort.
-        ArrayList<Sort> sort =Sort.makeSortList("lastHeight",false,"fid",true,null,null);
+        ArrayList<Sort> sort =Sort.makeSortList("nameTime",false,"fid",true,null,null);
 
         //Request
 

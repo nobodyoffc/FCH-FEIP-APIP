@@ -49,10 +49,10 @@ public class CashValidForPay extends HttpServlet {
         }
 
         //Set default sort.
-        ArrayList<Sort> defaultSort = Sort.makeSortList("cd", true, "value", false, "cashId", true);
+//        ArrayList<Sort> defaultSort = Sort.makeSortList("cd", true, "value", false, "cashId", true);
 
         //Request
-        String index = IndicesNames.CASH;
+//        String index = IndicesNames.CASH;
         String addrRequested = requestBody.getFcdsl().getQuery().getTerms().getValues()[0];
 
         long amount = 0;

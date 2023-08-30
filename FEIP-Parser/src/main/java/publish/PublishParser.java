@@ -1,15 +1,12 @@
 package publish;
 
 import constants.IndicesNames;
-import feipClass.Proof;
-import feipClass.Nid;
-import feipClass.Statement;
+import feipClass.*;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import co.elastic.clients.elasticsearch.core.GetResponse;
 import com.google.gson.Gson;
 import fcTools.Hash;
-import feipClass.Feip;
 import fchClass.OpReturn;
 import esTools.EsTools;
 import startFEIP.StartFEIP;
@@ -19,13 +16,13 @@ import java.util.ArrayList;
 
 public class PublishParser {
 
-    public ProofHistory makeProof(OpReturn opre, Feip feip) {
+    public ProofHistory makeProof(OpReturn opre, FcInfo feip) {
         // TODO Auto-generated method stub
         Gson gson = new Gson();
-        ProofRaw proofRaw = new ProofRaw();
+        ProofData proofRaw = new ProofData();
 
         try {
-            proofRaw = gson.fromJson(gson.toJson(feip.getData()),ProofRaw.class);
+            proofRaw = gson.fromJson(gson.toJson(feip.getData()), ProofData.class);
         }catch(com.google.gson.JsonSyntaxException e) {
             return null;
         }
@@ -87,16 +84,16 @@ public class PublishParser {
     }
 
 
-    public boolean parseStatement(ElasticsearchClient esClient, OpReturn opre, Feip feip) throws ElasticsearchException, IOException {
+    public boolean parseStatement(ElasticsearchClient esClient, OpReturn opre, FcInfo feip) throws ElasticsearchException, IOException {
         // TODO Auto-generated method stub
         boolean isValid = false;
 
         Gson gson = new Gson();
 
-        StatementRaw statementRaw = new StatementRaw();
+        StatementData statementRaw = new StatementData();
 
         try {
-            statementRaw = gson.fromJson(gson.toJson(feip.getData()),StatementRaw.class);
+            statementRaw = gson.fromJson(gson.toJson(feip.getData()), StatementData.class);
         }catch(com.google.gson.JsonSyntaxException e) {
             return isValid;
         }
@@ -253,16 +250,16 @@ public class PublishParser {
         return false;
     }
 
-    public boolean parseNid(ElasticsearchClient esClient, OpReturn opre, Feip feip) throws ElasticsearchException, IOException {
+    public boolean parseNid(ElasticsearchClient esClient, OpReturn opre, FcInfo feip) throws ElasticsearchException, IOException {
         // TODO Auto-generated method stub
         boolean isValid = false;
 
         Gson gson = new Gson();
 
-        NidRaw nidRaw = new NidRaw();
+        NidData nidRaw = new NidData();
 
         try {
-            nidRaw = gson.fromJson(gson.toJson(feip.getData()), NidRaw.class);
+            nidRaw = gson.fromJson(gson.toJson(feip.getData()), NidData.class);
         }catch(com.google.gson.JsonSyntaxException e) {
             return false;
         }

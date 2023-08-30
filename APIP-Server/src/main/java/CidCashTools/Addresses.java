@@ -6,7 +6,6 @@ import constants.IndicesNames;
 import constants.ReplyInfo;
 import fchClass.Address;
 import co.elastic.clients.elasticsearch.core.GetResponse;
-import initial.Initiator;
 import keyTools.KeyTools;
 
 import javax.servlet.ServletException;
@@ -38,7 +37,7 @@ public class Addresses extends HttpServlet {
 
         String addr = dataCheckResult.getAddr();
 
-        if (RequestChecker.checkPublicSessionKey(response, replier, writer, addr)) return;
+        if (RequestChecker.isPublicSessionKey(response, replier, writer, addr)) return;
 
         DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
         replier.setNonce(requestBody.getNonce());

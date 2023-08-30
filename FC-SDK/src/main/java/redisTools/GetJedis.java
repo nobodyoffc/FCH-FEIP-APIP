@@ -3,6 +3,8 @@ package redisTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisPoolConfig;
 
 public class GetJedis {
     private static final Logger log = LoggerFactory.getLogger(GetJedis.class);
@@ -24,5 +26,24 @@ public class GetJedis {
             log.error("Failed to startup redis.");
             return null;
         }
+    }
+
+    public static JedisPool createJedisPool() {
+        try {
+            log.debug("Create jedis pool.......");
+            JedisPoolConfig jedisConfig = new JedisPoolConfig();
+//            jedisConfig.setMaxTotal(128);
+//            jedisConfig.setMaxIdle(64);
+//            jedisConfig.setMinIdle(32);
+//            jedisConfig.setTestOnBorrow(true);
+//            jedisConfig.setTestOnReturn(true);
+//            jedisConfig.setTestWhileIdle(true);
+            JedisPool jedisPool1 = new JedisPool(jedisConfig, "localhost",6379,10000);
+            log.debug("Jedis pool created.");
+            return jedisPool1;
+        }catch (Exception e){
+            log.debug("Create jedisPool or jedis wrong. ",e);
+        }
+        return null;
     }
 }

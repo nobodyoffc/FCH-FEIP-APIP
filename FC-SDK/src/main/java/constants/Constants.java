@@ -39,11 +39,12 @@ public class Constants {
     public static final int PUBLIC_KEY_BYTES_LENGTH = 33;
     public static final int PRIVATE_KEY_BYTES_LENGTH = 32;
     public static final int SYM_KEY_BYTES_LENGTH = 32;
-    public static final String ECC_AES_256_K1_P7 = "EccAes256K1P7@C_armX";
+    public static final String ECC_AES_256_K1_P7 = "EccAes256K1P7@No1_NrC7";
     public static final int IV_BYTES_LENGTH = 16;
     public static final int K_BYTES = 1024;
     public static final int M_BYTES = 1024*1024;
     public static final int G_BYTES = 1024*1024*1024;
     public static final int MAX_FILE_SIZE_M = 200;
     public static final String DOT_FV = ".fv";
+    public static final int MaxOpFileSize = 200*1024*1024;//251658240;
 }

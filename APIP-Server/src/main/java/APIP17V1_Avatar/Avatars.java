@@ -1,7 +1,7 @@
 package APIP17V1_Avatar;
 
 import APIP0V1_OpenAPI.*;
-import APIP1V1_FCDSL.Fcdsl;
+import apipClass.Fcdsl;
 import constants.ApiNames;
 import constants.ReplyInfo;
 import constants.Strings;

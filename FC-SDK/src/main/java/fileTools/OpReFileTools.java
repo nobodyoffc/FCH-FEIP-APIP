@@ -1,5 +1,6 @@
 package fileTools;
 
+import constants.Constants;
 import fchClass.OpReturn;
 import javaTools.BytesTools;
 
@@ -23,7 +24,7 @@ public class OpReFileTools {
 
 			while(true) {
 				opFile = new File(OPRETURN_FILE_DIR,fileName);
-				if(opFile.length()>251658240) {
+				if(opFile.length()> Constants.MaxOpFileSize) {
 					fileName =  getNextFile(fileName);
 				}else break;
 			}

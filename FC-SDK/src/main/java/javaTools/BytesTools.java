@@ -80,6 +80,15 @@ public class BytesTools {
         return true;
     }
 
+    private static final String HEX_PATTERN = "^[0-9a-fA-F]+$";
+
+    public static boolean isHexString(String str) {
+        if (str == null || str.isEmpty()) {
+            return false;
+        }
+        return str.matches(HEX_PATTERN);
+    }
+
     public static char[] byteArrayToHexCharArray(byte[] byteArray) {
         char[] hexChars = new char[byteArray.length * 2];
         for (int i = 0; i < byteArray.length; i++) {

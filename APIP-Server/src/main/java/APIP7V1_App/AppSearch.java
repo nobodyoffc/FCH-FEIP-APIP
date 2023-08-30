@@ -44,7 +44,6 @@ public class AppSearch extends HttpServlet {
         //Set default sort.
         ArrayList<Sort> sort =Sort.makeSortList("active",false,"tRate",false,"aid",true);
 
-
         //Add condition
 
         //Request

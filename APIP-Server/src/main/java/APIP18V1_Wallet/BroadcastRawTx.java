@@ -4,7 +4,7 @@ import APIP0V1_OpenAPI.*;
 import constants.ApiNames;
 import constants.ReplyInfo;
 import freecashRPC.FcRpcMethods;
-import initial.Initiator;
+import javaTools.BytesTools;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import static mempool.MempoolScanner.fcClient;
+import static initial.Initiator.fcClient;
 
 @WebServlet(ApiNames.APIP18V1Path + ApiNames.BroadcastTxAPI)
 public class BroadcastRawTx extends HttpServlet {
@@ -32,7 +32,7 @@ public class BroadcastRawTx extends HttpServlet {
 
         String addr = dataCheckResult.getAddr();
 
-        if (RequestChecker.checkPublicSessionKey(response, replier, writer, addr)) return;
+        if (RequestChecker.isPublicSessionKey(response, replier, writer, addr)) return;
 
         DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
         replier.setNonce(requestBody.getNonce());
@@ -63,6 +63,13 @@ public class BroadcastRawTx extends HttpServlet {
 
         if(result.startsWith("\""))result=result.substring(1);
         if(result.endsWith("\""))result=result.substring(0,result.length()-2);
+
+        if(!BytesTools.isHexString(result)){
+            response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1020OtherError));
+            replier.setData(result);
+            writer.write(replier.reply1020OtherError(addr));
+            return;
+        }
 
         replier.setData(result);
         replier.setGot(1);

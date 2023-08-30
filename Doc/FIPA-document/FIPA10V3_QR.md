@@ -5,7 +5,7 @@
 
 {
     "meta":"FV",
-    "op":<sign,verify,encrypt,decrypt,show,goto,pay,gain,buy,sell...>,
+    "op":<sign,verify,encrypt,decrypt,show,goto,signIn,pay,gain,buy,sell...>,
     "relation":<master,own,include,equal...>
     "fidA":<>,
     "oidA":<>,
@@ -43,12 +43,12 @@ sign
 {
 "meta":"FV",
 "op":"sign",
+"fid":"",
 "data":{
 "msg":{
 "url":<string. 用户提交登录信息访问的url>,
 "nonce":<int. 置0，防止重放攻击和识别登录用户>,
 "time":<long. 置0，由用户端填入长度13的时间戳>,
-"pubKey":<string. 置空串，由用户端填入hex公钥>
 },
 "sign":<string. 置空串，由用户端填入签名>
 }
@@ -62,11 +62,36 @@ sign
 "url": "https://cid.cash/explorer/signin",
 "nonce": 0,
 "time": 0,
-"pubKey": ""
+"fid": ""
 },
 "sign": ""
 }
 }
+
+signIn:
+
+{
+"meta":"FV",
+"op":"signIn",
+"fid":"用户端填入",
+"data":{
+    "sign":"用户端填入",
+    "msg":"{
+        "url":"<string，服务端给出>",
+        "time":"<long，服务端给出>",
+        "nonce":"<long，服务端给出>",
+        "mode":"<string，服务端给出,省略默认自由登录>",
+        "oid":"<string，服务端给出,省略默认请求登录url>"
+        }"
+    }
+}
+
+{
+"meta":"FV",
+"op":"show",
+"oid":"(aid)000000000000000"
+}
+
 
 
 1. 检查op，成功则获取sign,veri,encr,decr之一：

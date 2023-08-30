@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 import walletTools.*;
 import fchClass.Cash;
-import feipClass.Feip;
+import feipClass.FcInfo;
 
 import java.util.*;
 
@@ -53,7 +53,7 @@ public class AffairMaker {
 
     public String makeAffair(){
 
-        Feip feip = new Feip();
+        FcInfo feip = new FcInfo();
         feip.setType(FBBP);
         feip.setSn("1");
         feip.setVer("1");

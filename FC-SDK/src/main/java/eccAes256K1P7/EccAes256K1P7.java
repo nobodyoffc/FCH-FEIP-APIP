@@ -29,6 +29,7 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import java.io.*;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.util.Arrays;
 import java.util.Base64;
@@ -137,12 +138,12 @@ public class EccAes256K1P7 {
         return decryptFile(encryptedFile, cipherBytes, eccAesDataByte);
     }
 
-    public static String decryptSymKeyFromIvCipher(String ivCipherStr, char[] symKey) {
-        EccAesDataByte eccAesDataByte = makeIvCipherToEccAesDataByte(Base64.getDecoder().decode(ivCipherStr));
-        String eccAesDataJson = new Gson().toJson(EccAesData.fromEccAesDataByte(eccAesDataByte));
-        EccAes256K1P7 ecc = new EccAes256K1P7();
-        eccAesDataJson = ecc.decryptWithSymKey(eccAesDataJson, symKey);
-        return eccAesDataJson;
+    public String decryptSymKeyBundle(String bundle, char[] symKey) {
+        EccAesDataByte eccAesDataByte = makeIvCipherToEccAesDataByte(Base64.getDecoder().decode(bundle));
+        eccAesDataByte.setSymKey(BytesTools.hexCharArrayToByteArray(symKey));
+        decrypt(eccAesDataByte);
+
+        return new String(eccAesDataByte.getMsg(),StandardCharsets.UTF_8);
     }
 
     public static String decryptFileWithSymKey(File encryptedFile, char[] symKey) {
@@ -571,6 +572,44 @@ public class EccAes256K1P7 {
         return gson.toJson(EccAesData.fromEccAesDataByte(eccAesDataByte));
     }
 
+    public String encryptAsyOneWayBundle(String msg,String pubKeyB){
+        EccAesData eccAesData = new EccAesData(EccAesType.AsyOneWay,msg,pubKeyB);
+        EccAesDataByte eccAesDataByte = EccAesDataByte.fromEccAesData(eccAesData);
+
+        encrypt(eccAesDataByte);
+        eccAesDataByte.clearSymKey();
+
+        byte[] bundleBytes = addArray(addArray(eccAesDataByte.getPubKeyA(),eccAesDataByte.getIv()),eccAesDataByte.getCipher());
+        return Base64.getEncoder().encodeToString(bundleBytes);
+    }
+
+    public String decryptAsyOneWayBundle(String bundle,char[] priKeyB){
+        byte[] bundleBytes = Base64.getDecoder().decode(bundle);
+        byte[] pubKeyABytes = new byte[33];
+        byte[] ivBytes = new byte[16];
+        byte[] cipherBytes = new byte[bundleBytes.length-pubKeyABytes.length-ivBytes.length];
+        byte[] priKeyBBytes = BytesTools.hexCharArrayToByteArray(priKeyB);
+
+        pubKeyABytes = Arrays.copyOfRange(bundleBytes,0,33);
+        ivBytes = Arrays.copyOfRange(bundleBytes,33,49);
+        cipherBytes = Arrays.copyOfRange(bundleBytes,33+16,bundleBytes.length);
+
+        EccAesDataByte eccAesDataByte = new EccAesDataByte();
+        eccAesDataByte.setType(EccAesType.AsyOneWay);
+        eccAesDataByte.setIv(ivBytes);
+        eccAesDataByte.setPubKeyA(pubKeyABytes);
+        eccAesDataByte.setPriKeyB(priKeyBBytes);
+        eccAesDataByte.setCipher(cipherBytes);
+
+        decrypt(eccAesDataByte);
+        eccAesDataByte.clearSymKey();
+
+        if(eccAesDataByte.getError()!=null){
+            return "Error:"+eccAesDataByte.getError();
+        }
+        return new String(eccAesDataByte.getMsg(), StandardCharsets.UTF_8);
+    }
+
     public String encryptAsyTwoWay(String eccAesDataJson, char[] priKeyA){
         Gson gson = new Gson();
         EccAesData eccAesData = gson.fromJson(eccAesDataJson,EccAesData.class);
@@ -585,6 +624,42 @@ public class EccAes256K1P7 {
         eccAesDataByte.clearSymKey();
         return gson.toJson(EccAesData.fromEccAesDataByte(eccAesDataByte));
     }
+
+    public String encryptAsyTwoWayBundle(String msg,String pubKeyB,char[] priKeyA){
+        EccAesData eccAesData = new EccAesData(EccAesType.AsyTwoWay,msg,pubKeyB,priKeyA);
+        EccAesDataByte eccAesDataByte = EccAesDataByte.fromEccAesData(eccAesData);
+
+        encrypt(eccAesDataByte);
+        eccAesDataByte.clearSymKey();
+
+        byte[] bundleBytes = addArray(eccAesDataByte.getIv(),eccAesDataByte.getCipher());
+        return Base64.getEncoder().encodeToString(bundleBytes);
+    }
+
+    public String decryptAsyTwoWayBundle(String bundle,String pubKeyA,char[] priKeyB){
+        byte[] priKeyBBytes = BytesTools.hexCharArrayToByteArray(priKeyB);
+        byte[] pubKeyABytes = HexFormat.of().parseHex(pubKeyA);
+
+        byte[] bundleBytes = Base64.getDecoder().decode(bundle);
+        byte[] ivBytes = Arrays.copyOfRange(bundleBytes,0,16);
+        byte[] cipherBytes = Arrays.copyOfRange(bundleBytes,16,bundleBytes.length);
+
+        EccAesDataByte eccAesDataByte = new EccAesDataByte();
+        eccAesDataByte.setType(EccAesType.AsyTwoWay);
+        eccAesDataByte.setIv(ivBytes);
+        eccAesDataByte.setPubKeyA(pubKeyABytes);
+        eccAesDataByte.setPriKeyB(priKeyBBytes);
+        eccAesDataByte.setCipher(cipherBytes);
+
+        decrypt(eccAesDataByte);
+        eccAesDataByte.clearSymKey();
+
+        if(eccAesDataByte.getError()!=null){
+            return "Error:"+eccAesDataByte.getError();
+        }
+        return new String(eccAesDataByte.getMsg(), StandardCharsets.UTF_8);
+    }
+
 
     public String encryptWithSymKey(String eccAesDataJson, char[] symKey){
         Gson gson = new Gson();
@@ -938,12 +1013,12 @@ public class EccAes256K1P7 {
             return false;
         }
 
-        if(eccAesDataByte.getPubKeyA().length!= Constants.PUBLIC_KEY_BYTES_LENGTH){
+        if(eccAesDataByte.getPubKeyA()!=null && eccAesDataByte.getPubKeyA().length!= Constants.PUBLIC_KEY_BYTES_LENGTH){
             eccAesDataByte.setError(EccAesType.AsyTwoWay.name()+" parameter pubKeyA should be "+Constants.PUBLIC_KEY_BYTES_LENGTH+" bytes. It is "+ eccAesDataByte.getPubKeyA().length +" now.");
             return false;
         }
 
-        if(eccAesDataByte.getPubKeyB().length!= Constants.PUBLIC_KEY_BYTES_LENGTH){
+        if(eccAesDataByte.getPubKeyB()!=null && eccAesDataByte.getPubKeyB().length!= Constants.PUBLIC_KEY_BYTES_LENGTH){
             eccAesDataByte.setError(EccAesType.AsyTwoWay.name()+" parameter pubKeyB should be "+Constants.PUBLIC_KEY_BYTES_LENGTH+" bytes. It is "+ eccAesDataByte.getPubKeyB().length +" now.");
             return false;
         }
@@ -1177,7 +1252,7 @@ public class EccAes256K1P7 {
         return iv;
     }
 
-    public String encryptSymKeyGetIvCipher(String msg, char[] symKey) {
+    public String encryptSymKeyBundle(String msg, char[] symKey) {
         EccAesData eccAesData = new EccAesData(EccAesType.SymKey, msg, symKey);
 
         encrypt(eccAesData);
@@ -1187,8 +1262,8 @@ public class EccAes256K1P7 {
         byte[] cipherBytes = Base64.getDecoder().decode(cipher);
 
         byte[]ivCipherBytes = EccAes256K1P7.addArray(ivBytes,cipherBytes);
-        String ivCipher = Base64.getEncoder().encodeToString(ivCipherBytes);
+        String bundle = Base64.getEncoder().encodeToString(ivCipherBytes);
         eccAesData.clearAllSensitiveData();
-        return ivCipher;
+        return bundle;
     }
 }

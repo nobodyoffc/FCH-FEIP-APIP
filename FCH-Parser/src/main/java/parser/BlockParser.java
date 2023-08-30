@@ -399,6 +399,7 @@ public class BlockParser {
 			Cash input = new Cash();
 
 			input.setSpendTime(tx.getBlockTime());
+			input.setSpendTxIndex(tx.getTxIndex());
 			input.setBirthBlockId(tx.getBlockId());
 			input.setSpendHeight(tx.getHeight());
 			input.setSpendIndex(j);

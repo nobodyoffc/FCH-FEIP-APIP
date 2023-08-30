@@ -1,6 +1,7 @@
 package eccAes256K1P7;
 
 import com.google.gson.Gson;
+import javaTools.BytesTools;
 
 import java.util.HexFormat;
 
@@ -47,16 +48,16 @@ public class Test {
         System.out.println("Encrypted with a new key pair:"+ gson.toJson(eccAesData));
 
         //Decrypt with new key
-        String priKeyBHex = "ee72e6dd4047ef7f4c9886059cbab42eaab08afe7799cbc0539269ee7e2ec30c";
+        String priKeyB = "ee72e6dd4047ef7f4c9886059cbab42eaab08afe7799cbc0539269ee7e2ec30c";
         eccAesDataByte.setMsg(null);
-        eccAesDataByte.setPriKeyB(HexFormat.of().parseHex(priKeyBHex));
+        eccAesDataByte.setPriKeyB(HexFormat.of().parseHex(priKeyB));
 
         ecc.decrypt(eccAesDataByte);
         eccAesDataByte.clearSymKey();
         System.out.println("Decrypted from bytes:"+ gson.toJson(EccAesData.fromEccAesDataByte(eccAesDataByte)));
 
         eccAesData= EccAesData.fromEccAesDataByte(eccAesDataByte);
-        eccAesData.setPriKeyB(priKeyBHex.toCharArray());
+        eccAesData.setPriKeyB(priKeyB.toCharArray());
         ecc.decrypt(eccAesData);
         System.out.println("Decrypted from String and char array:"+gson.toJson(eccAesData));
 
@@ -84,7 +85,7 @@ public class Test {
         ecc.encrypt(eccAesData);
         System.out.println("Encrypt: "+gson.toJson(eccAesData));
 
-        eccAesData.setPriKeyB(priKeyBHex.toCharArray());
+        eccAesData.setPriKeyB(priKeyB.toCharArray());
         eccAesData.setMsg(null);
         ecc.decrypt(eccAesData);
         System.out.println("Decrypt by private Key B: "+gson.toJson(eccAesData));
@@ -157,7 +158,7 @@ public class Test {
         checkResult(eccAesData,"Encrypted: \n"+ encOneWayJson0);
 
 
-        EccAesData eccAesData1 = ecc.decryptAsy(encOneWayJson0, priKeyBHex.toCharArray());
+        EccAesData eccAesData1 = ecc.decryptAsy(encOneWayJson0, priKeyB.toCharArray());
         checkResult(eccAesData,"Decrypted:\n"+eccAesData1.toJson());
 
         System.out.println("----------");
@@ -173,7 +174,7 @@ public class Test {
 
         String encTwoWayJson1 = ecc.encryptAsyTwoWay(twoWayJson1,priKeyA.toCharArray());
         checkResult(eccAesData,"Encrypted: \n"+ encTwoWayJson1);
-        eccAesData1 = ecc.decryptAsy(encTwoWayJson1, priKeyBHex.toCharArray());
+        eccAesData1 = ecc.decryptAsy(encTwoWayJson1, priKeyB.toCharArray());
         checkResult(eccAesData,"Decrypted:\n"+eccAesData1.toJson());
 
         System.out.println("----------");
@@ -248,7 +249,7 @@ public class Test {
         String cipher = "yu7qzwXoEeKwRsCT/fLxaA\u003d\u003d";
         String iv = "988a330ab28e61fa01471bf13ce6cc7d";
         String sum = "346a8033";
-        eccAesData = new EccAesData(EccAesType.AsyOneWay,pubKeyA,pubKeyB,iv,cipher,sum,priKeyBHex.toCharArray());
+        eccAesData = new EccAesData(EccAesType.AsyOneWay,pubKeyA,pubKeyB,iv,cipher,sum,priKeyB.toCharArray());
         ecc.decrypt(eccAesData);
         System.out.println(gson.toJson(eccAesData));
         System.out.println("----------");
@@ -260,7 +261,38 @@ public class Test {
         eccAesData = new EccAesData(EccAesType.SymKey,iv,cipher,sum,symKey);
         ecc.decrypt(eccAesData);
         System.out.println(gson.toJson(eccAesData));
+        System.out.println("----------------------");
+        System.out.println("Bundle test");
+        System.out.println("----------------------");
+        System.out.println("AsyOneWay bundle test");
         System.out.println("----------");
+
+        System.out.println("msg:"+msg+",pubKeyB:"+pubKeyB);
+        String bundle = ecc.encryptAsyOneWayBundle(msg,pubKeyB);
+        System.out.println("Cipher bundle: "+bundle);
+        String msgBundle = ecc.decryptAsyOneWayBundle(bundle, priKeyB.toCharArray());
+        System.out.println("Msg from bundle:"+ msgBundle);
+
+        System.out.println("----------------------");
+        System.out.println("AsyTwoWay bundle test");
+        System.out.println("----------");
+
+        bundle = ecc.encryptAsyTwoWayBundle(msg,pubKeyB,priKeyA.toCharArray());
+        System.out.println("Cipher bundle: "+bundle);
+        msgBundle = ecc.decryptAsyTwoWayBundle(bundle, pubKeyA,priKeyB.toCharArray());
+        System.out.println("Msg from PriKeyB:"+ msgBundle);
+        msgBundle = ecc.decryptAsyTwoWayBundle(bundle, pubKeyB,priKeyA.toCharArray());
+        System.out.println("Msg from PriKeyA:"+ msgBundle);
+
+        System.out.println("----------------------");
+        System.out.println("SymKey bundle test");
+        System.out.println("----------");
+
+        bundle = ecc.encryptSymKeyBundle(msg,symKey);
+        System.out.println("Cipher bundle: "+bundle);
+        msgBundle = ecc.decryptSymKeyBundle(bundle, symKey);
+        System.out.println("Msg from bundle:"+ msgBundle);
+
     }
 
     private static void checkResult(EccAesData eccAesData, String s) {

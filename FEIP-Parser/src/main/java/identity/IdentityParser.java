@@ -1,6 +1,6 @@
 package identity;
 
-import feipClass.Cid;
+import feipClass.*;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import co.elastic.clients.elasticsearch.core.GetResponse;
@@ -8,7 +8,6 @@ import co.elastic.clients.elasticsearch.core.SearchResponse;
 import com.google.gson.Gson;
 import fchClass.Address;
 import keyTools.KeyTools;
-import feipClass.Feip;
 import fchClass.OpReturn;
 import parser.WeightMethod;
 import startFEIP.StartFEIP;
@@ -21,10 +20,10 @@ import static constants.IndicesNames.CID;
 
 public class IdentityParser {
 
-	public CidHist makeCid(OpReturn opre, Feip feip) throws ElasticsearchException, IOException {
+	public CidHist makeCid(OpReturn opre, FcInfo feip) throws ElasticsearchException, IOException {
 
 		Gson gson = new Gson();
-		CidRaw cidRaw = gson.fromJson(gson.toJson(feip.getData()),CidRaw.class);
+		CidData cidRaw = gson.fromJson(gson.toJson(feip.getData()), CidData.class);
 		if(cidRaw==null)return null;
 
 		if(cidRaw.getOp()==null)return null;
@@ -54,10 +53,10 @@ public class IdentityParser {
 		return cidHist;
 	}
 
-	public CidHist makeNobody(OpReturn opre, Feip feip) {
+	public CidHist makeNobody(OpReturn opre, FcInfo feip) {
 
 		Gson gson = new Gson();
-		NobodyRaw nobodyRaw = gson.fromJson(gson.toJson(feip.getData()), NobodyRaw.class);
+		NobodyData nobodyRaw = gson.fromJson(gson.toJson(feip.getData()), NobodyData.class);
 		if(! addrFromPriKey(nobodyRaw.getPriKey()).equals(opre.getSigner()))return null;
 
 		CidHist cidHist = new CidHist();
@@ -80,10 +79,10 @@ public class IdentityParser {
 		return addr;
 	}
 
-	public CidHist makeMaster(OpReturn opre, Feip feip) {
+	public CidHist makeMaster(OpReturn opre, FcInfo feip) {
 
 		Gson gson = new Gson();
-		MasterRaw masterRaw = gson.fromJson(gson.toJson(feip.getData()),MasterRaw.class);
+		MasterData masterRaw = gson.fromJson(gson.toJson(feip.getData()), MasterData.class);
 		if(masterRaw==null)return null;
 		if(masterRaw.getPromise()==null)return null;
 		if(!masterRaw.getPromise().equals("The master owns all my rights."))return null;
@@ -106,10 +105,10 @@ public class IdentityParser {
 		return cidHist;
 	}
 
-	public CidHist makeHomepage(OpReturn opre, Feip feip) {
+	public CidHist makeHomepage(OpReturn opre, FcInfo feip) {
 
 		Gson gson = new Gson();
-		HomepageRaw homepageRaw = gson.fromJson(gson.toJson(feip.getData()),HomepageRaw.class);
+		HomepageData homepageRaw = gson.fromJson(gson.toJson(feip.getData()), HomepageData.class);
 
 		if(homepageRaw ==null)return null;
 
@@ -135,10 +134,10 @@ public class IdentityParser {
 		return cidHist;
 	}
 
-	public CidHist makeNoticeFee(OpReturn opre, Feip feip) {
+	public CidHist makeNoticeFee(OpReturn opre, FcInfo feip) {
 
 		Gson gson = new Gson();
-		NoticeFeeRaw noticeFeeRaw = gson.fromJson(gson.toJson(feip.getData()),NoticeFeeRaw.class);
+		NoticeFeeData noticeFeeRaw = gson.fromJson(gson.toJson(feip.getData()), NoticeFeeData.class);
 		if(noticeFeeRaw ==null)return null;
 
 		CidHist cidHist = new CidHist();
@@ -156,11 +155,11 @@ public class IdentityParser {
 		return cidHist;
 	}
 
-	public RepuHist makeReputation(OpReturn opre, Feip feip) {
+	public RepuHist makeReputation(OpReturn opre, FcInfo feip) {
 
 		if (opre.getCdd() < StartFEIP.CddRequired) return null;
 		Gson gson = new Gson();
-		ReputationRaw reputationRaw = gson.fromJson(gson.toJson(feip.getData()),ReputationRaw.class);
+		ReputationData reputationRaw = gson.fromJson(gson.toJson(feip.getData()), ReputationData.class);
 		if(reputationRaw ==null)return null;
 		if(reputationRaw.getRate()==null)return null;
 

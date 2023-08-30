@@ -2,9 +2,9 @@ package fchClass;
 
 public class CashMark {
 	private String cashId;		//input id, the hash of previous txid and index, e.g. the first 32+4 bytes of the input.
-	private String fid;	//input address
-	private long value;		//input value
-	private long cdd;		//input value
+	private String fid;
+	private long value;
+	private long cdd;
 
 	
 	public String getCashId() {

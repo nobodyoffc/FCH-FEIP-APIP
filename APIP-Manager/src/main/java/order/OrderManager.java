@@ -9,6 +9,7 @@ import constants.Strings;
 import fcTools.ParseTools;
 import feipClass.Service;
 import keyTools.KeyTools;
+import menu.Inputer;
 import menu.Menu;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,7 +82,7 @@ public class OrderManager {
 
         System.out.println("Reset last order height to 0? All order and balance will be flushed. 'reset' to reset:");
 
-        String input = Menu.getString(br);
+        String input = Inputer.inputString(br);
 
         if ("reset".equals(input)) {
             try {

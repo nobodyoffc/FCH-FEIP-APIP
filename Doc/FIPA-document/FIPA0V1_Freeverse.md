@@ -1,7 +1,7 @@
 ```
 ProtocolType: FIPA
 SerialNumber: 1
-ProtocolName: Entity
+ProtocolName: Freeverse
 Version: 1
 Description : Define bisic entities of Free Consensus 
 Authors: C_armX
@@ -37,30 +37,31 @@ UpdateDate: 2023-05-07
 eid：entity identify
 
 * Entity: Information
-  * Subject: Key
+  * Subject: Key Keeper
   * Object: Data
 
 ## FVI 身份
 
-* type
+* ID type
   * digitalId: hash of entity
-  * humanReadableId: Named by human
+  * humanReadableId: name by human
 
 * EID
-	* FID
-		* CID
-          * guide
-          * master
-          * messenger
-          * waiter
-          * maker
-          * teller
-          * dealer
-          * ...
+	* SubjectId：
+      * FID
+          * CID
+            * guide
+            * master
+            * messenger
+            * waiter
+            * fchTx
+            * teller
+            * dealer
+            * ...
 	* OID
 		* DID（DataID）
         * RID（ReferredID）:
-          * bid
+          * (bid)DID
           * aid
           * pid
           * sid

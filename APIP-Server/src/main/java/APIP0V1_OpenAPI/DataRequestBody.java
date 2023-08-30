@@ -1,6 +1,6 @@
 package APIP0V1_OpenAPI;
 
-import APIP1V1_FCDSL.Fcdsl;
+import apipClass.Fcdsl;
 
 public class DataRequestBody{
 

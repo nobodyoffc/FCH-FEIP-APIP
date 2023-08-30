@@ -14,8 +14,9 @@ import fcTools.ParseTools;
 import fchClass.CashMark;
 import fchClass.OpReturn;
 import fchClass.TxHas;
-import feipClass.Feip;
+import feipClass.FcInfo;
 import fileTools.JsonFileTools;
+import menu.Inputer;
 import menu.Menu;
 import order.Order;
 import org.slf4j.Logger;
@@ -183,7 +184,7 @@ public class Rewarder {
             return;
         }
 
-        Feip feip;
+        FcInfo feip;
         RewardData rewardData;
         Gson gson = new Gson();
         List<Hit<OpReturn>> hitList = result.hits().hits();
@@ -706,7 +707,7 @@ public class Rewarder {
         Double share;
         if(params!=null&&params.getConsumeViaShare()==null){
             System.out.println("Set consumeViaShare");
-            share = Menu.getGoodShare(br);
+            share = Inputer.inputGoodShare(br);
             String consumeViaShare;
             if (share != null) {
                 consumeViaShare = String.valueOf(share);
@@ -716,7 +717,7 @@ public class Rewarder {
 
         if(params!=null&&params.getOrderViaShare()==null) {
             System.out.println("Set orderViaShare");
-            share = Menu.getGoodShare(br);
+            share = Inputer.inputGoodShare(br);
             String orderViaShare;
             if (share != null) {
                 orderViaShare = String.valueOf(share);
@@ -724,12 +725,12 @@ public class Rewarder {
             }
         }
 
-        Map<String,String> costMap = Menu.inputGoodFidValueStrMap(br, serviceName+"_"+COST_MAP,false);
+        Map<String,String> costMap = Inputer.inputGoodFidValueStrMap(br, serviceName+"_"+COST_MAP,false);
         if(costMap!=null)rewardParams.setCostMap(costMap);
 
         Map<String, String> builderShareMap;
         while(true) {
-            builderShareMap = Menu.inputGoodFidValueStrMap(br, serviceName + "_" + BUILDER_SHARE_MAP,true);
+            builderShareMap = Inputer.inputGoodFidValueStrMap(br, serviceName + "_" + BUILDER_SHARE_MAP,true);
 
             if(builderShareMap==null ||builderShareMap.isEmpty()){
                 System.out.println("BuilderShareMap can't be empty.");

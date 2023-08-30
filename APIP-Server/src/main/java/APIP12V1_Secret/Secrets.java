@@ -1,13 +1,12 @@
 package APIP12V1_Secret;
 
 import APIP0V1_OpenAPI.*;
-import APIP1V1_FCDSL.Fcdsl;
-import APIP1V1_FCDSL.Filter;
-import APIP1V1_FCDSL.Terms;
+import apipClass.Fcdsl;
+import apipClass.Filter;
+import apipClass.Terms;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
-import initial.Initiator;
 import feipClass.Secret;
 
 import javax.servlet.ServletException;
@@ -39,16 +38,16 @@ public class Secrets extends HttpServlet {
 
         String addr = dataCheckResult.getAddr();
 
-        if (RequestChecker.checkPublicSessionKey(response, replier, writer, addr)) return;
+        if (RequestChecker.isPublicSessionKey(response, replier, writer, addr)) return;
 
         DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
 
         //Check API
-        if(!isThisApiRequest(requestBody)){
-            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
-            writer.write(replier.reply1012BadQuery(addr));
-            return;
-        }
+//        if(!isThisApiRequest(requestBody)){
+//            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
+//            writer.write(replier.reply1012BadQuery(addr));
+//            return;
+//        }
 
         //Set default sort.
         ArrayList<Sort> sort =Sort.makeSortList("birthHeight",false,"secretId",true,null,null);
@@ -100,15 +99,15 @@ public class Secrets extends HttpServlet {
         esRequest.writeSuccess(dataCheckResult.getSessionKey());
     }
 
-    private boolean isThisApiRequest(DataRequestBody requestBody) {
-        if(requestBody.getFcdsl()==null)
-            return false;
-        if(requestBody.getFcdsl().getQuery()==null)
-            return false;
-        if(requestBody.getFcdsl().getQuery().getTerms()==null)
-            return false;
-        if(!requestBody.getFcdsl().getQuery().getTerms().getFields()[0].equals("owner"))
-            return false;
-        return true;
-    }
+//    private boolean isThisApiRequest(DataRequestBody requestBody) {
+//        if(requestBody.getFcdsl()==null)
+//            return false;
+//        if(requestBody.getFcdsl().getQuery()==null)
+//            return false;
+//        if(requestBody.getFcdsl().getQuery().getTerms()==null)
+//            return false;
+//        if(!requestBody.getFcdsl().getQuery().getTerms().getFields()[0].equals("owner"))
+//            return false;
+//        return true;
+//    }
 }

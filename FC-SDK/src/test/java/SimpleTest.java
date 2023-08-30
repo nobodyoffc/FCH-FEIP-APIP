@@ -36,7 +36,6 @@ public class SimpleTest {
         eccAesData.setPriKeyB(priKeyB);
         eccAesData.setPubKeyA(pubKeyA);
 
-        ecc.decryptAsyBitcore(eccAesData);
         ParseTools.gsonPrint(eccAesData);
     }
 

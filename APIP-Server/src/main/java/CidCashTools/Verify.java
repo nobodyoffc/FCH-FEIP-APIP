@@ -5,7 +5,6 @@ import com.google.gson.Gson;
 import constants.ApiNames;
 import constants.ReplyInfo;
 import fcTools.ParseTools;
-import initial.Initiator;
 import org.bitcoinj.core.ECKey;
 
 import javax.servlet.ServletException;
@@ -34,7 +33,7 @@ public class Verify extends HttpServlet {
 
         String addr = dataCheckResult.getAddr();
 
-        if (RequestChecker.checkPublicSessionKey(response, replier, writer, addr)) return;
+        if (RequestChecker.isPublicSessionKey(response, replier, writer, addr)) return;
 
         DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
         replier.setNonce(requestBody.getNonce());

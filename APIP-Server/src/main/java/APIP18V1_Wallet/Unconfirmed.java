@@ -60,12 +60,6 @@ public class Unconfirmed extends HttpServlet {
             Map<String, String> resultMap = null;
             try {
                 resultMap = jedis.hgetAll(id);
-
-                if(resultMap == null||resultMap.size()==0){
-                    response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1011DataNotFound));
-                    writer.write(replier.reply1011DataNotFound(addr));
-                    return;
-                }
             }catch(Exception e){
                 UnconfirmedInfo info = new UnconfirmedInfo();
                 info.fid = id;

@@ -21,11 +21,20 @@ public class Cash {
 	private long spendTime;	//Block time when spent.
 	private String spendTxId;	//Tx hash when spent.
 	private long spendHeight; 	//Block height when spent.
+	private int spendTxIndex;		//Order in the block of the tx in which this cash was spent.
 	private String spendBlockId;		//block ID, hash of block head
 	private int spendIndex;		//Order in inputs of the tx when spent.
 	private String unlockScript;	//unlock script.
 	private String sigHash;	//sigHash.
 	private String sequence;	//nSequence
+
+	public int getSpendTxIndex() {
+		return spendTxIndex;
+	}
+
+	public void setSpendTxIndex(int spendTxIndex) {
+		this.spendTxIndex = spendTxIndex;
+	}
 
 	private long cdd;		//CoinDays Destroyed
 	private long cd;		//CoinDays

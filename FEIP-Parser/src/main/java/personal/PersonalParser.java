@@ -1,15 +1,11 @@
 package personal;
 
 import constants.IndicesNames;
-import feipClass.Box;
-import feipClass.Contact;
-import feipClass.Mail;
-import feipClass.Secret;
+import feipClass.*;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import co.elastic.clients.elasticsearch.core.GetResponse;
 import com.google.gson.Gson;
-import feipClass.Feip;
 import fchClass.OpReturn;
 import esTools.EsTools;
 import startFEIP.StartFEIP;
@@ -18,16 +14,16 @@ import java.io.IOException;
 
 public class PersonalParser {
 
-	public boolean parseContact(ElasticsearchClient esClient, OpReturn opre, Feip feip) throws ElasticsearchException, IOException {
+	public boolean parseContact(ElasticsearchClient esClient, OpReturn opre, FcInfo feip) throws ElasticsearchException, IOException {
 		// TODO Auto-generated method stub
 		boolean isValid = false;
 
 		Gson gson = new Gson();
 
-		ContactRaw contactRaw = new ContactRaw();
+		ContactData contactRaw = new ContactData();
 
 		try {
-			contactRaw = gson.fromJson(gson.toJson(feip.getData()), ContactRaw.class);
+			contactRaw = gson.fromJson(gson.toJson(feip.getData()), ContactData.class);
 		}catch(com.google.gson.JsonSyntaxException e) {
 			return isValid;
 		}
@@ -42,6 +38,7 @@ public class PersonalParser {
 
             	if (contactRaw.getAlg() != null)contact.setAlg(contactRaw.getAlg());
 				if (contact.getContactId()==null)return false;
+				if (contact.getCipher()==null)return false;
 				contact.setCipher(contactRaw.getCipher());
 
 				contact.setOwner(opre.getSigner());
@@ -57,7 +54,7 @@ public class PersonalParser {
 			case "delete":
 				if(contactRaw.getContactId() ==null)return isValid;
 				height = opre.getHeight();
-				ContactRaw contactRaw1 = contactRaw;
+				ContactData contactRaw1 = contactRaw;
 
 				GetResponse<Contact> result = esClient.get(g->g.index(IndicesNames.CONTACT).id(contactRaw1.getContactId()), Contact.class);
 
@@ -79,7 +76,7 @@ public class PersonalParser {
 				if(contactRaw.getContactId() ==null)return isValid;
 				height = opre.getHeight();
 
-				ContactRaw contactRaw2 = contactRaw;
+				ContactData contactRaw2 = contactRaw;
 
 				GetResponse<Contact> result1 = esClient.get(g->g.index(IndicesNames.CONTACT).id(contactRaw2.getContactId()), Contact.class);
 
@@ -103,27 +100,28 @@ public class PersonalParser {
 		return isValid;
 	}
 
-	public boolean parseMail(ElasticsearchClient esClient, OpReturn opre, Feip feip) throws ElasticsearchException, IOException {
+	public boolean parseMail(ElasticsearchClient esClient, OpReturn opre, FcInfo feip) throws ElasticsearchException, IOException {
 		// TODO Auto-generated method stub
-		boolean isValid = false;
 
 		Gson gson = new Gson();
 
-		MailRaw mailRaw = new MailRaw();
+		MailData mailRaw = new MailData();
 
+		boolean isValid = false;
 		try {
-			mailRaw = gson.fromJson(gson.toJson(feip.getData()),MailRaw.class);
+			mailRaw = gson.fromJson(gson.toJson(feip.getData()), MailData.class);
 		}catch(com.google.gson.JsonSyntaxException e) {
-			return isValid;
+			return false;
 		}
 
 		Mail mail = new Mail();
 
 		long height;
-		if(mailRaw.getOp()==null && mailRaw.getMsg()==null)return isValid;
+		if(mailRaw.getOp()==null && mailRaw.getMsg()==null)return false;
 
 		// For the old version mails.
 		if(mailRaw.getMsg()!=null) {
+			mail.setMailId(opre.getTxId());
             mail.setAlg(mailRaw.getAlg());
 			mail.setCipherReci(mailRaw.getMsg());
 
@@ -137,14 +135,14 @@ public class PersonalParser {
 			Mail mail1 = mail;
 			esClient.index(i->i.index(IndicesNames.MAIL).id(mail1.getMailId()).document(mail1));
 
-			isValid = true;
-			return isValid;
+			return true;
 		}
 		//Version 4
 		if(mailRaw.getOp()!=null) {
 			switch(mailRaw.getOp()) {
 				case "send":
 					mail.setMailId(opre.getTxId());
+
 					if(mailRaw.getCipher()==null
 							&&mailRaw.getCipherReci()==null
 							&&mailRaw.getCipherSend()==null)
@@ -176,20 +174,20 @@ public class PersonalParser {
 
 					Mail mail0 = mail;
 					esClient.index(i->i.index(IndicesNames.MAIL).id(mail0.getMailId()).document(mail0));
-					isValid = true;
+
 					break;
 				case "delete":
-					if(mailRaw.getMailId() ==null)return isValid;
+					if(mailRaw.getMailId() ==null)return false;
 					height = opre.getHeight();
-					MailRaw mailRaw1 = mailRaw;
+					MailData mailRaw1 = mailRaw;
 
 					GetResponse<Mail> result = esClient.get(g->g.index(IndicesNames.MAIL).id(mailRaw1.getMailId()), Mail.class);
 
-					if(!result.found())return isValid;
+					if(!result.found())return false;
 
 					mail = result.source();
 
-					if(!mail.getRecipient().equals(opre.getSigner()))return isValid;
+					if(!mail.getRecipient().equals(opre.getSigner()))return false;
 
 					mail.setActive(false);
 					mail.setLastHeight(height);
@@ -200,9 +198,9 @@ public class PersonalParser {
 					isValid = true;
 					break;
 				case "recover":
-					if(mailRaw.getMailId() ==null)return isValid;
+					if(mailRaw.getMailId() ==null)return false;
 					height = opre.getHeight();
-					MailRaw mailRaw2 = mailRaw;
+					MailData mailRaw2 = mailRaw;
 
 					GetResponse<Mail> result1 = esClient.get(g->g.index(IndicesNames.MAIL).id(mailRaw2.getMailId()), Mail.class);
 
@@ -210,7 +208,7 @@ public class PersonalParser {
 
 					mail = result1.source();
 
-					if(!mail.getRecipient().equals(opre.getSigner()))return isValid;
+					if(!mail.getRecipient().equals(opre.getSigner()))return false;
 
 					mail.setActive(true);
 					mail.setLastHeight(height);
@@ -218,25 +216,24 @@ public class PersonalParser {
 					Mail mail3 = mail;
 					esClient.index(i->i.index(IndicesNames.MAIL).id(mail3.getMailId()).document(mail3));
 
-					isValid = true;
 					break;
 				default:
 					break;
 			}
 		}
-		return isValid;
+		return true;
 	}
 
-	public boolean parseSecret(ElasticsearchClient esClient, OpReturn opre, Feip feip) throws ElasticsearchException, IOException {
+	public boolean parseSecret(ElasticsearchClient esClient, OpReturn opre, FcInfo feip) throws ElasticsearchException, IOException {
 		// TODO Auto-generated method stub
 		boolean isValid = false;
 
 		Gson gson = new Gson();
 
-		SecretRaw secretRaw = new SecretRaw();
+		SecretData secretRaw = new SecretData();
 
 		try {
-			secretRaw = gson.fromJson(gson.toJson(feip.getData()), SecretRaw.class);
+			secretRaw = gson.fromJson(gson.toJson(feip.getData()), SecretData.class);
 		}catch(com.google.gson.JsonSyntaxException e) {
 			return false;
 		}
@@ -274,7 +271,7 @@ public class PersonalParser {
 			case "delete":
 				if(secretRaw.getSecretId() ==null)return false;
 				height = opre.getHeight();
-				SecretRaw safeRaw1 = secretRaw;
+				SecretData safeRaw1 = secretRaw;
 
 				GetResponse<Secret> result = esClient.get(g->g.index(IndicesNames.SECRET).id(safeRaw1.getSecretId()), Secret.class);
 
@@ -295,7 +292,7 @@ public class PersonalParser {
 			case "recover":
 				if(secretRaw.getSecretId() ==null)return isValid;
 				height = opre.getHeight();
-				SecretRaw safeRaw2 = secretRaw;
+				SecretData safeRaw2 = secretRaw;
 
 				GetResponse<Secret> result1 = esClient.get(g->g.index(IndicesNames.SECRET).id(safeRaw2.getSecretId()), Secret.class);
 
@@ -319,13 +316,13 @@ public class PersonalParser {
 		return isValid;
 	}
 
-	public BoxHistory makeBox(OpReturn opre, Feip feip) {
+	public BoxHistory makeBox(OpReturn opre, FcInfo feip) {
 		// TODO Auto-generated method stub
 		Gson gson = new Gson();
-		BoxRaw boxRaw = new BoxRaw();
+		BoxData boxRaw = new BoxData();
 
 		try {
-			boxRaw = gson.fromJson(gson.toJson(feip.getData()),BoxRaw.class);
+			boxRaw = gson.fromJson(gson.toJson(feip.getData()), BoxData.class);
 		}catch(com.google.gson.JsonSyntaxException e) {
 			return null;
 		}

@@ -51,6 +51,7 @@ public class ApiNames {
     public static final String FidCidSeekAPI = "fidCidSeek";
     public static final String CidByIdsAPI = "cidByIds";
     public static final String CidInfoSearchAPI = "cidInfoSearch";
+    public static final String CidSearchAPI = "cidSearch";
     public static final String CidHistoryAPI = "cidHistory";
     public static final String HomepageHistoryAPI = "homepageHistory";
     public static final String NoticeFeeHistoryAPI = "noticeFeeHistory";
@@ -91,13 +92,17 @@ public class ApiNames {
     public static final String MyTeamsAPI = "myTeams";
     public static final String TeamOpHistoryAPI = "teamOpHistory";
     public static final String TeamRateHistoryAPI = "teamRateHistory";
+    public static final String ContactByIdsAPI = "contactByIds";
     public static final String ContactsAPI = "contacts";
     public static final String ContactsDeletedAPI = "contactsDeleted";
+    public static final String SecretByIdsAPI = "secretByIds";
     public static final String SecretsAPI = "secrets";
     public static final String SecretsDeletedAPI = "secretsDeleted";
+    public static final String MailByIdsAPI = "mailByIds";
     public static final String MailsAPI = "mails";
     public static final String MailsDeletedAPI = "mailsDeleted";
     public static final String MailThreadAPI = "mailThread";
+    public static final String StatementByIdsAPI = "statementByIds";
     public static final String StatementsAPI = "statements";
     public static final String StatementSearchAPI = "statementSearch";
     public static final String ProofByIdsAPI = "proofByIds";
@@ -110,6 +115,7 @@ public class ApiNames {
     public static final String GetAvatarAPI = "getAvatar";
     public static final String DecodeRawTxAPI = "decodeRawTx";
     public static final String BroadcastTxAPI = "broadcastTx";
+    public static final String BroadcastAPI = "broadcast";
     public static final String CashValidLiveAPI = "cashValidLive";
     public static final String CashValidForCdAPI = "cashValidForCd";
     public static final String CashValidForPayAPI = "cashValidForPay";
@@ -206,12 +212,15 @@ public class ApiNames {
         ApiNames.apiList.add(ApiNames.BoxSearchAPI);
         ApiNames.apiList.add(ApiNames.BoxHistoryAPI);
 
+        ApiNames.apiList.add(ApiNames.ContactByIdsAPI);
         ApiNames.apiList.add(ApiNames.ContactsAPI);
         ApiNames.apiList.add(ApiNames.ContactsDeletedAPI);
 
+        ApiNames.apiList.add(ApiNames.SecretByIdsAPI);
         ApiNames.apiList.add(ApiNames.SecretsAPI);
         ApiNames.apiList.add(ApiNames.SecretsDeletedAPI);
 
+        ApiNames.apiList.add(ApiNames.MailByIdsAPI);
         ApiNames.apiList.add(ApiNames.MailsAPI);
         ApiNames.apiList.add(ApiNames.MailsDeletedAPI);
         ApiNames.apiList.add(ApiNames.MailThreadAPI);
@@ -220,6 +229,7 @@ public class ApiNames {
         ApiNames.apiList.add(ApiNames.ProofSearchAPI);
         ApiNames.apiList.add(ApiNames.ProofHistoryAPI);
 
+        ApiNames.apiList.add(ApiNames.StatementByIdsAPI);
         ApiNames.apiList.add(ApiNames.StatementsAPI);
         ApiNames.apiList.add(ApiNames.StatementSearchAPI);
         ApiNames.apiList.add(ApiNames.NidSearchAPI);

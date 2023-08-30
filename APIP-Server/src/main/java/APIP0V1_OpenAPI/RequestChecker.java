@@ -165,7 +165,7 @@ public class RequestChecker {
         return signInCheckResult;
     }
 
-    public static boolean checkPublicSessionKey(HttpServletResponse response, Replier replier, PrintWriter writer, String addr) {
+    public static boolean isPublicSessionKey(HttpServletResponse response, Replier replier, PrintWriter writer, String addr) {
         if(PUBLIC.equals(addr)){
             response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1020OtherError));
             replier.setData("This session key isn't allowed to request this API.");

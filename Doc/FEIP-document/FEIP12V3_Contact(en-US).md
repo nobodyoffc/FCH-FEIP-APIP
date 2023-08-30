@@ -73,7 +73,7 @@ When user adds a contact, the data object contains:
 |field|type|content|required|
 |:----|:----|:----|:----|
 |op|string|operation: "add"|Y|
-|alg|string|The encrypt algorithm. "ECC256k1-AES256CBC" is recommended.|Y|
+|alg|string|The encrypt algorithm. "EccAes256BitPay@No1_NrC7" is recommended.|Y|
 |cipher|string|Encrypted message|Y|
 
 * Decrypted data of data.cipher
@@ -101,7 +101,7 @@ When user adds a contact, the data object contains:
     "name": "Contact",
     "data":{
         "op": "add",
-        "alg": "ECC256k1-AES256CBC",
+        "alg": "EccAes256BitPay@No1_NrC7",
         "cipher": "A4MF+Ys1rHRaZ3bcZ68rz9GA2Qdh1/x8bGSFQyzWAkRfV9Ks0d4Mm1AQ5eTn1Uj/3O4MPD85uJHlBZ9uV5x8YYhU+hb/"
     }
 }

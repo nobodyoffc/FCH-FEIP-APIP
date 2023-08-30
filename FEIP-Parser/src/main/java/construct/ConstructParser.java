@@ -1,15 +1,10 @@
 package construct;
 
 import constants.IndicesNames;
-import feipClass.App;
-import feipClass.Code;
-import feipClass.Protocol;
-import feipClass.Service;
+import feipClass.*;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import com.google.gson.Gson;
-import feipClass.Cid;
-import feipClass.Feip;
 import fchClass.OpReturn;
 import esTools.EsTools;
 import startFEIP.StartFEIP;
@@ -19,13 +14,13 @@ import java.util.concurrent.TimeUnit;
 
 public class ConstructParser {
 
-	public ProtocolHistory makeProtocol(OpReturn opre, Feip feip) {
+	public ProtocolHistory makeProtocol(OpReturn opre, FcInfo feip) {
 		// TODO Auto-generated method stub
 		Gson gson = new Gson();
 
-		ProtocolRaw protocolRaw = new ProtocolRaw();
+		ProtocolData protocolRaw = new ProtocolData();
 		try {
-		protocolRaw = gson.fromJson(gson.toJson(feip.getData()), ProtocolRaw.class);
+		protocolRaw = gson.fromJson(gson.toJson(feip.getData()), ProtocolData.class);
 		}catch(com.google.gson.JsonSyntaxException e) {
 			e.printStackTrace();
 			try {
@@ -133,13 +128,13 @@ public class ConstructParser {
 		return protocolHist;
 	}
 
-	public ServiceHistory makeService(OpReturn opre, Feip feip) {
+	public ServiceHistory makeService(OpReturn opre, FcInfo feip) {
 		// TODO Auto-generated method stub
 		Gson gson = new Gson();
-		ServiceRaw serviceRaw = new ServiceRaw();
+		ServiceData serviceRaw = new ServiceData();
 		
 		try {
-			serviceRaw = gson.fromJson(gson.toJson(feip.getData()),ServiceRaw.class);
+			serviceRaw = gson.fromJson(gson.toJson(feip.getData()), ServiceData.class);
 		}catch(com.google.gson.JsonSyntaxException e) {
 			return null;
 		}
@@ -244,14 +239,14 @@ public class ConstructParser {
 		}
 		return serviceHist; 
 	}
-	public AppHistory makeApp(OpReturn opre, Feip feip) {
+	public AppHistory makeApp(OpReturn opre, FcInfo feip) {
 		// TODO Auto-generated method stub
 		Gson gson = new Gson();
 		
-		AppRaw appRaw = new AppRaw();
+		AppData appRaw = new AppData();
 		
 		try {
-			appRaw = gson.fromJson(gson.toJson(feip.getData()),AppRaw.class);
+			appRaw = gson.fromJson(gson.toJson(feip.getData()), AppData.class);
 		}catch(com.google.gson.JsonSyntaxException e) {
 			return null;
 		}
@@ -361,13 +356,13 @@ public class ConstructParser {
 		}
 		return appHist; 
 	}
-	public CodeHistory makeCode(OpReturn opre, Feip feip) {
+	public CodeHistory makeCode(OpReturn opre, FcInfo feip) {
 		// TODO Auto-generated method stub
 		Gson gson = new Gson();
-		CodeRaw codeRaw = new CodeRaw();
+		CodeData codeRaw = new CodeData();
 		
 		try {
-			codeRaw = gson.fromJson(gson.toJson(feip.getData()),CodeRaw.class);
+			codeRaw = gson.fromJson(gson.toJson(feip.getData()), CodeData.class);
 		}catch(com.google.gson.JsonSyntaxException e) {
 			return null;
 		}

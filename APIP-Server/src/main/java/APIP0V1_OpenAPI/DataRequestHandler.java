@@ -1,6 +1,6 @@
 package APIP0V1_OpenAPI;
 
-import APIP1V1_FCDSL.*;
+import apipClass.*;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.query_dsl.*;
@@ -65,7 +65,7 @@ public class DataRequestHandler {
             }else {
                 List<Query> queryList = null;
                 if(fcdsl.getQuery()!=null) {
-                    APIP1V1_FCDSL.Query query = fcdsl.getQuery();
+                    apipClass.Query query = fcdsl.getQuery();
                     queryList = getQueryList(query);
                 }
                 
@@ -166,7 +166,7 @@ public class DataRequestHandler {
 
     }
 
-    private List<Query> getQueryList(APIP1V1_FCDSL.Query query) {
+    private List<Query> getQueryList(apipClass.Query query) {
         BoolQuery termsQuery;
         BoolQuery partQuery;
         BoolQuery matchQuery;

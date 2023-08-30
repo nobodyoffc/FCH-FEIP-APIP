@@ -4,7 +4,6 @@ import APIP0V1_OpenAPI.*;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
-import initial.Initiator;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -36,7 +35,7 @@ public class BoxHistory extends HttpServlet {
 
         String addr = dataCheckResult.getAddr();
 
-        if (RequestChecker.checkPublicSessionKey(response, replier, writer, addr)) return;
+        if (RequestChecker.isPublicSessionKey(response, replier, writer, addr)) return;
 
         DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
 

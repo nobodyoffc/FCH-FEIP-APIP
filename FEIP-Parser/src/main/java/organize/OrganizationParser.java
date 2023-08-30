@@ -4,10 +4,7 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import com.google.gson.Gson;
 import constants.IndicesNames;
-import feipClass.Cid;
-import feipClass.Group;
-import feipClass.Team;
-import feipClass.Feip;
+import feipClass.*;
 import fchClass.OpReturn;
 import esTools.EsTools;
 import startFEIP.StartFEIP;
@@ -17,14 +14,14 @@ import java.util.*;
 
 public class OrganizationParser {
 
-	public GroupHistory makeGroup(OpReturn opre, Feip feip) {
+	public GroupHistory makeGroup(OpReturn opre, FcInfo feip) {
 		// TODO Auto-generated method stub
 		Gson gson = new Gson();
 
-		GroupRaw groupRaw = new GroupRaw();
+		GroupData groupRaw = new GroupData();
 
 		try {
-			groupRaw = gson.fromJson(gson.toJson(feip.getData()),GroupRaw.class);
+			groupRaw = gson.fromJson(gson.toJson(feip.getData()), GroupData.class);
 		}catch(com.google.gson.JsonSyntaxException e) {
 			return null;
 		}
@@ -272,16 +269,16 @@ public class OrganizationParser {
 		return isValid;
 	}
 
-	public TeamHistory makeTeam(OpReturn opre, Feip feip) throws InterruptedException {
+	public TeamHistory makeTeam(OpReturn opre, FcInfo feip) throws InterruptedException {
 
         if (opre.getHeight() > StartFEIP.CddCheckHeight && opre.getCdd() < StartFEIP.CddRequired) return null;
 
 		Gson gson = new Gson();
 
-		TeamRaw teamRaw = new TeamRaw();
+		TeamData teamRaw = new TeamData();
 
 		try {
-			teamRaw = gson.fromJson(gson.toJson(feip.getData()),TeamRaw.class);
+			teamRaw = gson.fromJson(gson.toJson(feip.getData()), TeamData.class);
 		}catch(com.google.gson.JsonSyntaxException e) {
 			return null;
 		}

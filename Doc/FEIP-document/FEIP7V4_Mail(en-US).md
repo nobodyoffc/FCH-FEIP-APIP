@@ -94,7 +94,7 @@ When user sends a mail, the data object contains:
 	"pid": "",
 	"data": {
 		"op": "send",
-		"alg": "ECC256k1-AES256CBC",
+		"alg": "EccAes256BitPay@No1_NrC7",
 		"ciphertextSend": "AtpfHV/b+P2TMG8eFYpwdR7FCOhRjsK5I9UiZBIwUBtBAzi+B/tS5lMv27T9ofORhmSTYRYEfMIaffEwkwtfgEdormE5u4YKnBf001bWPeIQIXEz8HAj7XVt1rYLciJPdQ==",
 		"ciphertextReci": "Avmexwg3OUjOPl7KyAcu1VcAYy1ln90DmqLH/POOPtwDD6PhiitBd/aRjRBZR9Tx9khysbQLHXKFL4BJ6Af0J6iKiDLZXOfvlzdXNM+TzADj0ryOsX9vtVXPsiljS6PjFg==";
 		"textId":"c269f3b03960a695e1e2e4ab451bd645c7134d3328a327c98c00ed102f76b451"

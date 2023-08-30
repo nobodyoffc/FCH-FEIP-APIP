@@ -1,13 +1,12 @@
 package APIP13V1_Mail;
 
 import APIP0V1_OpenAPI.*;
-import APIP1V1_FCDSL.Fcdsl;
-import APIP1V1_FCDSL.Filter;
-import APIP1V1_FCDSL.Terms;
+import apipClass.Fcdsl;
+import apipClass.Filter;
+import apipClass.Terms;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
-import initial.Initiator;
 import feipClass.Mail;
 
 import javax.servlet.ServletException;
@@ -40,16 +39,16 @@ public class Mails extends HttpServlet {
 
         String addr = dataCheckResult.getAddr();
 
-        if (RequestChecker.checkPublicSessionKey(response, replier, writer, addr)) return;
+        if (RequestChecker.isPublicSessionKey(response, replier, writer, addr)) return;
 
         DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
 
         //Check API
-        if(!isThisApiRequest(requestBody)){
-            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
-            writer.write(replier.reply1012BadQuery(addr));
-            return;
-        }
+//        if(!isThisApiRequest(requestBody)){
+//            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
+//            writer.write(replier.reply1012BadQuery(addr));
+//            return;
+//        }
 
         //Set default sort.
         ArrayList<Sort> sort =Sort.makeSortList("birthHeight",false,"mailId",true,null,null);
@@ -102,13 +101,13 @@ public class Mails extends HttpServlet {
         esRequest.writeSuccess(dataCheckResult.getSessionKey());
     }
 
-    private boolean isThisApiRequest(DataRequestBody requestBody) {
-        if(requestBody.getFcdsl()==null)
-            return false;
-        if(requestBody.getFcdsl().getQuery()==null)
-            return false;
-        if(requestBody.getFcdsl().getQuery().getTerms()==null)
-            return false;
-        return true;
-    }
+//    private boolean isThisApiRequest(DataRequestBody requestBody) {
+//        if(requestBody.getFcdsl()==null)
+//            return false;
+//        if(requestBody.getFcdsl().getQuery()==null)
+//            return false;
+//        if(requestBody.getFcdsl().getQuery().getTerms()==null)
+//            return false;
+//        return true;
+//    }
 }

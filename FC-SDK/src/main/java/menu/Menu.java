@@ -20,22 +20,11 @@ public class Menu {
     }
 
     public static boolean askIfNotToDo(String x, BufferedReader br)  {
-        System.out.println(x+"'y' to do it. Other key to quit:");
+        System.out.println(x+" 'y' to do it. Other key to quit:");
 
-        String input = getString(br);
+        String input = Inputer.inputString(br);
 
-        if (!"y".equals(input)) return true;
-        return false;
-    }
-
-    public static String getString(BufferedReader br) {
-        String input = null;
-        try {
-            input = br.readLine();
-        } catch (IOException e) {
-            System.out.println("BufferedReader is wrong. Can't read.");
-        }
-        return input;
+        return !"y".equals(input);
     }
 
     public static void printUnderline(int num) {
@@ -62,92 +51,6 @@ public class Menu {
             return false;
         }
         return true;
-    }
-
-    public static Double getGoodShare(BufferedReader br) {
-        while (true) {
-            Double share = inputNum(br);
-            if(share==null)return null;
-            if (share > 1) {
-                System.out.println("A share should less than 1. ");
-                continue;
-            }
-            return ParseTools.roundDouble4(share);
-        }
-    }
-
-    public static Double inputNum(BufferedReader br)  {
-
-        while(true) {
-            System.out.println("Input the number. 'q' to quit.");
-            String inputStr;
-            double input;
-            try {
-                inputStr = br.readLine();
-            } catch (IOException e) {
-                System.out.println("br.readLine() wrong.");
-                return null;
-            }
-            if("q".equals(inputStr))return null;
-            try {
-                input = Double.parseDouble(inputStr);
-                return input;
-            } catch (Exception e) {
-                System.out.println("Input a number. Try again.");
-            }
-        }
-    }
-
-    public static Map<String,String> inputGoodFidValueStrMap(BufferedReader br, String mapName, boolean checkFullShare)  {
-        Map<String,String> map = new HashMap<>();
-
-        while(true) {
-
-            while(true) {
-                System.out.println("Set " + mapName + ". 'y' to input. 'q' to quit. 'i' to quit ignore all changes.");
-                String input;
-                try {
-                    input = br.readLine();
-                } catch (IOException e) {
-                    System.out.println("br.readLine() wrong.");
-                    return null;
-                }
-                if("y".equals(input))break;
-                if("q".equals(input)){
-                    System.out.println(mapName + " is set.");
-                    return map;
-                }
-                if("i".equals(input))return null;
-                System.out.println("Invalid input. Try again.");
-            }
-
-            String key;
-            while (true) {
-                System.out.println("Input FID. 'q' to quit:");
-                key = getString(br);
-                if(key == null)return null;
-                if ("q".equals(key)) break;
-
-                if (!keyTools.KeyTools.isValidFchAddr(key)) {
-                    System.out.println("It's not a valid FID. Try again.");
-                    continue;
-                }
-                break;
-            }
-            Double value = null;
-
-            if(!"q".equals(key)) {
-                if (checkFullShare) {
-                    value = getGoodShare(br);
-                } else {
-                    value = inputNum(br);
-                }
-            }
-
-            if(value!=null){
-                map.put(key,String.valueOf(value));
-            }
-        }
     }
 
     public void add(ArrayList<String> itemList) {

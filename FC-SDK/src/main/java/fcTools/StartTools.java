@@ -10,6 +10,7 @@ import javaTools.BytesTools;
 import keyTools.KeyTools;
 import menu.Menu;
 import org.bitcoinj.core.ECKey;
+import org.bitcoinj.params.MainNetParams;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -70,13 +71,7 @@ public class StartTools {
             int choice = menu.choose(br);
             switch (choice) {
                 case 1 -> getRandom(br);
-                case 2 -> {
-                    try {
-                        pubKeyToAddrs(br);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
+                case 2 -> pubKeyToAddrs(br);
                 case 3 -> findNiceFid(br);
                 case 4 -> hex32Base58(br);
                 case 5 -> sha256String(br);
@@ -141,8 +136,9 @@ public class StartTools {
             System.out.println("BufferedReader wrong;");
             return;
         }
+        EccAes256K1P7 ecc = new EccAes256K1P7();
         char[] symKey = EccAes256K1P7.inputSymKey(br);
-        String eccAesDataJson = EccAes256K1P7.decryptSymKeyFromIvCipher(ivCipherStr, symKey);
+        String eccAesDataJson = ecc.decryptSymKeyBundle(ivCipherStr, symKey);
         System.out.println(eccAesDataJson);
         Menu.anyKeyToContinue(br);
     }
@@ -168,7 +164,7 @@ public class StartTools {
         String msg = EccAes256K1P7.inputMsg(br);
         char[] symKey = EccAes256K1P7.inputSymKey(br);
         EccAes256K1P7 ecc = new EccAes256K1P7();
-        String ivCipher = ecc.encryptSymKeyGetIvCipher(msg, symKey);
+        String ivCipher = ecc.encryptSymKeyBundle(msg, symKey);
         System.out.println(ivCipher);
         Menu.anyKeyToContinue(br);
     }
@@ -492,6 +488,7 @@ public class StartTools {
         }
         long i =0;
         long j = 0;
+        System.out.println("Finding...");
         while (true) {
             ECKey ecKey = new ECKey();
             String fid = KeyTools.pubKeyToFchAddr(ecKey.getPubKey());
@@ -499,7 +496,8 @@ public class StartTools {
                 System.out.println("----");
                 System.out.println("FID:"+fid);
                 System.out.println("PubKey: "+ecKey.getPublicKeyAsHex());
-                System.out.println("PriKey: "+ecKey.getPrivateKeyAsHex());
+                System.out.println("PriKeyHex: "+ecKey.getPrivateKeyAsHex());
+                System.out.println("PriKeyBase58: "+ecKey.getPrivateKeyEncoded(MainNetParams.get()));
                 System.out.println("----");
                 System.out.println("Begin at: "+sdf.format(begin));
                 Date end = new Date();
@@ -515,9 +513,14 @@ public class StartTools {
         }
     }
 
-    private static void pubKeyToAddrs(BufferedReader br) throws IOException {
+    private static void pubKeyToAddrs(BufferedReader br){
         System.out.println("Input the public key, enter to exit:");
-        String pubKey = br.readLine();
+        String pubKey = null;
+        try {
+            pubKey = br.readLine();
+        } catch (IOException e) {
+            System.out.println("BufferedReader wrong.");
+        }
         if ("".equals(pubKey)) {
             return;
         }
@@ -625,7 +628,6 @@ public class StartTools {
         String symKey;
         try {
             symKey = br.readLine();
-
             if("".equals(symKey)) {
                 return;
             }
@@ -653,7 +655,9 @@ public class StartTools {
 
         while (true) {
             line = br.readLine();
-            if("".equals(line)||"\n".equals(line))break;
+            if("".equals(line)){
+                break;
+            }
             input.append(line).append("\n");
         }
 

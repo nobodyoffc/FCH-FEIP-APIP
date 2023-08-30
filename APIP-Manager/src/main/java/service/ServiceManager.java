@@ -10,8 +10,10 @@ import com.google.gson.GsonBuilder;
 import config.ConfigAPIP;
 import constants.FieldNames;
 import constants.OpNames;
+import feipClass.ServiceData;
 import fcTools.ParseTools;
 import keyTools.KeyTools;
+import menu.Inputer;
 import menu.Menu;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -187,27 +189,28 @@ public class ServiceManager {
 	public void publish(BufferedReader br, Jedis jedis) throws IOException {
 		if (Menu.askIfNotToDo("Get the OpReturn text to publish a new service?", br)) return;
 
-		OpReturn opReturn = new OpReturn();
+		Feip5 feip5 = new Feip5();
 
-		Data data = new Data();
+//		Data data = new Data();
 
+		ServiceData data = new ServiceData();
 		data.setOp(OpNames.PUBLISH);
-
-		setStdName(br, data);
-
-		setLocalNames(br, data);
-
-		setDesc(br, data);
-
 		String[] types = {"APIP","FEIP"};
 		data.setTypes(types);
+		data.inputServicePublish(br);
+		inputServiceApipParams(br);
 
-		setUrls(br, data);
+		data.setParams(params);
+		feip5.setData(data);
 
-		setWaiters(br, data);
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-		setPids(br, data);
+		System.out.println("Check the JSON text below. Send it in a TX by the owner of the service to freecash blockchain:");
+		System.out.println(gson.toJson(feip5));
+		System.out.println();
+	}
 
+	private void inputServiceApipParams(BufferedReader br) throws IOException {
 		setUrlHead(br);
 
 		setCurrency(br);
@@ -222,56 +225,9 @@ public class ServiceManager {
 
 		setSessionKey(br);
 
-		params.setConsumeViaShare(inputViaShare(br, CONSUME_VIA_SHARE));
+		params.setConsumeViaShare(Inputer.inputShare(br, CONSUME_VIA_SHARE));
 
-		params.setOrderViaShare(inputViaShare(br,ORDER_VIA_SHARE));
-
-		data.setParams(params);
-		opReturn.setData(data);
-
-		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
-		System.out.println("Check the JSON text below. Send it in a TX by the owner of the service to freecash blockchain:");
-		System.out.println(gson.toJson(opReturn));
-		System.out.println();
-	}
-
-	private static void setStdName(BufferedReader br, Data data) throws IOException {
-		System.out.println("Input the English name of your service:");
-		data.setStdName(br.readLine());
-	}
-
-	private void setLocalNames(BufferedReader br, Data data) throws IOException {
-		String ask = "Input the local names of your service, if you want. Enter to end :";
-		String[] localNames = inputStringArray(br,ask,0);
-		if(localNames.length!=0) data.setLocalNames(localNames);
-	}
-
-	private static void setDesc(BufferedReader br, Data data) throws IOException {
-		System.out.println("Input the description of your service if you want.Enter to ignore:");
-		String str = br.readLine();
-		if(!str.equals("")) data.setDesc(str);
-	}
-
-	private void setUrls(BufferedReader br, Data data) throws IOException {
-		String ask;
-		ask = "Input the URLs of your service, if you want. Enter to end :";
-		String[] urls = inputStringArray(br,ask,0);
-		if(urls.length!=0) data.setUrls(urls);
-	}
-
-	private void setWaiters(BufferedReader br, Data data) throws IOException {
-		String ask;
-		ask = "Input the FCH address of the waiter for your service if you want. Enter to ignore:";
-		String[] waiters = inputStringArray(br,ask,0);
-		if(waiters.length!=0) data.setWaiters(waiters);
-	}
-
-	private void setPids(BufferedReader br, Data data) throws IOException {
-		String ask;
-		ask = "Input the PIDs of the PIDs your service using if you want. Enter to end :";
-		String[] protocols = inputStringArray(br,ask,64);
-		if(protocols.length!=0) data.setProtocols(protocols);
+		params.setOrderViaShare(Inputer.inputShare(br,ORDER_VIA_SHARE));
 	}
 
 	private void setUrlHead(BufferedReader br) throws IOException {
@@ -369,49 +325,6 @@ public class ServiceManager {
 	}
 
 
-	private String inputViaShare(BufferedReader br, String viaShare) throws IOException {
-		float flo;
-		String str;
-		System.out.println("Input the "+viaShare+ " of your service, if you need. Enter to ignore:");
-		while(true) {
-			str = br.readLine();
-			if("".equals(str)) return null;
-			try {
-				flo = Float.valueOf(str);
-				if(flo>1){
-					System.out.println("A share should less than 1. Input again:");
-					continue;
-				}
-				flo = (float) ParseTools.roundDouble4(flo);
-				return String.valueOf(flo);
-			}catch(Exception e) {
-				System.out.println("It isn't a number. Input again:");
-			}
-		}
-	}
-
-	private String[] inputStringArray(BufferedReader br, String ask, int len) throws IOException {
-		System.out.println(ask);
-		ArrayList<String> itemList = new ArrayList<String>();
-		while(true) {
-			String item = br.readLine();
-			if(item.equals(""))break;
-			if(len>0) {
-				if(item.length()!=len) {
-					System.out.println("The length does not match.");
-					continue;
-				}
-			}
-			itemList.add(item);
-			System.out.println("Input next item if you want or enter to end:");
-		}
-		if(itemList.isEmpty())return new String [0];
-
-		String[] items = itemList.toArray(new String[itemList.size()]);
-
-		return items;
-	}
-
 	private void update(ElasticsearchClient esClient, BufferedReader br) throws IOException {
 
 		if (Menu.askIfNotToDo("Get the OpReturn text to update your service? ", br)) return;
@@ -431,9 +344,9 @@ public class ServiceManager {
 			return;
 		}
 
-		OpReturn opReturn = new OpReturn();
+		Feip5 opReturn = new Feip5();
 
-		Data data = new Data();
+		ServiceData data = new ServiceData();
 
 		data.setOp(OpNames.UPDATE);
 		data.setSid(sid);
@@ -489,7 +402,7 @@ public class ServiceManager {
 		String str;
 		System.out.println("Input "+viaShare+" your service if you want to change it. Enter to keep it:");
 		while(true) {
-			str = Menu.getString(br);
+			str = Inputer.inputString(br);
 			if("".equals(str)) return null;
 			if(ParseTools.isGoodShare(str)) {
 				try {
@@ -510,7 +423,7 @@ public class ServiceManager {
 		System.out.println("\nThe consumeViaShare of your service: "+ params.getOrderViaShare());
 		System.out.println("Input consumeViaShare your service if you want to change it. Enter to keep it:");
 		while(true) {
-			str = Menu.getString(br);
+			str = Inputer.inputString(br);
 			if(!"".equals(str)) {
 				if(ParseTools.isGoodShare(str)) {
 					try {
@@ -632,7 +545,7 @@ public class ServiceManager {
 		}
 	}
 
-	private void updatePids(BufferedReader br, ApipService service, Data data) throws IOException {
+	private void updatePids(BufferedReader br, ApipService service, ServiceData data) throws IOException {
 		String ask;
 		if(service.getProtocols()!=null) {
 			System.out.println("\nThe PIDs of your service: ");
@@ -643,7 +556,7 @@ public class ServiceManager {
 			System.out.println("\nNo PIDs yet.");
 		}
 		ask = "Input the PIDs of your service if you want to change it . Enter to keep it or 'd' to delete it:";
-		String[] protocols = inputStringArray(br,ask,64);
+		String[] protocols = Inputer.inputStringArray(br,ask,64);
 		if(protocols.length!=0) {
 			data.setProtocols(protocols);
 		}else {
@@ -652,7 +565,7 @@ public class ServiceManager {
 		}
 	}
 
-	private void updateWaiters(BufferedReader br, ApipService service, Data data) throws IOException {
+	private void updateWaiters(BufferedReader br, ApipService service, ServiceData data) throws IOException {
 		String ask;
 		if(service.getWaiters()!=null) {
 			System.out.println("\nThe FIDs of the waiters of your service: ");
@@ -663,7 +576,7 @@ public class ServiceManager {
 			System.out.println("\nNo FCH addresses of the waiters yet.");
 		}
 		ask = "Input the FIDs of the waiters of your service if you want to change it . Enter to keep it or 'd' to delete it:";
-		String[] waiters = inputStringArray(br,ask,0);
+		String[] waiters = Inputer.inputStringArray(br,ask,0);
 		if(waiters.length!=0) {
 			data.setWaiters(waiters);
 		}else {
@@ -672,10 +585,10 @@ public class ServiceManager {
 		}
 	}
 
-	private String[] updateUrls(BufferedReader br, ApipService service, Data data) throws IOException {
+	private String[] updateUrls(BufferedReader br, ApipService service, ServiceData data) throws IOException {
 		String ask;
 		ask = "Input the URLs of your service if you want to change it . Enter to keep it or 'd' to delete it:";
-		String[] urls = inputStringArray(br,ask,0);
+		String[] urls = Inputer.inputStringArray(br,ask,0);
 		if(urls.length!=0) {
 			data.setUrls(urls);
 		}else {
@@ -685,7 +598,7 @@ public class ServiceManager {
 		return urls;
 	}
 
-	private static void updateDesc(BufferedReader br, ApipService service, Data data) throws IOException {
+	private static void updateDesc(BufferedReader br, ApipService service, ServiceData data) throws IOException {
 		String str;
 		if(service.getDesc()!=null) {
 			System.out.println("\nThe description of your service: "+ service.getDesc());
@@ -710,7 +623,7 @@ public class ServiceManager {
 		}
 	}
 
-	private void updateLocalNames(BufferedReader br, ApipService service, Data data) throws IOException {
+	private void updateLocalNames(BufferedReader br, ApipService service, ServiceData data) throws IOException {
 		if(service.getLocalNames()!=null) {
 			System.out.println("\nThe local names of your service: ");
 			for(String item: service.getLocalNames()) {
@@ -720,7 +633,7 @@ public class ServiceManager {
 			System.out.println("\nNo local names yet.");
 		}
 		String ask = "Input the local names of your service if you want to change it . Enter to keep it or 'd' to delete it:";
-		String[] localNames = inputStringArray(br,ask,0);
+		String[] localNames = Inputer.inputStringArray(br,ask,0);
 		if(localNames.length!=0) {
 			data.setLocalNames(localNames);
 		}else {
@@ -729,7 +642,7 @@ public class ServiceManager {
 		}
 	}
 
-	private static void updateStdName(BufferedReader br, ApipService service, Data data) throws IOException {
+	private static void updateStdName(BufferedReader br, ApipService service, ServiceData data) throws IOException {
 		System.out.println("\nThe English name of your service: "+service.getStdName());
 		System.out.println("Input the English name of your service if you want to change it. Enter to keep it:");
 		String str = br.readLine();
@@ -753,9 +666,9 @@ public class ServiceManager {
 			return;
 		}
 
-		OpReturn opReturn = new OpReturn();
+		Feip5 opReturn = new Feip5();
 
-		Data data = new Data();
+		ServiceData data = new ServiceData();
 
 		data.setOp("stop");
 		data.setSid(sid);
@@ -782,9 +695,9 @@ public class ServiceManager {
 			return;
 		}
 
-		OpReturn opReturn = new OpReturn();
+		Feip5 opReturn = new Feip5();
 
-		Data data = new Data();
+		ServiceData data = new ServiceData();
 
 		data.setOp("recover");
 		data.setSid(sid);
@@ -811,9 +724,9 @@ public class ServiceManager {
 			return;
 		}
 
-		OpReturn opReturn = new OpReturn();
+		Feip5 opReturn = new Feip5();
 
-		Data data = new Data();
+		ServiceData data = new ServiceData();
 
 		data.setOp("close");
 		data.setSid(sid);

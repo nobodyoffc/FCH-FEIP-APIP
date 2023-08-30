@@ -7,6 +7,7 @@ import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import constants.Constants;
 import constants.IndicesNames;
 import construct.*;
 import fcTools.ParseTools;
@@ -14,7 +15,7 @@ import identity.CidHist;
 import identity.IdentityParser;
 import identity.IdentityRollbacker;
 import identity.RepuHist;
-import feipClass.Feip;
+import feipClass.FcInfo;
 import opReturn.OpReFileTools;
 import fchClass.OpReturn;
 import opReturn.opReReadResult;
@@ -52,15 +53,15 @@ public class FileParser {
 	private int lastIndex = 0;
 	private String lastId = null;
 
-	public static Feip parseFeip(OpReturn opre) {
+	public static FcInfo parseFeip(OpReturn opre) {
 
 		if(opre.getOpReturn()==null)return null;
 
 		String protStr = ParseTools.strToJson(opre.getOpReturn());
 
-		Feip feip = null;
+		FcInfo feip = null;
 		try {
-			feip = new Gson().fromJson(protStr, Feip.class);
+			feip = new Gson().fromJson(protStr, FcInfo.class);
 		}catch(JsonSyntaxException e) {
 			System.out.println("Invalid opReturn content. Check the JSON string of FEIP:\n"+opre.getOpReturn());
 		}
@@ -68,7 +69,7 @@ public class FileParser {
 	}
 
 	enum FEIP_NAME{
-		CID,ABANDON,MASTER,HOMEPAGE,NOTICE_FEE,REPUTATION,SERVICE,PROTOCOL,APP,CODE,NID, CONTACT,MAIL,SAFE,STATEMENT,GROUP,TEAM, BOX,PROOF
+		CID,NOBODY,MASTER,HOMEPAGE,NOTICE_FEE,REPUTATION,SERVICE,PROTOCOL,APP,CODE,NID, CONTACT,MAIL,SAFE,STATEMENT,GROUP,TEAM, BOX,PROOF
 	}
 
 	private static final Logger log = LoggerFactory.getLogger(FileParser.class);
@@ -120,7 +121,7 @@ public class FileParser {
 			boolean isValid= false;
 
 			if(readOpResult.isFileEnd()) {
-				if(pointer>251658240) {
+				if(pointer> Constants.MaxOpFileSize) {
 					fileName = OpReFileTools.getNextFile(fileName);
 					while(!new File(fileName).exists()) {
 						System.out.print(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis())));
@@ -136,7 +137,7 @@ public class FileParser {
 					fis.close();
 					ParseTools.waitForNewItemInFile(path+fileName);
 					fis = openFile();
-					fis.skip(pointer);
+					long result = fis.skip(pointer);
 					continue;
 				}
 			}
@@ -156,7 +157,7 @@ public class FileParser {
 
             if (opre.getHeight() > StartFEIP.CddCheckHeight && opre.getCdd() < StartFEIP.CddRequired) continue;
 
-			Feip feip = parseFeip(opre);
+			FcInfo feip = parseFeip(opre);
 			if(feip==null)continue;
 			if(feip.getType()==null)continue;
 			if(!feip.getType().equals("FEIP"))continue;
@@ -164,128 +165,141 @@ public class FileParser {
 			FEIP_NAME feipName = checkFeipSn(feip);
 			if(feipName == null)continue;
 
-			switch(feipName) {
-
-				case CID:
+			switch (feipName) {
+				case CID -> {
 					System.out.println("Cid.");
-					CidHist identityHist = cidParser.makeCid(opre,feip);
-					if(identityHist==null)break;
-					isValid = cidParser.parseCidInfo(esClient,identityHist);
-					if(isValid)esClient.index(i->i.index(IndicesNames.CID_HISTORY).id(identityHist.getTxId()).document(identityHist));
-					break;
-				case ABANDON:
+					CidHist identityHist = cidParser.makeCid(opre, feip);
+					if (identityHist == null) break;
+					isValid = cidParser.parseCidInfo(esClient, identityHist);
+					if (isValid)
+						esClient.index(i -> i.index(IndicesNames.CID_HISTORY).id(identityHist.getTxId()).document(identityHist));
+				}
+				case NOBODY -> {
 					System.out.println("abandon.");
-					CidHist identityHist4 = cidParser.makeNobody(opre,feip);
-					if(identityHist4==null)break;
-					isValid = cidParser.parseCidInfo(esClient,identityHist4);
-					if(isValid)esClient.index(i->i.index(IndicesNames.CID_HISTORY).id(identityHist4.getTxId()).document(identityHist4));
-					break;
-				case MASTER:
+					CidHist identityHist4 = cidParser.makeNobody(opre, feip);
+					if (identityHist4 == null) break;
+					isValid = cidParser.parseCidInfo(esClient, identityHist4);
+					if (isValid)
+						esClient.index(i -> i.index(IndicesNames.CID_HISTORY).id(identityHist4.getTxId()).document(identityHist4));
+				}
+				case MASTER -> {
 					System.out.println("master.");
-					CidHist identityHist1 = cidParser.makeMaster(opre,feip);
-					if(identityHist1==null)break;
-					isValid = cidParser.parseCidInfo(esClient,identityHist1);
-					if(isValid)esClient.index(i->i.index(IndicesNames.CID_HISTORY).id(identityHist1.getTxId()).document(identityHist1));
-					break;
-				case HOMEPAGE:
+					CidHist identityHist1 = cidParser.makeMaster(opre, feip);
+					if (identityHist1 == null) break;
+					isValid = cidParser.parseCidInfo(esClient, identityHist1);
+					if (isValid)
+						esClient.index(i -> i.index(IndicesNames.CID_HISTORY).id(identityHist1.getTxId()).document(identityHist1));
+				}
+				case HOMEPAGE -> {
 					System.out.println("homepage.");
-					CidHist identityHist2 = cidParser.makeHomepage(opre,feip);
-					if(identityHist2==null)break;
-					isValid = cidParser.parseCidInfo(esClient,identityHist2);
-					if(isValid)esClient.index(i->i.index(IndicesNames.CID_HISTORY).id(identityHist2.getTxId()).document(identityHist2));
-					break;
-				case NOTICE_FEE:
+					CidHist identityHist2 = cidParser.makeHomepage(opre, feip);
+					if (identityHist2 == null) break;
+					isValid = cidParser.parseCidInfo(esClient, identityHist2);
+					if (isValid)
+						esClient.index(i -> i.index(IndicesNames.CID_HISTORY).id(identityHist2.getTxId()).document(identityHist2));
+				}
+				case NOTICE_FEE -> {
 					System.out.println("notice fee.");
-					CidHist identityHist3 = cidParser.makeNoticeFee(opre,feip);
-					if(identityHist3==null)break;
-					isValid = cidParser.parseCidInfo(esClient,identityHist3);
-					if(isValid)esClient.index(i->i.index(IndicesNames.CID_HISTORY).id(identityHist3.getTxId()).document(identityHist3));
-					break;
-				case REPUTATION:
+					CidHist identityHist3 = cidParser.makeNoticeFee(opre, feip);
+					if (identityHist3 == null) break;
+					isValid = cidParser.parseCidInfo(esClient, identityHist3);
+					if (isValid)
+						esClient.index(i -> i.index(IndicesNames.CID_HISTORY).id(identityHist3.getTxId()).document(identityHist3));
+				}
+				case REPUTATION -> {
 					System.out.println("reputation.");
-					RepuHist repuHist = cidParser.makeReputation(opre,feip);
-					if(repuHist==null)break;
-					isValid = cidParser.parseReputation(esClient,repuHist);
-					if(isValid)esClient.index(i->i.index(IndicesNames.REPUTATION_HISTORY).id(repuHist.getTxId()).document(repuHist));
-					break;
-				case PROTOCOL:
+					RepuHist repuHist = cidParser.makeReputation(opre, feip);
+					if (repuHist == null) break;
+					isValid = cidParser.parseReputation(esClient, repuHist);
+					if (isValid)
+						esClient.index(i -> i.index(IndicesNames.REPUTATION_HISTORY).id(repuHist.getTxId()).document(repuHist));
+				}
+				case PROTOCOL -> {
 					System.out.println("Protocol.");
-					ProtocolHistory freeProtocolHist = constructParser.makeProtocol(opre,feip);
-					if(freeProtocolHist==null)break;
-					isValid = constructParser.parseFreeProtocol(esClient,freeProtocolHist);
-					if(isValid)esClient.index(i->i.index(IndicesNames.PROTOCOL_HISTORY).id(freeProtocolHist.getTxId()).document(freeProtocolHist));
-					break;
-				case SERVICE:
+					ProtocolHistory freeProtocolHist = constructParser.makeProtocol(opre, feip);
+					if (freeProtocolHist == null) break;
+					isValid = constructParser.parseFreeProtocol(esClient, freeProtocolHist);
+					if (isValid)
+						esClient.index(i -> i.index(IndicesNames.PROTOCOL_HISTORY).id(freeProtocolHist.getTxId()).document(freeProtocolHist));
+				}
+				case SERVICE -> {
 					System.out.println("Service.");
-					ServiceHistory serviceHist = constructParser.makeService(opre,feip);
-					if(serviceHist==null)break;
-					isValid = constructParser.parseService(esClient,serviceHist);
-					if(isValid)esClient.index(i->i.index(IndicesNames.SERVICE_HISTORY).id(serviceHist.getTxId()).document(serviceHist));
-					break;
-				case APP:
+					ServiceHistory serviceHist = constructParser.makeService(opre, feip);
+					if (serviceHist == null) break;
+					isValid = constructParser.parseService(esClient, serviceHist);
+					if (isValid)
+						esClient.index(i -> i.index(IndicesNames.SERVICE_HISTORY).id(serviceHist.getTxId()).document(serviceHist));
+				}
+				case APP -> {
 					System.out.println("APP.");
-					AppHistory appHist = constructParser.makeApp(opre,feip);
-					if(appHist==null)break;
-					isValid = constructParser.parseApp(esClient,appHist);
-					if(isValid)esClient.index(i->i.index(IndicesNames.APP_HISTORY).id(appHist.getTxId()).document(appHist));
-					break;
-				case CODE:
+					AppHistory appHist = constructParser.makeApp(opre, feip);
+					if (appHist == null) break;
+					isValid = constructParser.parseApp(esClient, appHist);
+					if (isValid)
+						esClient.index(i -> i.index(IndicesNames.APP_HISTORY).id(appHist.getTxId()).document(appHist));
+				}
+				case CODE -> {
 					System.out.println("Code.");
-					CodeHistory codeHist = constructParser.makeCode(opre,feip);
-					if(codeHist==null)break;
-					isValid = constructParser.parseCode(esClient,codeHist);
-					if(isValid)esClient.index(i->i.index(IndicesNames.CODE_HISTORY).id(codeHist.getTxId()).document(codeHist));
-					break;
-				case NID:
+					CodeHistory codeHist = constructParser.makeCode(opre, feip);
+					if (codeHist == null) break;
+					isValid = constructParser.parseCode(esClient, codeHist);
+					if (isValid)
+						esClient.index(i -> i.index(IndicesNames.CODE_HISTORY).id(codeHist.getTxId()).document(codeHist));
+				}
+				case NID -> {
 					System.out.println("Nid.");
-					isValid = publishParser.parseNid(esClient,opre,feip);
-					break;
-				case CONTACT:
+					isValid = publishParser.parseNid(esClient, opre, feip);
+				}
+				case CONTACT -> {
 					System.out.println("Contact.");
-					isValid = personalParser.parseContact(esClient,opre,feip);
-					break;
-				case MAIL:
+					isValid = personalParser.parseContact(esClient, opre, feip);
+				}
+				case MAIL -> {
 					System.out.println("Mail.");
-					isValid = personalParser.parseMail(esClient,opre,feip);
-					break;
-				case SAFE:
+					isValid = personalParser.parseMail(esClient, opre, feip);
+				}
+				case SAFE -> {
 					System.out.println("Safe.");
-					isValid = personalParser.parseSecret(esClient,opre,feip);
-					break;
-				case STATEMENT:
+					isValid = personalParser.parseSecret(esClient, opre, feip);
+				}
+				case STATEMENT -> {
 					System.out.println("Statement.");
-					isValid = publishParser.parseStatement(esClient,opre,feip);
-					break;
-				case GROUP:
+					isValid = publishParser.parseStatement(esClient, opre, feip);
+				}
+				case GROUP -> {
 					System.out.println("Group.");
-					GroupHistory groupHist = organizationParser.makeGroup(opre,feip);
-					if(groupHist==null)break;
-					isValid = organizationParser.parseGroup(esClient,groupHist);
-					if(isValid)esClient.index(i->i.index(IndicesNames.GROUP_HISTORY).id(groupHist.getTxId()).document(groupHist));
-					break;
-				case TEAM:
+					GroupHistory groupHist = organizationParser.makeGroup(opre, feip);
+					if (groupHist == null) break;
+					isValid = organizationParser.parseGroup(esClient, groupHist);
+					if (isValid)
+						esClient.index(i -> i.index(IndicesNames.GROUP_HISTORY).id(groupHist.getTxId()).document(groupHist));
+				}
+				case TEAM -> {
 					System.out.println("Team.");
-					TeamHistory teamHist = organizationParser.makeTeam(opre,feip);
-					if(teamHist==null)break;
-					isValid = organizationParser.parseTeam(esClient,teamHist);
-					if(isValid)esClient.index(i->i.index(IndicesNames.TEAM_HISTORY).id(teamHist.getTxId()).document(teamHist));
-					break;
-				case BOX:
+					TeamHistory teamHist = organizationParser.makeTeam(opre, feip);
+					if (teamHist == null) break;
+					isValid = organizationParser.parseTeam(esClient, teamHist);
+					if (isValid)
+						esClient.index(i -> i.index(IndicesNames.TEAM_HISTORY).id(teamHist.getTxId()).document(teamHist));
+				}
+				case BOX -> {
 					System.out.println("Box.");
-					BoxHistory boxHist = personalParser.makeBox(opre,feip);
-					if(boxHist==null)break;
-					isValid = personalParser.parseBox(esClient,boxHist);
-					if(isValid)esClient.index(i->i.index(IndicesNames.BOX_HISTORY).id(boxHist.getTxId()).document(boxHist));
-					break;
-				case PROOF:
+					BoxHistory boxHist = personalParser.makeBox(opre, feip);
+					if (boxHist == null) break;
+					isValid = personalParser.parseBox(esClient, boxHist);
+					if (isValid)
+						esClient.index(i -> i.index(IndicesNames.BOX_HISTORY).id(boxHist.getTxId()).document(boxHist));
+				}
+				case PROOF -> {
 					System.out.println("Proof.");
-					ProofHistory proofHist = publishParser.makeProof(opre,feip);
-					if(proofHist==null)break;
-					isValid = publishParser.parseProof(esClient,proofHist);
-					if(isValid)esClient.index(i->i.index(IndicesNames.PROOF_HISTORY).id(proofHist.getTxId()).document(proofHist));
-					break;
-				default:
-					break;
+					ProofHistory proofHist = publishParser.makeProof(opre, feip);
+					if (proofHist == null) break;
+					isValid = publishParser.parseProof(esClient, proofHist);
+					if (isValid)
+						esClient.index(i -> i.index(IndicesNames.PROOF_HISTORY).id(proofHist.getTxId()).document(proofHist));
+				}
+				default -> {
+				}
 			}
 			if(isValid)writeParseMark(esClient,readOpResult.getLength());
 		}
@@ -312,13 +326,13 @@ public class FileParser {
 		return new FileInputStream(file);
 	}
 
-	private FEIP_NAME checkFeipSn(Feip feip) {
+	private FEIP_NAME checkFeipSn(FcInfo feip) {
 
 		String sn = feip.getSn();
 		if(sn.equals("1"))return FEIP_NAME.PROTOCOL;
 		if(sn.equals("2"))return FEIP_NAME.CODE;
 		if(sn.equals("3"))return FEIP_NAME.CID;
-		if(sn.equals("4"))return FEIP_NAME.ABANDON;
+		if(sn.equals("4"))return FEIP_NAME.NOBODY;
 		if(sn.equals("5"))return FEIP_NAME.SERVICE;
 		if(sn.equals("6"))return FEIP_NAME.MASTER;
 		if(sn.equals("7"))return FEIP_NAME.MAIL;

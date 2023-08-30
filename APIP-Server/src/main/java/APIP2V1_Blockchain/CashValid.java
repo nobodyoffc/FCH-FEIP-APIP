@@ -5,10 +5,9 @@ import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
 import fchClass.Cash;
-import APIP1V1_FCDSL.Fcdsl;
-import APIP1V1_FCDSL.Filter;
-import APIP1V1_FCDSL.Terms;
-import initial.Initiator;
+import apipClass.Fcdsl;
+import apipClass.Filter;
+import apipClass.Terms;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

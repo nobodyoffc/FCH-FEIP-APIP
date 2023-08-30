@@ -23,7 +23,7 @@ import static startFEIP.IndicesFEIP.createAllIndices;
 import static startFEIP.IndicesFEIP.deleteAllIndices;
 
 public class StartFEIP {
-	public static long CddCheckHeight=2000000;
+	public static long CddCheckHeight=3000000;
 	public static long CddRequired=1;
 
 	private static final Logger log = LoggerFactory.getLogger(StartFEIP.class);

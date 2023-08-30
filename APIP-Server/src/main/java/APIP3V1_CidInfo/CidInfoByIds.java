@@ -52,19 +52,15 @@ public class CidInfoByIds extends HttpServlet {
         List<Address> meetAddrList;
 
         try {
-            meetCidList = esRequest.doRequest(IndicesNames.CID,null, Cid.class);
-            if(meetCidList==null ){
-                response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
-                writer.write(replier.reply1012BadQuery(addr));
-                return;
-            }
-
             meetAddrList = esRequest.doRequest(IndicesNames.ADDRESS, null,Address.class);
             if(meetAddrList==null){
                 response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
                 writer.write(replier.reply1012BadQuery(addr));
                 return;
             }
+
+            meetCidList = esRequest.doRequest(IndicesNames.CID,null, Cid.class);
+
         //make addrList
 
         } catch (Exception e) {

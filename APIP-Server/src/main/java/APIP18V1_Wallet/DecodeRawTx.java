@@ -4,7 +4,6 @@ import APIP0V1_OpenAPI.*;
 import constants.ApiNames;
 import constants.ReplyInfo;
 import freecashRPC.FcRpcMethods;
-import initial.Initiator;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -14,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import static mempool.MempoolScanner.fcClient;
+import static initial.Initiator.fcClient;
 
 @WebServlet(ApiNames.APIP18V1Path + ApiNames.DecodeRawTxAPI)
 public class DecodeRawTx extends HttpServlet {
@@ -32,7 +31,7 @@ public class DecodeRawTx extends HttpServlet {
 
         String addr = dataCheckResult.getAddr();
 
-        if (RequestChecker.checkPublicSessionKey(response, replier, writer, addr)) return;
+        if (RequestChecker.isPublicSessionKey(response, replier, writer, addr)) return;
 
         DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
         replier.setNonce(requestBody.getNonce());

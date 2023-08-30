@@ -3,27 +3,24 @@ package initial;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import com.google.gson.Gson;
 
+import com.googlecode.jsonrpc4j.JsonRpcHttpClient;
 import config.ConfigAPIP;
 import constants.Strings;
 import esTools.NewEsClient;
 import fcTools.ParseTools;
+import freecashRPC.NewFcRpcClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 
 import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPoolConfig;
+import redisTools.GetJedis;
 import service.ApipService;
 import service.Params;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServlet;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.Serial;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.*;
 
 import static constants.Strings.*;
 
@@ -42,20 +39,34 @@ public class Initiator extends HttpServlet {
 
     public static boolean isPricePerRequest;
     public static boolean forbidFreeGet;
+    private final NewEsClient newEsClient = new NewEsClient();
+    private BufferedReader br;
+    public static JsonRpcHttpClient fcClient;
 
     @Override
     public void destroy(){
+        log.debug("Destroy APIP server...");
         jedisPool.close();
-        esClient.shutdown();
+        try {
+            br.close();
+        } catch (IOException e) {
+            log.debug("Close bufferedReader wrong.");
+        }
+        try {
+            newEsClient.shutdownClient();
+        } catch (IOException e) {
+            log.debug("Shutdown NewEsClient wrong.");
+        }
+
         log.debug("APIP server is stopped.");
     }
     @Override
     public void init(ServletConfig config) {
         log.debug("init starting...");
-        NewEsClient newEsClient = new NewEsClient();
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        createJedisPools();
+        br = new BufferedReader(new InputStreamReader(System.in));
+
+        jedisPool = GetJedis.createJedisPool();
 
         //Get config.json
         ConfigAPIP configAPIP = new ConfigAPIP();
@@ -95,17 +106,12 @@ public class Initiator extends HttpServlet {
             serviceName = configAPIP.getServiceName();
             try {
                 service = gson.fromJson(jedis.get(serviceName +"_" + Strings.SERVICE), ApipService.class);
-//                sid = service.getSid();
 
                 if(service ==null )log.error("Reading service from redis failed.");
 
                 log.debug("Service: "+ ParseTools.gsonString(service));
 
                 params = service.getParams();
-
-//                Map<String, String> nPriceMapStr = jedis.hgetAll(N_PRICE);
-//                nPriceMap = makeStrMapToIntegerMap(nPriceMapStr);
-
 
             }catch (Exception e){
                 log.error("Get service or nPrice from redis wrong.");
@@ -115,65 +121,23 @@ public class Initiator extends HttpServlet {
             }
         }
 
+        String rpcIp = configAPIP.getRpcIp();
+        int rpcPort = configAPIP.getRpcPort();
+        String rpcUser = configAPIP.getRpcUser();
+        String rpcPassword = configAPIP.getRpcPassword();
 
+        try {
+            log.debug("Create FcRpcClient for "+this.getClass());
+            NewFcRpcClient newFcRpcClient = new NewFcRpcClient(rpcIp, rpcPort,rpcUser,rpcPassword);
+            fcClient = newFcRpcClient.getClientSilent();
+        } catch (Exception e) {
+            log.error("Creating FchRpcClient failed."+ e.getMessage());
+            throw new RuntimeException(e);
+        }
 
         log.debug("APIP server initiated successfully.");
-
-
-
-//        if (configAPIP.isScanMempool()) {
-//            log.debug("Clean mempool data in Redis...");
-//            MempoolCleaner mempoolCleaner = new MempoolCleaner(configAPIP.getBlockFilePath());
-//            Thread thread = new Thread(mempoolCleaner);
-//            thread.start();
-//
-////            MempoolScanner mempoolScanner = new MempoolScanner();
-////            mempoolScanner.start();
-//            log.debug("Start mempoolScanner");
-//            MempoolScanner mempoolScanner = new MempoolScanner(esClient);
-//            Thread thread1 = new Thread(mempoolScanner);
-//            thread1.start();
-//
-//            log.debug("Mempool scanner is running.");
-//        }
-//
-//        log.debug("Start order scanner...");
-//        String listenPath = configAPIP.getListenPath();
-//
-//        OrderScanner orderScanner = new OrderScanner(listenPath, esClient);
-//        Thread thread2 = new Thread(orderScanner);
-//        thread2.start();
-//        log.debug("Order scanner is running.");
     }
 
-    public static Map<String, Integer> makeStrMapToIntegerMap(Map<String, String> nPriceMapStr) {
-        Map<String,Integer> nPriceMap = new HashMap<>();
-        if(nPriceMapStr !=null){
-            for(String key: nPriceMapStr.keySet()){
-                try{
-                    nPriceMap.put(key, Integer.parseInt(nPriceMapStr.get(key)));
-                }catch (Exception ignore){}
-            }
-        }
-        return nPriceMap;
-    }
-
-    private static void createJedisPools() {
-        try {
-            log.debug("Create jedis pool.......");
-            JedisPoolConfig jedisConfig = new JedisPoolConfig();
-//            jedisConfig.setMaxTotal(128);
-//            jedisConfig.setMaxIdle(64);
-//            jedisConfig.setMinIdle(32);
-//            jedisConfig.setTestOnBorrow(true);
-//            jedisConfig.setTestOnReturn(true);
-//            jedisConfig.setTestWhileIdle(true);
-            jedisPool = new JedisPool(jedisConfig, "localhost",6379,10000);
-            log.debug("Jedis pool created.");
-        }catch (Exception e){
-            log.debug("Create jedisPool or jedis wrong. ",e);
-        }
-    }
     public static boolean isFreeGetForbidden(PrintWriter writer) {
         if(forbidFreeGet){
             writer.write("Sorry, the freeGet APIs were closed.");
