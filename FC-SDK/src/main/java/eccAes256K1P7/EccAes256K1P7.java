@@ -137,15 +137,6 @@ public class EccAes256K1P7 {
         eccAesDataByte.setPriKeyB(priKeyBBytes);
         return decryptFile(encryptedFile, cipherBytes, eccAesDataByte);
     }
-
-    public String decryptSymKeyBundle(String bundle, char[] symKey) {
-        EccAesDataByte eccAesDataByte = makeIvCipherToEccAesDataByte(Base64.getDecoder().decode(bundle));
-        eccAesDataByte.setSymKey(BytesTools.hexCharArrayToByteArray(symKey));
-        decrypt(eccAesDataByte);
-
-        return new String(eccAesDataByte.getMsg(),StandardCharsets.UTF_8);
-    }
-
     public static String decryptFileWithSymKey(File encryptedFile, char[] symKey) {
         byte[] cipherBytes;
         Affair affair;
@@ -164,8 +155,204 @@ public class EccAes256K1P7 {
         }
         eccAesDataByte = EccAesDataByte.fromEccAesData(eccAesData);
         eccAesDataByte.setSymKey(BytesTools.hexCharArrayToByteArray(symKey));
+        if(eccAesDataByte.getError()!=null)return "Error:"+eccAesDataByte.getError();
         return decryptFile(encryptedFile, cipherBytes, eccAesDataByte);
     }
+
+    public String encryptAsyOneWayBundle(String msg,String pubKeyB){
+        EccAesData eccAesData = new EccAesData(EccAesType.AsyOneWay,msg,pubKeyB);
+        EccAesDataByte eccAesDataByte = EccAesDataByte.fromEccAesData(eccAesData);
+
+        encrypt(eccAesDataByte);
+        eccAesDataByte.clearSymKey();
+
+        byte[] bundleBytes = addArray(addArray(eccAesDataByte.getPubKeyA(),eccAesDataByte.getIv()),eccAesDataByte.getCipher());
+        if(eccAesDataByte.getError()!=null)return "Error:"+eccAesDataByte.getError();
+        return Base64.getEncoder().encodeToString(bundleBytes);
+    }
+
+    public String decryptAsyOneWayBundle(String bundle,char[] priKeyB){
+        byte[] bundleBytes = Base64.getDecoder().decode(bundle);
+        byte[] pubKeyABytes = new byte[33];
+        byte[] ivBytes = new byte[16];
+        byte[] cipherBytes = new byte[bundleBytes.length-pubKeyABytes.length-ivBytes.length];
+        byte[] priKeyBBytes = BytesTools.hexCharArrayToByteArray(priKeyB);
+
+        pubKeyABytes = Arrays.copyOfRange(bundleBytes,0,33);
+        ivBytes = Arrays.copyOfRange(bundleBytes,33,49);
+        cipherBytes = Arrays.copyOfRange(bundleBytes,33+16,bundleBytes.length);
+
+        EccAesDataByte eccAesDataByte = new EccAesDataByte();
+        eccAesDataByte.setType(EccAesType.AsyOneWay);
+        eccAesDataByte.setIv(ivBytes);
+        eccAesDataByte.setPubKeyA(pubKeyABytes);
+        eccAesDataByte.setPriKeyB(priKeyBBytes);
+        eccAesDataByte.setCipher(cipherBytes);
+
+        decrypt(eccAesDataByte);
+        eccAesDataByte.clearSymKey();
+
+        if(eccAesDataByte.getError()!=null){
+            return "Error:"+eccAesDataByte.getError();
+        }
+        return new String(eccAesDataByte.getMsg(), StandardCharsets.UTF_8);
+    }
+
+    public String encryptAsyTwoWayBundle(String msg,String pubKeyB,char[] priKeyA){
+        EccAesData eccAesData = new EccAesData(EccAesType.AsyTwoWay,msg,pubKeyB,priKeyA);
+        EccAesDataByte eccAesDataByte = EccAesDataByte.fromEccAesData(eccAesData);
+
+        encrypt(eccAesDataByte);
+        eccAesDataByte.clearSymKey();
+
+        byte[] bundleBytes = addArray(eccAesDataByte.getIv(),eccAesDataByte.getCipher());
+        if(eccAesDataByte.getError()!=null)return "Error:"+eccAesDataByte.getError();
+        return Base64.getEncoder().encodeToString(bundleBytes);
+    }
+
+    public String decryptAsyTwoWayBundle(String bundle,String pubKeyA,char[] priKeyB){
+        byte[] priKeyBBytes = BytesTools.hexCharArrayToByteArray(priKeyB);
+        byte[] pubKeyABytes = HexFormat.of().parseHex(pubKeyA);
+
+        byte[] bundleBytes = Base64.getDecoder().decode(bundle);
+        byte[] ivBytes = Arrays.copyOfRange(bundleBytes,0,16);
+        byte[] cipherBytes = Arrays.copyOfRange(bundleBytes,16,bundleBytes.length);
+
+        EccAesDataByte eccAesDataByte = new EccAesDataByte();
+        eccAesDataByte.setType(EccAesType.AsyTwoWay);
+        eccAesDataByte.setIv(ivBytes);
+        eccAesDataByte.setPubKeyA(pubKeyABytes);
+        eccAesDataByte.setPriKeyB(priKeyBBytes);
+        eccAesDataByte.setCipher(cipherBytes);
+
+        decrypt(eccAesDataByte);
+        eccAesDataByte.clearSymKey();
+
+        if(eccAesDataByte.getError()!=null){
+            return "Error:"+eccAesDataByte.getError();
+        }
+        return new String(eccAesDataByte.getMsg(), StandardCharsets.UTF_8);
+    }
+
+    public String encryptSymKeyBundle(String msg, char[] symKey) {
+        EccAesData eccAesData = new EccAesData(EccAesType.SymKey, msg, symKey);
+
+        encrypt(eccAesData);
+        String iv = eccAesData.getIv();
+        String cipher = eccAesData.getCipher();
+        byte[] ivBytes = HexFormat.of().parseHex(iv);
+        byte[] cipherBytes = Base64.getDecoder().decode(cipher);
+
+        byte[]ivCipherBytes = EccAes256K1P7.addArray(ivBytes,cipherBytes);
+        String bundle = Base64.getEncoder().encodeToString(ivCipherBytes);
+        eccAesData.clearAllSensitiveData();
+        if(eccAesData.getError()!=null)return "Error:"+eccAesData.getError();
+        return bundle;
+    }
+    public String decryptSymKeyBundle(String bundle, char[] symKey) {
+        EccAesDataByte eccAesDataByte = makeIvCipherToEccAesDataByte(Base64.getDecoder().decode(bundle));
+        eccAesDataByte.setSymKey(BytesTools.hexCharArrayToByteArray(symKey));
+        decrypt(eccAesDataByte);
+
+        if(eccAesDataByte.getError()!=null)return "Error:"+eccAesDataByte.getError();
+
+        return new String(eccAesDataByte.getMsg(),StandardCharsets.UTF_8);
+    }
+
+
+
+    public byte[] encryptAsyOneWayBundle(byte[] msg,byte[] pubKeyB){
+
+        EccAesDataByte eccAesDataByte = new EccAesDataByte();
+        eccAesDataByte.setType(EccAesType.AsyOneWay);
+        eccAesDataByte.setMsg(msg);
+        eccAesDataByte.setPubKeyB(pubKeyB);
+
+        encrypt(eccAesDataByte);
+        eccAesDataByte.clearSymKey();
+
+        if(eccAesDataByte.getError()!=null)return null;
+        return addArray(addArray(eccAesDataByte.getPubKeyA(),eccAesDataByte.getIv()),eccAesDataByte.getCipher());
+    }
+
+    public byte[] decryptAsyOneWayBundle(byte[] bundle,byte[] priKeyB){
+
+        byte[] pubKeyA = Arrays.copyOfRange(bundle,0,33);
+        byte[] ivBytes = Arrays.copyOfRange(bundle,33,49);
+        byte[] cipherBytes = Arrays.copyOfRange(bundle,33+16,bundle.length);
+
+        EccAesDataByte eccAesDataByte = new EccAesDataByte();
+        eccAesDataByte.setType(EccAesType.AsyOneWay);
+        eccAesDataByte.setIv(ivBytes);
+        eccAesDataByte.setPubKeyA(pubKeyA);
+        eccAesDataByte.setPriKeyB(priKeyB);
+        eccAesDataByte.setCipher(cipherBytes);
+
+        decrypt(eccAesDataByte);
+        eccAesDataByte.clearSymKey();
+
+        if(eccAesDataByte.getError()!=null)return ("Error:"+eccAesDataByte.getError()).getBytes();
+        return eccAesDataByte.getMsg();
+    }
+
+    public byte[] encryptAsyTwoWayBundle(byte[] msg,byte[] pubKeyB,byte[] priKeyA){
+        EccAesDataByte eccAesDataByte = new EccAesDataByte();
+        eccAesDataByte.setType(EccAesType.AsyTwoWay);
+        eccAesDataByte.setMsg(msg);
+        eccAesDataByte.setPubKeyB(pubKeyB);
+        eccAesDataByte.setPriKeyA(priKeyA);
+
+        encrypt(eccAesDataByte);
+        eccAesDataByte.clearSymKey();
+
+        if(eccAesDataByte.getError()!=null)return null;
+        return addArray(eccAesDataByte.getIv(),eccAesDataByte.getCipher());
+    }
+
+    public byte[] decryptAsyTwoWayBundle(byte[] bundle,byte[] pubKeyA,byte[] priKeyB){
+
+        byte[] iv = Arrays.copyOfRange(bundle,0,16);
+        byte[] cipher = Arrays.copyOfRange(bundle,16,bundle.length);
+
+        EccAesDataByte eccAesDataByte = new EccAesDataByte();
+        eccAesDataByte.setType(EccAesType.AsyTwoWay);
+        eccAesDataByte.setIv(iv);
+        eccAesDataByte.setCipher(cipher);
+        eccAesDataByte.setPubKeyA(pubKeyA);
+        eccAesDataByte.setPriKeyB(priKeyB);
+
+        decrypt(eccAesDataByte);
+        eccAesDataByte.clearSymKey();
+
+        if(eccAesDataByte.getError()!=null)return ("Error:"+eccAesDataByte.getError()).getBytes();
+        return eccAesDataByte.getMsg();
+    }
+
+    public byte[] encryptSymKeyBundle(byte[] msg, byte[] symKey) {
+        EccAesDataByte eccAesDataByte = new EccAesDataByte();
+
+        eccAesDataByte.setType(EccAesType.SymKey);
+        eccAesDataByte.setSymKey(symKey);
+        eccAesDataByte.setMsg(msg);
+
+        encrypt(eccAesDataByte);
+        eccAesDataByte.clearAllSensitiveData();
+        return addArray(eccAesDataByte.getIv(),eccAesDataByte.getCipher());
+    }
+    public byte[] decryptSymKeyBundle(byte[] bundle, byte[] symKey) {
+        EccAesDataByte eccAesDataByte = new EccAesDataByte();
+        byte[] iv = Arrays.copyOfRange(bundle,0,16);
+        byte[] cipher = Arrays.copyOfRange(bundle,16,bundle.length);
+        eccAesDataByte.setType(EccAesType.SymKey);
+        eccAesDataByte.setSymKey(symKey);
+        eccAesDataByte.setIv(iv);
+        eccAesDataByte.setCipher(cipher);
+
+        decrypt(eccAesDataByte);
+        if(eccAesDataByte.getError()!=null)return ("Error:"+eccAesDataByte.getError()).getBytes();
+        return eccAesDataByte.getMsg();
+    }
+
 
     private static String decryptFile(File encryptedFile, byte[] cipherBytes, EccAesDataByte eccAesDataByte) {
         eccAesDataByte.setCipher(cipherBytes);
@@ -571,45 +758,6 @@ public class EccAes256K1P7 {
         eccAesDataByte.clearSymKey();
         return gson.toJson(EccAesData.fromEccAesDataByte(eccAesDataByte));
     }
-
-    public String encryptAsyOneWayBundle(String msg,String pubKeyB){
-        EccAesData eccAesData = new EccAesData(EccAesType.AsyOneWay,msg,pubKeyB);
-        EccAesDataByte eccAesDataByte = EccAesDataByte.fromEccAesData(eccAesData);
-
-        encrypt(eccAesDataByte);
-        eccAesDataByte.clearSymKey();
-
-        byte[] bundleBytes = addArray(addArray(eccAesDataByte.getPubKeyA(),eccAesDataByte.getIv()),eccAesDataByte.getCipher());
-        return Base64.getEncoder().encodeToString(bundleBytes);
-    }
-
-    public String decryptAsyOneWayBundle(String bundle,char[] priKeyB){
-        byte[] bundleBytes = Base64.getDecoder().decode(bundle);
-        byte[] pubKeyABytes = new byte[33];
-        byte[] ivBytes = new byte[16];
-        byte[] cipherBytes = new byte[bundleBytes.length-pubKeyABytes.length-ivBytes.length];
-        byte[] priKeyBBytes = BytesTools.hexCharArrayToByteArray(priKeyB);
-
-        pubKeyABytes = Arrays.copyOfRange(bundleBytes,0,33);
-        ivBytes = Arrays.copyOfRange(bundleBytes,33,49);
-        cipherBytes = Arrays.copyOfRange(bundleBytes,33+16,bundleBytes.length);
-
-        EccAesDataByte eccAesDataByte = new EccAesDataByte();
-        eccAesDataByte.setType(EccAesType.AsyOneWay);
-        eccAesDataByte.setIv(ivBytes);
-        eccAesDataByte.setPubKeyA(pubKeyABytes);
-        eccAesDataByte.setPriKeyB(priKeyBBytes);
-        eccAesDataByte.setCipher(cipherBytes);
-
-        decrypt(eccAesDataByte);
-        eccAesDataByte.clearSymKey();
-
-        if(eccAesDataByte.getError()!=null){
-            return "Error:"+eccAesDataByte.getError();
-        }
-        return new String(eccAesDataByte.getMsg(), StandardCharsets.UTF_8);
-    }
-
     public String encryptAsyTwoWay(String eccAesDataJson, char[] priKeyA){
         Gson gson = new Gson();
         EccAesData eccAesData = gson.fromJson(eccAesDataJson,EccAesData.class);
@@ -624,42 +772,6 @@ public class EccAes256K1P7 {
         eccAesDataByte.clearSymKey();
         return gson.toJson(EccAesData.fromEccAesDataByte(eccAesDataByte));
     }
-
-    public String encryptAsyTwoWayBundle(String msg,String pubKeyB,char[] priKeyA){
-        EccAesData eccAesData = new EccAesData(EccAesType.AsyTwoWay,msg,pubKeyB,priKeyA);
-        EccAesDataByte eccAesDataByte = EccAesDataByte.fromEccAesData(eccAesData);
-
-        encrypt(eccAesDataByte);
-        eccAesDataByte.clearSymKey();
-
-        byte[] bundleBytes = addArray(eccAesDataByte.getIv(),eccAesDataByte.getCipher());
-        return Base64.getEncoder().encodeToString(bundleBytes);
-    }
-
-    public String decryptAsyTwoWayBundle(String bundle,String pubKeyA,char[] priKeyB){
-        byte[] priKeyBBytes = BytesTools.hexCharArrayToByteArray(priKeyB);
-        byte[] pubKeyABytes = HexFormat.of().parseHex(pubKeyA);
-
-        byte[] bundleBytes = Base64.getDecoder().decode(bundle);
-        byte[] ivBytes = Arrays.copyOfRange(bundleBytes,0,16);
-        byte[] cipherBytes = Arrays.copyOfRange(bundleBytes,16,bundleBytes.length);
-
-        EccAesDataByte eccAesDataByte = new EccAesDataByte();
-        eccAesDataByte.setType(EccAesType.AsyTwoWay);
-        eccAesDataByte.setIv(ivBytes);
-        eccAesDataByte.setPubKeyA(pubKeyABytes);
-        eccAesDataByte.setPriKeyB(priKeyBBytes);
-        eccAesDataByte.setCipher(cipherBytes);
-
-        decrypt(eccAesDataByte);
-        eccAesDataByte.clearSymKey();
-
-        if(eccAesDataByte.getError()!=null){
-            return "Error:"+eccAesDataByte.getError();
-        }
-        return new String(eccAesDataByte.getMsg(), StandardCharsets.UTF_8);
-    }
-
 
     public String encryptWithSymKey(String eccAesDataJson, char[] symKey){
         Gson gson = new Gson();
@@ -950,7 +1062,7 @@ public class EccAes256K1P7 {
             return false;
         }
 
-        if(eccAesDataByte.getPassword()==null){
+        if(eccAesDataByte.getPassword()==null||isZero(eccAesDataByte.getPassword())){
             eccAesDataByte.setError(EccAesType.Password.name()+" parameters lack password.");
             return false;
         }
@@ -973,7 +1085,7 @@ public class EccAes256K1P7 {
             return false;
         }
 
-        if(eccAesDataByte.getSymKey()==null){
+        if(eccAesDataByte.getSymKey()==null||isZero(eccAesDataByte.getSymKey())){
             eccAesDataByte.setError(EccAesType.SymKey.name()+" parameters lack symKey.");
             return false;
         }
@@ -1008,7 +1120,8 @@ public class EccAes256K1P7 {
             return false;
         }
 
-        if(eccAesDataByte.getPriKeyB()==null && eccAesDataByte.getPriKeyA()==null){
+        if((eccAesDataByte.getPriKeyB()==null||isZero(eccAesDataByte.getPriKeyB()))
+                && (eccAesDataByte.getPriKeyA()==null||isZero(eccAesDataByte.getPriKeyA()))){
             eccAesDataByte.setError(EccAesType.AsyTwoWay.name()+" parameters lack both priKeyA and priKeyB.");
             return false;
         }
@@ -1036,6 +1149,12 @@ public class EccAes256K1P7 {
         return true;
     }
 
+    private boolean isZero(byte[] bytes){
+        for(byte b:bytes){
+            if(b!=0)return false;
+        }
+        return true;
+    }
     private boolean isGoodAsyOneWayDecryptParams(EccAesDataByte eccAesDataByte) {
         if(eccAesDataByte.getCipher()==null){
             eccAesDataByte.setError(EccAesType.AsyOneWay.name()+" parameters lack cipher.");
@@ -1052,7 +1171,7 @@ public class EccAes256K1P7 {
             return false;
         }
 
-        if(eccAesDataByte.getPriKeyB()==null){
+        if(eccAesDataByte.getPriKeyB()==null||isZero(eccAesDataByte.getPriKeyB())){
             eccAesDataByte.setError(EccAesType.AsyOneWay.name()+" parameters lack priKeyB.");
             return false;
         }
@@ -1252,18 +1371,4 @@ public class EccAes256K1P7 {
         return iv;
     }
 
-    public String encryptSymKeyBundle(String msg, char[] symKey) {
-        EccAesData eccAesData = new EccAesData(EccAesType.SymKey, msg, symKey);
-
-        encrypt(eccAesData);
-        String iv = eccAesData.getIv();
-        String cipher = eccAesData.getCipher();
-        byte[] ivBytes = HexFormat.of().parseHex(iv);
-        byte[] cipherBytes = Base64.getDecoder().decode(cipher);
-
-        byte[]ivCipherBytes = EccAes256K1P7.addArray(ivBytes,cipherBytes);
-        String bundle = Base64.getEncoder().encodeToString(ivCipherBytes);
-        eccAesData.clearAllSensitiveData();
-        return bundle;
-    }
 }

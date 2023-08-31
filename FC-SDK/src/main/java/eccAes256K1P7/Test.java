@@ -1,8 +1,9 @@
 package eccAes256K1P7;
 
 import com.google.gson.Gson;
-import javaTools.BytesTools;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.HexFormat;
 
 public class Test {
@@ -246,7 +247,7 @@ public class Test {
         System.out.println("----------");
         System.out.println("Asy Decrypt Constructor:");
         System.out.println("----------");
-        String cipher = "yu7qzwXoEeKwRsCT/fLxaA\u003d\u003d";
+        String cipher = "yu7qzwXoEeKwRsCT/fLxaA==";
         String iv = "988a330ab28e61fa01471bf13ce6cc7d";
         String sum = "346a8033";
         eccAesData = new EccAesData(EccAesType.AsyOneWay,pubKeyA,pubKeyB,iv,cipher,sum,priKeyB.toCharArray());
@@ -255,7 +256,7 @@ public class Test {
         System.out.println("----------");
         System.out.println("Sym Decrypt Constructor:");
         System.out.println("----------");
-        cipher = "6f20f3ukM3ol0KRJHACb0w\u003d\u003d";
+        cipher = "6f20f3ukM3ol0KRJHACb0w==";
         iv = "862dc48880b515d589851df25827fbcf";
         sum = "befc5792";
         eccAesData = new EccAesData(EccAesType.SymKey,iv,cipher,sum,symKey);
@@ -264,6 +265,8 @@ public class Test {
         System.out.println("----------------------");
         System.out.println("Bundle test");
         System.out.println("----------------------");
+        System.out.println("String");
+        System.out.println("----------");
         System.out.println("AsyOneWay bundle test");
         System.out.println("----------");
 
@@ -292,7 +295,56 @@ public class Test {
         System.out.println("Cipher bundle: "+bundle);
         msgBundle = ecc.decryptSymKeyBundle(bundle, symKey);
         System.out.println("Msg from bundle:"+ msgBundle);
+        System.out.println("----------------------");
 
+        System.out.println("byte[]");
+        System.out.println("----------");
+        byte[] msgBytes = msg.getBytes(StandardCharsets.UTF_8);
+        byte[] pubKeyBBytes = HexFormat.of().parseHex(pubKeyB);
+        byte[] priKeyBBytes = HexFormat.of().parseHex(priKeyB);
+        byte[] pubKeyABytes = HexFormat.of().parseHex(pubKeyA);
+        byte[] priKeyABytes = HexFormat.of().parseHex(priKeyA);
+
+
+        System.out.println("AsyOneWay bundle test");
+        System.out.println("----------");
+
+        byte[] bundleBytes = ecc.encryptAsyOneWayBundle(msgBytes,pubKeyBBytes);
+        System.out.println("Cipher bundle: "+Base64.getEncoder().encodeToString(bundleBytes));
+        byte[] msgBundleBytes = ecc.decryptAsyOneWayBundle(bundleBytes, priKeyBBytes);
+        System.out.println("Msg from bundle:"+ new String(msgBundleBytes));
+
+        System.out.println("----------------------");
+        System.out.println("AsyTwoWay bundle test");
+        System.out.println("----------");
+
+        //Reload sensitive parameters
+        priKeyBBytes = HexFormat.of().parseHex(priKeyB);
+        priKeyABytes = HexFormat.of().parseHex(priKeyA);
+
+        bundleBytes = ecc.encryptAsyTwoWayBundle(msgBytes, pubKeyBBytes, priKeyABytes);
+        System.out.println("Cipher bundle: "+ Base64.getEncoder().encodeToString(bundleBytes));
+        msgBundleBytes = ecc.decryptAsyTwoWayBundle(bundleBytes, pubKeyABytes, priKeyBBytes);
+        System.out.println("Msg from PriKeyB:"+ new String(msgBundleBytes));
+
+        //Reload sensitive parameters
+        priKeyBBytes = HexFormat.of().parseHex(priKeyB);
+        priKeyABytes = HexFormat.of().parseHex(priKeyA);
+        msgBundleBytes = ecc.decryptAsyTwoWayBundle(bundleBytes, pubKeyBBytes,priKeyABytes);
+        System.out.println("Msg from PriKeyA:"+ new String(msgBundleBytes));
+
+        System.out.println("----------------------");
+        System.out.println("SymKey bundle test");
+        System.out.println("----------");
+
+        byte[] symKeyBytes = HexFormat.of().parseHex(symKeyStr);
+        bundleBytes = ecc.encryptSymKeyBundle(msgBytes,symKeyBytes);
+        System.out.println("Cipher bundle: "+Base64.getEncoder().encodeToString(bundleBytes));
+
+        //Reload sensitive parameters
+        symKeyBytes = HexFormat.of().parseHex(symKeyStr);
+        msgBundleBytes = ecc.decryptSymKeyBundle(bundleBytes, symKeyBytes);
+        System.out.println("Msg from bundle:"+ new String(msgBundleBytes));
     }
 
     private static void checkResult(EccAesData eccAesData, String s) {
