@@ -1,7 +1,9 @@
 package APIP3V1_CidInfo;
 
 import APIP0V1_OpenAPI.*;
+import apipClass.DataRequestBody;
 import apipClass.Fcdsl;
+import apipClass.Sort;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
@@ -16,8 +18,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-
-import esTools.Sort;
 
 @WebServlet(ApiNames.APIP3V1Path + ApiNames.NoticeFeeHistoryAPI)
 public class NoticeFeeHistory extends HttpServlet {
@@ -47,7 +47,7 @@ public class NoticeFeeHistory extends HttpServlet {
 
 
         //Set default sort.
-        ArrayList<Sort> sort =Sort.makeSortList("height",false,"index",false,null,null);
+        ArrayList<Sort> sort = Sort.makeSortList("height",false,"index",false,null,null);
 
         //Request
         DataRequestHandler esRequest = new DataRequestHandler(dataCheckResult.getAddr(),requestBody,response,replier);

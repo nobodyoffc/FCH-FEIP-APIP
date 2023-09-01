@@ -1,10 +1,10 @@
 package APIP11V1_Contact;
 
 import APIP0V1_OpenAPI.*;
+import apipClass.DataRequestBody;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
-import feipClass.Box;
 import feipClass.Contact;
 
 import javax.servlet.ServletException;

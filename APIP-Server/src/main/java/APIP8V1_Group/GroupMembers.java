@@ -1,10 +1,10 @@
 package APIP8V1_Group;
 
 import APIP0V1_OpenAPI.*;
+import apipClass.DataRequestBody;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
-import initial.Initiator;
 import feipClass.Group;
 
 import javax.servlet.ServletException;

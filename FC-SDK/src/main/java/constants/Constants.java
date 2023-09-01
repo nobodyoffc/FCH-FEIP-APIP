@@ -12,7 +12,7 @@ public class Constants {
     public static final int DefaultSize = 20;
     public static final String zeroBlockId = "00000000cbe04361b1d6de82b893a7d8419e76e99dd2073ac0db2ba0e652eea8";
     public static final String MAGIC = "f9beb4d9";
-    public static final String ALG_SIGN_TX_BY_CRYPTO_SIGN = "SignTxByCryptoSign@C_armX";
+    public static final String ALG_SIGN_TX_BY_CRYPTO_SIGN = "SignTxByCryptoSign@No1_NrC7";
 
     public static final long FchToSatoshi = 100000000;
     public static final double MinPayValue = 0.00001;

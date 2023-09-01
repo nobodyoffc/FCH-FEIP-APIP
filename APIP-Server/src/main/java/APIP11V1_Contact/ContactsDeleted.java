@@ -1,9 +1,7 @@
 package APIP11V1_Contact;
 
 import APIP0V1_OpenAPI.*;
-import apipClass.Fcdsl;
-import apipClass.Filter;
-import apipClass.Terms;
+import apipClass.*;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
@@ -18,8 +16,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-
-import esTools.Sort;
 
 
 @WebServlet(ApiNames.APIP11V1Path + ApiNames.ContactsDeletedAPI)
@@ -52,7 +48,7 @@ public class ContactsDeleted extends HttpServlet {
         }
 
         //Set default sort.
-        ArrayList<Sort> sort =Sort.makeSortList("lastHeight",false,"contactId",true,null,null);
+        ArrayList<Sort> sort = Sort.makeSortList("lastHeight",false,"contactId",true,null,null);
 
         //Add condition
         Fcdsl fcdsl;

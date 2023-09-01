@@ -1,6 +1,8 @@
 package APIP3V1_CidInfo;
 
 import APIP0V1_OpenAPI.*;
+import apipClass.DataRequestBody;
+import apipClass.Sort;
 import co.elastic.clients.elasticsearch.core.MgetResponse;
 import co.elastic.clients.elasticsearch.core.mget.MultiGetResponseItem;
 import constants.ApiNames;
@@ -20,8 +22,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-
-import esTools.Sort;
 
 @WebServlet(ApiNames.APIP3V1Path + ApiNames.CidInfoSearchAPI)
 public class CidInfoSearch extends HttpServlet {
@@ -43,7 +43,7 @@ public class CidInfoSearch extends HttpServlet {
         DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
 
         //Set default sort.
-        ArrayList<Sort> sort =Sort.makeSortList("nameTime",false,"fid",true,null,null);
+        ArrayList<Sort> sort = Sort.makeSortList("nameTime",false,"fid",true,null,null);
 
         //Request
 

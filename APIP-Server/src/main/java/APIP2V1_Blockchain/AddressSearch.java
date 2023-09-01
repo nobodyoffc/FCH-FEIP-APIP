@@ -1,12 +1,12 @@
 package APIP2V1_Blockchain;
 
 import APIP0V1_OpenAPI.*;
+import apipClass.DataRequestBody;
+import apipClass.Sort;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
 import fchClass.Address;
-import esTools.Sort;
-import initial.Initiator;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -38,7 +38,7 @@ public class AddressSearch extends HttpServlet {
         DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
 
         //Set default sort.
-        ArrayList<Sort> sort =Sort.makeSortList("lastHeight",false,"fid",true,null,null);
+        ArrayList<Sort> sort = Sort.makeSortList("lastHeight",false,"fid",true,null,null);
 
         //Request
         String index = IndicesNames.ADDRESS;

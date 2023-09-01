@@ -1,5 +1,6 @@
 package reward;
 
+import apipClass.Sort;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.SortOptions;
 import co.elastic.clients.elasticsearch._types.SortOrder;
@@ -9,7 +10,6 @@ import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
 import com.google.gson.Gson;
 import esTools.EsTools;
-import esTools.Sort;
 import fcTools.ParseTools;
 import fchClass.CashMark;
 import fchClass.OpReturn;

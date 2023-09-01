@@ -1,6 +1,8 @@
 package APIP7V1_App;
 
 import APIP0V1_OpenAPI.*;
+import apipClass.DataRequestBody;
+import apipClass.Sort;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
@@ -16,8 +18,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-
-import esTools.Sort;
 
 
 @WebServlet(ApiNames.APIP7V1Path + ApiNames.AppOpHistoryAPI)
@@ -42,7 +42,7 @@ public class AppOpHistory extends HttpServlet {
         //Check API
 
         //Set default sort.
-        ArrayList<Sort> sort =Sort.makeSortList("height",false,"index",false,null,null);
+        ArrayList<Sort> sort = Sort.makeSortList("height",false,"index",false,null,null);
 
         //Add condition
         if(requestBody.getFcdsl()==null)requestBody.setFcdsl(new Fcdsl());

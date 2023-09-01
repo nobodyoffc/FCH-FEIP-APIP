@@ -6,6 +6,7 @@ import java.nio.ByteOrder;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
 import java.util.*;
 
 
@@ -331,6 +332,13 @@ public class BytesTools {
             decPos += src.length;
         }
         return all;
+    }
+
+    public static byte[] getRandomBytes(int len) {
+        SecureRandom secureRandom = new SecureRandom();
+        byte[] bytes = new byte[len];
+        secureRandom.nextBytes(bytes);
+        return bytes;
     }
 }
 

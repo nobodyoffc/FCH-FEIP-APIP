@@ -1,11 +1,11 @@
 package APIP18V1_Wallet;
 
 import APIP0V1_OpenAPI.*;
+import apipClass.DataRequestBody;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import constants.ApiNames;
 import constants.ReplyInfo;
-import initial.Initiator;
 import redis.clients.jedis.Jedis;
 
 import javax.servlet.ServletException;

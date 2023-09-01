@@ -1,6 +1,7 @@
 package APIP12V1_Secret;
 
 import APIP0V1_OpenAPI.*;
+import apipClass.DataRequestBody;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;

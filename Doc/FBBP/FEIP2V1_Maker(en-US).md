@@ -46,6 +46,54 @@ UpdateDate: 2023-05-07
 
 1. This protocol publishes and manages market fchTx services on the blockchain.
 2. Maker is a kind of service which implements the protocol`FEIP5V2_Service`.
+
+```json
+{
+  "type": "FEIP",
+  "sn": "5",
+  "ver": "2",
+  "name": "Service",
+  "data": {
+    "op": "publish",
+    "stdName": "FCH For ETH on arbitrum",
+    "localNames": [
+      "出售FCH接受arbETH"
+    ],
+    "desc": "Sell FCH and accept ETH on arbitrum",
+    "types": [
+      "Maker",
+      "FCH",
+      "arbETH"
+    ],
+    "urls": [
+      "https://myshop.cash"
+    ],
+    "waiters": [
+      "FErVBq2SzT4GGcH61wSvo6BofQ8U5JL3Cg"
+    ],
+    "params": {
+      "sell": "FCH",
+      "accept": "arbETH",
+      "minSellAmount": "10000.0",
+      "confirmation": {
+        "min": "1",
+        "step": "1",
+        "raiseBy": "10000",
+        "max": "6"
+      },
+      "price": {
+        "min": "0.000025",
+        "step": "10000",
+        "raiseBy": "0.000005",
+        "waitFor": "1440",
+        "dropBy": "0.000005",
+        "max": "0.00025"
+      }
+    }
+  }
+}
+```
+
 ```json
 {
 	"type": "FEIP",

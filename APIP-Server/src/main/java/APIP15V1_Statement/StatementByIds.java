@@ -1,6 +1,7 @@
 package APIP15V1_Statement;
 
 import APIP0V1_OpenAPI.*;
+import apipClass.DataRequestBody;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;

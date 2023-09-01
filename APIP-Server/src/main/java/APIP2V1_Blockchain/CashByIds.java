@@ -1,11 +1,11 @@
 package APIP2V1_Blockchain;
 
 import APIP0V1_OpenAPI.*;
+import apipClass.DataRequestBody;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
 import fchClass.Cash;
-import initial.Initiator;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

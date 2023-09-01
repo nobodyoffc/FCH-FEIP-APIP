@@ -1,13 +1,11 @@
 package APIP11V1_Contact;
 
 import APIP0V1_OpenAPI.*;
+import apipClass.*;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
 import feipClass.Contact;
-import apipClass.Fcdsl;
-import apipClass.Filter;
-import apipClass.Terms;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -18,8 +16,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-
-import esTools.Sort;
 
 
 @WebServlet(ApiNames.APIP11V1Path + ApiNames.ContactsAPI)
@@ -51,7 +47,7 @@ public class Contacts extends HttpServlet {
 //        }
 
         //Set default sort.
-        ArrayList<Sort> sort =Sort.makeSortList("birthHeight",false,"contactId",true,null,null);
+        ArrayList<Sort> sort = Sort.makeSortList("birthHeight",false,"contactId",true,null,null);
 
         //Add condition
         Fcdsl fcdsl;

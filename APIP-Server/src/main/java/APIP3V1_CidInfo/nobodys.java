@@ -1,8 +1,9 @@
 package APIP3V1_CidInfo;
 
 import APIP0V1_OpenAPI.*;
+import apipClass.DataRequestBody;
 import apipClass.Fcdsl;
-import esTools.Sort;
+import apipClass.Sort;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
@@ -46,7 +47,7 @@ public class Nobodys extends HttpServlet {
 
 
         //Set default sort.
-        ArrayList<Sort> sort =Sort.makeSortList("height",false,"index",false,null,null);
+        ArrayList<Sort> sort = Sort.makeSortList("height",false,"index",false,null,null);
 
         //Request
         DataRequestHandler esRequest = new DataRequestHandler(dataCheckResult.getAddr(),requestBody,response,replier);

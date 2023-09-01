@@ -1,11 +1,12 @@
 package APIP3V1_CidInfo;
 
 import APIP0V1_OpenAPI.*;
+import apipClass.DataRequestBody;
+import apipClass.Sort;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
 import feipClass.Cid;
-import initial.Initiator;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -18,8 +19,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import esTools.Sort;
 
 @WebServlet(ApiNames.APIP3V1Path + ApiNames.FidCidSeekAPI)
 public class CidFidSeek extends HttpServlet {
@@ -54,7 +53,7 @@ public class CidFidSeek extends HttpServlet {
         List<Cid> meetList = null;
 
         //Set default sort.
-        ArrayList<Sort> sort =Sort.makeSortList("lastHeight",false,"fid",true,null,null);
+        ArrayList<Sort> sort = Sort.makeSortList("lastHeight",false,"fid",true,null,null);
 
         try {
             meetList = esRequest.doRequest(IndicesNames.CID, sort, Cid.class);

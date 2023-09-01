@@ -70,4 +70,5 @@ public class Strings {
 
     public static final String OP_RETURN_FILE_PATH = "opReturnFilePath";
     public static final String LISTEN_PATH = "listenPath";
+    public static final String FIELDS = "fields";
 }

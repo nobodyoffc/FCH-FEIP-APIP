@@ -1,12 +1,12 @@
 package reward;
 
+import apipClass.Sort;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.SortOptions;
 import co.elastic.clients.elasticsearch.core.DeleteResponse;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import esTools.EsTools;
-import esTools.Sort;
 import fcTools.ParseTools;
 import fchClass.Address;
 import fileTools.JsonFileTools;

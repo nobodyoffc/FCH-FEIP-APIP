@@ -1,9 +1,7 @@
 package APIP12V1_Secret;
 
 import APIP0V1_OpenAPI.*;
-import apipClass.Fcdsl;
-import apipClass.Filter;
-import apipClass.Terms;
+import apipClass.*;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
@@ -18,8 +16,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-
-import esTools.Sort;
 
 @WebServlet(ApiNames.APIP12V1Path + ApiNames.SecretsAPI)
 public class Secrets extends HttpServlet {
@@ -50,7 +46,7 @@ public class Secrets extends HttpServlet {
 //        }
 
         //Set default sort.
-        ArrayList<Sort> sort =Sort.makeSortList("birthHeight",false,"secretId",true,null,null);
+        ArrayList<Sort> sort = Sort.makeSortList("birthHeight",false,"secretId",true,null,null);
 
         //Add condition
         Fcdsl fcdsl;

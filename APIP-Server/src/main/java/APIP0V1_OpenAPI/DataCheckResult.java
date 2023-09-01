@@ -1,5 +1,7 @@
 package APIP0V1_OpenAPI;
 
+import apipClass.DataRequestBody;
+
 public class DataCheckResult {
 
     private DataRequestBody dataRequestBody;

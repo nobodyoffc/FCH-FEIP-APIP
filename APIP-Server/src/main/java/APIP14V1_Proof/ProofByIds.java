@@ -1,10 +1,10 @@
 package APIP14V1_Proof;
 
 import APIP0V1_OpenAPI.*;
+import apipClass.DataRequestBody;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
-import initial.Initiator;
 import feipClass.Proof;
 
 import javax.servlet.ServletException;

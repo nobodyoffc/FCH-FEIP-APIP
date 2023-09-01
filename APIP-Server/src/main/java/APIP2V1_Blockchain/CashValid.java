@@ -1,13 +1,11 @@
 package APIP2V1_Blockchain;
 
 import APIP0V1_OpenAPI.*;
+import apipClass.*;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
 import fchClass.Cash;
-import apipClass.Fcdsl;
-import apipClass.Filter;
-import apipClass.Terms;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -18,8 +16,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-
-import esTools.Sort;
 
 
 @WebServlet(ApiNames.APIP2V1Path + ApiNames.CashValidAPI)
@@ -49,7 +45,7 @@ public class CashValid extends HttpServlet {
         }
 
         //Set default sort.
-        ArrayList<Sort> sort =Sort.makeSortList("cd",true,"value",false,"cashId",true);
+        ArrayList<Sort> sort = Sort.makeSortList("cd",true,"value",false,"cashId",true);
 
         //Add condition
         Fcdsl fcdsl;

@@ -1,10 +1,11 @@
 package APIP8V1_Group;
 
 import APIP0V1_OpenAPI.*;
+import apipClass.DataRequestBody;
+import apipClass.Sort;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
-import initial.Initiator;
 import feipClass.Group;
 
 import javax.servlet.ServletException;
@@ -16,8 +17,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-
-import esTools.Sort;
 
 
 @WebServlet(ApiNames.APIP8V1Path + ApiNames.MyGroupsAPI)
@@ -47,7 +46,7 @@ public class MyGroups extends HttpServlet {
         }
 
         //Set default sort.
-        ArrayList<Sort> sort =Sort.makeSortList("lastHeight",false,"gid",true,null,null);
+        ArrayList<Sort> sort = Sort.makeSortList("lastHeight",false,"gid",true,null,null);
 
         //Add condition
 

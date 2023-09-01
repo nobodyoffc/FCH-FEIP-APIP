@@ -1,6 +1,7 @@
 package test;
 
 import APIP0V1_OpenAPI.*;
+import apipClass.DataRequestBody;
 import fchClass.Address;
 
 import javax.servlet.ServletException;

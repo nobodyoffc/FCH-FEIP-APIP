@@ -1,11 +1,12 @@
 package APIP3V1_CidInfo;
 
 import APIP0V1_OpenAPI.*;
+import apipClass.DataRequestBody;
+import apipClass.Sort;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
 import identity.RepuHist;
-import initial.Initiator;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -16,8 +17,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-
-import esTools.Sort;
 
 @WebServlet(ApiNames.APIP3V1Path + ApiNames.ReputationHistoryAPI)
 public class ReputationHistory extends HttpServlet {
@@ -42,7 +41,7 @@ public class ReputationHistory extends HttpServlet {
         //Check API
 
         //Set default sort.
-        ArrayList<Sort> sort =Sort.makeSortList("height",false,"index",false,null,null);
+        ArrayList<Sort> sort = Sort.makeSortList("height",false,"index",false,null,null);
 
         //Request
         DataRequestHandler esRequest = new DataRequestHandler(dataCheckResult.getAddr(),requestBody,response,replier);

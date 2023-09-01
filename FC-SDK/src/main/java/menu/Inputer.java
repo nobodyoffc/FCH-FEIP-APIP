@@ -1,6 +1,7 @@
 package menu;
 
 import fcTools.ParseTools;
+import javaTools.BytesTools;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -192,5 +193,36 @@ public class Inputer {
                 }
             }
         }
+    }
+
+    public static char[] inputKey(BufferedReader br, String ask)  {
+        System.out.println(ask);
+        char[] symKey = new char[64];
+        int num = 0;
+        try {
+            num = br.read(symKey);
+
+            if(num!=64 || !BytesTools.isHexCharArray(symKey)){
+                System.out.println("The key should be 32 bytes in hex.");
+                return null;
+            }
+            br.read();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return symKey;
+    }
+
+    public static String inputMsg(BufferedReader br) {
+        System.out.println("Input the plaintext:");
+        String msg = null;
+        char[] symKey;
+        try {
+            msg = br.readLine();
+        } catch (IOException e) {
+            System.out.println("BufferedReader wrong.");
+            return null;
+        }
+        return msg;
     }
 }

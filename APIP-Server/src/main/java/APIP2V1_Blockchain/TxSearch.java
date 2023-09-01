@@ -1,6 +1,8 @@
 package APIP2V1_Blockchain;
 
 import APIP0V1_OpenAPI.*;
+import apipClass.DataRequestBody;
+import apipClass.Sort;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
@@ -19,8 +21,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-
-import esTools.Sort;
 
 @WebServlet(ApiNames.APIP2V1Path + ApiNames.TxSearchAPI)
 public class TxSearch extends HttpServlet {
@@ -44,7 +44,7 @@ public class TxSearch extends HttpServlet {
         //Check API
 
         //Set default sort.
-        ArrayList<Sort> sort =Sort.makeSortList("height",false,"txId",true,null,false);
+        ArrayList<Sort> sort = Sort.makeSortList("height",false,"txId",true,null,false);
 
         //Add condition
 

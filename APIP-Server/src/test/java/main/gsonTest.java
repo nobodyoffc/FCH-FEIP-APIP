@@ -1,7 +1,7 @@
 package main;
 
 
-import APIP0V1_OpenAPI.DataRequestBody;
+import apipClass.DataRequestBody;
 import com.google.gson.Gson;
 import fcTools.ParseTools;
 

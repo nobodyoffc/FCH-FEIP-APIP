@@ -1,10 +1,11 @@
 package APIP15V1_Statement;
 
 import APIP0V1_OpenAPI.*;
+import apipClass.DataRequestBody;
+import apipClass.Sort;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
-import initial.Initiator;
 import feipClass.Statement;
 
 import javax.servlet.ServletException;
@@ -16,8 +17,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-
-import esTools.Sort;
 
 
 @WebServlet(ApiNames.APIP15V1Path + ApiNames.StatementsAPI)
@@ -47,7 +46,7 @@ public class Statements extends HttpServlet {
         }
 
         //Set default sort.
-        ArrayList<Sort> sort =Sort.makeSortList("birthHeight",false,"statementId",true,null,null);
+        ArrayList<Sort> sort = Sort.makeSortList("birthHeight",false,"statementId",true,null,null);
 
         //Add condition
 

@@ -8,6 +8,7 @@ import eccAes256K1P7.EccAesType;
 import fileTools.FileTools;
 import javaTools.BytesTools;
 import keyTools.KeyTools;
+import menu.Inputer;
 import menu.Menu;
 import org.bitcoinj.core.ECKey;
 import org.bitcoinj.params.MainNetParams;
@@ -50,23 +51,27 @@ public class StartTools {
         itemList.add("Verify Schnorr");
         
         itemList.add("Encrypt with symKey");
-        itemList.add("Encrypt with symKey to ivCipher");
+        itemList.add("Encrypt with symKey to bundle");
         itemList.add("Encrypt with password");
         itemList.add("Encrypt with public key EccAes256K1P7");
+        itemList.add("Encrypt with public key EccAes256K1P7 to bundle one way");
+        itemList.add("Encrypt with public key EccAes256K1P7 to bundle two way");
         itemList.add("Encrypt file with symKey EccAes256K1P7");
         itemList.add("Encrypt file with public key EccAes256K1P7");
         
         itemList.add("Decrypt with symKey");
-        itemList.add("Decrypt with symKey from ivCipher");
+        itemList.add("Decrypt with symKey from bundle");
         itemList.add("Decrypt with password");
         itemList.add("Decrypt with private key EccAes256K1P7");
+        itemList.add("Encrypt with private key EccAes256K1P7 from bundle one way");
+        itemList.add("Encrypt with private key EccAes256K1P7 from bundle two way");
         itemList.add("Decrypt file with symKey EccAes256K1P7");
-        itemList.add("Decrypt file with public key EccAes256K1P7");
+        itemList.add("Decrypt file with private key EccAes256K1P7");
         itemList.add("Timestamp now");
         menu.add(itemList);
 
         while(true) {
-            System.out.println("<<FreeConsesus Tools>> v1.0.0 by No1_NrC7");
+            System.out.println("<<FreeConsensus Tools>> v1.0.0 by No1_NrC7");
             menu.show();
             int choice = menu.choose(br);
             switch (choice) {
@@ -88,15 +93,19 @@ public class StartTools {
                 case 16 -> encryptWithSymKeyIvCipher(br);
                 case 17 -> encryptWithPassword(br);
                 case 18 -> encryptAsy(br);
-                case 19 -> encryptFileWithSymKey(br);
-                case 20 -> encryptFileAsy(br);
-                case 21 -> decryptWithSymKey(br);
-                case 22 -> decryptWithSymKeyIvCipher(br);
-                case 23 -> decryptWithPassword(br);
-                case 24 -> decryptAsy(br);
-                case 25 -> decryptFileSymKey(br);
-                case 26 -> decryptFileAsy(br);
-                case 27 -> {
+                case 19 -> encryptAsyOneWayBundle(br);
+                case 20 -> encryptAsyTwoWayBundle(br);
+                case 21 -> encryptFileWithSymKey(br);
+                case 22 -> encryptFileAsy(br);
+                case 23 -> decryptWithSymKey(br);
+                case 24 -> decryptWithSymKeyIvCipher(br);
+                case 25 -> decryptWithPassword(br);
+                case 26 -> decryptAsy(br);
+                case 27 -> decryptAsyOneWayBundle(br);
+                case 28 -> decryptAsyTwoWayBundle(br);
+                case 29-> decryptFileSymKey(br);
+                case 30 -> decryptFileAsy(br);
+                case 31 -> {
                     gainTimestamp();
                     Menu.anyKeyToContinue(br);
                 }
@@ -109,20 +118,120 @@ public class StartTools {
         }
     }
 
+    private static void decryptAsyTwoWayBundle(BufferedReader br) {
+        EccAes256K1P7 ecc = new EccAes256K1P7();
+        try {
+            System.out.println("Input the bundle in Base64:");
+            String bundle = br.readLine();
+            if(bundle==null){
+                System.out.println("Bundle is null.");
+                return;
+            }
+
+            System.out.println("Input the pubKey in hex:");
+
+            String pubKey = br.readLine();
+
+            String ask = "Input the priKey in hex:";
+            char[] priKey = Inputer.inputKey(br, ask);
+
+            System.out.println(ecc.decryptAsyTwoWayBundle(bundle,pubKey,priKey));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        Menu.anyKeyToContinue(br);
+    }
+
+    private static void decryptAsyOneWayBundle(BufferedReader br) {
+        EccAes256K1P7 ecc = new EccAes256K1P7();
+        try {
+            System.out.println("Input the bundle in Base64:");
+            String bundle = br.readLine();
+            if(bundle==null){
+                System.out.println("Bundle is null.");
+                return;
+            }
+            String ask = "Input the priKey in hex:";
+            char[] priKey = Inputer.inputKey(br, ask);
+
+            System.out.println(ecc.decryptAsyOneWayBundle(bundle,priKey));
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        Menu.anyKeyToContinue(br);
+    }
+
+    private static void encryptAsyTwoWayBundle(BufferedReader br) {
+        EccAes256K1P7 ecc = new EccAes256K1P7();
+        EccAesData eccAesData = getEncryptedEccAesDataTwoWay(br);
+        if(eccAesData.getMsg()==null){
+            System.out.println( "Error: no message.");
+            return;
+        }
+        String bundle = ecc.encryptAsyTwoWayBundle(eccAesData.getMsg(),eccAesData.getPubKeyB(),eccAesData.getPriKeyA());
+        System.out.println(bundle);
+        Menu.anyKeyToContinue(br);
+    }
+
+    private static EccAesData getEncryptedEccAesDataTwoWay(BufferedReader br) {
+
+        String pubKeyB;
+        String msg;
+        char[] priKeyA;
+        try {
+            System.out.println("Input the recipient public key in hex:");
+            pubKeyB = br.readLine();
+            if (pubKeyB.length() != 66) {
+                System.out.println("The public key should be 66 characters of hex.");
+                return null;
+            }
+            String ask = "Input the sender's private Key:";
+            priKeyA = Inputer.inputKey(br,ask);
+            if(priKeyA==null)return null;
+
+            System.out.println("Input the msg:");
+            msg = br.readLine();
+        }catch (Exception e){
+            System.out.println("BufferedReader wrong.");
+            return null;
+        }
+        return new EccAesData(EccAesType.AsyTwoWay,msg,pubKeyB,priKeyA);
+    }
+
+    private static void encryptAsyOneWayBundle(BufferedReader br) {
+        EccAes256K1P7 ecc = new EccAes256K1P7();
+        EccAesData eccAesData = getEncryptedEccAesDataOneWay(br);
+        if(eccAesData.getMsg()==null){
+            System.out.println( "Error: no message.");
+            return;
+        }
+        String bundle = ecc.encryptAsyOneWayBundle(eccAesData.getMsg(),eccAesData.getPubKeyB());
+        System.out.println(bundle);
+        Menu.anyKeyToContinue(br);
+    }
+
     private static void decryptFileSymKey(BufferedReader br) {
         File encryptedFile = FileTools.getAvailableFile(br);
+        EccAes256K1P7 ecc = new EccAes256K1P7();
         if(encryptedFile==null||encryptedFile.length()> Constants.MAX_FILE_SIZE_M * Constants.M_BYTES)return;
-        char[] symKey = EccAes256K1P7.inputSymKey(br);
-        String result = EccAes256K1P7.decryptFileWithSymKey(encryptedFile,symKey);
+        String ask = "Input the symKey in hex:";
+        char[] symKey = Inputer.inputKey(br, ask);
+        String result = ecc.decryptFileWithSymKey(encryptedFile,symKey);
         System.out.println(result);
         Menu.anyKeyToContinue(br);
     }
 
     private static void encryptFileWithSymKey(BufferedReader br) {
         File originalFile = FileTools.getAvailableFile(br);
+        EccAes256K1P7 ecc = new EccAes256K1P7();
         if(originalFile==null||originalFile.length()> Constants.MAX_FILE_SIZE_M * Constants.M_BYTES)return;
-        char[] symKey = EccAes256K1P7.inputSymKey(br);
-        System.out.println(EccAes256K1P7.encryptFileSymKey(originalFile, symKey));
+
+        String ask = "Input the symKey in hex:";
+        char[] symKey = Inputer.inputKey(br, ask);
+        System.out.println(ecc.encryptFileSymKey(originalFile, symKey));
         Menu.anyKeyToContinue(br);
     }
 
@@ -137,33 +246,18 @@ public class StartTools {
             return;
         }
         EccAes256K1P7 ecc = new EccAes256K1P7();
-        char[] symKey = EccAes256K1P7.inputSymKey(br);
-        String eccAesDataJson = ecc.decryptSymKeyBundle(ivCipherStr, symKey);
+        String ask = "Input the symKey in hex:";
+        char[] symKey = Inputer.inputKey(br, ask);
+        String eccAesDataJson;
+        eccAesDataJson = ecc.decryptSymKeyBundle(ivCipherStr, symKey);
         System.out.println(eccAesDataJson);
         Menu.anyKeyToContinue(br);
     }
-
-//    private static char[] inputSymKeyOld(BufferedReader br) {
-//        char[] symKey = new char[64];
-//        int num = 0;
-//        try {
-//            num = br.read(symKey);
-//        } catch (IOException e) {
-//            System.out.println("BufferedReader wrong.");
-//            return null;
-//        }
-//        if(num!=64 || !BytesTools.isHexCharArray(symKey)){
-//            System.out.println("The symKey should be 64 characters in hex.");
-//            return null;
-//        }
-//        return symKey;
-//    }
-
-
     private static void encryptWithSymKeyIvCipher(BufferedReader br) {
-        String msg = EccAes256K1P7.inputMsg(br);
-        char[] symKey = EccAes256K1P7.inputSymKey(br);
         EccAes256K1P7 ecc = new EccAes256K1P7();
+        String msg = Inputer.inputMsg(br);
+        String ask = "Input the symKey in hex:";
+        char[] symKey = Inputer.inputKey(br, ask);
         String ivCipher = ecc.encryptSymKeyBundle(msg, symKey);
         System.out.println(ivCipher);
         Menu.anyKeyToContinue(br);
@@ -186,7 +280,8 @@ public class StartTools {
         if(num!=64 || !javaTools.BytesTools.isHexCharArray(priKey)){
             System.out.println("The symKey should be 64 characters in hex.");
         }
-        String result = EccAes256K1P7.decryptFileWithPriKey(encryptedFile,javaTools.BytesTools.hexCharArrayToByteArray(priKey));
+        EccAes256K1P7 ecc = new EccAes256K1P7();
+        String result = ecc.decryptFileWithPriKey(encryptedFile,javaTools.BytesTools.hexCharArrayToByteArray(priKey));
         System.out.println(result);
         Menu.anyKeyToContinue(br);
     }
@@ -198,7 +293,8 @@ public class StartTools {
         String pubKeyB;
         pubKeyB = getPubKey(br);
         if (pubKeyB == null) return;
-        System.out.println(EccAes256K1P7.encryptFileAsy(originalFile, pubKeyB));
+        EccAes256K1P7 ecc = new EccAes256K1P7();
+        System.out.println(ecc.encryptFileAsy(originalFile, pubKeyB));
         Menu.anyKeyToContinue(br);
     }
 
@@ -224,10 +320,11 @@ public class StartTools {
     }
 
     private static void encryptWithSymKey(BufferedReader br)  {
-        String msg = EccAes256K1P7.inputMsg(br);
-        if(msg==null)return;
-        char[] symKey = EccAes256K1P7.inputSymKey(br);
         EccAes256K1P7 ecc = new EccAes256K1P7();
+        String msg = Inputer.inputMsg(br);
+        if(msg==null)return;
+        String ask = "Input the symKey in hex:";
+        char[] symKey = Inputer.inputKey(br, ask);
         EccAesData eccAesData = new EccAesData(EccAesType.SymKey,msg,symKey);
 
         ecc.encrypt(eccAesData);
@@ -237,16 +334,14 @@ public class StartTools {
     }
 
     private static void decryptWithSymKey(BufferedReader br) throws Exception {
-        // TODO Auto-generated method stub
 
         System.out.println("Input the json string of EccAesData:");
         String eccAesDataJson = br.readLine();
-
-        System.out.println("Input the symKey in hex:");
-        char[] symKey = EccAes256K1P7.inputSymKey(br);
+        EccAes256K1P7 ecc = new EccAes256K1P7();
+        String ask = "Input the symKey in hex:";
+        char[] symKey = Inputer.inputKey(br, ask);
         if(symKey==null)return;
 
-        EccAes256K1P7 ecc = new EccAes256K1P7();
         eccAesDataJson = ecc.decryptWithSymKey(eccAesDataJson,symKey);
         System.out.println(eccAesDataJson);
         Menu.anyKeyToContinue(br);
@@ -295,7 +390,7 @@ public class StartTools {
 
         EccAes256K1P7 ecc = new EccAes256K1P7();
 
-        System.out.println(ecc.decryptWithPassword(eccAesDataJson,password));
+        System.out.println(ecc.decryptWithPasswordJson(eccAesDataJson,password));
 
         Menu.anyKeyToContinue(br);
     }
@@ -329,7 +424,7 @@ public class StartTools {
 
         EccAes256K1P7 ecc = new EccAes256K1P7();
 
-        EccAesData eccAesData = ecc.decryptAsy(eccAesDataJson, priKey);
+        EccAesData eccAesData = ecc.decryptAsyJson(eccAesDataJson, priKey);
 
         System.out.println(eccAesData.toJson());
     }
@@ -341,8 +436,9 @@ public class StartTools {
     }
 
     private static void encryptAsy(BufferedReader br)  {
-
-        EccAesData eccAesData = getEncryptedEccAesData(br);
+        EccAes256K1P7 ecc = new EccAes256K1P7();
+        EccAesData eccAesData = getEncryptedEccAesDataOneWay(br);
+        ecc.encrypt(eccAesData);
         if (eccAesData == null) return;
         if(eccAesData.getError()!=null){
             System.out.println(eccAesData.getError());
@@ -350,7 +446,7 @@ public class StartTools {
         Menu.anyKeyToContinue(br);
     }
 
-    private static EccAesData getEncryptedEccAesData(BufferedReader br) {
+    private static EccAesData getEncryptedEccAesDataOneWay(BufferedReader br) {
         System.out.println("Input the recipient public key in hex:");
         String pubKeyB;
         String msg;
@@ -366,11 +462,7 @@ public class StartTools {
             System.out.println("BufferedReader wrong.");
             return null;
         }
-        EccAes256K1P7 ecc = new EccAes256K1P7();
-        EccAesData eccAesData = new EccAesData(EccAesType.AsyOneWay,msg,pubKeyB);
-
-        ecc.encrypt(eccAesData);
-        return eccAesData;
+        return new EccAesData(EccAesType.AsyOneWay,msg,pubKeyB);
     }
 
     private static void encryptWithBtcEcc() {
@@ -405,7 +497,7 @@ public class StartTools {
 
     public static void getRandom(BufferedReader br) throws IOException {
         // TODO Auto-generated method stub
-        SecureRandom secureRandom = new SecureRandom();
+
         int len =0;
         while(true) {
             System.out.println("Input the bytes length of the random you want. Enter to exit:");
@@ -421,9 +513,8 @@ public class StartTools {
                 continue;
             }
         }
-        byte[] bytes = new byte[len];
-        secureRandom.nextBytes(bytes);
 
+        byte[] bytes = BytesTools.getRandomBytes(len);
 
         if (bytes.length <= 8) {
             // Create a ByteBuffer with the byte array

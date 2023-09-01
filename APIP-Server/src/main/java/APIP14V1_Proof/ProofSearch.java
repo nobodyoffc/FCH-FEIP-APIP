@@ -1,10 +1,11 @@
 package APIP14V1_Proof;
 
 import APIP0V1_OpenAPI.*;
+import apipClass.DataRequestBody;
+import apipClass.Sort;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
-import initial.Initiator;
 import feipClass.Proof;
 
 import javax.servlet.ServletException;
@@ -16,8 +17,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-
-import esTools.Sort;
 
 
 @WebServlet(ApiNames.APIP14V1Path + ApiNames.ProofSearchAPI)
@@ -42,7 +41,7 @@ public class ProofSearch extends HttpServlet {
         //Check API
 
         //Set default sort.
-        ArrayList<Sort> sort =Sort.makeSortList("lastHeight",false,"proofId",true,null,null);
+        ArrayList<Sort> sort = Sort.makeSortList("lastHeight",false,"proofId",true,null,null);
 
         //Add condition
 

@@ -155,11 +155,11 @@ public class Test {
         String oneWayJson0 = gson.toJson(eccAesData);
 
         System.out.println("OneWayJson0: "+oneWayJson0);
-        String encOneWayJson0 = ecc.encryptAsyOneWay(oneWayJson0);
+        String encOneWayJson0 = ecc.encryptAsyOneWayJson(oneWayJson0);
         checkResult(eccAesData,"Encrypted: \n"+ encOneWayJson0);
 
 
-        EccAesData eccAesData1 = ecc.decryptAsy(encOneWayJson0, priKeyB.toCharArray());
+        EccAesData eccAesData1 = ecc.decryptAsyJson(encOneWayJson0, priKeyB.toCharArray());
         checkResult(eccAesData,"Decrypted:\n"+eccAesData1.toJson());
 
         System.out.println("----------");
@@ -173,9 +173,9 @@ public class Test {
         String twoWayJson1 = gson.toJson(eccAesData);
         System.out.println("TwoWayJson1:"+twoWayJson1);
 
-        String encTwoWayJson1 = ecc.encryptAsyTwoWay(twoWayJson1,priKeyA.toCharArray());
+        String encTwoWayJson1 = ecc.encryptAsyTwoWayJson(twoWayJson1,priKeyA.toCharArray());
         checkResult(eccAesData,"Encrypted: \n"+ encTwoWayJson1);
-        eccAesData1 = ecc.decryptAsy(encTwoWayJson1, priKeyB.toCharArray());
+        eccAesData1 = ecc.decryptAsyJson(encTwoWayJson1, priKeyB.toCharArray());
         checkResult(eccAesData,"Decrypted:\n"+eccAesData1.toJson());
 
         System.out.println("----------");
@@ -190,7 +190,7 @@ public class Test {
         String symKeyJson1 = gson.toJson(eccAesData);
         System.out.println("SymKeyJson1:"+symKeyJson1);
 
-        String encSymKeyJson1 = ecc.encryptWithSymKey(symKeyJson1,symKey);
+        String encSymKeyJson1 = ecc.encryptWithSymKeyJson(symKeyJson1,symKey);
         checkResult(eccAesData,"Encrypted: \n"+ encSymKeyJson1);
 
         String decSymKeyJson = ecc.decryptWithSymKey(encSymKeyJson1, symKey);
@@ -207,10 +207,10 @@ public class Test {
         String passwordDataJson1 = gson.toJson(eccAesData);
         System.out.println("PasswordJson1:"+passwordDataJson1 );
 
-        String encPasswordJson1 = ecc.encryptWithPassword(passwordDataJson1 ,passwordStr.toCharArray());
+        String encPasswordJson1 = ecc.encryptWithPasswordJson(passwordDataJson1 ,passwordStr.toCharArray());
         checkResult(eccAesData,"Encrypted: \n"+ encPasswordJson1);
 
-        String decPasswordJson = ecc.decryptWithPassword(encPasswordJson1, passwordStr.toCharArray());
+        String decPasswordJson = ecc.decryptWithPasswordJson(encPasswordJson1, passwordStr.toCharArray());
         checkResult(eccAesData,"Decrypted:\n"+decPasswordJson);
         System.out.println("----------------------");
 

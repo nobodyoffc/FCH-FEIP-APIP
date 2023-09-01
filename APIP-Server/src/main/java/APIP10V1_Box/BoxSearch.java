@@ -1,6 +1,8 @@
 package APIP10V1_Box;
 
 import APIP0V1_OpenAPI.*;
+import apipClass.DataRequestBody;
+import apipClass.Sort;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
@@ -15,8 +17,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-
-import esTools.Sort;
 
 @WebServlet(ApiNames.APIP10V1Path + ApiNames.BoxSearchAPI)
 public class BoxSearch extends HttpServlet {
@@ -42,7 +42,7 @@ public class BoxSearch extends HttpServlet {
         //Check API
 
         //Set default sort.
-        ArrayList<Sort> sort =Sort.makeSortList("lastHeight",false,"bid",true,null,null);
+        ArrayList<Sort> sort = Sort.makeSortList("lastHeight",false,"bid",true,null,null);
 
         //Add condition
 

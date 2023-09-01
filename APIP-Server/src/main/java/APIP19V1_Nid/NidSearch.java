@@ -1,12 +1,12 @@
 package APIP19V1_Nid;
 
 import APIP0V1_OpenAPI.*;
-import esTools.Sort;
+import apipClass.DataRequestBody;
+import apipClass.Sort;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
 import feipClass.Nid;
-import initial.Initiator;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -41,7 +41,7 @@ public class NidSearch extends HttpServlet {
         //Check API
 
         //Set default sort.
-        ArrayList<Sort> sort =Sort.makeSortList("birthTime",false,"nameId",true,null,null);
+        ArrayList<Sort> sort = Sort.makeSortList("birthTime",false,"nameId",true,null,null);
 
         //Add condition
 

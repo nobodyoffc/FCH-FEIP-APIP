@@ -1,9 +1,7 @@
 package APIP13V1_Mail;
 
 import APIP0V1_OpenAPI.*;
-import apipClass.Fcdsl;
-import apipClass.Filter;
-import apipClass.Terms;
+import apipClass.*;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
@@ -18,7 +16,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.ArrayList;
-import esTools.Sort;
 
 
 @WebServlet(ApiNames.APIP13V1Path + ApiNames.MailsDeletedAPI)
@@ -50,7 +47,7 @@ public class MailsDeleted extends HttpServlet {
         }
 
         //Set default sort.
-        ArrayList<Sort> sort =Sort.makeSortList("lastHeight",false,"mailId",true,null,null);
+        ArrayList<Sort> sort = Sort.makeSortList("lastHeight",false,"mailId",true,null,null);
 
         //Add condition
         Fcdsl fcdsl;

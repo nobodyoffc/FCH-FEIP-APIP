@@ -1,6 +1,7 @@
 package CidCashTools;
 
 import APIP0V1_OpenAPI.*;
+import apipClass.DataRequestBody;
 import constants.ApiNames;
 import constants.ReplyInfo;
 import fchClass.Cash;

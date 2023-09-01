@@ -1,5 +1,6 @@
 package APIP0V1_OpenAPI;
 
+import apipClass.DataRequestBody;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.cat.IndicesResponse;
 import co.elastic.clients.elasticsearch.cat.indices.IndicesRecord;

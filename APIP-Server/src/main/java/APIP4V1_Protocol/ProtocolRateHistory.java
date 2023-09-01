@@ -1,8 +1,9 @@
 package APIP4V1_Protocol;
 
 import APIP0V1_OpenAPI.*;
+import apipClass.DataRequestBody;
 import apipClass.Fcdsl;
-import esTools.Sort;
+import apipClass.Sort;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
@@ -41,7 +42,7 @@ public class ProtocolRateHistory extends HttpServlet {
         //Check API
 
         //Set default sort.
-        ArrayList<Sort> sort =Sort.makeSortList("height",false,"index",false,null,null);
+        ArrayList<Sort> sort = Sort.makeSortList("height",false,"index",false,null,null);
 
         //Add condition
 

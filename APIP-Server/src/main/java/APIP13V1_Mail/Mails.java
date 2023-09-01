@@ -1,9 +1,7 @@
 package APIP13V1_Mail;
 
 import APIP0V1_OpenAPI.*;
-import apipClass.Fcdsl;
-import apipClass.Filter;
-import apipClass.Terms;
+import apipClass.*;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
@@ -18,8 +16,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-
-import esTools.Sort;
 
 
 @WebServlet(ApiNames.APIP13V1Path + ApiNames.MailsAPI)
@@ -51,7 +47,7 @@ public class Mails extends HttpServlet {
 //        }
 
         //Set default sort.
-        ArrayList<Sort> sort =Sort.makeSortList("birthHeight",false,"mailId",true,null,null);
+        ArrayList<Sort> sort = Sort.makeSortList("birthHeight",false,"mailId",true,null,null);
 
 
         //Add condition
