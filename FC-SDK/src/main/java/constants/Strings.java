@@ -71,4 +71,13 @@ public class Strings {
     public static final String OP_RETURN_FILE_PATH = "opReturnFilePath";
     public static final String LISTEN_PATH = "listenPath";
     public static final String FIELDS = "fields";
+    public static final String MAKER ="Maker";
+    public static final String SIGN = "Sign";
+    public static final String SESSION_NAME = "sessionName";
+    public static final String VIA = "via";
+    public static final String OWNER = "owner";
+    public static final String TYPE = "type";
+    public static final String CLOSED = "closed";
+    public static final String ACTIVE = "active";
+    public static final String TYPES = "types";
 }

@@ -133,7 +133,7 @@ public class StartTools {
             String pubKey = br.readLine();
 
             String ask = "Input the priKey in hex:";
-            char[] priKey = Inputer.inputKey(br, ask);
+            char[] priKey = Inputer.input32BytesKey(br, ask);
 
             System.out.println(ecc.decryptAsyTwoWayBundle(bundle,pubKey,priKey));
         } catch (IOException e) {
@@ -153,7 +153,7 @@ public class StartTools {
                 return;
             }
             String ask = "Input the priKey in hex:";
-            char[] priKey = Inputer.inputKey(br, ask);
+            char[] priKey = Inputer.input32BytesKey(br, ask);
 
             System.out.println(ecc.decryptAsyOneWayBundle(bundle,priKey));
 
@@ -189,7 +189,7 @@ public class StartTools {
                 return null;
             }
             String ask = "Input the sender's private Key:";
-            priKeyA = Inputer.inputKey(br,ask);
+            priKeyA = Inputer.input32BytesKey(br,ask);
             if(priKeyA==null)return null;
 
             System.out.println("Input the msg:");
@@ -218,7 +218,7 @@ public class StartTools {
         EccAes256K1P7 ecc = new EccAes256K1P7();
         if(encryptedFile==null||encryptedFile.length()> Constants.MAX_FILE_SIZE_M * Constants.M_BYTES)return;
         String ask = "Input the symKey in hex:";
-        char[] symKey = Inputer.inputKey(br, ask);
+        char[] symKey = Inputer.input32BytesKey(br, ask);
         String result = ecc.decryptFileWithSymKey(encryptedFile,symKey);
         System.out.println(result);
         Menu.anyKeyToContinue(br);
@@ -230,7 +230,7 @@ public class StartTools {
         if(originalFile==null||originalFile.length()> Constants.MAX_FILE_SIZE_M * Constants.M_BYTES)return;
 
         String ask = "Input the symKey in hex:";
-        char[] symKey = Inputer.inputKey(br, ask);
+        char[] symKey = Inputer.input32BytesKey(br, ask);
         System.out.println(ecc.encryptFileSymKey(originalFile, symKey));
         Menu.anyKeyToContinue(br);
     }
@@ -247,7 +247,7 @@ public class StartTools {
         }
         EccAes256K1P7 ecc = new EccAes256K1P7();
         String ask = "Input the symKey in hex:";
-        char[] symKey = Inputer.inputKey(br, ask);
+        char[] symKey = Inputer.input32BytesKey(br, ask);
         String eccAesDataJson;
         eccAesDataJson = ecc.decryptSymKeyBundle(ivCipherStr, symKey);
         System.out.println(eccAesDataJson);
@@ -257,7 +257,7 @@ public class StartTools {
         EccAes256K1P7 ecc = new EccAes256K1P7();
         String msg = Inputer.inputMsg(br);
         String ask = "Input the symKey in hex:";
-        char[] symKey = Inputer.inputKey(br, ask);
+        char[] symKey = Inputer.input32BytesKey(br, ask);
         String ivCipher = ecc.encryptSymKeyBundle(msg, symKey);
         System.out.println(ivCipher);
         Menu.anyKeyToContinue(br);
@@ -324,7 +324,7 @@ public class StartTools {
         String msg = Inputer.inputMsg(br);
         if(msg==null)return;
         String ask = "Input the symKey in hex:";
-        char[] symKey = Inputer.inputKey(br, ask);
+        char[] symKey = Inputer.input32BytesKey(br, ask);
         EccAesData eccAesData = new EccAesData(EccAesType.SymKey,msg,symKey);
 
         ecc.encrypt(eccAesData);
@@ -339,7 +339,7 @@ public class StartTools {
         String eccAesDataJson = br.readLine();
         EccAes256K1P7 ecc = new EccAes256K1P7();
         String ask = "Input the symKey in hex:";
-        char[] symKey = Inputer.inputKey(br, ask);
+        char[] symKey = Inputer.input32BytesKey(br, ask);
         if(symKey==null)return;
 
         eccAesDataJson = ecc.decryptWithSymKey(eccAesDataJson,symKey);

@@ -1,6 +1,5 @@
 package apipClass;
 
-import apipClass.Fcdsl;
 import com.google.gson.Gson;
 import cryptoTools.SHA;
 import javaTools.BytesTools;
@@ -14,6 +13,14 @@ public class DataRequestBody{
     private long nonce;
     private String via;
     private Fcdsl fcdsl;
+
+    public void makeRequestBody(String url, String via) {
+        setTime(System.currentTimeMillis());
+        setNonce((BytesTools.bytes4ToLongBE(BytesTools.getRandomBytes(4))));
+        setVia(via);
+        setUrl(url);
+    }
+
 
     public String getVia() {
         return via;
@@ -53,17 +60,5 @@ public class DataRequestBody{
 
     public void setNonce(long nonce) {
         this.nonce = nonce;
-    }
-
-    public void makeRequestBody(String url, String via) {
-        setTime(System.currentTimeMillis());
-        setNonce((BytesTools.bytes4ToLongBE(BytesTools.getRandomBytes(4))));
-        setVia(via);
-        setUrl(url);
-    }
-
-    public byte[] makeRequestBodySign(byte[] symKey) {
-        String json = new Gson().toJson(this);
-        return SHA.Sha256x2(BytesTools.bytesMerger(json.getBytes(StandardCharsets.UTF_8),symKey));
     }
 }

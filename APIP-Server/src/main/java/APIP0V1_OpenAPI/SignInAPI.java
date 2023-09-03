@@ -72,18 +72,17 @@ public class SignInAPI extends HttpServlet {
 
         PrintWriter writer = response.getWriter();
         RequestChecker requestChecker = new RequestChecker(request, response,replier);
-
         SignInCheckResult signInCheckResult;
         try {
             signInCheckResult = requestChecker.checkSignInRequest();
         } catch (SignatureException e) {
-            e.printStackTrace();
-            
+            response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1008BadSign));
+            replier.setData(e.getMessage());
+            writer.write(replier.reply1008BadSign(null));
             return;
         }
 
         if(signInCheckResult==null) {
-            
             return;
         }
 
@@ -101,24 +100,33 @@ public class SignInAPI extends HttpServlet {
                     response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1020OtherError));
                     replier.setData("Some thing wrong when making sessionKey.\n" + e.getMessage());
                     writer.write(replier.reply1020OtherError(fid));
-
                     return;
                 }
             } else {
                 String sessionName = jedis.hget(Initiator.serviceName+"_"+Strings.FID_SESSION_NAME, fid);
+
                 jedis.select(1);
-                signInReplyData.setSessionKey(jedis.hget(sessionName, SESSION_KEY));
-
-                long expireMilliSed = jedis.ttl(sessionName);
-                if (expireMilliSed < 0) {
-                    response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1020OtherError));
-                    replier.setData("Expire time is wrong.");
-                    writer.write(replier.reply1020OtherError(fid));
-
-                    return;
+                String sessionKey = jedis.hget(sessionName, SESSION_KEY);
+                if(sessionKey!=null) {
+                    long expireMillis = jedis.ttl(sessionName);
+                    if (expireMillis > 0) {
+                        long expireTime = System.currentTimeMillis() + expireMillis * 1000;
+                        signInReplyData.setExpireTime(expireTime);
+                        signInReplyData.setSessionKey(sessionKey);
+                    }else{
+                        signInReplyData.setExpireTime(expireMillis);
+                        signInReplyData.setSessionKey(sessionKey);
+                    }
+                }else {
+                    try {
+                        signInReplyData = makeSession();
+                    } catch (Exception e) {
+                        response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1020OtherError));
+                        replier.setData("Some thing wrong when making sessionKey.\n" + e.getMessage());
+                        writer.write(replier.reply1020OtherError(fid));
+                        return;
+                    }
                 }
-                long expireTime = System.currentTimeMillis() + expireMilliSed * 1000;
-                signInReplyData.setExpireTime(expireTime);
             }
         }
         response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code0Success));
@@ -126,8 +134,7 @@ public class SignInAPI extends HttpServlet {
         replier.setTotal(1);
         replier.setData(signInReplyData);
         writer.write(replier.reply0Success(fid));
-        replier.setData(null);
-        
+        replier.clean();
     }
 
 

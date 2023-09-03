@@ -44,5 +44,5 @@ public class ReplyInfo {
     public static final int Code1016IllegalUrl = 1016;
     public static final String Msg1016IllegalUrl  = "Illegal URL.";
     public static final int Code1020OtherError = 1020;
-    public static final String Msg1020OtherError = "Other error，please contact the service provider.";
+    public static final String Msg1020OtherError = "Other error, please contact the service provider.";
 }

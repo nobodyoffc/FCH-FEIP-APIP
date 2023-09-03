@@ -178,7 +178,7 @@ public class ChainParserTest {
 		CheckResult checkResult = new CheckResult();
 		
 		byte []	b8 = new byte[8];
-		byte []	b4 = new byte[4];	
+		byte []	b4 = new byte[4];
 
 		//If file ends.
 		if(fis.read(b8) == -1) {

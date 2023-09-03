@@ -82,7 +82,7 @@ public class DataMaker {
 			fis.skip(pointer);
 
 			byte []	b8 = new byte[8];
-			byte []	b4 = new byte[4];	
+			byte []	b4 = new byte[4];
 			byte []	b80 = new byte[8];
 			
 			int end = fis.read(b8);
@@ -180,7 +180,7 @@ public class DataMaker {
 		BlockParts bp = new BlockParts();
 		
 		byte []	b8 = new byte[8];
-		byte []	b4 = new byte[4];	
+		byte []	b4 = new byte[4];
 		byte []	b80 = new byte[8];
 		
 		fis.read(b8);

@@ -77,6 +77,23 @@ public class Inputer {
         }
     }
 
+
+    public static String inputGoodFid(BufferedReader br,String ask)  {
+
+        String fid;
+        while (true) {
+            System.out.println(ask);
+            fid = inputString(br);
+            if(fid == null||"".equals(fid))continue;
+            if ("q".equals(fid)) return null;
+            if (!keyTools.KeyTools.isValidFchAddr(fid)) {
+                System.out.println("It's not a valid FID. Try again.");
+                continue;
+            }
+            return fid;
+        }
+    }
+
     public static Map<String,String> inputGoodFidValueStrMap(BufferedReader br, String mapName, boolean checkFullShare)  {
         Map<String,String> map = new HashMap<>();
 
@@ -195,7 +212,7 @@ public class Inputer {
         }
     }
 
-    public static char[] inputKey(BufferedReader br, String ask)  {
+    public static char[] input32BytesKey(BufferedReader br, String ask)  {
         System.out.println(ask);
         char[] symKey = new char[64];
         int num = 0;
@@ -211,6 +228,21 @@ public class Inputer {
             throw new RuntimeException(e);
         }
         return symKey;
+    }
+
+    public static char[] inputPassword(BufferedReader br, String ask)  {
+        System.out.println(ask);
+        char[] input = new char[64];
+        int num = 0;
+        try {
+            num = br.read(input);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        if(num==0)return null;
+        char[] password = new char[num];
+        System.arraycopy(input, 0, password, 0, num);
+        return password;
     }
 
     public static String inputMsg(BufferedReader br) {

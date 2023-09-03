@@ -84,7 +84,7 @@ public class RequestChecker {
         }
 
         String sign = request.getHeader(ReplyInfo.SignInHeader);
-        if(sign==null){
+        if(sign==null||"".equals(sign)){
             response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1000SignMissed));
             String urlHead = Initiator.params.getUrlHead();
             String data = "FID and Sign are required in request header.";
@@ -138,6 +138,7 @@ public class RequestChecker {
 
         if(isBadNonce(signInRequestBody.getNonce())){
             response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1007UsedNonce));
+            this.replier.setNonce(signInRequestBody.getNonce());
             writer.write(this.replier.reply1007UsedNonce(fid));
             return null;
         }

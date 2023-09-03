@@ -404,6 +404,32 @@ public class EccAes256K1P7 {
         return eccAesDataByte.getMsg();
     }
 
+    public byte[] encryptPasswordBundle(byte[] msg, byte[] password) {
+        EccAesDataByte eccAesDataByte = new EccAesDataByte();
+
+        eccAesDataByte.setType(EccAesType.Password);
+        eccAesDataByte.setPassword(password);
+        eccAesDataByte.setMsg(msg);
+
+        encrypt(eccAesDataByte);
+        eccAesDataByte.clearAllSensitiveData();
+        return addArray(eccAesDataByte.getIv(),eccAesDataByte.getCipher());
+    }
+    public byte[] decryptPasswordBundle(byte[] bundle, byte[] password) {
+        EccAesDataByte eccAesDataByte = new EccAesDataByte();
+        byte[] iv = Arrays.copyOfRange(bundle,0,16);
+        byte[] cipher = Arrays.copyOfRange(bundle,16,bundle.length);
+        eccAesDataByte.setType(EccAesType.Password);
+        eccAesDataByte.setPassword(password);
+        eccAesDataByte.setIv(iv);
+        eccAesDataByte.setCipher(cipher);
+
+        decrypt(eccAesDataByte);
+        if(eccAesDataByte.getError()!=null)return ("Error:"+eccAesDataByte.getError()).getBytes();
+        return eccAesDataByte.getMsg();
+    }
+
+
     public void encrypt(EccAesDataByte eccAesDataByte){
         if (isBadErrorAlgAndType(eccAesDataByte)) return;
         switch (eccAesDataByte.getType()){

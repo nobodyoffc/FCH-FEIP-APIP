@@ -4,6 +4,7 @@ package APIP0V1_OpenAPI;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import constants.ReplyInfo;
+import fcTools.ParseTools;
 import initial.Initiator;
 import initial.ServerParamsInRedis;
 import order.Order;
@@ -32,6 +33,8 @@ public class Replier {
     private transient final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     public String reply(String userAddr) {
+        if(userAddr==null)
+            return replyBase();
         return replyBase(userAddr);
     }
 
@@ -47,6 +50,11 @@ public class Replier {
     public String replyBase(String userAddr) {
 
         String replyJson = gson.toJson(this);
+
+        if(paramsInRedis==null){
+            balance = 0;
+            return gson.toJson(this);
+        }
         long price = paramsInRedis.getPrice();
         balance = paramsInRedis.getBalance();
         bestHeight = paramsInRedis.getBestHeight();
@@ -298,5 +306,18 @@ public class Replier {
 
     public void setParamsInRedis(ServerParamsInRedis paramsInRedis) {
         this.paramsInRedis = paramsInRedis;
+    }
+
+    public void clean() {
+//        code=0;
+//        message=null;
+        nonce=0;
+        balance=0;
+        got=0;
+        total=0;
+        bestHeight=0;
+        data=null;
+        via=null;
+        last=null;
     }
 }
