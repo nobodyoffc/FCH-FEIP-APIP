@@ -2,6 +2,7 @@ package cryptoTools;
 
 import com.google.common.hash.Hashing;
 import com.xwc1125.chain5j.utils.Numeric;
+import javaTools.BytesTools;
 import org.bouncycastle.crypto.digests.RIPEMD160Digest;
 import org.bouncycastle.crypto.digests.SHA512Digest;
 import org.bouncycastle.crypto.macs.HMac;
@@ -11,6 +12,7 @@ import org.bouncycastle.jcajce.provider.digest.Keccak;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -140,6 +142,13 @@ public class SHA {
         byte[] out = new byte[20];
         digest.doFinal(out, 0);
         return out;
+    }
+
+    public static byte[] stringMerge2Utf8(String strA, Charset charsetA, String strB, Charset charsetB) {
+        byte[] a = strA.getBytes(charsetA);
+        byte[] b = strB.getBytes(charsetB);
+        return BytesTools.bytesMerger(a,b);
+
     }
 
 

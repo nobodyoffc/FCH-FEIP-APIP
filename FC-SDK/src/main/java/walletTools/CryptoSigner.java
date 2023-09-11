@@ -15,7 +15,7 @@ public class CryptoSigner {
         for(Cash cash:meetList){
             if(i>0)RawTx.append(",");
             RawTxForCs rawTxForCs = new RawTxForCs();
-            rawTxForCs.setAddress(cash.getFid());
+            rawTxForCs.setAddress(cash.getOwner());
             rawTxForCs.setAmount((double) cash.getValue() / Constants.FchToSatoshi);
             rawTxForCs.setTxid(cash.getBirthTxId());
             rawTxForCs.setIndex(cash.getBirthIndex());

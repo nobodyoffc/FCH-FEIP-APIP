@@ -433,6 +433,11 @@ public class KeyTools {
         String address = KeyTools.hash160ToMultiAddr(h);
         return address;
     }
+    public static byte[] priKeyToPubKey(byte[] priKey32Bytes) {
+        ECKey eckey = ECKey.fromPrivate(priKey32Bytes);
+        return eckey.getPubKey();
+    }
+
 
     public static String priKeyToPubKey(String priKey) {
         // TODO Auto-generated method stub

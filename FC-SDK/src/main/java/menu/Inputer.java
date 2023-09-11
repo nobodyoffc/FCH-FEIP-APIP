@@ -6,10 +6,27 @@ import javaTools.BytesTools;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.io.Console;
 
 public class Inputer {
+
+public static byte[] inputPassword() {
+    Console console = System.console();
+    if (console == null) {
+        System.out.println("Couldn't get Console instance. Maybe you're running this from within an IDE, which doesn't support Console.");
+        return null;
+    }
+
+    char[] passwordChars = console.readPassword("Enter your password: ");
+    byte[] passwordBytes = new String(passwordChars).getBytes();
+    // Clear the password characters immediately after using them for security reasons.
+    Arrays.fill(passwordChars, (char) 0);
+    return passwordBytes;
+}
+
 
     public static String inputString(BufferedReader br) {
         String input = null;
@@ -84,8 +101,9 @@ public class Inputer {
         while (true) {
             System.out.println(ask);
             fid = inputString(br);
-            if(fid == null||"".equals(fid))continue;
-            if ("q".equals(fid)) return null;
+            if(fid == null)return null;
+            if("".equals(fid))return "";
+            if ("d".equals(fid)) return "d";
             if (!keyTools.KeyTools.isValidFchAddr(fid)) {
                 System.out.println("It's not a valid FID. Try again.");
                 continue;
@@ -148,8 +166,8 @@ public class Inputer {
     }
 
     public static String[] inputStringArray(BufferedReader br, String ask, int len) {
-        System.out.println(ask);
         ArrayList<String> itemList = new ArrayList<String>();
+        System.out.println(ask);
         while(true) {
             String item =Inputer.inputString(br);
             if(item.equals(""))break;
@@ -172,8 +190,8 @@ public class Inputer {
     public static String inputShare(BufferedReader br, String share)  {
         float flo;
         String str;
-        System.out.println("Input the "+share+ " if you need. Enter to ignore:");
         while(true) {
+            System.out.println("Input the "+share+ " if you need. Enter to ignore:");
             str = Inputer.inputString(br);
             if("".equals(str)) return null;
             try {
@@ -190,11 +208,11 @@ public class Inputer {
         }
     }
 
-    public static String inputInteger(BufferedReader br, String ask) {
+    public static String inputIntegerStr(BufferedReader br, String ask) {
         String str;
-        System.out.println(ask);
         int num = 0;
         while(true) {
+            System.out.println(ask);
             try {
                 str = br.readLine();
             } catch (IOException e) {
@@ -208,7 +226,35 @@ public class Inputer {
                 }catch(Exception e) {
                     System.out.println("It isn't a integer. Input again:");
                 }
+            }else return "";
+        }
+    }
+
+    public static int inputInteger(BufferedReader br, String ask,int maximum) {
+        String str;
+        int num = 0;
+        while(true) {
+            System.out.println(ask);
+            try {
+                str = br.readLine();
+            } catch (IOException e) {
+                System.out.println("BufferReader wrong.");
+                return 0;
             }
+            if(!("".equals(str))) {
+                try {
+                    num = Integer.parseInt(str);
+                    if(maximum>0){
+                        if(num>maximum){
+                            System.out.println("It's bigger than "+maximum+".");
+                            continue;
+                        }
+                    }
+                    return num;
+                }catch(Exception e) {
+                    System.out.println("It isn't a integer. Input again:");
+                }
+            }else return 0;
         }
     }
 

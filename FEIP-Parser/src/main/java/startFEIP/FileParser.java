@@ -63,7 +63,7 @@ public class FileParser {
 		try {
 			feip = new Gson().fromJson(protStr, FcInfo.class);
 		}catch(JsonSyntaxException e) {
-			System.out.println("Invalid opReturn content. Check the JSON string of FEIP:\n"+opre.getOpReturn());
+			log.debug("Invalid opReturn content on {}. ",opre.getTxId());
 		}
 		return  feip;
 	}

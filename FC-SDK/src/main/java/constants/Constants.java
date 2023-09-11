@@ -1,5 +1,7 @@
 package constants;
 
+import com.xwc1125.chain5j.crypto.Sign;
+
 public class Constants {
 
 
@@ -47,4 +49,12 @@ public class Constants {
     public static final int MAX_FILE_SIZE_M = 200;
     public static final String DOT_FV = ".fv";
     public static final int MaxOpFileSize = 200*1024*1024;//251658240;
+    public static final String WEBHOOK_FIDS_PREFIX = "Fids_";
+    public static final String RECEIVER = "Receiver";
+    public static final String SIGN = "Sign";
+    public static final String SESSION_NAME = "SessionName";
+    public static final String METHOD = "Method";
+    public static final String BALANCE = "Balance";
+    public static int RedisDb4Webhook = 4;
+    public static final String FCH_TICKET="FCH";
 }

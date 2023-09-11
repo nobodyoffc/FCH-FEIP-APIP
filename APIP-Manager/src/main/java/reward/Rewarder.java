@@ -268,9 +268,9 @@ public class Rewarder {
         Map<String, SendTo> sentToMap = new HashMap<>();
         for(CashMark cashMark: txHas.getOutMarks()){
             SendTo sendTo = new SendTo();
-            sendTo.setFid(cashMark.getFid());
+            sendTo.setFid(cashMark.getOwner());
             sendTo.setAmount((double)cashMark.getValue()/FchToSatoshi);
-            sentToMap.put(cashMark.getFid(),sendTo);
+            sentToMap.put(cashMark.getOwner(),sendTo);
         }
         return sentToMap;
     }

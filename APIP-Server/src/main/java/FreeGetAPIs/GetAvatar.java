@@ -1,6 +1,6 @@
 package FreeGetAPIs;
 
-import APIP17V1_Avatar.AvatarMaker;
+import avatar.AvatarMaker;
 import constants.ApiNames;
 import initial.Initiator;
 import constants.Strings;

@@ -11,6 +11,7 @@ import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
 import constants.Constants;
 import constants.IndicesNames;
+import constants.Strings;
 import fchClass.Cash;
 import fchClass.OpReturn;
 import javaTools.BytesTools;
@@ -129,7 +130,7 @@ public class RollBacker {
 		int size = EsTools.READ_MAX;
 		SearchResponse<Cash> response = esClient.search(s -> s.index(IndicesNames.CASH)
 						.size(size)
-						.sort(s1 -> s1.field(f -> f.field("fid").order(SortOrder.Asc)))
+						.sort(s1 -> s1.field(f -> f.field(Strings.OWNER).order(SortOrder.Asc)))
 						.trackTotalHits(t->t.enabled(true))
 						.query(q -> q.bool(b -> b
 								.should(m -> m.range(r -> r.field("spendHeight").gt(JsonData.of(lastHeight))))
@@ -137,7 +138,7 @@ public class RollBacker {
 				, Cash.class);
 		for(Hit<Cash>item: response.hits().hits()){
 			if (item.source() != null) {
-				addrSet.add(item.source().getFid());
+				addrSet.add(item.source().getOwner());
 			}
 		}
 		int hitSize = response.hits().hits().size();
@@ -158,7 +159,7 @@ public class RollBacker {
 					, Cash.class);
 			for(Hit<Cash>item: response.hits().hits()){
 				if (item.source() != null) {
-					addrSet.add(item.source().getFid());
+					addrSet.add(item.source().getOwner());
 				}
 			}
 			hitSize = response.hits().hits().size();
@@ -186,14 +187,14 @@ public class RollBacker {
 						.size(0)
 						.aggregations("addrFilterAggs",a->a
 								.filter(f->f.terms(t->t
-										.field("fid")
+										.field(Strings.OWNER)
 										.terms(t1->t1
 												.value(fieldValueList))))
 								.aggregations("utxoFilterAggs",a0->a0
 										.filter(f1->f1.match(m->m.field("valid").query(true)))
 										.aggregations("utxoAggs",a3->a3
 												.terms(t2->t2
-														.field("fid")
+														.field(Strings.OWNER)
 														.size(200000))
 												.aggregations("utxoSum",t5->t5
 														.sum(s1->s1
@@ -203,7 +204,7 @@ public class RollBacker {
 										.filter(f1->f1.match(m->m.field("valid").query(false)))
 										.aggregations("stxoAggs",a1->a1
 												.terms(t2->t2
-														.field("fid")
+														.field(Strings.OWNER)
 														.size(200000))
 												.aggregations("stxoSum",t3->t3
 														.sum(s1->s1
@@ -215,7 +216,7 @@ public class RollBacker {
 								)
 								.aggregations("txoAggs",a1->a1
 										.terms(t2->t2
-												.field("fid")
+												.field(Strings.OWNER)
 												.size(200000))
 										.aggregations("txoSum",t3->t3
 												.sum(s1->s1

@@ -37,6 +37,7 @@ public class IndicesNames {
     public static final String FEIP_MARK = "feip_mark";
     public static final String NID = "nid";
     public static final String ORDER = "order";
+    public static final String WEBHOOK = "webhook";
 
     public static void printIndices() {
         Indices indices = Indices.CID;

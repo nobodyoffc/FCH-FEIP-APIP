@@ -4,11 +4,12 @@ public class Cash {
 
 	//calculated
 	private String cashId;	//hash of this cash: sha256(sha256(tx + index)).
+	private String issuer; //first input fid when this cash was born.
 
 	//from utxo
 	private int birthIndex;		//index of cash. Order in cashs of the tx when created.
 	private String type;	//type of the script. P2PKH,P2SH,OP_RETURN,Unknown,MultiSig
-	private String fid; 	//address
+	private String owner; 	//address
 	private long value;		//in satoshi
 	private String lockScript;	//LockScript
 	private String birthTxId;		//txid, hash in which this cash was created.
@@ -48,7 +49,7 @@ public class Cash {
 				String blockId, long birthTime, long birthHeight) {
 		this.birthIndex = outIndex;
 		this.type = type;
-		this.fid = addr;
+		this.owner = addr;
 		this.value = value;
 		this.lockScript = lockScript;
 		this.birthTxId = txId;
@@ -92,11 +93,11 @@ public class Cash {
 	public void setType(String type) {
 		this.type = type;
 	}
-	public String getFid() {
-		return fid;
+	public String getOwner() {
+		return owner;
 	}
-	public void setFid(String fid) {
-		this.fid = fid;
+	public void setOwner(String owner) {
+		this.owner = owner;
 	}
 	public long getValue() {
 		return value;
@@ -193,5 +194,13 @@ public class Cash {
 	}
 	public void setValid(boolean valid) {
 		this.valid = valid;
+	}
+
+	public String getIssuer() {
+		return issuer;
+	}
+
+	public void setIssuer(String issuer) {
+		this.issuer = issuer;
 	}
 }

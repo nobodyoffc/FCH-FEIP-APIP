@@ -2,18 +2,21 @@ package fcTools;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import cryptoTools.SHA;
 import io.netty.buffer.Unpooled;
 import javaTools.BytesTools;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.nio.file.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -124,7 +127,7 @@ public class ParseTools {
         return;
     }
 
-    public static void waitForNewItemInDirectory(String directoryPathStr, Boolean running) {
+    public static void waitForChangeInDirectory(String directoryPathStr, Boolean running) {
         try {
             Path directory = Paths.get(directoryPathStr);
 

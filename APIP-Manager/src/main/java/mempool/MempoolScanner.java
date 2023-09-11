@@ -162,7 +162,7 @@ public class MempoolScanner implements Runnable {
         Map<String, Long> fidNetMap = new HashMap<>();
 
         for (Cash cash : inList) {
-            String fid = cash.getFid();
+            String fid = cash.getOwner();
             String txId = cash.getSpendTxId();
             //income数量，income金额，spend数量，spend金额，fid的net净变化, 交易中净变化
             int spendCount = 0;
@@ -212,7 +212,7 @@ public class MempoolScanner implements Runnable {
         }
 
         for (Cash cash : outList) {
-            String fid = cash.getFid();
+            String fid = cash.getOwner();
             String txId = cash.getBirthTxId();
             //income数量，income金额，income数量，income金额，net净变化
             int incomeCount = 0;

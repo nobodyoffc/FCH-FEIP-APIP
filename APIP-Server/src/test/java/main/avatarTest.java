@@ -1,5 +1,7 @@
 package main;
 
+import avatar.AvatarMaker;
+
 import java.io.IOException;
 
 public class avatarTest {
@@ -15,7 +17,7 @@ public class avatarTest {
         String basePath = "/Users/liuchangyong/Desktop/eclipse-web-workspace/APIP-server/avatar/elements/";
         String filePath = "/Users/liuchangyong/Desktop/eclipse-web-workspace/APIP-server/avatar/png/";
 
-        APIP17V1_Avatar.AvatarMaker.getAvatars(addrs,basePath,filePath);
+        AvatarMaker.getAvatars(addrs,basePath,filePath);
 
     }
 }

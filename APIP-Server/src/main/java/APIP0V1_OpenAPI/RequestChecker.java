@@ -1,6 +1,7 @@
 package APIP0V1_OpenAPI;
 
 import apipClass.DataRequestBody;
+import apipClass.SignInRequestBody;
 import com.google.gson.Gson;
 import constants.ApiNames;
 import constants.ReplyInfo;
@@ -67,15 +68,6 @@ public class RequestChecker {
 
         SignInCheckResult signInCheckResult = new SignInCheckResult();
 
-        String fid = request.getHeader(ReplyInfo.FidInHeader);
-        if(fid==null){
-            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1015FidMissed));
-            writer.write(this.replier.reply1015FidMissed());
-            return null;
-        }
-        signInCheckResult.setFid(fid);
-        this.fid = fid;
-
         String url = request.getRequestURL().toString();
         if(illegalUrl(url)){
             response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1016IllegalUrl));
@@ -83,11 +75,24 @@ public class RequestChecker {
             return null;
         }
 
+        String fid = request.getHeader(ReplyInfo.FidInHeader);
+        if(fid==null){
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1015FidMissed));
+            String data = "A FID is required in request header.";
+            replier.setData(data);
+            writer.write(this.replier.reply1015FidMissed());
+            return null;
+        }
+        signInCheckResult.setFid(fid);
+        this.fid = fid;
+
+
+
         String sign = request.getHeader(ReplyInfo.SignInHeader);
         if(sign==null||"".equals(sign)){
             response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1000SignMissed));
             String urlHead = Initiator.params.getUrlHead();
-            String data = "FID and Sign are required in request header.";
+            String data = "A Sign is required in request header.";
             SecureRandom secureRandom = new SecureRandom();
             byte[] bytes = new byte[4];
             secureRandom.nextBytes(bytes);
@@ -118,6 +123,14 @@ public class RequestChecker {
         SignInRequestBody signInRequestBody = getSignInRequestBody(requestBodyBytes);
         if(signInRequestBody==null)return null;
 
+        if(isBadNonce(signInRequestBody.getNonce())){
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1007UsedNonce));
+            this.replier.setNonce(signInRequestBody.getNonce());
+            writer.write(this.replier.reply1007UsedNonce(fid));
+            return null;
+        }
+        this.replier.setNonce(signInRequestBody.getNonce());
+
         if(!isGoodAsySign(sign)){
             response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1008BadSign));
             writer.write(this.replier.reply1008BadSign(fid));
@@ -135,14 +148,6 @@ public class RequestChecker {
             replyInsufficientBalance(buyJson, fid);
             return null;
         }
-
-        if(isBadNonce(signInRequestBody.getNonce())){
-            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1007UsedNonce));
-            this.replier.setNonce(signInRequestBody.getNonce());
-            writer.write(this.replier.reply1007UsedNonce(fid));
-            return null;
-        }
-        this.replier.setNonce(signInRequestBody.getNonce());
 
         if(isBadUrl(signInRequestBody.getUrl())){
             response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1005UrlUnequal));
@@ -274,6 +279,11 @@ public class RequestChecker {
             writer.write(replier.reply1003MissBody(fid));
             return null;
         }
+        DataRequestBody dataRequestBody = getDataRequestBody(requestBodyBytes);
+
+        assert dataRequestBody != null;
+
+        replier.setNonce(dataRequestBody.getNonce());
 
         if(!isGoodSymSign(sign)){
             response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1008BadSign));
@@ -281,11 +291,6 @@ public class RequestChecker {
             return null;
         }
 
-        DataRequestBody dataRequestBody = getDataRequestBody(requestBodyBytes);
-
-        assert dataRequestBody != null;
-
-        replier.setNonce(dataRequestBody.getNonce());
         if(dataRequestBody.getVia()!=null)replier.setVia(dataRequestBody.getVia());
 
         if(isBadNonce(dataRequestBody.getNonce())){
@@ -349,7 +354,7 @@ public class RequestChecker {
         String doubleSha256Hash = HexFormat.of().formatHex(SHA.Sha256x2(signBytes));
 
         if(!sign.equals(doubleSha256Hash)){
-            replier.setData(doubleSha256Hash);
+            replier.setData("The sign of the request body should be: "+doubleSha256Hash);
             return false;
         }
         return true;

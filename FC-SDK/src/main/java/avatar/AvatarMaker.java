@@ -1,4 +1,4 @@
-package APIP17V1_Avatar;
+package avatar;
 
         import keyTools.KeyTools;
         import net.coobird.thumbnailator.Thumbnails;

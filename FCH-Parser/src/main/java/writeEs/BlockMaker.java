@@ -33,10 +33,8 @@ public class BlockMaker {
 			inputMadeBlock.setOutList(rawBlock.getOutList());
 			ReadyBlock txTxHasOpMadeBlock = makeTxTxHasOpReturn(inputMadeBlock);
 			ReadyBlock blockBlockHasMadeBlock = makeBlockBlockHas(txTxHasOpMadeBlock);
-			ReadyBlock addrMadeBlock = makeAddress(esClient, blockBlockHasMadeBlock);
-			ReadyBlock readyBlock = addrMadeBlock;
 
-			return readyBlock;
+			return makeAddress(esClient, blockBlockHasMadeBlock);
 		}
 
 	}
@@ -68,7 +66,7 @@ public class BlockMaker {
 
 		for (Cash out : inOldList) {
 			Cash in = inMap.get(out.getCashId());
-			in.setFid(out.getFid());
+			in.setOwner(out.getOwner());
 			in.setBirthIndex(out.getBirthIndex());
 			in.setType(out.getType());
 			in.setValue(out.getValue());
@@ -85,7 +83,7 @@ public class BlockMaker {
 		for (String id : inNewIdList) {
 			Cash in = inMap.get(id);
 			Cash out = outMap.get(id);
-			in.setFid(out.getFid());
+			in.setOwner(out.getOwner());
 			in.setBirthIndex(out.getBirthIndex());
 			in.setType(out.getType());
 			in.setValue(out.getValue());
@@ -144,7 +142,7 @@ public class BlockMaker {
 				TxHas txHas = txHasMap.get(in.getSpendTxId());
 				CashMark inMark = new CashMark();
 				inMark.setCashId(in.getCashId());
-				inMark.setFid(in.getFid());
+				inMark.setOwner(in.getOwner());
 				inMark.setValue(in.getValue());
 				inMark.setCdd(in.getCdd());
 
@@ -160,12 +158,17 @@ public class BlockMaker {
 			TxHas txHas = txHasMap.get(out.getBirthTxId());
 			CashMark outMark = new CashMark();
 			outMark.setCashId(out.getCashId());
-			outMark.setFid(out.getFid());
+			outMark.setOwner(out.getOwner());
 			outMark.setValue(out.getValue());
 
 			txHas.getOutMarks().add(outMark);
-		}
 
+			if(txHas.getInMarks().size()>0){
+				out.setIssuer(txHas.getInMarks().get(0).getOwner());
+			}else {
+				out.setIssuer("coinbase");
+			}
+		}
 
 		if (opList != null && !opList.isEmpty()) {
 
@@ -185,11 +188,11 @@ public class BlockMaker {
 				opReturn.setTime(tx.getBlockTime());
 
 				TxHas txhas = txHasMap.get(txId);
-				String signer = txhas.getInMarks().get(0).getFid();
+				String signer = txhas.getInMarks().get(0).getOwner();
 				opReturn.setSigner(signer);
 
 				for (CashMark txoB : txhas.getOutMarks()) {
-					String addr = txoB.getFid();
+					String addr = txoB.getOwner();
 					if (!addr.equals(signer) && !addr.equals("unknown") && !addr.equals("OpReturn")) {
 						opReturn.setRecipient(addr);
 						break;
@@ -277,7 +280,7 @@ public class BlockMaker {
 
 			if (txHas.getInMarks() != null && !txHas.getInMarks().isEmpty()) {
 				for (CashMark inb : txHas.getInMarks()) {
-					String inAddr = inb.getFid();
+					String inAddr = inb.getOwner();
 					long inValue = inb.getValue();
 					long cdd = inb.getCdd();
 
@@ -294,11 +297,11 @@ public class BlockMaker {
 						Iterator<Cash> iter = inList.iterator();
 						while (iter.hasNext()) {
 							Cash in = iter.next();
-							if (in.getFid().equals(addr.getFid()) && in.getType().equals("P2PKH")) {
+							if (in.getOwner().equals(addr.getFid()) && in.getType().equals("P2PKH")) {
 								setPKAndMoreAddrs(addr, in.getUnlockScript());
 								break;
 							}
-							if (in.getFid().equals(addr.getFid()) && in.getType().equals("P2SH")) {
+							if (in.getOwner().equals(addr.getFid()) && in.getType().equals("P2SH")) {
 								P2SH p2sh = new P2SH();
 								p2sh.parseP2SH(esClient,in);
 								break;
@@ -308,7 +311,7 @@ public class BlockMaker {
 				}
 			}
 			for (CashMark outb : txHas.getOutMarks()) {
-				String outAddr = outb.getFid();
+				String outAddr = outb.getOwner();
 				long outValue = outb.getValue();
 				Address addr = addrMap.get(outAddr);
 				addr.setIncome(addr.getIncome() + outValue);
@@ -321,7 +324,7 @@ public class BlockMaker {
 
 				if (addr.getGuide() == null) {
 					if (txHas.getInMarks() != null && !txHas.getInMarks().isEmpty()) {
-						addr.setGuide(txHas.getInMarks().get(0).getFid());
+						addr.setGuide(txHas.getInMarks().get(0).getOwner());
 					} else
 						addr.setGuide("coinbase");
 				}
@@ -349,9 +352,9 @@ public class BlockMaker {
 		Set<String> addrStrSet = new HashSet<String>();
 
 		for (Cash in : inList)
-			addrStrSet.add(in.getFid());
+			addrStrSet.add(in.getOwner());
 		for (Cash out : outList)
-			addrStrSet.add(out.getFid());
+			addrStrSet.add(out.getOwner());
 
 		List<String> addrStrList = new ArrayList<String>(addrStrSet);
 
@@ -380,7 +383,7 @@ public class BlockMaker {
 		return addrList;
 	}
 
-	private Address setPKAndMoreAddrs(Address addr, String unLockScript) {
+	private void setPKAndMoreAddrs(Address addr, String unLockScript) {
 
 		String pk = KeyTools.parsePkFromUnlockScript(unLockScript);
 
@@ -390,6 +393,5 @@ public class BlockMaker {
 		addr.setLtcAddr(KeyTools.pubKeyToLtcAddr(pk));
 		addr.setDogeAddr(KeyTools.pubKeyToDogeAddr(pk));
 		addr.setTrxAddr(KeyTools.pubKeyToTrxAddr(pk));
-		return addr;
 	}
 }

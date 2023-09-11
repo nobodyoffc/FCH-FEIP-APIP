@@ -105,7 +105,7 @@ public class MempoolScannerTest extends Thread {
         List<Cash> outList = cashListMap.get(OutCashListKey);
 
         for(Cash cash:inList){
-            String addr = cash.getFid();
+            String addr = cash.getOwner();
             //income数量，income金额，spend数量，spend金额，net净变化
             int spendCount = 0;
             long spendValue = 0;
@@ -120,7 +120,7 @@ public class MempoolScannerTest extends Thread {
         }
 
         for(Cash cash:outList){
-            String addr = cash.getFid();
+            String addr = cash.getOwner();
             //income数量，income金额，spend数量，spend金额，net净变化
             int incomeCount = 0;
             long incomeValue = 0;

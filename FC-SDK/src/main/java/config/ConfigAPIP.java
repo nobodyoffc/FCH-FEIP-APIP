@@ -62,7 +62,7 @@ public class ConfigAPIP extends ConfigService {
             jedis.hset(CONFIG, AVATAR_PNG_PATH, avatarPngPath);
 
         }catch (Exception e){
-//            e.printStackTrace();
+            System.out.println("Error: Load config to redis. "+e.getMessage());
             return false;
         }
         return true;

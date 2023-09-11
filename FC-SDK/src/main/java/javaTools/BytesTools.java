@@ -8,6 +8,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.*;
+import java.util.regex.Pattern;
 
 
 public class BytesTools {
@@ -88,6 +89,16 @@ public class BytesTools {
             return false;
         }
         return str.matches(HEX_PATTERN);
+    }
+
+    private static final Pattern BASE64_PATTERN = Pattern.compile("^[A-Za-z0-9+/]+={0,2}$");
+
+    public static boolean isBase64Encoded(String s) {
+        if (s == null) return false;
+        // Check length
+        if (s.length() % 4 != 0) return false;
+        // Check valid Base64 characters
+        return BASE64_PATTERN.matcher(s).matches();
     }
 
     public static char[] byteArrayToHexCharArray(byte[] byteArray) {
@@ -340,6 +351,19 @@ public class BytesTools {
         secureRandom.nextBytes(bytes);
         return bytes;
     }
+
+    public static void clearByteArray(byte[] array) {
+        if(array!=null){
+            Arrays.fill(array, (byte) 0);
+            array=null;
+        }
+    }
+    public static void clearCharArray(char[] array) {
+        if(array!=null){
+            Arrays.fill(array, (char) 0);
+        }
+    }
+
 }
 
 

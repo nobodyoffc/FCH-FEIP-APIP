@@ -1,6 +1,6 @@
 package apipClass;
 
-public class DataResponseBody {
+public class ResponseBody {
     private int code;
     private String message;
     private long nonce;

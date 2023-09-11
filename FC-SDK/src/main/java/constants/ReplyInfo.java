@@ -20,7 +20,7 @@ public class ReplyInfo {
     public static final int Code1004InsufficientBalance = 1004;
     public static final String Msg1004InsufficientBalance = "Insufficient balance. Buy the service please.";
     public static final int Code1005UrlUnequal = 1005;
-    public static final String Msg1005UrlUnequal = "The request URL isn't the same as the one you signed.";
+    public static final String Msg1005UrlUnequal = "The request URL is not the same as the one you signed.";
     public static final int Code1006RequestTimeExpired = 1006;
     public static final String Msg1006RequestTimeExpired = "Request expired.";
     public static final int Code1007UsedNonce = 1007;

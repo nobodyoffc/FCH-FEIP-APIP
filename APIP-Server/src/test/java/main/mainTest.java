@@ -55,7 +55,7 @@ public class mainTest {
                 , Cash.class);
         for(Hit<Cash> item: response.hits().hits()){
             if (item.source() != null) {
-                addrSet.add(item.source().getFid());
+                addrSet.add(item.source().getOwner());
             }
         }
         int hitSize = response.hits().hits().size();
@@ -78,7 +78,7 @@ public class mainTest {
                     , Cash.class);
             for(Hit<Cash>item: response.hits().hits()){
                 if (item.source() != null) {
-                    addrSet.add(item.source().getFid());
+                    addrSet.add(item.source().getOwner());
                 }
             }
             hitSize = response.hits().hits().size();

@@ -1,5 +1,6 @@
 package constants;
 
+import com.google.protobuf.Api;
 import org.checkerframework.checker.units.qual.A;
 
 import java.util.ArrayList;
@@ -126,6 +127,7 @@ public class ApiNames {
     public static final String OffLineTxAPI = "offLineTx";
     public static final String OffLineTxByCdAPI = "offLineTxByCd";
     public static final String AddressesAPI = "addresses";
+    public static final String NewCashByFidsAPI = "newCashByFids";
     public static ArrayList<String> freeApiList = new ArrayList<>();
     static {
         freeApiList.add(ApiNames.GetFreeServiceAPI);
@@ -248,5 +250,6 @@ public class ApiNames {
         ApiNames.apiList.add(ApiNames.EncryptAPI);
         ApiNames.apiList.add(ApiNames.VerifyAPI);
         ApiNames.apiList.add(ApiNames.AddressesAPI);
+        ApiNames.apiList.add(ApiNames.NewCashByFidsAPI);
     }
 }

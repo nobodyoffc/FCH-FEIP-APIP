@@ -51,7 +51,7 @@ public class P2SH {
 		*/
 		String script = input.getUnlockScript();
 
-		GetResponse<P2SH> resultGetP2SH = esClient.get(g->g.index(IndicesNames.P2SH).id(input.getFid()), P2SH.class);
+		GetResponse<P2SH> resultGetP2SH = esClient.get(g->g.index(IndicesNames.P2SH).id(input.getOwner()), P2SH.class);
 
 		if(resultGetP2SH.found())return;
 
@@ -113,7 +113,7 @@ public class P2SH {
 		scriptIs.read(b);
 		redeemScriptBytesList.add(b.clone());
 
-		this.setFid(input.getFid());
+		this.setFid(input.getOwner());
 		this.setRedeemScript(BytesTools.bytesToHexStringBE(BytesTools.bytesMerger(redeemScriptBytesList)));
 		this.setM(m);
 		this.setN(n);

@@ -1,5 +1,7 @@
 package APIP0V1_OpenAPI;
 
+import apipClass.SignInRequestBody;
+
 public class SignInCheckResult {
 
     private SignInRequestBody signInRequestBody;

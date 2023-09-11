@@ -1,5 +1,6 @@
 package APIP0V1_OpenAPI;
 
+import apipClass.SignInReplyData;
 import constants.ApiNames;
 import constants.ReplyInfo;
 import service.ApipService;

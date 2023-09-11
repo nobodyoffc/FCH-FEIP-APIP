@@ -191,23 +191,23 @@ public class RawTxParser {
                     newCash.setType("P2PKH");
                     newCash.setLockScript(BytesTools.bytesToHexStringBE(bScript));
                     byte[] hash160Bytes = Arrays.copyOfRange(bScript, 3, 23);
-                    newCash.setFid(KeyTools.hash160ToFCHAddr(hash160Bytes));
+                    newCash.setOwner(KeyTools.hash160ToFCHAddr(hash160Bytes));
                 }
                 case OP_RETURN -> {
                     newCash.setType("OP_RETURN");
-                    newCash.setFid("OpReturn");
+                    newCash.setOwner("OpReturn");
                     newCash.setValid(false);
                 }
                 case OP_HASH160 -> {
                     newCash.setType("P2SH");
                     newCash.setLockScript(BytesTools.bytesToHexStringBE(bScript));
                     byte[] hash160Bytes1 = Arrays.copyOfRange(bScript, 2, 22);
-                    newCash.setFid(KeyTools.hash160ToMultiAddr(hash160Bytes1));
+                    newCash.setOwner(KeyTools.hash160ToMultiAddr(hash160Bytes1));
                 }
                 default -> {
                     newCash.setType("Unknown");
                     newCash.setLockScript(BytesTools.bytesToHexStringBE(bScript));
-                    newCash.setFid("Unknown");
+                    newCash.setOwner("Unknown");
                 }
             }
 

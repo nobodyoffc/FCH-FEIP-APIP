@@ -1,10 +1,21 @@
-package APIP0V1_OpenAPI;
+package apipClass;
+
+import javaTools.BytesTools;
 
 public class SignInRequestBody {
     private String url;
     private long time;
     private long nonce;
     private String mode;
+    private String via;
+
+    public String getVia() {
+        return via;
+    }
+
+    public void setVia(String via) {
+        this.via = via;
+    }
 
     public String getMode() {
         return mode;
@@ -46,5 +57,12 @@ public class SignInRequestBody {
 
     public void setNonce(long nonce) {
         this.nonce = nonce;
+    }
+
+    public void makeRequestBody(String url, String via) {
+        setTime(System.currentTimeMillis());
+        setNonce((BytesTools.bytes4ToLongBE(BytesTools.getRandomBytes(4))));
+        setVia(via);
+        setUrl(url);
     }
 }

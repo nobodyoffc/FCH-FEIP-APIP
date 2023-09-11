@@ -205,10 +205,10 @@ public class BlockParser {
 
 		// Parse output count.
 		// 解析输出数量。
-		VarintResult varintParseResult = new VarintResult();
+		VarintResult varintParseResult;
 		varintParseResult = ParseTools.parseVarint(blockInputStream);
-		long outputCount = (long) varintParseResult.number;
-		byte[] b0 = (byte[]) varintParseResult.rawBytes;
+		long outputCount = varintParseResult.number;
+		byte[] b0 = varintParseResult.rawBytes;
 		rawBytesList.add(b0);
 
 		tx.setOutCount((int) outputCount);
@@ -255,12 +255,12 @@ public class BlockParser {
 				out.setType("P2PKH");
 				out.setLockScript(BytesTools.bytesToHexStringBE(bScript));
 				byte[] hash160Bytes = Arrays.copyOfRange(bScript, 3, 23);
-				out.setFid(KeyTools.hash160ToFCHAddr(hash160Bytes));
+				out.setOwner(KeyTools.hash160ToFCHAddr(hash160Bytes));
 				break;
 			case OP_RETURN:
 				out.setType("OP_RETURN");
 				opReturnStr = new String(Arrays.copyOfRange(bScript, 2, bScript.length));
-				out.setFid("OpReturn");
+				out.setOwner("OpReturn");
 
 				out.setValid(false);
 				if (tx.getTxIndex() != 0) {
@@ -275,12 +275,12 @@ public class BlockParser {
 				out.setType("P2SH");
 				out.setLockScript(BytesTools.bytesToHexStringBE(bScript));
 				byte[] hash160Bytes1 = Arrays.copyOfRange(bScript, 2, 22);
-				out.setFid(KeyTools.hash160ToMultiAddr(hash160Bytes1));
+				out.setOwner(KeyTools.hash160ToMultiAddr(hash160Bytes1));
 				break;
 			default:
 				out.setType("Unknown");
 				out.setLockScript(BytesTools.bytesToHexStringBE(bScript));
-				out.setFid("Unknown");
+				out.setOwner("Unknown");
 			}
 
 			// Add block and tx information to output./给输出添加区块和交易信息。

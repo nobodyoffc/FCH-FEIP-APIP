@@ -1,4 +1,4 @@
-package APIP0V1_OpenAPI;
+package apipClass;
 
 public class SignInReplyData {
     private String sessionKey;

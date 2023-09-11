@@ -1,5 +1,6 @@
 package APIP17V1_Avatar;
 
+import avatar.AvatarMaker;
 import constants.ApiNames;
 import initial.Initiator;
 import constants.Strings;

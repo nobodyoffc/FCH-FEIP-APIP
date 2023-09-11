@@ -2,7 +2,6 @@ package mempool;
 
 import config.ConfigAPIP;
 import fcTools.ParseTools;
-import fileTools.BlockFileTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
@@ -40,7 +39,7 @@ public class MempoolCleaner implements Runnable {
         System.out.println("MempoolCleaner running...");
         try {
             while (running) {
-                ParseTools.waitForNewItemInDirectory(blockFilePath,running);
+                ParseTools.waitForChangeInDirectory(blockFilePath,running);
                 jedis.flushDB();
             }
         }catch (Exception e){

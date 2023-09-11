@@ -1,5 +1,7 @@
 package APIP17V1_Avatar;
 
+import avatar.AvatarMaker;
+
 import java.io.IOException;
 import java.util.Set;
 
@@ -37,15 +39,15 @@ public class Test {
 
 
 
-        AvatarMaker.getAvatars(addrs, basePath, filePath);
+        avatar.AvatarMaker.getAvatars(addrs, basePath, filePath);
     }
     private static void get2(String basePath, String filePath) throws IOException {
         String[]  addrs = new String[]{"FkkkkkkkkkkkkkkkkkkkkkkkkZkkkkkkkkkk","Fkkkkkkkkkkkkkkkkkkkkkkkhzkkkkkkkkkk"};
-        AvatarMaker.getAvatars(addrs, basePath, filePath);
+        avatar.AvatarMaker.getAvatars(addrs, basePath, filePath);
     }
 
     private static void gen58(String basePath, String filePath) throws IOException {
-        Set<String> set = AvatarMaker.data.keySet();
+        Set<String> set = avatar.AvatarMaker.data.keySet();
         String[] chars = new String[set.size()];
         System.out.println(set.size());
         int i=0;

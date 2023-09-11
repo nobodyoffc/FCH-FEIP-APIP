@@ -2,7 +2,7 @@ package apipRequest;
 
 import apipClass.ApipDataRequestParams;
 import apipClass.DataRequestBody;
-import apipClass.DataResponseBody;
+import apipClass.ResponseBody;
 import apipClass.Fcdsl;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -85,7 +85,7 @@ public class PostRequester {
 
     public static List<Service> searchService(ApipDataRequestParams apipDataRequestParams, byte[]sessionKey,String owner, String type,boolean onlyActive,boolean ignoreClosed) {
         DataRequestBody dataRequestBody = new DataRequestBody();
-        DataResponseBody dataResponseBody;
+        ResponseBody dataResponseBody;
         List<Service> serviceList = null;
         try {
             Gson gson = new Gson();
@@ -101,10 +101,10 @@ public class PostRequester {
             String requestBodyJson = gson.toJson(dataRequestBody);
 
             byte[] sign = SHA.Sha256x2(BytesTools.bytesMerger(requestBodyJson.getBytes(StandardCharsets.UTF_8),sessionKey));
-            headerMap.put(Strings.SIGN, HexFormat.of().formatHex(sign));
+            headerMap.put(Strings.Header_SIGN, HexFormat.of().formatHex(sign));
             String responseJson = requestPost(url, headerMap, requestBodyJson);
 
-            dataResponseBody = gson.fromJson(responseJson, DataResponseBody.class);
+            dataResponseBody = gson.fromJson(responseJson, ResponseBody.class);
             if(dataResponseBody.getCode()!=0){
                 System.out.println(responseJson);
             }else {

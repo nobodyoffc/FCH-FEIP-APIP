@@ -87,8 +87,6 @@ public class OrganizationParser {
 				groupHist.setIndex(opre.getTxIndex());
 				groupHist.setTime(opre.getTime());
 				groupHist.setSigner(opre.getSigner());
-				//TODO;
-				System.out.println("leave made.");
 				break;
 			default:
 				return null;

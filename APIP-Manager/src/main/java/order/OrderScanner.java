@@ -1,14 +1,16 @@
 package order;
 
 import balance.BalanceInfo;
-import constants.Constants;
-import constants.IndicesNames;
-import fchClass.Cash;
-import fchClass.TxHas;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.SortOrder;
 import com.google.gson.Gson;
+import config.ConfigAPIP;
+import constants.Constants;
+import constants.IndicesNames;
+import constants.Strings;
+import esTools.EsTools;
 import fcTools.ParseTools;
+import fchClass.Cash;
 import fchClass.OpReturn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,11 +19,8 @@ import redisTools.ReadRedis;
 import reward.RewardReturn;
 import reward.Rewarder;
 import rollback.Rollbacker;
-import esTools.EsTools;
 import service.ApipService;
 import service.Params;
-import config.ConfigAPIP;
-import constants.Strings;
 import startAPIP.StartAPIP;
 
 import java.io.IOException;
@@ -29,9 +28,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-import static constants.Constants.*;
+import static constants.Constants.BalanceBackupInterval;
+import static constants.Constants.RewardInterval;
 import static constants.IndicesNames.ORDER;
-import static constants.IndicesNames.TX_HAS;
 import static constants.Strings.*;
 import static redisTools.ReadRedis.readHashLong;
 import static startAPIP.StartAPIP.getNameOfService;
@@ -137,7 +136,7 @@ public class OrderScanner implements Runnable {
 private void waitNewOrder() {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     log.debug(LocalDateTime.now().format(formatter) + "  Wait for new order...");
-    ParseTools.waitForNewItemInDirectory(listenDir,running);
+    ParseTools.waitForChangeInDirectory(listenDir,running);
 }
 
     private void checkRollback() {
@@ -159,7 +158,6 @@ private void waitNewOrder() {
         long lastHeight = ReadRedis.readLong(jedis0Common, StartAPIP.serviceName+"_"+ORDER_LAST_HEIGHT);
         ArrayList<Cash> cashList = getNewCashList(lastHeight,params.getAccount());
         if (cashList != null && cashList.size() > 0) {
-//            log.debug("Got " + cashList.size() + " cashes of " + params.getAccount());
             setLastOrderInfoToRedis(cashList);
             getValidOrderList(cashList);
         }
@@ -167,80 +165,91 @@ private void waitNewOrder() {
 
     private void getValidOrderList(ArrayList<Cash> cashList) {
 
-        ArrayList<String> txidList = new ArrayList<>();
+        ArrayList<Order> orderList = getNewOrderList(cashList);
+        if(orderList.size()==0)return;
 
+        String isCheckOrderOpReturn = jedis0Common.hget(CONFIG,Strings.CHECK_ORDER_OPRETURN);
+        Map<String, OrderInfo> validOpReturnOrderInfoMap;
+
+        if("true".equals(isCheckOrderOpReturn)) {
+            ArrayList<String> txidList = getTxIdList(orderList);
+            validOpReturnOrderInfoMap = getValidOpReturnOrderInfoMap(txidList);
+
+            if (validOpReturnOrderInfoMap.size() == 0) return;
+
+            for (Order order : orderList) {
+                OrderInfo orderInfo = validOpReturnOrderInfoMap.get(order.getTxId());
+                if (orderInfo == null) continue;
+                String via = orderInfo.getVia();
+                if(via!=null)order.setVia(via);
+            }
+        }
+        ArrayList<String> orderIdList = new ArrayList<>();
+        for(Order order:orderList) {
+            String payer = order.getFromFid();
+            if (payer != null) {
+                long balance = readHashLong(jedis0Common, StartAPIP.serviceName + "_" + Strings.FID_BALANCE, payer);
+                jedis0Common.hset(StartAPIP.serviceName + "_" + Strings.FID_BALANCE, payer, String.valueOf(balance + order.getAmount()));
+            }else continue;
+
+            String via = order.getVia();
+            if (via != null) {
+                order.setVia(via);
+                long viaT = ReadRedis.readHashLong(jedis0Common, StartAPIP.serviceName + "_" + Strings.ORDER_VIA, via);
+                jedis0Common.hset(StartAPIP.serviceName + "_" + Strings.CONSUME_VIA, via, String.valueOf(viaT + order.getAmount()));
+            }
+
+            log.debug("New order from [" + order.getFromFid() + "]: " + order.getAmount() / 100000000 + " F");
+
+            orderIdList.add(order.getOrderId());
+        }
+        try {
+            String index = getNameOfService(jedis0Common,ORDER);
+            EsTools.bulkWriteList(esClient, index, orderList, orderIdList, Order.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private ArrayList<String> getTxIdList(ArrayList<Order> orderList) {
+        ArrayList<String> txIdList = new ArrayList<>();
+        for(Order order :orderList){
+            txIdList.add(order.getTxId());
+        }
+        return txIdList;
+    }
+
+    private ArrayList<Order> getNewOrderList(ArrayList<Cash> cashList) {
         long minPayment = (long) Double.parseDouble(params.getMinPayment()) * 100000000;
 
         ArrayList<Order> orderList = new ArrayList<>();
+
         Iterator<Cash> iterator = cashList.iterator();
         while (iterator.hasNext()) {
             Cash cash = iterator.next();
-            if (cash.getValue() < minPayment) iterator.remove();
-
-            txidList.add(cash.getBirthTxId());
+            if (cash.getValue() < minPayment) {
+                iterator.remove();
+                continue;
+            }
+            String issuer = cash.getIssuer();
+            if(issuer.equals(params.getAccount())||issuer.equals(service.getOwner())){
+                iterator.remove();
+                continue;
+            }
 
             Order order = new Order();
             order.setOrderId(cash.getCashId());
+            order.setFromFid(cash.getIssuer());
             order.setAmount(cash.getValue());
             order.setHeight(cash.getBirthHeight());
             order.setTime(cash.getBirthTime());
-            order.setToFid(cash.getFid());
+            order.setToFid(cash.getOwner());
             order.setTxId(cash.getBirthTxId());
             order.setTxIndex(cash.getBirthTxIndex());
 
             orderList.add(order);
         }
-        if(txidList.size()==0)return;
-
-        //Get sender info and check OpReturn;
-        Map<String, OrderInfo> validOrderInfoMap = getValidSimpleOrderInfoMap(txidList);
-
-        String isCheckOrderOpReturn = jedis0Common.hget(CONFIG,Strings.CHECK_ORDER_OPRETURN);
-        if("true".equals(isCheckOrderOpReturn)) {
-            Map<String, OrderInfo> validOpReturnOrderInfoMap = getValidOpReturnOrderInfoMap(txidList);
-            //Merge simple order and OpReturn order;
-            for (String txId : validOpReturnOrderInfoMap.keySet()) {
-                validOrderInfoMap.put(txId, validOpReturnOrderInfoMap.get(txId));
-            }
-        }
-
-        if (validOrderInfoMap.size() == 0) return;
-        Iterator<Order> iterOrder = orderList.iterator();
-        ArrayList<String> goodOrderIdList = new ArrayList<>();
-        while (iterOrder.hasNext()) {
-            Order order = iterOrder.next();
-            OrderInfo orderInfo = validOrderInfoMap.get(order.getTxId());
-            if (orderInfo == null) {
-                iterOrder.remove();
-                continue;
-            }
-
-            String payer = orderInfo.getSender();
-            order.setFromFid(payer);
-            if("true".equals(isCheckOrderOpReturn)) order.setVia(orderInfo.getVia());
-            goodOrderIdList.add(order.getOrderId());
-
-            long balance = readHashLong(jedis0Common, StartAPIP.serviceName+"_"+Strings.FID_BALANCE, payer);
-            jedis0Common.hset(StartAPIP.serviceName+"_"+Strings.FID_BALANCE, payer, String.valueOf(balance + order.getAmount()));
-
-            String via;
-            if("true".equals(isCheckOrderOpReturn)){
-                via = order.getVia();
-                if(via!=null) {
-                    long viaT = ReadRedis.readHashLong(jedis0Common, StartAPIP.serviceName+"_"+Strings.ORDER_VIA, via);
-                    jedis0Common.hset(StartAPIP.serviceName+"_"+Strings.CONSUME_VIA, via, String.valueOf(viaT + order.getAmount()));
-                }
-            }
-
-            log.debug("New order from [" + order.getFromFid() + "]: " + order.getAmount() / 100000000 + " F");
-        }
-
-        try {
-            String index = getNameOfService(jedis0Common,ORDER);
-            EsTools.bulkWriteList(esClient, index, orderList, goodOrderIdList, Order.class);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        return orderList;
     }
 
     private Map<String, OrderInfo> getValidOpReturnOrderInfoMap(ArrayList<String> txidList) {
@@ -268,48 +277,22 @@ private void waitNewOrder() {
                 }
 
                 if (orderOpreturn.getType().equals("APIP")
-                        && orderOpreturn.getSn().equals("1")
+                        && orderOpreturn.getSn().equals("0")
                         && orderOpreturn.getData().getOp().equals("buy")
                         && orderOpreturn.getData().getSid().equals(this.service.getSid())
                 ) {
                     OrderInfo orderInfo = new OrderInfo();
                     orderInfo.setId(opReturn.getTxId());
-                    orderInfo.setSender(opReturn.getSigner());
                     orderInfo.setVia(orderOpreturn.getData().getVia());
                     validOrderInfoMap.put(opReturn.getTxId(), orderInfo);
                 }else{
                     //TODO
-                    log.debug("Invalid order. ID:"+opReturn.getTxId());
-                    ParseTools.gsonPrint(orderOpreturn);
+                    log.debug("Invalid order OpReturn. ID:"+opReturn.getTxId());
                 }
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new RuntimeException(e);
             }
-        }
-        return validOrderInfoMap;
-    }
-
-    private Map<String, OrderInfo> getValidSimpleOrderInfoMap(ArrayList<String> txidList) {
-        Map<String, OrderInfo> validOrderInfoMap = new HashMap<>();
-        EsTools.MgetResult<TxHas> result1 = new EsTools.MgetResult<>();
-
-        try {
-            result1 = EsTools.getMultiByIdList(esClient, TX_HAS, txidList, TxHas.class);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (result1.getResultList() == null || result1.getResultList().size() == 0) return validOrderInfoMap;
-
-        List<TxHas> txList = result1.getResultList();
-
-        for (TxHas tx : txList) {
-            OrderInfo orderInfo = new OrderInfo();
-            orderInfo.setId(tx.getTxId());
-            String fid = tx.getInMarks().get(0).getFid();
-            if(fid.equals(service.getParams().getAccount())||fid.equals(service.getOwner()))continue;
-            orderInfo.setSender(fid);
-            validOrderInfoMap.put(tx.getTxId(),orderInfo);
         }
         return validOrderInfoMap;
     }
@@ -350,7 +333,6 @@ private void waitNewOrder() {
 
     static class OrderInfo {
         private String id;
-        private String sender;
         private String via;
 
         public String getId() {
@@ -359,14 +341,6 @@ private void waitNewOrder() {
 
         public void setId(String id) {
             this.id = id;
-        }
-
-        public String getSender() {
-            return sender;
-        }
-
-        public void setSender(String sender) {
-            this.sender = sender;
         }
 
         public String getVia() {

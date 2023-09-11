@@ -4,6 +4,7 @@ import constants.OpNames;
 import menu.Inputer;
 
 import java.io.BufferedReader;
+import java.util.Arrays;
 
 public class ServiceData {
 	private String sid;
@@ -22,17 +23,17 @@ public class ServiceData {
 
 	public void inputServicePublish(BufferedReader br)  {
 
-			inputStdName(br);
+		inputStdName(br);
 
-			inputLocalNames(br);
+		inputLocalNames(br);
 
-			inputDesc(br);
+		inputDesc(br);
 
-			inputUrls(br);
+		inputUrls(br);
 
-			inputWaiters(br);
+		inputWaiters(br);
 
-			inputPids(br);
+		inputProtocols(br);
 
 	}
 
@@ -53,6 +54,11 @@ public class ServiceData {
 		String ask = "Input the types of your service if you want. Enter to end :";
 		String[] types = Inputer.inputStringArray(br,ask,0);
 		if(types.length!=0) setTypes(types);
+	}
+
+	public void updateTypes(BufferedReader br)  {
+		System.out.println("Types are: "+ Arrays.toString(types));
+		inputTypes(br);
 	}
 
 	private void inputStdName(BufferedReader br) {
@@ -86,9 +92,9 @@ public class ServiceData {
 		if(waiters.length!=0) setWaiters(waiters);
 	}
 
-	private void inputPids(BufferedReader br) {
+	private void inputProtocols(BufferedReader br) {
 		String ask;
-		ask = "Input the PIDs of the PIDs your service using if you want. Enter to end :";
+		ask = "Input the PIDs of the protocols your service using if you want. Enter to end :";
 		String[] protocols = Inputer.inputStringArray(br,ask,64);
 		if(protocols.length!=0) setProtocols(protocols);
 	}
@@ -198,4 +204,47 @@ public class ServiceData {
 	}
 
 
+	public void updateServiceHead(BufferedReader br) {
+		updateStdName(br);
+
+		updateLocalNames(br);
+
+		updateDesc(br);
+
+		updateUrls(br);
+
+		updateWaiters(br);
+
+		updateProtocols(br);
+	}
+
+	private void updateProtocols(BufferedReader br) {
+		System.out.println("Protocols are: "+ Arrays.toString(protocols));
+		inputProtocols(br);
+	}
+
+	private void updateWaiters(BufferedReader br) {
+		System.out.println("Waiters are: "+ Arrays.toString(waiters));
+		inputWaiters(br);
+	}
+
+	private void updateUrls(BufferedReader br) {
+		System.out.println("Urls are: "+ Arrays.toString(urls));
+		inputUrls(br);
+	}
+
+	private void updateDesc(BufferedReader br) {
+		System.out.println("StdName is: "+desc);
+		inputDesc(br);
+	}
+
+	private void updateLocalNames(BufferedReader br) {
+		System.out.println("LocalNames are: "+ localNames);
+		inputLocalNames(br);
+	}
+
+	private void updateStdName(BufferedReader br) {
+		System.out.println("StdName is: "+stdName);
+		inputStdName(br);
+	}
 }

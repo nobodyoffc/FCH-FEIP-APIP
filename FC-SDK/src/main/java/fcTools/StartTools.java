@@ -53,6 +53,7 @@ public class StartTools {
         itemList.add("Encrypt with symKey");
         itemList.add("Encrypt with symKey to bundle");
         itemList.add("Encrypt with password");
+        itemList.add("Encrypt with password to bundle");
         itemList.add("Encrypt with public key EccAes256K1P7");
         itemList.add("Encrypt with public key EccAes256K1P7 to bundle one way");
         itemList.add("Encrypt with public key EccAes256K1P7 to bundle two way");
@@ -62,6 +63,7 @@ public class StartTools {
         itemList.add("Decrypt with symKey");
         itemList.add("Decrypt with symKey from bundle");
         itemList.add("Decrypt with password");
+        itemList.add("Decrypt with password from bundle");
         itemList.add("Decrypt with private key EccAes256K1P7");
         itemList.add("Encrypt with private key EccAes256K1P7 from bundle one way");
         itemList.add("Encrypt with private key EccAes256K1P7 from bundle two way");
@@ -90,22 +92,24 @@ public class StartTools {
                 case 13 -> verifyEcdsa();
                 case 14 -> verifySchnorr();
                 case 15 -> encryptWithSymKey(br);
-                case 16 -> encryptWithSymKeyIvCipher(br);
+                case 16 -> encryptWithSymKeyBundle(br);
                 case 17 -> encryptWithPassword(br);
-                case 18 -> encryptAsy(br);
-                case 19 -> encryptAsyOneWayBundle(br);
-                case 20 -> encryptAsyTwoWayBundle(br);
-                case 21 -> encryptFileWithSymKey(br);
-                case 22 -> encryptFileAsy(br);
-                case 23 -> decryptWithSymKey(br);
-                case 24 -> decryptWithSymKeyIvCipher(br);
-                case 25 -> decryptWithPassword(br);
-                case 26 -> decryptAsy(br);
-                case 27 -> decryptAsyOneWayBundle(br);
-                case 28 -> decryptAsyTwoWayBundle(br);
-                case 29-> decryptFileSymKey(br);
-                case 30 -> decryptFileAsy(br);
-                case 31 -> {
+                case 18 -> encryptWithPasswordBundle(br);
+                case 19 -> encryptAsy(br);
+                case 20 -> encryptAsyOneWayBundle(br);
+                case 21 -> encryptAsyTwoWayBundle(br);
+                case 22 -> encryptFileWithSymKey(br);
+                case 23 -> encryptFileAsy(br);
+                case 24 -> decryptWithSymKey(br);
+                case 25 -> decryptWithSymKeyBundle(br);
+                case 26 -> decryptWithPassword(br);
+                case 27 -> decryptWithPasswordBundle(br);
+                case 28 -> decryptAsy(br);
+                case 29 -> decryptAsyOneWayBundle(br);
+                case 30 -> decryptAsyTwoWayBundle(br);
+                case 31-> decryptFileSymKey(br);
+                case 32 -> decryptFileAsy(br);
+                case 33 -> {
                     gainTimestamp();
                     Menu.anyKeyToContinue(br);
                 }
@@ -116,6 +120,40 @@ public class StartTools {
                 }
             }
         }
+    }
+
+    private static void decryptWithPasswordBundle(BufferedReader br) {
+        EccAes256K1P7 ecc = new EccAes256K1P7();
+        try {
+            System.out.println("Input the bundle in Base64:");
+            String bundle = br.readLine();
+            if(bundle==null){
+                System.out.println("Bundle is null.");
+                return;
+            }
+            String ask = "Input the password:";
+            char[] password = Inputer.inputPassword(br,ask);
+            byte[] bundleBytes = Base64.getDecoder().decode(bundle);
+            byte[] passwordBytes = BytesTools.utf8CharArrayToByteArray(password);
+            byte[] msgBytes = ecc.decryptPasswordBundle(bundleBytes,passwordBytes);
+            System.out.println(new String(msgBytes));
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static void encryptWithPasswordBundle(BufferedReader br) {
+        EccAes256K1P7 ecc = new EccAes256K1P7();
+        String msg = Inputer.inputMsg(br);
+        String ask = "Input the password:";
+        char[] password = Inputer.inputPassword(br, ask);
+        assert msg != null;
+        byte[] msgBytes = msg.getBytes(StandardCharsets.UTF_8);
+        byte[] passwordBytes = BytesTools.utf8CharArrayToByteArray(password);
+        byte[] bundle = ecc.encryptPasswordBundle(msgBytes, passwordBytes);
+        System.out.println(Base64.getEncoder().encodeToString(bundle));
+        Menu.anyKeyToContinue(br);
     }
 
     private static void decryptAsyTwoWayBundle(BufferedReader br) {
@@ -235,7 +273,7 @@ public class StartTools {
         Menu.anyKeyToContinue(br);
     }
 
-    private static void decryptWithSymKeyIvCipher(BufferedReader br) {
+    private static void decryptWithSymKeyBundle(BufferedReader br) {
         System.out.println("Input ivCipher in Base64:");
         String ivCipherStr;
         try {
@@ -253,7 +291,7 @@ public class StartTools {
         System.out.println(eccAesDataJson);
         Menu.anyKeyToContinue(br);
     }
-    private static void encryptWithSymKeyIvCipher(BufferedReader br) {
+    private static void encryptWithSymKeyBundle(BufferedReader br) {
         EccAes256K1P7 ecc = new EccAes256K1P7();
         String msg = Inputer.inputMsg(br);
         String ask = "Input the symKey in hex:";

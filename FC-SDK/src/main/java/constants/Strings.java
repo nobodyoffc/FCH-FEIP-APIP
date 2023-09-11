@@ -1,5 +1,7 @@
 package constants;
 
+import cryptoTools.Sha256Hash;
+
 public class Strings {
 
     //Redis keys
@@ -72,7 +74,7 @@ public class Strings {
     public static final String LISTEN_PATH = "listenPath";
     public static final String FIELDS = "fields";
     public static final String MAKER ="Maker";
-    public static final String SIGN = "Sign";
+    public static final String Header_SIGN = "Sign";
     public static final String SESSION_NAME = "sessionName";
     public static final String VIA = "via";
     public static final String OWNER = "owner";
@@ -80,4 +82,13 @@ public class Strings {
     public static final String CLOSED = "closed";
     public static final String ACTIVE = "active";
     public static final String TYPES = "types";
+    public static final String HOOK_ID = "hookId";
+    public static final String ENDPOINT = "endpoint";
+    public static final String TARGET_API = "targetApi";
+    public static final String HOOK_INFO_ = "hookInfo_";
+
+    public static final String FCH = "fch";
+    public static final String WEBHOOK_ENDPOINT_SESSION_KEY = "webhookEndpointSessionKey";
+    public static final String DOT_JSON = ".json";
+    public static final String CASH_ID = "cashId";
 }

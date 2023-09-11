@@ -1,9 +1,9 @@
 package eccAes256K1P7;
 
 import fcTools.ParseTools;
+import javaTools.BytesTools;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.HexFormat;
 
@@ -93,29 +93,23 @@ public class EccAesDataByte {
         clearPriKeyB();
     }
 
-    public void clearByteArray(byte[] array) {
-        if(array!=null){
-            Arrays.fill(array, (byte) 0);
-            array=null;
-        }
-    }
     public void clearSymKey(){
-        clearByteArray(this.symKey);
+        BytesTools.clearByteArray(this.symKey);
         this.symKey=null;
     }
 
     public void clearPassword(){
-        clearByteArray(this.password);
+        BytesTools.clearByteArray(this.password);
         this.password=null;
     }
 
     public void clearPriKeyA(){
-        clearByteArray(this.priKeyA);
+        BytesTools.clearByteArray(this.priKeyA);
         this.priKeyA=null;
     }
 
     public void clearPriKeyB(){
-        clearByteArray(this.priKeyB);
+        BytesTools.clearByteArray(this.priKeyB);
         this.priKeyB=null;
     }
 
