@@ -1,6 +1,7 @@
 package FreeGetAPIs;
 
 import constants.ApiNames;
+import data.ReplierForFree;
 import freecashRPC.FcRpcMethods;
 import initial.Initiator;
 import javaTools.BytesTools;
@@ -25,11 +26,14 @@ public class Broadcast extends HttpServlet {
         String rawTxHex = request.getParameter("rawTx");
         rawTxHex=rawTxHex.toLowerCase();
         PrintWriter writer = response.getWriter();
+        ReplierForFree replier = new ReplierForFree();
 
         if (Initiator.isFreeGetForbidden(writer)) return;
 
         if(!BytesTools.isHexString(rawTxHex)){
-                writer.write("Raw TX must be in HEX.");
+                replier.setOther();
+                replier.setData("Error: Raw TX must be in HEX.");
+                writer.write(replier.toJson());
                 return;
             }
 
@@ -37,16 +41,26 @@ public class Broadcast extends HttpServlet {
         try {
             result = FcRpcMethods.sendTx(fcClient,rawTxHex);
         } catch (Throwable e) {
-            writer.write("Send TX failed.");
+            replier.setOther();
+            replier.setData("Error: Send TX failed.");
+            writer.write(replier.toJson());
             return;
         }
         if(result.contains("{")){
-            writer.write(result);
+            replier.setOther();
+            replier.setData(result);
+            writer.write(replier.toJson());
             return;
         }
 
-        if(result.startsWith("\""))result=result.substring(1);
-        if(result.endsWith("\""))result=result.substring(0,result.length()-2);
-        writer.write(result);
+
+        if(result.startsWith("\"")){
+            result=result.substring(1);
+            if(result.endsWith("\""))result=result.substring(0,result.length()-2);
+            replier.setData(result);
+            replier.setSuccess();
+        }
+
+        writer.write(replier.toJson());
     }
 }

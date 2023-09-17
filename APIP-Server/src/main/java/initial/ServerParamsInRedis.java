@@ -1,5 +1,6 @@
 package initial;
 
+import constants.Constants;
 import redis.clients.jedis.Jedis;
 
 import static constants.Strings.*;
@@ -21,14 +22,16 @@ public class ServerParamsInRedis {
             }
 
             try {
-                this.price = Long.parseLong(jedis.hget(CONFIG,PRICE));
-            }catch (Exception ignore){
+                this.price = (long)(Double.parseDouble(jedis.hget(CONFIG,PRICE))*Constants.FchToSatoshi);
+            }catch (Exception e){
+                e.printStackTrace();
                 this.price=0;
             }
 
             try {
-                this.nPrice = Integer.parseInt(jedis.hget(N_PRICE,apiName));
-            }catch (Exception ignore){
+                this.nPrice = Integer.parseInt(jedis.hget(Initiator.serviceName+"_"+N_PRICE,apiName));
+            }catch (Exception e){
+                e.printStackTrace();
                 this.nPrice=0;
             }
 

@@ -31,18 +31,12 @@ import static constants.ApiNames.APIP0V1Path;
 import static constants.Strings.PUBLIC;
 
 public class RequestChecker {
-//    private final Jedis jedis0;
 
     private final PrintWriter writer;
     private final HttpServletResponse response;
     private final HttpServletRequest request;
     private final Gson gson;
     private final String url;
-
-//    private long windowTime;
-//    private long price;
-//    private long balance;
-
     private final String apiName;
     private String fid = null;
     private String pubKey = null;
@@ -51,9 +45,11 @@ public class RequestChecker {
     private byte[] requestBodyBytes;
     private transient ServerParamsInRedis paramsInRedis;
 
+    public ServerParamsInRedis getParamsInRedis() {
+        return paramsInRedis;
+    }
 
     public RequestChecker(HttpServletRequest request, HttpServletResponse response, Replier replier) throws IOException {
-
         this.replier = replier;
         this.request = request;
         this.response = response;
@@ -86,7 +82,8 @@ public class RequestChecker {
         signInCheckResult.setFid(fid);
         this.fid = fid;
 
-
+        this.paramsInRedis = new ServerParamsInRedis(fid, apiName);
+        replier.setParamsInRedis(paramsInRedis);
 
         String sign = request.getHeader(ReplyInfo.SignInHeader);
         if(sign==null||"".equals(sign)){
@@ -332,20 +329,21 @@ public class RequestChecker {
     }
 
     public Session getSession(String sessionName) {
+        Session session;
+        try(Jedis jedis = Initiator.jedisPool.getResource()) {
+            jedis.select(1);
 
-        Jedis jedis1 = new Jedis();
-        jedis1.select(1);
+            String fid = jedis.hget(sessionName, "fid");
+            String sessionKey = jedis.hget(sessionName, "sessionKey");
+            if (fid == null || sessionKey == null) {
+                return null;
+            }
 
-        String fid = jedis1.hget(sessionName,"fid");
-        String sessionKey = jedis1.hget(sessionName,"sessionKey");
-        if(fid==null || sessionKey ==null){
-            return null;
+            session = new Session();
+            session.setFid(fid);
+            session.setSessionKey(sessionKey);
+            session.setSessionName(sessionName);
         }
-        Session session = new Session();
-        session.setFid(fid);
-        session.setSessionKey(sessionKey);
-        session.setSessionName(sessionName);
-        jedis1.close();
         return session;
     }
     private boolean isGoodSymSign(String sign) {
@@ -370,7 +368,6 @@ public class RequestChecker {
         try {
             dataRequestBody = gson.fromJson(requestDataJson, DataRequestBody.class);
         }catch(Exception e){
-            e.printStackTrace();
             response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1013BadRequest));
             replier.setData(e);
             writer.write(replier.reply1013BadRequst(fid));
@@ -380,15 +377,15 @@ public class RequestChecker {
         return dataRequestBody;
     }
     public boolean isBadNonce(long nonce){
-        Jedis jedis2 = new Jedis();
-        jedis2.select(2);
-        if(nonce == 0)return true;
-        String nonceStr = String.valueOf(nonce);
-        if(jedis2.get(nonceStr)!=null)
-            return true;
-        jedis2.set(nonceStr,"");
-        jedis2.expire(nonceStr,paramsInRedis.getWindowTime());
-        jedis2.close();
+        try(Jedis jedis = Initiator.jedisPool.getResource()) {
+            jedis.select(2);
+            if (nonce == 0) return true;
+            String nonceStr = String.valueOf(nonce);
+            if (jedis.get(nonceStr) != null)
+                return true;
+            jedis.set(nonceStr, "");
+            jedis.expire(nonceStr, paramsInRedis.getWindowTime());
+        }
         return false;
     }
     public boolean isBadBalance(){

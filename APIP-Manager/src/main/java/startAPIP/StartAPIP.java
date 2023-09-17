@@ -20,6 +20,7 @@ import reward.Rewarder;
 import service.ApipService;
 import service.Params;
 import service.ServiceManager;
+import webhook.Pusher;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -39,6 +40,7 @@ public class StartAPIP {
 	private static ElasticsearchClient esClient = null;
 	private static MempoolScanner mempoolScanner =null;
 	private static OrderScanner orderScanner=null;
+	private static Pusher pusher = null;
 	private static MempoolCleaner mempoolCleaner=null;
 	private static final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 	private static IndicesAPIP indicesAPIP;
@@ -87,6 +89,9 @@ public class StartAPIP {
 
 			if(!jedis.exists(serviceName+"_"+Strings.N_PRICE)) Settings.setNPrices(jedis, br);
 
+			indicesAPIP = new IndicesAPIP(esClient, jedis,br);
+			indicesAPIP.checkApipIndices();
+
 			if(orderScanner==null) {
 				startOrderScan(configAPIP, esClient);
 				Menu.anyKeyToContinue(br);
@@ -97,14 +102,16 @@ public class StartAPIP {
 				Menu.anyKeyToContinue(br);
 			}
 
+			if(pusher == null){
+				startPusher(configAPIP,esClient);
+				Menu.anyKeyToContinue(br);
+			}
+
 			checkServiceParams(jedis);
 
 			checkPublicSessionKey(jedis);
 
 			checkRewardParams(jedis);
-
-			indicesAPIP = new IndicesAPIP(esClient, jedis,br);
-			indicesAPIP.checkApipIndices();
 
 			Menu menu = new Menu();
 
@@ -120,8 +127,9 @@ public class StartAPIP {
 			menu.add(menuItemList);
 			System.out.println(" << " + configAPIP.getServiceName() + " manager>> \n");
 			menu.show();
-			if(orderScanner!=null && orderScanner.isRunning()) System.out.println("Order scanner is running.");
-			if(mempoolScanner!=null && mempoolScanner.isRunning()) System.out.println("Mempool scanner is running.");
+			if(orderScanner!=null && orderScanner.isRunning().get()) System.out.println("Order scanner is running.");
+			if(mempoolScanner!=null && mempoolScanner.getRunning().get()) System.out.println("Mempool scanner is running.");
+			if(pusher!=null && pusher.isRunning().get()) System.out.println("Webhook pusher is running.");
 			int choice = menu.choose(br);
 			switch (choice) {
 				case 1 -> new ServiceManager(esClient, jedis,br, configAPIP).menu();
@@ -131,18 +139,22 @@ public class StartAPIP {
 				case 5 -> manageIndices();
 				case 6 -> new Settings(jedis, esClient, br, configAPIP).menu();
 				case 0 -> {
-					if(orderScanner!=null && orderScanner.isRunning()) System.out.println("Order scanner is running.");
-					if(mempoolScanner!=null && mempoolScanner.isRunning()) System.out.println("Mempool scanner is running.");
+					if(orderScanner!=null && orderScanner.isRunning().get()) System.out.println("Order scanner is running.");
+					if(mempoolScanner!=null && mempoolScanner.getRunning().get()) System.out.println("Mempool scanner is running.");
+					if(mempoolCleaner!=null && mempoolScanner.getRunning().get()) System.out.println("Mempool cleaner is running.");
+					if(pusher!=null && pusher.isRunning().get()) System.out.println("Webhook pusher is running.");
 					System.out.println("Do you want to quit? 'q' to quit.");
 					String input = br.readLine();
 					if("q".equals(input)) {
 						if (mempoolScanner != null) mempoolScanner.shutdown();
 						if (orderScanner != null) orderScanner.shutdown();
 						if (mempoolCleaner != null) mempoolCleaner.shutdown();
+						if (pusher!=null)pusher.shutdown();
 						jedis.close();
 						br.close();
-						if(orderScanner==null ||!orderScanner.isRunning()) System.out.println("Order scanner is set to stop.");
-						if(mempoolScanner==null|| !mempoolScanner.isRunning()) System.out.println("Mempool scanner is set to stop.");
+						if(orderScanner==null ||!orderScanner.isRunning().get()) System.out.println("Order scanner is set to stop.");
+						if(mempoolScanner==null|| !mempoolScanner.getRunning().get()) System.out.println("Mempool scanner is set to stop.");
+						if(pusher==null ||!pusher.isRunning().get()) System.out.println("Webhook pusher is set to stop.");
 						System.out.println("Exited, see you again.");
 						return;
 					}
@@ -249,6 +261,20 @@ public class StartAPIP {
 			Thread thread2 = new Thread(orderScanner);
 			thread2.start();
 			log.debug("Order scanner is running.");
+		}
+	}
+
+	private static void startPusher(ConfigAPIP configAPIP, ElasticsearchClient esClient) throws IOException {
+		System.out.println("Start webhook pusher? 'y' to start. Other to ignore");
+		String input = StartAPIP.br.readLine();
+		if("y".equals(input)) {
+			String listenPath = configAPIP.getListenPath();
+
+			pusher = new Pusher(listenPath, esClient);
+			Thread thread3 = new Thread(pusher);
+			thread3.start();
+
+			log.debug("Webhook pusher is running.");
 		}
 	}
 

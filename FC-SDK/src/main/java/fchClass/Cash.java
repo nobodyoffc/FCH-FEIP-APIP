@@ -28,15 +28,6 @@ public class Cash {
 	private String unlockScript;	//unlock script.
 	private String sigHash;	//sigHash.
 	private String sequence;	//nSequence
-
-	public int getSpendTxIndex() {
-		return spendTxIndex;
-	}
-
-	public void setSpendTxIndex(int spendTxIndex) {
-		this.spendTxIndex = spendTxIndex;
-	}
-
 	private long cdd;		//CoinDays Destroyed
 	private long cd;		//CoinDays
 	private boolean valid;	//Is this cash valid (utxo), or spent (stxo);
@@ -73,6 +64,13 @@ public class Cash {
 
 	public void setSpendBlockId(String spendBlockId) {
 		this.spendBlockId = spendBlockId;
+	}
+	public int getSpendTxIndex() {
+		return spendTxIndex;
+	}
+
+	public void setSpendTxIndex(int spendTxIndex) {
+		this.spendTxIndex = spendTxIndex;
 	}
 
 	public String getCashId() {

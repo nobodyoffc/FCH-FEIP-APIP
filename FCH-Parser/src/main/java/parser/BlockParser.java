@@ -384,12 +384,11 @@ public class BlockParser {
 		ArrayList<byte[]> rawBytesList = new ArrayList<byte[]>(); // For returning raw bytes
 		ArrayList<Cash> rawInList = new ArrayList<Cash>();// For returning inputs without
 
-		Tx tx = tx1;
 		// Get input count./获得输入数量
 		VarintResult varintParseResult = new VarintResult();
 		varintParseResult = ParseTools.parseVarint(blockInputStream);
 		long inputCount = varintParseResult.number;
-		tx.setInCount((int) inputCount);
+		tx1.setInCount((int) inputCount);
 
 		byte[] bvVarint = varintParseResult.rawBytes;
 		rawBytesList.add(bvVarint);
@@ -398,10 +397,11 @@ public class BlockParser {
 		for (int j = 0; j < inputCount; j++) {
 			Cash input = new Cash();
 
-			input.setSpendTime(tx.getBlockTime());
-			input.setSpendTxIndex(tx.getTxIndex());
-			input.setBirthBlockId(tx.getBlockId());
-			input.setSpendHeight(tx.getHeight());
+			input.setSpendTime(tx1.getBlockTime());
+			input.setSpendTxIndex(tx1.getTxIndex());
+			input.setBirthBlockId(tx1.getBlockId());
+			input.setSpendHeight(tx1.getHeight());
+			input.setSpendBlockId(tx1.getBlockId());
 			input.setSpendIndex(j);
 			input.setValid(false);
 
@@ -448,7 +448,7 @@ public class BlockParser {
 
 		parseTxInResult.rawBytes = rawBytes;
 		parseTxInResult.rawInList = rawInList;
-		parseTxInResult.tx = tx;
+		parseTxInResult.tx = tx1;
 
 		return parseTxInResult;
 	}

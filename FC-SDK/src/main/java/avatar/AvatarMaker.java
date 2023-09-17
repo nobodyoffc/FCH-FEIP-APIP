@@ -1,6 +1,4 @@
 package avatar;
-
-        import keyTools.KeyTools;
         import net.coobird.thumbnailator.Thumbnails;
         import net.coobird.thumbnailator.geometry.Positions;
         import javax.imageio.ImageIO;

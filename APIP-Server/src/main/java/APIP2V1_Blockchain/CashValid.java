@@ -99,7 +99,7 @@ public class CashValid extends HttpServlet {
             return false;
         if(requestBody.getFcdsl().getQuery()==null)
             return false;
-        if(!requestBody.getFcdsl().getQuery().getTerms().getFields()[0].equals("fid"))
+        if(!requestBody.getFcdsl().getQuery().getTerms().getFields()[0].equals("owner"))
             return false;
         return true;
     }

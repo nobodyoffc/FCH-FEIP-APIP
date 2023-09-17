@@ -1,6 +1,7 @@
 package webhook;
 
 import apipClass.WebhookInfo;
+import apipClass.WebhookPushBody;
 import apipRequest.PostRequester;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.SortOrder;
@@ -14,7 +15,6 @@ import esTools.EsTools;
 import fcTools.ParseTools;
 import fchClass.Cash;
 import javaTools.BytesTools;
-import org.bouncycastle.pqc.legacy.crypto.rainbow.util.GF2Field;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
@@ -24,31 +24,32 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static constants.Strings.*;
 
 public class Pusher implements Runnable{
 
     private static final Logger log = LoggerFactory.getLogger(Pusher.class);
-    private boolean running;
+    private volatile AtomicBoolean running = new AtomicBoolean(true);
     private final String listenDir;
-    private ElasticsearchClient esClient;
-    private Map<String,Map<String,WebhookInfo>> methodFidEndpointInfoMapMap;
+    private final ElasticsearchClient esClient;
+    private Map<String,Map<String,WebhookInfo>> methodFidEndpointInfoMapMap = new HashMap<>();
+    private long sinceHeight;
 
-    public Pusher(boolean running, String listenDir, ElasticsearchClient esClient) {
-        this.running = running;
-        this.listenDir = listenDir;
+    public Pusher(String listenDir, ElasticsearchClient esClient) {
         this.esClient = esClient;
+        this.listenDir = listenDir;
     }
 
     @Override
     public void run() {
 
         try(Jedis jedis = new Jedis()) {
-
+            long bestHeight = Long.parseLong(jedis.get(BEST_HEIGHT));
+            sinceHeight=bestHeight;
             List<WebhookInfo> webhookInfoList;
             webhookInfoList = getWebhookInfoListFromEs(esClient);
-
             makeMethodFidEndpointMapMap(webhookInfoList);
 
             // <method:<owner:webhookInfo>>
@@ -57,14 +58,21 @@ public class Pusher implements Runnable{
             jedis.flushDB();
             setNewCashByFidsMapMapIntoRedis(methodFidEndpointInfoMapMap,jedis);
 
-            while (running) {
+            while (running.get()) {
+                jedis.select(Constants.RedisDb4Webhook);
                 readMethodFidWebhookInfoMapMapFromRedis(jedis);
                 ParseTools.waitForChangeInDirectory(listenDir, running);
                 TimeUnit.SECONDS.sleep(3);
-                pushWebhooks(methodFidEndpointInfoMapMap);
+                jedis.select(0);
+                bestHeight = Long.parseLong(jedis.get(BEST_HEIGHT));
+                if(sinceHeight<bestHeight) {
+                    pushWebhooks(methodFidEndpointInfoMapMap, sinceHeight);
+                    sinceHeight=bestHeight;
+                }
             }
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            log.debug("Run pusher thread wrong.");
         }
     }
 
@@ -80,11 +88,11 @@ public class Pusher implements Runnable{
             newCashByFidsHookInfoMap.put(owner,gson.fromJson(webhookInfoStr, WebhookInfo.class));
         }
         methodFidEndpointInfoMapMap.put(ApiNames.NewCashByFidsAPI,newCashByFidsHookInfoMap);
-
         //More method:
     }
 
     private void setNewCashByFidsMapMapIntoRedis(Map<String, Map<String, WebhookInfo>> methodFidEndpointInfoMapMap, Jedis jedis) {
+        if(methodFidEndpointInfoMapMap==null||methodFidEndpointInfoMapMap.size()==0)return;
         Gson gson = new Gson();
         for(String method:methodFidEndpointInfoMapMap.keySet()){
             Map<String, WebhookInfo> ownerWebhookInfoMap = methodFidEndpointInfoMapMap.get(method);
@@ -96,7 +104,7 @@ public class Pusher implements Runnable{
     }
 
     private void makeMethodFidEndpointMapMap(List<WebhookInfo> webhookInfoList) {
-
+        if(webhookInfoList==null || webhookInfoList.size()==0)return;
         Map<String, WebhookInfo> newCashByFidsWebhookInfoMap = new HashMap<>();
         for (WebhookInfo webhookInfo : webhookInfoList) {
             switch (webhookInfo.getMethod()) {
@@ -108,25 +116,27 @@ public class Pusher implements Runnable{
 
     private List<WebhookInfo> getWebhookInfoListFromEs(ElasticsearchClient esClient) {
         try {
-            ArrayList<WebhookInfo> webhookInfoList = EsTools.getAllList(esClient,IndicesNames.WEBHOOK, Strings.HOOK_ID,SortOrder.Asc, WebhookInfo.class);
-            return webhookInfoList;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            return EsTools.getAllList(esClient,StartAPIP.serviceName.toLowerCase()+"_"+IndicesNames.WEBHOOK, Strings.HOOK_ID,SortOrder.Asc, WebhookInfo.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Read webhook info failed.");
+            return null;
         }
     }
 
-    private void pushWebhooks(Map<String, Map<String, WebhookInfo>> methodFidWatchedFidsMapMap) {
+    private void pushWebhooks(Map<String, Map<String, WebhookInfo>> methodFidWatchedFidsMapMap,long sinceHeight) {
+
         for(String method: methodFidWatchedFidsMapMap.keySet()){
             switch (method){
-                case ApiNames.NewCashByFidsAPI-> putNewCashByFids(methodFidWatchedFidsMapMap.get(method));
+                case ApiNames.NewCashByFidsAPI-> putNewCashByFids(methodFidWatchedFidsMapMap.get(method),sinceHeight);
             }
         }
     }
 
-    private void putNewCashByFids(Map<String, WebhookInfo> ownerWebhookInfoMap) {
+    private void putNewCashByFids(Map<String, WebhookInfo> ownerWebhookInfoMap,long sinceHeight) {
         for(String owner:ownerWebhookInfoMap.keySet()){
             WebhookInfo webhookInfo = ownerWebhookInfoMap.get(owner);
-            ArrayList<Cash> newCashList = getNewCashList(webhookInfo);
+            ArrayList<Cash> newCashList = getNewCashList(webhookInfo,sinceHeight);
             if(newCashList==null)return;
             pushNewCashList(webhookInfo,newCashList);
         }
@@ -140,21 +150,25 @@ public class Pusher implements Runnable{
         String sessionName ;
         String sessionKey;
         String balance;
+        String bestHeight;
         try(Jedis jedis = new Jedis()){
-
-            balance = jedis.hget(Strings.FID_BALANCE,webhookInfo.getOwner());
-            String nPrice = jedis.hget(Strings.N_PRICE, ApiNames.NewCashByFidsAPI);
-            long price = Long.parseLong(jedis.hget(CONFIG,PRICE));
+            jedis.select(0);
+            balance = jedis.hget(StartAPIP.serviceName+"_"+Strings.FID_BALANCE,webhookInfo.getOwner());
+            if(balance==null)return;
+            String nPrice = jedis.hget(StartAPIP.serviceName+"_"+Strings.N_PRICE, ApiNames.NewCashByFidsAPI);
+            long price = (long)(Double.parseDouble(jedis.hget(CONFIG,PRICE))*Constants.FchToSatoshi);
             float nPriceF = Float.parseFloat(nPrice);
-            long balanceL = Long.parseLong(nPrice);
+            long balanceL = Long.parseLong(balance);
+            bestHeight = jedis.get(BEST_HEIGHT);
             boolean isPricePerRequest = Boolean.parseBoolean(jedis.hget(CONFIG, IS_PRICE_PER_REQUEST));
             if(isPricePerRequest){
-                long newbalanceL = (long) (balanceL-(price*nPriceF));
-                balance = String.valueOf(newbalanceL);
+                long newBalanceL = (long) (balanceL-(price*nPriceF));
+                balance = String.valueOf(newBalanceL);
                 jedis.hset(Strings.FID_BALANCE,webhookInfo.getOwner(),balance);
             }
 
             sessionName = jedis.hget(StartAPIP.serviceName+"_"+Strings.FID_SESSION_NAME,webhookInfo.getOwner());
+            if(sessionName==null)return;
             jedis.select(1);
             sessionKey = jedis.hget(sessionName,Strings.SESSION_KEY);
         }catch (Exception e){
@@ -167,23 +181,40 @@ public class Pusher implements Runnable{
 
         String endpoint = webhookInfo.getEndpoint();
 
+        WebhookPushBody postBody = new WebhookPushBody();
 
-        HashMap<String, String> headMap = new HashMap<>();
-        headMap.put(Constants.SIGN,sign);
-        headMap.put(Constants.SESSION_NAME,sessionName);
-        headMap.put(Constants.METHOD,method);
-        headMap.put(Constants.BALANCE,balance);
+        postBody.setData(dataStr);
+        postBody.setBalance(balance);
+        postBody.setBestHeight(bestHeight);
+        postBody.setFromSid(StartAPIP.service.getSid());
+        postBody.setMethod(method);
+        postBody.setSessionName(sessionName);
+        postBody.setSign(sign);
 
-        PostRequester.requestPost(endpoint,headMap,dataStr);
+        String result = PostRequester.requestPost(endpoint,null,gson.toJson(postBody));
+        System.out.println(result);
     }
 
-    private ArrayList<Cash> getNewCashList(WebhookInfo webhookInfo) {
-        String[] fids = (String[])webhookInfo.getData();
+    private ArrayList<Cash> getNewCashList(WebhookInfo webhookInfo,long sinceHeight) {
+        Gson gson = new Gson();
+
+        DataOfNewCashListByIds data = gson.fromJson(gson.toJson(webhookInfo.getData()),DataOfNewCashListByIds.class);
+        String[] fids = data.getFids();
         try {
-            return EsTools.getListByTerms(esClient,ApiNames.NewCashByFidsAPI,Strings.OWNER,fids,Strings.CASH_ID,SortOrder.Asc,Cash.class);
+            return EsTools.getListByTermsSinceHeight(esClient,IndicesNames.CASH,Strings.OWNER,fids,sinceHeight,Strings.CASH_ID,SortOrder.Asc,Cash.class);
         } catch (IOException e) {
             log.error("Get new cash list for "+ApiNames.NewCashByFidsAPI+" from ES wrong.",e);
             return null;
         }
+    }
+    public void shutdown() {
+        running.set(false);
+    }
+    public AtomicBoolean isRunning() {
+        return running;
+    }
+
+    public void setRunning(AtomicBoolean running) {
+        this.running = running;
     }
 }

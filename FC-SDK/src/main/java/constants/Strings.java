@@ -58,6 +58,7 @@ public class Strings {
     public static final String PRICE_PER_REQUEST = "pricePerRequest";
     public static final String BALANCE = "balance";
     public static final String REWARD = "reward";
+    public static final String WEBHOOK = "webhook";
     public static final String REWARD_ID = "rewardId";
     public static final String FBBP = "FBBP";
 
@@ -91,4 +92,5 @@ public class Strings {
     public static final String WEBHOOK_ENDPOINT_SESSION_KEY = "webhookEndpointSessionKey";
     public static final String DOT_JSON = ".json";
     public static final String CASH_ID = "cashId";
+    public static final String BIRTH_HEIGHT = "birthHeight";
 }

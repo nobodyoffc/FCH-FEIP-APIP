@@ -1,7 +1,5 @@
 package APIP17V1_Avatar;
 
-import avatar.AvatarMaker;
-
 import java.io.IOException;
 import java.util.Set;
 
@@ -47,7 +45,7 @@ public class Test {
     }
 
     private static void gen58(String basePath, String filePath) throws IOException {
-        Set<String> set = avatar.AvatarMaker.data.keySet();
+        Set<String> set = AvatarMaker.data.keySet();
         String[] chars = new String[set.size()];
         System.out.println(set.size());
         int i=0;

@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static constants.Constants.BalanceBackupInterval;
 import static constants.Constants.RewardInterval;
@@ -36,7 +37,7 @@ import static redisTools.ReadRedis.readHashLong;
 import static startAPIP.StartAPIP.getNameOfService;
 
 public class OrderScanner implements Runnable {
-    private volatile Boolean running = true;
+    private volatile AtomicBoolean running = new AtomicBoolean(true);
     private static final Logger log = LoggerFactory.getLogger(OrderScanner.class);
     public static  String serviceName;
     private final ElasticsearchClient esClient;
@@ -52,7 +53,7 @@ public class OrderScanner implements Runnable {
         this.esClient = esClient;
         this.service = StartAPIP.service;
     }
-    public Boolean isRunning(){
+    public AtomicBoolean isRunning(){
         return running;
     }
 
@@ -87,12 +88,12 @@ public class OrderScanner implements Runnable {
                 + "\nService Name: "
                 + service.getStdName()
                 + "\nAccount: " + params.getAccount());
-
+        System.out.println("Any Key to continue...");
         int countBackUpBalance = 0;
         int countReward = 0;
         Rewarder rewarder = new Rewarder(esClient,jedis0Common);
 
-        while (running) {
+        while (running.get()) {
             checkIfNewStart();
             checkRollback();
             getNewOrders();
@@ -121,7 +122,6 @@ public class OrderScanner implements Runnable {
                 countReward = 0;
             }
             waitNewOrder();
-
         }
     }
 
@@ -134,8 +134,8 @@ public class OrderScanner implements Runnable {
     }
 
 private void waitNewOrder() {
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    log.debug(LocalDateTime.now().format(formatter) + "  Wait for new order...");
+//    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+//    log.debug(LocalDateTime.now().format(formatter) + "  Wait for new order...");
     ParseTools.waitForChangeInDirectory(listenDir,running);
 }
 
@@ -320,7 +320,7 @@ private void waitNewOrder() {
                     lastHeight,
                     "cashId",
                     SortOrder.Asc,
-                    "fid",
+                    "owner",
                     account,
                     //params.getAccount(),
                     Cash.class);
@@ -353,11 +353,11 @@ private void waitNewOrder() {
     }
     public void shutdown() {
         jedis0Common.close();
-        running = false;
+        running.set(false);
     }
     public void restart(){
         jedis0Common = new Jedis();
-        running = true;
+        running.set(true);
     }
 
 }

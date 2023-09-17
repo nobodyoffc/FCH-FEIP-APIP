@@ -2,6 +2,7 @@ package FreeGetAPIs;
 
 import avatar.AvatarMaker;
 import constants.ApiNames;
+import data.ReplierForFree;
 import initial.Initiator;
 import constants.Strings;
 import redis.clients.jedis.Jedis;
@@ -31,10 +32,25 @@ public class GetAvatar extends HttpServlet {
         String avatarBasePath = null;
         String avatarPngPath = null;
         PrintWriter writer = response.getWriter();
+        ReplierForFree replier = new ReplierForFree();
 
-        if (Initiator.isFreeGetForbidden(writer)) return;
+        if (Initiator.isFreeGetForbidden(writer)) {
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            replier.setOther();
+            replier.setData("Error: FreeGet API is not active now.");
+            writer.write(replier.toJson());
+            return;
+        }
         fidRequested = request.getParameter("fid");
-        if (!(fidRequested.charAt(0) == 'F' || fidRequested.charAt(0) == '3')) return;
+        if (!(fidRequested.charAt(0) == 'F' || fidRequested.charAt(0) == '3')) {
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            replier.setOther();
+            replier.setData("Error: It is not a FID.");
+            writer.write(replier.toJson());
+            return;
+        }
         try(Jedis jedis0Common= jedisPool.getResource()) {
             avatarBasePath = jedis0Common.hget(CONFIG, Strings.AVATAR_BASE_PATH);
             avatarPngPath = jedis0Common.hget(CONFIG, Strings.AVATAR_PNG_PATH);

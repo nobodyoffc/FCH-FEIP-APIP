@@ -30,6 +30,12 @@
             <version>4.4.0-m1</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>net.coobird</groupId>
+            <artifactId>thumbnailator</artifactId>
+            <version>0.4.19</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
 </project>

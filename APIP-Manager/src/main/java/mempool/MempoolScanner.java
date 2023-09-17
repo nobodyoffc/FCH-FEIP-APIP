@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static constants.Strings.CONFIG;
 import static constants.Strings.CONFIG_FILE_PATH;
@@ -28,11 +29,11 @@ import static freecashRPC.FcRpcMethods.getTxIds;
 import static parser.RawTxParser.parseMempoolTx;
 
 public class MempoolScanner implements Runnable {
-    private volatile boolean running = true;
+    private volatile AtomicBoolean running = new AtomicBoolean(true);
     private static final Logger log = LoggerFactory.getLogger(MempoolScanner.class);
     private Jedis jedis = new Jedis();
     private final long IntervalSeconds = 5;
-    private ElasticsearchClient esClient;
+    private final ElasticsearchClient esClient;
 
     private final Gson gson = new Gson();
 
@@ -72,8 +73,10 @@ public class MempoolScanner implements Runnable {
 
     public void run() {
         jedis.select(3);
-        log.debug("Scanning mempool. Any key to continue...");
-        while (running) {
+        log.debug("Scanning mempool.");
+        System.out.println("Any key to continue...");
+
+        while (running.get()) {
             String[] txIds;
 
             txIds = getTxIds(fcClient);
@@ -155,8 +158,8 @@ public class MempoolScanner implements Runnable {
         String spendCountKey = "spendCount";
         String spendValueKey = "spendValue";
         String spendCashesKey = "spendCashes";
-        String incomeCount1 = "incomeCount";
-        String incomeValue1 = "incomeValue";
+        String incomeCountKey = "incomeCount";
+        String incomeValueKey = "incomeValue";
         String incomeCashesKey = "incomeCashes";
 
         Map<String, Long> fidNetMap = new HashMap<>();
@@ -168,24 +171,28 @@ public class MempoolScanner implements Runnable {
             int spendCount = 0;
             long spendValue = 0;
             String[] spendCashes = new String[0];
-            long net = 0;
+
             Map<String,Long> txValueMap;
 
+            String netStr = jedis.hget(fid, netKey);
+            long net;
+            if(netStr==null) net = 0;
+            else net = Long.parseLong(netStr);
+            net = net-cash.getValue();
+
             String spendCountStr = jedis.hget(fid, spendCountKey);
-            //String netStr = jedis3Unconfirmed.hget(fid, netKey);
             String spendValueStr = jedis.hget(fid, spendValueKey);
             String txValueMapStr = jedis.hget(fid, txValueMapKey);
+
             //Load existed values from redis
             if ( spendCountStr!= null) {
                 spendCount = Integer.parseInt(spendCountStr);
                 spendValue = Long.parseLong(spendValueStr);
-                //net = Long.parseLong(netStr);
                 spendCashes = gson.fromJson(jedis.hget(fid,spendCashesKey),String[].class);
-
                 if(spendCashes==null)spendCashes = new String[0];
             }
             spendValue += cash.getValue();
-            net = net-spendValue;
+
             spendCount++;
             String[] newSpendCashes = new String[spendCashes.length+1];
             System.arraycopy(spendCashes,0,newSpendCashes,0,spendCashes.length);
@@ -215,30 +222,33 @@ public class MempoolScanner implements Runnable {
             String fid = cash.getOwner();
             String txId = cash.getBirthTxId();
             //income数量，income金额，income数量，income金额，net净变化
+            long net;
+            String netStr = jedis.hget(fid, netKey);
+            if(netStr==null) net = 0;
+            else net = Long.parseLong(netStr);
+            net = net + cash.getValue();
+
             int incomeCount = 0;
             long incomeValue = 0;
-            long net = 0;
             String[] incomeCashes = new String[0];
-
             Map<String,Long> txValueMap;
-            String txValueMapStr = jedis.hget(fid, txValueMapKey);
 
-            if (jedis.hget(fid, incomeCount1) != null) {
-                incomeCount = Integer.parseInt(jedis.hget(fid, incomeCount1));
-                incomeValue = Long.parseLong(jedis.hget(fid, incomeValue1));
-                net = Long.parseLong(jedis.hget(fid, netKey));
+            if (jedis.hget(fid, incomeCountKey) != null) {
+                incomeCount = Integer.parseInt(jedis.hget(fid, incomeCountKey));
+                incomeValue = Long.parseLong(jedis.hget(fid, incomeValueKey));
                 incomeCashes = gson.fromJson(jedis.hget(fid,incomeCashesKey),String[].class);
                 if(incomeCashes==null)incomeCashes = new String[0];
             }
 
-            net = net+incomeValue;
             incomeValue += cash.getValue();
+
             incomeCount++;
 
             String[] newIncomeCashes = new String[incomeCashes.length+1];
             System.arraycopy(incomeCashes,0,newIncomeCashes,0,incomeCashes.length);
             newIncomeCashes[newIncomeCashes.length-1]=cash.getCashId();
 
+            String txValueMapStr = jedis.hget(fid, txValueMapKey);
             if(txValueMapStr!=null){
                 Type mapType = new TypeToken<Map<String, Long>>(){}.getType();
                 txValueMap = gson.fromJson(txValueMapStr,mapType);
@@ -248,8 +258,8 @@ public class MempoolScanner implements Runnable {
 
             txValueMap.merge(txId, cash.getValue(), Long::sum);
 
-            jedis.hset(fid, incomeValue1, String.valueOf(incomeValue));
-            jedis.hset(fid, incomeCount1, String.valueOf(incomeCount));
+            jedis.hset(fid, incomeValueKey, String.valueOf(incomeValue));
+            jedis.hset(fid, incomeCountKey, String.valueOf(incomeCount));
             jedis.hset(fid,incomeCashesKey,ParseTools.gsonString(newIncomeCashes));
             jedis.hset(fid, netKey, String.valueOf(net));
             jedis.hset(fid, txValueMapKey, ParseTools.gsonString(txValueMap));
@@ -258,14 +268,14 @@ public class MempoolScanner implements Runnable {
     }
     public void shutdown() {
         jedis.close();
-        running = false;
+        running.set(false);
     }
     public void restart(){
         jedis = new Jedis();
-        running = true;
+        running.set(true);
     }
 
-    public boolean isRunning() {
+    public AtomicBoolean getRunning() {
         return running;
     }
 }

@@ -63,8 +63,10 @@ public class PostRequester {
     public static String requestPost(String requestUrl, HashMap<String, String> headerMap,  String requestBody) {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpPost httpPost = new HttpPost(requestUrl);
-            for(String key: headerMap.keySet()){
-                httpPost.setHeader(key,headerMap.get(key));
+            if(headerMap!=null) {
+                for (String key : headerMap.keySet()) {
+                    httpPost.setHeader(key, headerMap.get(key));
+                }
             }
             httpPost.setHeader("Content-Type", "application/json");
 

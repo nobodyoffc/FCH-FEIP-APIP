@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import static constants.Constants.ORDER;
+import static constants.IndicesNames.WEBHOOK;
 import static constants.Strings.BALANCE;
 import static constants.Strings.REWARD;
 import static startAPIP.StartAPIP.getNameOfService;
@@ -31,7 +32,7 @@ public class IndicesAPIP {
     public static  final  String  orderMappingJsonStr = "{\"mappings\":{\"properties\":{\"amount\":{\"type\":\"long\"},\"orderId\":{\"type\":\"keyword\"},\"fromFid\":{\"type\":\"wildcard\"},\"height\":{\"type\":\"long\"},\"time\":{\"type\":\"long\"},\"toFid\":{\"type\":\"wildcard\"},\"txId\":{\"type\":\"keyword\"},\"txIndex\":{\"type\":\"long\"},\"txid\":{\"type\":\"keyword\"},\"via\":{\"type\":\"wildcard\"}}}}";
     public static  final  String  balanceMappingJsonStr = "{\"mappings\":{\"properties\":{\"user\":{\"type\":\"text\"},\"consumeVia\":{\"type\":\"text\"},\"orderVia\":{\"type\":\"text\"},\"bestHeight\":{\"type\":\"keyword\"}}}}";
     public static final String  rewardMappingJsonStr = "{\"mappings\":{\"properties\":{\"rewardId\":{\"type\":\"keyword\"},\"rewardT\":{\"type\":\"long\"},\"time\":{\"type\":\"long\"},\"txId\":{\"type\":\"keyword\"},\"state\":{\"type\":\"keyword\"},\"bestHeight\":{\"type\":\"keyword\"},\"builderList\":{\"type\":\"nested\",\"properties\":{\"fid\":{\"type\":\"keyword\"},\"share\":{\"type\":\"float\"},\"amount\":{\"type\":\"long\"},\"fixed\":{\"type\":\"long\"}}},\"orderViaList\":{\"type\":\"nested\",\"properties\":{\"fid\":{\"type\":\"keyword\"},\"share\":{\"type\":\"float\"},\"amount\":{\"type\":\"long\"},\"fixed\":{\"type\":\"long\"}}},\"consumeViaList\":{\"type\":\"nested\",\"properties\":{\"fid\":{\"type\":\"keyword\"},\"share\":{\"type\":\"float\"},\"amount\":{\"type\":\"long\"},\"fixed\":{\"type\":\"long\"}}},\"costList\":{\"type\":\"nested\",\"properties\":{\"fid\":{\"type\":\"keyword\"},\"share\":{\"type\":\"float\"},\"amount\":{\"type\":\"long\"},\"fixed\":{\"type\":\"long\"}}}}}}";
-
+    public static final String  webhookMappingJsonStr = "{\"mappings\":{\"properties\":{\"hookId\":{\"type\":\"keyword\"},\"owner\":{\"type\":\"wildcard\"},\"endpoint\":{\"type\":\"text\"},\"data\":{\"type\":\"object\"},\"method\":{\"type\":\"wildcard\"},\"op\":{\"type\":\"keyword\"}}}}";
     public IndicesAPIP(ElasticsearchClient esClient, Jedis jedis, BufferedReader br){
         this.br = br;
         this.jedis = jedis;
@@ -48,6 +49,7 @@ public class IndicesAPIP {
         menuItemList.add("Recreate Order index");
         menuItemList.add("Recreate Balance Backup index");
         menuItemList.add("Recreate Reward index");
+        menuItemList.add("Recreate Webhook index");
         menuItemList.add("Recreate Order, Balance and Reward indices");
 
         menu.add(menuItemList);
@@ -59,7 +61,8 @@ public class IndicesAPIP {
                 case 2 -> recreateApipIndex(br, esClient, jedis, ORDER, orderMappingJsonStr);
                 case 3 -> recreateApipIndex(br, esClient, jedis, BALANCE, balanceMappingJsonStr);
                 case 4 -> recreateApipIndex(br, esClient, jedis, REWARD, rewardMappingJsonStr);
-                case 5 -> recreateAllApipIndex(br, esClient, jedis);
+                case 5 -> recreateApipIndex(br, esClient, jedis, WEBHOOK, webhookMappingJsonStr);
+                case 6 -> recreateAllApipIndex(br, esClient, jedis);
                 case 0 -> {
                     return;
                 }
@@ -71,6 +74,7 @@ public class IndicesAPIP {
         recreateApipIndex(br, esClient, jedis, ORDER, orderMappingJsonStr);
         recreateApipIndex(br, esClient, jedis, BALANCE, balanceMappingJsonStr);
         recreateApipIndex(br, esClient, jedis, REWARD, rewardMappingJsonStr);
+        recreateApipIndex(br, esClient, jedis, WEBHOOK, webhookMappingJsonStr);
     }
 
     public static void recreateApipIndex(BufferedReader br, ElasticsearchClient esClient, Jedis jedis, String indexName, String mappingJsonStr) {
@@ -125,6 +129,11 @@ public class IndicesAPIP {
         String rewardIndex = getNameOfService(jedis, REWARD);
         if (noSuchIndex(esClient, rewardIndex)) {
             createIndex(rewardIndex,esClient,rewardMappingJsonStr);
+        }
+
+        String webhookIndex = getNameOfService(jedis, WEBHOOK);
+        if (noSuchIndex(esClient, webhookIndex)) {
+            createIndex(webhookIndex,esClient,webhookMappingJsonStr);
         }
     }
 

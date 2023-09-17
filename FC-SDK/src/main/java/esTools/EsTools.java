@@ -9,6 +9,7 @@ import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.elasticsearch.indices.CreateIndexResponse;
 import co.elastic.clients.elasticsearch.indices.DeleteIndexResponse;
 import co.elastic.clients.json.JsonData;
+import constants.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -192,7 +193,7 @@ public class EsTools {
         return result;
     }
 
-    public static <T> ArrayList<T> getListByTerms(ElasticsearchClient esClient, String index, String termField,String[] termValues,String sortField, SortOrder order, Class<T> clazz) throws IOException {
+    public static <T> ArrayList<T> getListByTermsSinceHeight(ElasticsearchClient esClient, String index, String termField, String[] termValues, long sinceHeight,String sortField, SortOrder order, Class<T> clazz) throws IOException {
 
         List<FieldValue> values = new ArrayList<>();
         for(String v:termValues){
@@ -200,7 +201,10 @@ public class EsTools {
         }
 
         SearchResponse<T> result = esClient.search(s -> s.index(index)
-                .query(q -> q.terms(t->t.field(termField).terms(t1->t1.value(values))))
+                .query(q->q.bool(b->b
+                        .must(m1->m1.terms(t->t.field(termField).terms(t1->t1.value(values))))
+                        .must(m2->m2.range(r->r.field(Strings.BIRTH_HEIGHT).gte(JsonData.of(sinceHeight))))
+                ))
                 .size(EsTools.READ_MAX)
                 .sort(s1 -> s1
                         .field(f -> f
@@ -290,10 +294,11 @@ public class EsTools {
         SearchResponse<T> result = esClient.search(s -> s.index(index)
                 .query(q -> q.matchAll(m->m))
                 .size(EsTools.READ_MAX)
-                .sort(s1 -> s1
-                        .field(f -> f
-                                .field(sortField).order(order)
-                        )), clazz);
+//                .sort(s1 -> s1
+//                        .field(f -> f
+//                                .field(sortField).order(order)
+//                        ))
+                , clazz);
 
         if (result.hits().total().value() == 0) return null;
 
@@ -315,7 +320,7 @@ public class EsTools {
                         .size(EsTools.READ_MAX)
                         .sort(s1 -> s1
                                 .field(f -> f
-                                        .field(sortField).order(SortOrder.Asc)
+                                        .field(sortField).order(order)
                                 ))
                         .searchAfter(lastSort1), clazz);
 

@@ -24,38 +24,6 @@ import java.util.*;
 
 public class WalletTools {
     static final double Million = 100000000d;
-//    public static void main(String[] args) throws Throwable {
-//        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-//
-//        System.out.println("Input the sending address: ");
-//        String fromAddr = br.readLine();
-//        if("".equals(fromAddr))return;
-////
-////        System.out.println("Input the receiving address: ");
-////        String toAddr = br.readLine();
-////
-////        System.out.println("Input the text being wrote into OP_RETURN: ");
-////        String opReturn = br.readLine();
-//
-//        NewEsClient newEsClient = new NewEsClient();
-//        System.out.println("Create esClient.");
-//        ElasticsearchClient esClient = newEsClient.getClientHttp("127.0.0.1", 9200);
-//        JsonRpcHttpClient fcClient = createFcRpcClient();
-//
-////        long cd = 1;
-//
-////        String unsignedRawTx = makeOpCdTx(esClient, fcClient, fromAddr, toAddr, opReturn, cd);
-////        SignResult signedRawTxResult = FcRpcMethods.signRawTxWithWallet(fcClient, unsignedRawTx);
-////
-////        String sighedRawTx = signedRawTxResult.getHex();
-////
-////        System.out.println("Sent. "+FcRpcMethods.sendTx(fcClient,sighedRawTx));
-//        splitCashes(esClient,fcClient,fromAddr,100,20);
-//
-//        newEsClient.shutdownClient();
-//        br.close();
-//    }
-
     private static JsonRpcHttpClient createFcRpcClient() {
 
         System.out.println("Create esClient test");
@@ -165,7 +133,7 @@ public class WalletTools {
         List<Cash> cashList = new ArrayList<>();
         SearchResponse<Cash> result = esClient.search(s -> s.index("cash")
                 .query(q ->q.bool(b->b.must(m->m
-                                .term(t -> t.field("fid").value(addr))
+                                .term(t -> t.field("owner").value(addr))
                         ).must(m1->m1.term(t1->t1.field("valid").value(true))))
                 )
                 .trackTotalHits(tr->tr.enabled(true))
@@ -236,7 +204,7 @@ public class WalletTools {
         System.out.println("get cash list.");
         SearchResponse<Cash> result = esClient.search(s -> s.index("cash")
                 .query(q ->q.bool(b->b.must(m->m
-                                .term(t -> t.field("fid").value(addr))
+                                .term(t -> t.field("owner").value(addr))
                         ).must(m1->m1.term(t1->t1.field("valid").value(true))))
                 )
                 .trackTotalHits(tr->tr.enabled(true))
@@ -352,7 +320,7 @@ public class WalletTools {
         CashListReturn cashListReturn = new CashListReturn();
         SearchResponse<Cash> result = esClient.search(s -> s.index(index)
                 .query(q ->q.bool(b->b
-                                .must(m->m.term(t -> t.field("fid").value(addrRequested)))
+                                .must(m->m.term(t -> t.field("owner").value(addrRequested)))
                                 .must(m1->m1.term(t1->t1.field("valid").value(true)))
                                 .must(m2->m2.range(r1->r1.field("cd").gte(JsonData.of(cd))))
                         )
@@ -380,7 +348,7 @@ public class WalletTools {
 
         SearchResponse<Cash> result = esClient.search(s -> s.index(index)
                 .query(q ->q.bool(b->b
-                                .must(m->m.term(t -> t.field("fid").value(addrRequested)))
+                                .must(m->m.term(t -> t.field("owner").value(addrRequested)))
                                 .must(m1->m1.term(t1->t1.field("valid").value(true)))
                                 .must(m2->m2.range(r1->r1.field("cd").lte(JsonData.of(cd))))
                         )
@@ -450,7 +418,7 @@ public class WalletTools {
         try {
             result = esClient.search(s -> s.index(index)
                     .query(q ->q.bool(b->b
-                                    .must(m->m.term(t -> t.field("fid").value(addrRequested)))
+                                    .must(m->m.term(t -> t.field("owner").value(addrRequested)))
                                     .must(m1->m1.term(t1->t1.field("valid").value(true)))
     //                                .must(m2->m2.range(r1->r1.field("value").lte(JsonData.of(value))))
                             )

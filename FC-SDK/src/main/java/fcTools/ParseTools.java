@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static constants.Constants.FchToSatoshi;
 
@@ -127,22 +128,25 @@ public class ParseTools {
         return;
     }
 
-    public static void waitForChangeInDirectory(String directoryPathStr, Boolean running) {
+    public static void waitForChangeInDirectory(String directoryPathStr, AtomicBoolean running) {
         try {
             Path directory = Paths.get(directoryPathStr);
 
             try (WatchService watchService = FileSystems.getDefault().newWatchService()) {
                 directory.register(watchService, StandardWatchEventKinds.ENTRY_CREATE,
-                        StandardWatchEventKinds.ENTRY_DELETE,
-                        StandardWatchEventKinds.ENTRY_MODIFY);
+                        StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY);
 
-                while (running) {
+                while (running.get()) {
                     WatchKey key = watchService.take();
                     for (WatchEvent<?> event : key.pollEvents()) {
                         WatchEvent.Kind<?> kind = event.kind();
 
                         if (kind != StandardWatchEventKinds.OVERFLOW) {
-                            WatchEvent<Path> ev = (WatchEvent<Path>) event;
+                            if (event.context() instanceof Path) {
+                                WatchEvent<Path> ev = (WatchEvent<Path>) event;
+//                                System.out.println("Path affected: " + ev.context() + ", event kind: " + ev.kind());
+                                return;
+                            }
                         }
                     }
 
@@ -152,13 +156,48 @@ public class ParseTools {
                     }
                 }
             }
-        } catch (IOException e) {
+        } catch (IOException | InvalidPathException e) {
             System.err.println("Error while watching directory: " + e.getMessage());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             System.err.println("Waiting for directory interrupted: " + e.getMessage());
         }
     }
+//
+//    public static void waitForChangeInDirectory(String directoryPathStr, AtomicBoolean running) {
+//        try {
+//            Path directory = Paths.get(directoryPathStr);
+//
+//            try (WatchService watchService = FileSystems.getDefault().newWatchService()) {
+//                directory.register(watchService, StandardWatchEventKinds.ENTRY_CREATE,
+//                        StandardWatchEventKinds.ENTRY_DELETE,
+//                        StandardWatchEventKinds.ENTRY_MODIFY);
+//
+//                while (running.get()) {
+//                    WatchKey key = watchService.take();
+//                    for (WatchEvent<?> event : key.pollEvents()) {
+//                        WatchEvent.Kind<?> kind = event.kind();
+//
+//                        if (kind != StandardWatchEventKinds.OVERFLOW) {
+//                            WatchEvent<Path> ev = (WatchEvent<Path>) event;
+//                        }
+//                    }
+//
+//                    boolean valid = key.reset();
+//                    if (!valid) {
+//                        //TODO
+//                        System.out.println(directoryPathStr+" changed.");
+//                        break;
+//                    }
+//                }
+//            }
+//        } catch (IOException e) {
+//            System.err.println("Error while watching directory: " + e.getMessage());
+//        } catch (InterruptedException e) {
+//            Thread.currentThread().interrupt();
+//            System.err.println("Waiting for directory interrupted: " + e.getMessage());
+//        }
+//    }
 
     public static void waitForNewItemInFile(String filePathStr) {
         try {

@@ -6,8 +6,8 @@ import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import constants.ApiNames;
 import constants.IndicesNames;
+import data.ReplierForFree;
 import feipClass.Service;
-import fcTools.ParseTools;
 import initial.Initiator;
 
 import javax.servlet.ServletException;
@@ -28,25 +28,41 @@ public class GetServices extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
 
         PrintWriter writer = response.getWriter();
+        ReplierForFree replier = new ReplierForFree();
 
-        if (Initiator.isFreeGetForbidden(writer)) return;
+        if (Initiator.isFreeGetForbidden(writer)) {
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            replier.setOther();
+            replier.setData("Error: FreeGet API is not active now.");
+            writer.write(replier.toJson());
+            return;
+        }
         ElasticsearchClient esClient = Initiator.esClient;
 
 
-        SearchResponse<Service> cashResult = esClient.search(s -> s.index(IndicesNames.SERVICE)
+        SearchResponse<Service> result = esClient.search(s -> s.index(IndicesNames.SERVICE)
                 .query(q -> q.term(t -> t.field("active").value(true)))
                 .size(20)
                 .sort(so -> so.field(f -> f.field("tRate").order(SortOrder.Desc).field("tCdd").order(SortOrder.Desc)))
                 , Service.class);
-        List<Hit<Service>> hitList = cashResult.hits().hits();
+        List<Hit<Service>> hitList = result.hits().hits();
         if(hitList==null || hitList.size()==0){
-            writer.write("Service no found.");
+            replier.setOther();
+            replier.setData("Service no found.");
+            writer.write(replier.toJson());
             return;
         }
         List<Service> foundList = new ArrayList<>();
         for(Hit<Service> hit : hitList){
             foundList.add(hit.source());
         }
-        writer.write(ParseTools.gsonString(foundList));
+
+        assert result.hits().total() != null;
+        replier.setTotal(result.hits().total().value());
+        replier.setGot(foundList.size());
+        replier.setSuccess();
+        replier.setData(foundList);
+        writer.write(replier.toJson());
     }
 }

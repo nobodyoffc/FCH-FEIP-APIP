@@ -1,5 +1,6 @@
 package redisTools;
 
+import constants.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
@@ -39,7 +40,13 @@ public class GetJedis {
 //            jedisConfig.setTestOnReturn(true);
 //            jedisConfig.setTestWhileIdle(true);
             JedisPool jedisPool1 = new JedisPool(jedisConfig, "localhost",6379,10000);
-            log.debug("Jedis pool created.");
+            try(Jedis jedis = jedisPool1.getResource()){
+                jedis.set("test","ok");
+                if("ok".equals(jedis.get("test"))){
+                    log.debug("Jedis pool created and tested.");
+                    jedis.del("test");
+                }
+            }
             return jedisPool1;
         }catch (Exception e){
             log.debug("Create jedisPool or jedis wrong. ",e);

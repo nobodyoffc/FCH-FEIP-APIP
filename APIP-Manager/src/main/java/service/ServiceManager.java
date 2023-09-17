@@ -10,11 +10,13 @@ import com.google.gson.GsonBuilder;
 import config.ConfigAPIP;
 import constants.FieldNames;
 import constants.OpNames;
+import feipClass.Service;
 import feipClass.ServiceData;
 import fcTools.ParseTools;
 import keyTools.KeyTools;
 import menu.Inputer;
 import menu.Menu;
+import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
@@ -147,12 +149,13 @@ public class ServiceManager {
 		}
 
 		String finalStr = str;
-		SearchResponse<ApipService> result = esClient.search(s -> s.index(SERVICE).query(q -> q.term(t -> t.field(FieldNames.OWNER).value(finalStr))), ApipService.class);
+//		SearchResponse<ApipService> result = esClient.search(s -> s.index(SERVICE).query(q -> q.term(t -> t.field(FieldNames.OWNER).value(finalStr))), ApipService.class);
+		SearchResponse<Service> result = esClient.search(s -> s.index(SERVICE).query(q -> q.bool(b->b.must(m->m.term(t -> t.field(FieldNames.OWNER).value(finalStr))).must(m1->m1.term(t -> t.field(FieldNames.TYPES).value("APIP"))))), Service.class);
 
-		List<Hit<ApipService>> hitList = result.hits().hits();
-        ArrayList<ApipService> serviceList = new ArrayList<ApipService>();
-        for(Hit<ApipService> hit:hitList){
-			ApipService s = hit.source();
+		List<Hit<Service>> hitList = result.hits().hits();
+        ArrayList<Service> serviceList = new ArrayList<Service>();
+        for(Hit<Service> hit:hitList){
+			Service s = hit.source();
 			if(s.isClosed())continue;
             serviceList.add(s);
         }
@@ -162,28 +165,69 @@ public class ServiceManager {
 			br.readLine();
             return null;
         }
-        for(int i = 0;i<size;i++){
-			StartAPIP.service = serviceList.get(i);
-            System.out.println((i+1) +". service \nname: "+ StartAPIP.service.getStdName()+"\nsid: "+StartAPIP.service.getSid());
-        }
-        if(size==1){
-			return StartAPIP.service;
-        }
+		Service serviceRow;
 
+		ApipService service1;
 		int choice = 0;
-		while (true) {
-			String input = br.readLine();
-			try {
-				choice = Integer.parseInt(input);
-				break;
-			}catch (Exception e){
-				System.out.println("Input a integer please:");
-			}
-        }
+		do{
+			System.out.println("Choice your service:");
+			for(int i = 0;i<size;i++){
 
-		StartAPIP.service= serviceList.get(choice-1);
-        System.out.println(choice +". service name: "+ StartAPIP.service.getStdName()+"sid: "+StartAPIP.service.getSid());
-        return StartAPIP.service;
+				serviceRow = serviceList.get(i);
+				System.out.println((i+1) +". service \nname: "+ serviceRow.getStdName()+"\nsid: "+serviceRow.getSid());
+			}
+			if(size==1){
+				return serviceToApip(serviceList.get(0));
+			}
+
+			while (true) {
+				String input = br.readLine();
+				try {
+					choice = Integer.parseInt(input);
+					break;
+				}catch (Exception e){
+					System.out.println("Input a integer please:");
+				}
+			}
+			service1 = serviceToApip(serviceList.get(choice - 1));
+		}while (service1==null);
+        System.out.println(choice +". name: "+ StartAPIP.service.getStdName()+"sid: "+StartAPIP.service.getSid());
+        return service1;
+	}
+
+	private ApipService serviceToApip(Service serviceRow) {
+		ApipService apipService = new ApipService();
+
+		Gson gson = new Gson();
+		try {
+			apipService.setParams(gson.fromJson(gson.toJson(serviceRow.getParams()), Params.class));
+		}catch (Exception e){
+			System.out.println("It is not an APIP service.");
+			return null;
+		}
+		apipService.setSid(serviceRow.getSid());
+		apipService.setStdName(serviceRow.getStdName());
+		apipService.setLocalNames(serviceRow.getLocalNames());
+		apipService.setDesc(serviceRow.getDesc());
+		apipService.setTypes(serviceRow.getTypes());
+		apipService.setUrls(serviceRow.getUrls());
+		apipService.setWaiters(serviceRow.getWaiters());
+		apipService.setProtocols(serviceRow.getProtocols());
+		apipService.setCodes(serviceRow.getCodes());
+		apipService.setOwner(serviceRow.getOwner());
+		apipService.setBirthTime(serviceRow.getBirthTime());
+		apipService.setBirthHeight(serviceRow.getBirthHeight());
+		apipService.setLastTxId(serviceRow.getLastTxId());
+		apipService.setLastTime(serviceRow.getLastTime());
+		apipService.setLastHeight(serviceRow.getLastHeight());
+		apipService.settCdd(serviceRow.gettCdd());
+		apipService.settRate(serviceRow.gettRate());
+
+		apipService.setActive(serviceRow.isActive());
+		apipService.setClosed(serviceRow.isClosed());
+		apipService.setCloseStatement(serviceRow.getCloseStatement());
+
+		return apipService;
 	}
 
 	public void publish(BufferedReader br, Jedis jedis) throws IOException {
@@ -349,6 +393,8 @@ public class ServiceManager {
 		ServiceData data = new ServiceData();
 
 		data.setOp(OpNames.UPDATE);
+		String[] types = {"APIP","FEIP"};
+		data.setTypes(types);
 		data.setSid(sid);
 
 		updateStdName(br, service, data);

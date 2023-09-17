@@ -1,7 +1,5 @@
 package constants;
 
-import com.xwc1125.chain5j.crypto.Sign;
-
 public class Constants {
 
 

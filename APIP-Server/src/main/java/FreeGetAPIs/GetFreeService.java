@@ -3,7 +3,7 @@ package FreeGetAPIs;
 import com.google.gson.Gson;
 import constants.ApiNames;
 import constants.Strings;
-import fcTools.ParseTools;
+import data.ReplierForFree;
 import initial.Initiator;
 import redis.clients.jedis.Jedis;
 import service.ApipService;
@@ -27,11 +27,18 @@ public class GetFreeService  extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-
+        ReplierForFree replier = new ReplierForFree();
         PrintWriter writer = response.getWriter();
         ApipService service;
         try (Jedis jedis = Initiator.jedisPool.getResource()) {
-            if (Initiator.isFreeGetForbidden(writer)) return;
+            if (Initiator.isFreeGetForbidden(writer)) {
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                replier.setOther();
+                replier.setData("Error: FreeGet API is not active now.");
+                writer.write(replier.toJson());
+                return;
+            }
             service = new Gson().fromJson(jedis.get(Initiator.serviceName +"_"+ Strings.SERVICE), ApipService.class);
             Map<String, String> data = new HashMap<>();
 
@@ -56,10 +63,14 @@ public class GetFreeService  extends HttpServlet {
                 jedis.select(1);
                 publicSessionKey = jedis.hget(key, SESSION_KEY);
                 data.put(SESSION_KEY, publicSessionKey);
-                writer.write(ParseTools.gsonString(data));
+
+                replier.setSuccess();
+                replier.setData(data);
+                writer.write(replier.toJson());
             }catch (Exception e){
-                data.put("Error", "Can't get free sessionKey.");
-                writer.write(ParseTools.gsonString(data));
+                replier.setOther();
+                replier.setData("Can't get free sessionKey.");
+                writer.write(replier.toJson());
             }
         }
     }

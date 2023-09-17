@@ -71,6 +71,8 @@ public class SignInAPI extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
         PrintWriter writer = response.getWriter();
         RequestChecker requestChecker = new RequestChecker(request, response,replier);
         SignInCheckResult signInCheckResult;
@@ -140,17 +142,22 @@ public class SignInAPI extends HttpServlet {
 
 
     private SignInReplyData makeSession() throws Exception {
-
-        String sessionKey = genSessionKey();
-        String sessionName = makeSessionName(sessionKey);
-        SignInReplyData data = new SignInReplyData();
-
-        Map<String,String> sessionMap = new HashMap<>();
-        sessionMap.put("sessionKey",sessionKey);
-        sessionMap.put("fid", fid);
+        String sessionKey;
+        String sessionName;
+        SignInReplyData data;
+        try(Jedis jedis = Initiator.jedisPool.getResource()) {
+            jedis.select(1);
+            do {
+                sessionKey = genSessionKey();
+                sessionName = makeSessionName(sessionKey);
+            } while (jedis.exists(sessionName));
+            data = new SignInReplyData();
+            Map<String,String> sessionMap = new HashMap<>();
+            sessionMap.put("sessionKey",sessionKey);
+            sessionMap.put("fid", fid);
 
         //Delete the old session of the requester.
-        try(Jedis jedis = Initiator.jedisPool.getResource()) {
+            jedis.select(0);
             String oldSessionName = jedis.hget(Initiator.serviceName+"_"+Strings.FID_SESSION_NAME, fid);
 
             jedis.select(1);
@@ -159,12 +166,15 @@ public class SignInAPI extends HttpServlet {
             //Set the new session
             jedis.hmset(sessionName, sessionMap);
             Params params = service.getParams();
+
             long lifeSeconds = Long.parseLong(params.getSessionDays()) * 86400;
+
             jedis.expire(sessionName, lifeSeconds);
             jedis.close();
 
             data.setSessionKey(sessionKey);
             long expireTime = System.currentTimeMillis() + (lifeSeconds * 1000);
+
             data.setExpireTime(expireTime);
 
             jedis.select(0);

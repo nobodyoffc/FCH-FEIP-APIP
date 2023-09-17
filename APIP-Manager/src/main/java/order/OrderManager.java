@@ -100,7 +100,7 @@ public class OrderManager {
     private void switchOrderScanner(OrderScanner orderScanner) {
         System.out.println("OrderScanner running is "+orderScanner.isRunning()+".");
         Menu.askIfNotToDo("Switch it?",br);
-        if(orderScanner.isRunning()){
+        if(orderScanner.isRunning().get()){
             orderScanner.shutdown();
         }else{
             orderScanner.restart();
