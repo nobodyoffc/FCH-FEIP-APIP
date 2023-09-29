@@ -1,11 +1,13 @@
 package apipClass;
 
 import eccAes256K1P7.EccAes256K1P7;
+import eccAes256K1P7.EccAesData;
+import eccAes256K1P7.EccAesDataByte;
+import eccAes256K1P7.EccAesType;
 import javaTools.BytesTools;
 import menu.Inputer;
 
 import java.io.BufferedReader;
-import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.HexFormat;
 
@@ -70,13 +72,13 @@ public class ApipDataRequestParams {
 
     public void inputBuyerPriKeyCipher(BufferedReader br){
         while (true) {
-            System.out.println("Input the cipher of APIP buyer's private key in Base64:");
+            System.out.println("Input the cipher json of APIP buyer's private key:");
             String cipher = Inputer.inputString(br);
             if (cipher==null||"".equals(cipher))return;
-            if(!BytesTools.isBase64Encoded(cipher)){
-                System.out.println("It's not Base64 encoded. Try again.");
-                continue;
-            }
+//            if(!BytesTools.isBase64Encoded(cipher)){
+//                System.out.println("It's not Base64 encoded. Try again.");
+//                continue;
+//            }
             apipBuyerPriKeyCipher = cipher;
             return;
         }
@@ -84,10 +86,17 @@ public class ApipDataRequestParams {
 
     public byte[] decryptApipBuyerPriKey(String cipher,BufferedReader br){
         System.out.println("Decrypt APIP buyer private key...");
-        byte[] cipherBytes = Base64.getDecoder().decode(cipher);
-        byte[] password = inputPassword(br);
+        char[] password = inputPassword(br);
         EccAes256K1P7 ecc = new EccAes256K1P7();
-        byte[] priKey = ecc.decryptPasswordBundle(cipherBytes, password);
+        EccAesData eccAesData = new EccAesData();
+        eccAesData.fromJson(cipher);
+        ecc.decrypt(eccAesData);
+        String error = eccAesData.getError();
+        if(error==null){
+            System.out.println("Error:"+error);
+            return null;
+        }
+        byte[] priKey = EccAesDataByte.fromEccAesData(eccAesData).getMsg();
         String priKeyStr = new String(priKey);
         if(BytesTools.isHexString(priKeyStr)){
             System.out.println("Got APIP buyer priKey from UTF-8 encoded hex.");
@@ -101,25 +110,31 @@ public class ApipDataRequestParams {
     public void inputSessionKeyCipher(BufferedReader br) {
         String ask = "Input sessionKey:";
         char[] sessionKey = Inputer.input32BytesKey(br, ask);
+        char[] passwordBytes = inputPassword(br);
         assert sessionKey != null;
-        byte[] passwordBytes = inputPassword(br);
         byte[] sessionKeyBytes = BytesTools.hexCharArrayToByteArray(sessionKey);
-        sessionKeyCipher = Base64.getEncoder().encodeToString(encryptKey(sessionKeyBytes,passwordBytes));
+        sessionKeyCipher = encryptKey(sessionKeyBytes,BytesTools.hexCharArrayToByteArray(passwordBytes));
         System.out.println("SessionKeyCipher is: "+sessionKeyCipher);
-        BytesTools.clearByteArray(passwordBytes);
+        BytesTools.clearCharArray(passwordBytes);
     }
 
-    public byte[] inputPassword(BufferedReader br) {
+    public char[] inputPassword(BufferedReader br) {
         String ask;
         ask = "Input password:";
         char[] password = Inputer.inputPassword(br, ask);
-        byte[] passwordBytes = BytesTools.charArrayToByteArray(password, StandardCharsets.UTF_8);
+//        byte[] passwordBytes = BytesTools.charArrayToByteArray(password, StandardCharsets.UTF_8);
         BytesTools.clearCharArray(password);
-        return passwordBytes;
+        return password;
     }
 
-    public byte[] encryptKey(byte[] keyBytes, byte[] passwordBytes) {
+    public String encryptKey(byte[] keyBytes, byte[] passwordBytes) {
         EccAes256K1P7 ecc = new EccAes256K1P7();
-        return ecc.encryptPasswordBundle(keyBytes,passwordBytes);
+
+        EccAesDataByte eccAesDataByte = new EccAesDataByte();
+        eccAesDataByte.setType(EccAesType.Password);
+        eccAesDataByte.setMsg(keyBytes);
+        eccAesDataByte.setPassword(passwordBytes);
+        ecc.encrypt(eccAesDataByte);
+        return EccAesData.fromEccAesDataByte(eccAesDataByte).toJson();
     }
 }

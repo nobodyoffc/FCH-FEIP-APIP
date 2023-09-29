@@ -14,7 +14,6 @@ import fcTools.ParseTools;
 import fchClass.Cash;
 import freecashRPC.FcRpcMethods;
 import freecashRPC.NewFcRpcClient;
-import freecashRPC.SignResult;
 import javaTools.BytesTools;
 import redis.clients.jedis.Jedis;
 
@@ -118,9 +117,9 @@ public class WalletTools {
         int outputNum = outputs.size();
         long length = 0 ;
         if(opLength==0) {
-            length = 6+ (32+4+3+66+66+4)*inputNum +(8+1+25+4)*(outputNum+1);
+            length = 6+ (long) (32 + 4 + 3 + 66 + 66 + 4) *inputNum + (long) (8 + 1 + 25 + 4) *(outputNum+1);
         }else{
-            length= 6+ (32+4+3+66+66+4)*inputNum +(8+1+25+4)*(outputNum+1)+ opLength+11;
+            length= 6+ (long) (32 + 4 + 3 + 66 + 66 + 4) *inputNum + (long) (8 + 1 + 25 + 4) *(outputNum+1)+ opLength+11;
         }
 
         long fee = priceInSatoshi*length;
@@ -173,33 +172,33 @@ public class WalletTools {
 
     public static void checkUnconfirmed(String addr, List<Cash> meetList) {
         Gson gson = new Gson();
-        Jedis jedis3Mempool = new Jedis();
-        jedis3Mempool.select(3);
-        String spendCashIdStr = jedis3Mempool.hget(addr,"spendCashes");
-        if(spendCashIdStr!=null){
-            String[] spendCashIdList = gson.fromJson(spendCashIdStr, String[].class);
-            Iterator<Cash> iter = meetList.iterator();
-            while(iter.hasNext()){
-                Cash cash = iter.next();
-                for(String id : spendCashIdList){
-                    if(id.equals(cash.getCashId()))iter.remove();
-                    break;
+        try(Jedis jedis3Mempool = new Jedis()) {
+            jedis3Mempool.select(3);
+            String spendCashIdStr = jedis3Mempool.hget(addr, "spendCashes");
+            if (spendCashIdStr != null) {
+                String[] spendCashIdList = gson.fromJson(spendCashIdStr, String[].class);
+                Iterator<Cash> iter = meetList.iterator();
+                while (iter.hasNext()) {
+                    Cash cash = iter.next();
+                    for (String id : spendCashIdList) {
+                        if (id.equals(cash.getCashId())) iter.remove();
+                        break;
+                    }
                 }
             }
-        }
 
-        String newCashIdStr = jedis3Mempool.hget(addr,"newCashes");
-        if(newCashIdStr!=null){
-            String[] newCashIdList = gson.fromJson(newCashIdStr, String[].class);
-            for(String id :newCashIdList){
-                Cash cash = gson.fromJson(jedis3Mempool.hget("newCashes",id),Cash.class);
-                if(cash!=null)meetList.add(cash);
+            String newCashIdStr = jedis3Mempool.hget(addr, "newCashes");
+            if (newCashIdStr != null) {
+                String[] newCashIdList = gson.fromJson(newCashIdStr, String[].class);
+                for (String id : newCashIdList) {
+                    Cash cash = gson.fromJson(jedis3Mempool.hget("newCashes", id), Cash.class);
+                    if (cash != null) meetList.add(cash);
+                }
             }
         }
     }
 
-    public static void splitCashes(ElasticsearchClient esClient, JsonRpcHttpClient fcClient,String addr, int inCount, int outCount) throws Throwable {
-
+    public static String splitCashes(ElasticsearchClient esClient, JsonRpcHttpClient fcClient, String addr, int inCount, int outCount) throws Throwable {
 
         System.out.println("get cash list.");
         SearchResponse<Cash> result = esClient.search(s -> s.index("cash")
@@ -213,9 +212,7 @@ public class WalletTools {
                 .sort(s1->s1.field(f->f.field("cd").order(SortOrder.Asc).field("value").order(SortOrder.Asc)))
                 .size(inCount), Cash.class);
 
-        System.out.println(result.hits().total());
-
-        if(result==null)return;
+        if(result==null) return addr;
 
         long cdSum = (long)result.aggregations().get("cdSum").sum().value();
         long valueSum = (long)result.aggregations().get("valueSum").sum().value();
@@ -223,41 +220,31 @@ public class WalletTools {
 
         List<Hit<Cash>> hitList = result.hits().hits();
         int size = hitList.size();
-        if(size==0)return;
+        if(size==0) return addr;
 
         System.out.println(size);
 
         List<Cash> cashList = new ArrayList<>();
         for(Hit<Cash> hit : hitList){
             Cash cash = hit.source();
-            //TODO
-            ParseTools.gsonPrint(cash);
             cashList.add(cash);
         }
-//TODO
-        ParseTools.gsonPrint(cashList);
 
         //checkUnconfirmed(addr,cashList);
 
         CashToInputsResult inputResult = cashListToInputs(cashList);
 
-        //TODO
-        ParseTools.gsonPrint(inputResult);
-
         List<Map<String, Object>> inputs = inputResult.getInputs();
 
         Map<String, Object> outputs = splitToOutputs(addr,outCount, inputResult);
 
-        //TODO
-        ParseTools.gsonPrint(outputs);
+        return FcRpcMethods.createRawTx(fcClient, inputs, outputs);
 
-        String unsignedRawTx = FcRpcMethods.createRawTx(fcClient, inputs, outputs);
-
-        SignResult signedRawTxResult = FcRpcMethods.signRawTxWithWallet(fcClient, unsignedRawTx);
-
-        String sighedRawTx = signedRawTxResult.getHex();
-
-        //System.out.println("Sent. "+FcRpcMethods.sendTx(fcClient,sighedRawTx));
+//        SignResult signedRawTxResult = FcRpcMethods.signRawTxWithWallet(fcClient, unsignedRawTx);
+//
+//        String sighedRawTx = signedRawTxResult.getHex();
+//
+//        FcRpcMethods.sendTx(fcClient,sighedRawTx);
 
     }
 
@@ -285,7 +272,7 @@ public class WalletTools {
         long fee = calcFee(inputs, outputs, 0);
         outputs.put(addr,(valueSum-valueEach*(outCount-1)-fee)/Million);
 
-        ParseTools.gsonPrint(outputs);
+//        ParseTools.gsonPrint(outputs);
 //        System.out.println("spent cashes: "+inputs.size());
 //        System.out.println("total input: "+inputSum/Million);
 //        System.out.println("spent FCH:"+(inputSum-change-fee)/Million);
@@ -307,13 +294,13 @@ public class WalletTools {
     }
 
     public static CashListReturn getCashForCd(String addrRequested, long cd,ElasticsearchClient esClient) throws IOException {
-        CashListReturn cashListReturn = new CashListReturn();
+        CashListReturn cashListReturn;
 
         cashListReturn = getCdFromOneCash(addrRequested, cd, esClient);
 
-        if(cashListReturn.getCashList()!=null &&cashListReturn.getCashList().size()==1)return cashListReturn;
+        if(cashListReturn!=null && cashListReturn.getCashList()!=null && cashListReturn.getCashList().size()==1)return cashListReturn;
 
-        return getCdfromCashList(cd, addrRequested, esClient);
+        return getCdFromCashList(cd, addrRequested, esClient);
     }
     private static CashListReturn getCdFromOneCash(String addrRequested, long cd, ElasticsearchClient esClient) throws IOException {
         String index = IndicesNames.CASH;
@@ -336,13 +323,14 @@ public class WalletTools {
         }catch (Exception e){
             return null;
         }
+        assert result.hits().total() != null;
         cashListReturn.setTotal(result.hits().total().value());
         List<Cash> cashList = new ArrayList<>();
         cashList.add(cash);
         cashListReturn.setCashList(cashList);
         return cashListReturn;
     }
-    private static CashListReturn getCdfromCashList(long cd, String addrRequested, ElasticsearchClient esClient) throws IOException {
+    private static CashListReturn getCdFromCashList(long cd, String addrRequested, ElasticsearchClient esClient) throws IOException {
         String index = IndicesNames.CASH;
         CashListReturn cashListReturn = new CashListReturn();
 
@@ -372,6 +360,7 @@ public class WalletTools {
             return cashListReturn;
         }
 
+        assert result.hits().total() != null;
         cashListReturn.setTotal(result.hits().total().value());
 
         List<Hit<Cash>> hitList = result.hits().hits();
@@ -439,6 +428,7 @@ public class WalletTools {
             return cashListReturn;
         }
 
+        assert result.hits().total() != null;
         cashListReturn.setTotal(result.hits().total().value());
 
         long sum = (long)result.aggregations().get("sum").sum().value();

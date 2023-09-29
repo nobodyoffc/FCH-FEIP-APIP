@@ -1,10 +1,13 @@
 package FreeGetAPIs;
 
+import APIP0V1_OpenAPI.Replier;
 import constants.ApiNames;
-import data.ReplierForFree;
+import constants.ReplyInfo;
+import constants.Strings;
 import freecashRPC.FcRpcMethods;
 import initial.Initiator;
 import javaTools.BytesTools;
+import redis.clients.jedis.Jedis;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -16,7 +19,7 @@ import java.io.PrintWriter;
 
 import static initial.Initiator.fcClient;
 
-@WebServlet(ApiNames.FreeGet + ApiNames.BroadcastAPI)
+@WebServlet(ApiNames.FreeGetPath + ApiNames.BroadcastAPI)
 public class Broadcast extends HttpServlet {
 
 
@@ -26,30 +29,32 @@ public class Broadcast extends HttpServlet {
         String rawTxHex = request.getParameter("rawTx");
         rawTxHex=rawTxHex.toLowerCase();
         PrintWriter writer = response.getWriter();
-        ReplierForFree replier = new ReplierForFree();
+        Replier replier = new Replier();
 
-        if (Initiator.isFreeGetForbidden(writer)) return;
+        if(Initiator.forbidFreeGet){
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code2001NoFreeGet));
+            writer.write(replier.reply2001NoFreeGet());
+            return;
+        }
 
         if(!BytesTools.isHexString(rawTxHex)){
-                replier.setOther();
-                replier.setData("Error: Raw TX must be in HEX.");
-                writer.write(replier.toJson());
-                return;
-            }
+            response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code2004RawTxNoHex));
+            writer.write(replier.reply2004RawTxNoHex());
+            return;
+        }
 
         String result;
         try {
             result = FcRpcMethods.sendTx(fcClient,rawTxHex);
         } catch (Throwable e) {
-            replier.setOther();
-            replier.setData("Error: Send TX failed.");
-            writer.write(replier.toJson());
+            response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code2005SendTxFailed));
+            writer.write(replier.reply2005SendTxFailed());
             return;
         }
         if(result.contains("{")){
-            replier.setOther();
             replier.setData(result);
-            writer.write(replier.toJson());
+            response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code2010ErrorFromFchRpc));
+            writer.write(replier.reply2010ErrorFromFchRpc());
             return;
         }
 
@@ -58,9 +63,13 @@ public class Broadcast extends HttpServlet {
             result=result.substring(1);
             if(result.endsWith("\""))result=result.substring(0,result.length()-2);
             replier.setData(result);
-            replier.setSuccess();
+            replier.setTotal(1);
+            replier.setGot(1);
+            try(Jedis jedis = Initiator.jedisPool.getResource()) {
+                replier.setBestHeight(Long.parseLong(jedis.get(Strings.BEST_HEIGHT)));
+            }
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code0Success));
+            writer.write(replier.reply0Success());
         }
-
-        writer.write(replier.toJson());
     }
 }

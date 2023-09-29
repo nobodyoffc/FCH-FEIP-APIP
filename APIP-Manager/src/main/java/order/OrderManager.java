@@ -28,14 +28,12 @@ import static startAPIP.IndicesAPIP.recreateApipIndex;
 public class OrderManager {
 
     private static final Logger log = LoggerFactory.getLogger(OrderManager.class);
-    private final Jedis jedis;
     private final ElasticsearchClient esClient;
     private final BufferedReader br;
 
     private final OrderScanner orderScanner;
 
-    public OrderManager(Jedis jedis, ElasticsearchClient esClient, BufferedReader br, OrderScanner orderScanner) {
-        this.jedis = jedis;
+    public OrderManager(ElasticsearchClient esClient, BufferedReader br, OrderScanner orderScanner) {
         this.esClient = esClient;
         this.br = br;
         this.orderScanner = orderScanner;
@@ -59,12 +57,12 @@ public class OrderManager {
             menu.show();
             int choice = menu.choose(br);
             switch (choice) {
-                case 1-> howToByService(br, jedis);
-                case 2 -> recreateIndexAndResetOrderHeight(br, esClient, jedis, ORDER, orderMappingJsonStr);
-                case 3 -> switchScanOpReturn(br, jedis);
+                case 1-> howToByService(br);
+                case 2 -> recreateIndexAndResetOrderHeight(br, esClient,  ORDER, orderMappingJsonStr);
+                case 3 -> switchScanOpReturn(br);
                 case 4 -> switchOrderScanner(orderScanner);
                 case 5 -> findFidOrders(br,esClient);
-                case 6 -> resetLastOrderHeight(br,jedis);
+                case 6 -> resetLastOrderHeight(br);
                 case 0 -> {
                     return;
                 }
@@ -72,20 +70,20 @@ public class OrderManager {
         }
     }
 
-    private void recreateIndexAndResetOrderHeight(BufferedReader br, ElasticsearchClient esClient, Jedis jedis, String order, String orderMappingJsonStr) {
+    private void recreateIndexAndResetOrderHeight(BufferedReader br, ElasticsearchClient esClient, String order, String orderMappingJsonStr) {
         Menu.askIfNotToDo("You will loss all orders info in the 'order' index of ES and Redis. Do you want to RECREATE?",br);
-        recreateApipIndex(br, esClient, jedis, ORDER, orderMappingJsonStr);
-        resetLastOrderHeight(br,jedis);
+        recreateApipIndex(br, esClient, ORDER, orderMappingJsonStr);
+        resetLastOrderHeight(br);
     }
 
-    private void resetLastOrderHeight(BufferedReader br, Jedis jedis) {
+    private void resetLastOrderHeight(BufferedReader br) {
 
         System.out.println("Reset last order height to 0? All order and balance will be flushed. 'reset' to reset:");
 
         String input = Inputer.inputString(br);
 
         if ("reset".equals(input)) {
-            try {
+            try(Jedis jedis = StartAPIP.jedisPool.getResource()) {
                 jedis.set(StartAPIP.serviceName+"_"+ORDER_LAST_HEIGHT, "0");
                 jedis.set(StartAPIP.serviceName+"_"+ORDER_LAST_BLOCK_ID, zeroBlockId);
                 System.out.println("Last order height has set to 0.");
@@ -133,7 +131,7 @@ public class OrderManager {
         SearchResponse<Order> result = null;
         try {
             result = esClient.search(s -> s
-                            .index(StartAPIP.getNameOfService(jedis, ORDER))
+                            .index(StartAPIP.getNameOfService(ORDER))
                             .query(q -> q.term(t -> t.field(FROM_FID).value(finalFid)))
                             .sort(so->so.field(f->f.field(TIME)))
                             .size(100)
@@ -173,46 +171,51 @@ public class OrderManager {
         Menu.anyKeyToContinue(br);
     }
 
-    private void switchScanOpReturn(BufferedReader br, Jedis jedis) {
-        String isCheckOrderOpReturn = jedis.hget(CONFIG, Strings.CHECK_ORDER_OPRETURN);
-        System.out.println("Check order's OpReturn: "+isCheckOrderOpReturn+". Change it? 'y' to switch.");
-        String input;
-        try {
-            input = br.readLine();
-        } catch (IOException e) {
-            System.out.println("br.readLine() wrong.");
-            return;
-        }
-        if("y".equals(input)){
-            if(TRUE.equals(isCheckOrderOpReturn)){
-                jedis.hset(CONFIG, Strings.CHECK_ORDER_OPRETURN,FALSE);
-            }else if(FALSE.equals(isCheckOrderOpReturn)){
-                jedis.hset(CONFIG, Strings.CHECK_ORDER_OPRETURN,TRUE);
-            }else{
-                System.out.println("Invalid input.");
+    private void switchScanOpReturn(BufferedReader br) {
+        try(Jedis jedis = StartAPIP.jedisPool.getResource()) {
+            String isCheckOrderOpReturn = jedis.hget(CONFIG, Strings.CHECK_ORDER_OPRETURN);
+            System.out.println("Check order's OpReturn: " + isCheckOrderOpReturn + ". Change it? 'y' to switch.");
+            String input;
+            try {
+                input = br.readLine();
+            } catch (IOException e) {
+                System.out.println("br.readLine() wrong.");
+                return;
             }
+            if ("y".equals(input)) {
+                if (TRUE.equals(isCheckOrderOpReturn)) {
+                    jedis.hset(CONFIG, Strings.CHECK_ORDER_OPRETURN, FALSE);
+                } else if (FALSE.equals(isCheckOrderOpReturn)) {
+                    jedis.hset(CONFIG, Strings.CHECK_ORDER_OPRETURN, TRUE);
+                } else {
+                    System.out.println("Invalid input.");
+                }
+            }
+            System.out.println("Check order's OpReturn: " + jedis.hget(CONFIG, Strings.CHECK_ORDER_OPRETURN) + " now.");
         }
-        System.out.println("Check order's OpReturn: "+jedis.hget(CONFIG, Strings.CHECK_ORDER_OPRETURN) + " now.");
         Menu.anyKeyToContinue(br);
     }
 
-    private static void howToByService(BufferedReader br, Jedis jedis) {
+    private static void howToByService(BufferedReader br) {
         System.out.println("Anyone can send a freecash TX with following json in Op_Return to buy your service:" +
                 "\n--------");
-        String sidStr = jedis.get(StartAPIP.serviceName +"_"+ SERVICE);
-        if (sidStr == null) {
-            System.out.println("No service yet.");
-            return;
-        }
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        Service service = gson.fromJson(sidStr, Service.class);
-        System.out.println(gson.toJson(Order.getJsonBuyOrder(service.getSid())) +
-                "\n--------" +
-                "\nMake sure the 'sid' is your service id. " +
-                "\nAny key to continue...");
-        try {
-            br.readLine();
-        } catch (IOException ignored) {
+        try(Jedis jedis = StartAPIP.jedisPool.getResource()) {
+            String sidStr = jedis.get(StartAPIP.serviceName + "_" + SERVICE);
+            if (sidStr == null) {
+                System.out.println("No service yet.");
+                return;
+            }
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            Service service = gson.fromJson(sidStr, Service.class);
+
+            System.out.println(gson.toJson(Order.getJsonBuyOrder(service.getSid())) +
+                    "\n--------" +
+                    "\nMake sure the 'sid' is your service id. " +
+                    "\nAny key to continue...");
+            try {
+                br.readLine();
+            } catch (IOException ignored) {
+            }
         }
     }
 }

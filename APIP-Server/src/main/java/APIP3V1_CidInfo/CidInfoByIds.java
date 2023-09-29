@@ -78,9 +78,6 @@ public class CidInfoByIds extends HttpServlet {
             return;
         }
         for(CidInfo cidInfo : cidInfoList){
-            cidInfo.setTrxAddr(null);
-            cidInfo.setDogeAddr(null);
-            cidInfo.setLtcAddr(null);
             cidInfo.reCalcWeight();
         }
 

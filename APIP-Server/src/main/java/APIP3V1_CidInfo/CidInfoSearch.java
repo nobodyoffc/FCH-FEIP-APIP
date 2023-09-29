@@ -72,9 +72,6 @@ public class CidInfoSearch extends HttpServlet {
                 return;
             }
             for(CidInfo cidInfo : cidInfoList){
-                cidInfo.setTrxAddr(null);
-                cidInfo.setDogeAddr(null);
-                cidInfo.setLtcAddr(null);
                 cidInfo.reCalcWeight();
             }
         } catch (Exception e) {

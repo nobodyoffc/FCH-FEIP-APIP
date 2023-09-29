@@ -14,6 +14,7 @@ import order.OrderScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
 import reward.RewardManager;
 import reward.RewardParams;
 import reward.Rewarder;
@@ -44,6 +45,7 @@ public class StartAPIP {
 	private static MempoolCleaner mempoolCleaner=null;
 	private static final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 	private static IndicesAPIP indicesAPIP;
+	public static JedisPool jedisPool;
 
 
 	public static void main(String[] args)throws Exception{
@@ -52,45 +54,48 @@ public class StartAPIP {
 		Gson gson = new Gson();
 
 		NewEsClient newEsClient = new NewEsClient();
-
-		Jedis jedis = new Jedis();
+		jedisPool = new JedisPool();
 
 		ConfigAPIP configAPIP = new ConfigAPIP();
 		configAPIP = configAPIP.getClassInstanceFromFile(ConfigAPIP.class);
 
 		while(true) {
 
-			while (!configAPIP.loadConfigToRedis(jedis)) {
-				configAPIP.config(br);
-			}
-
-			if (esClient == null){
-				esClient = newEsClient.getElasticSearchClient(br, configAPIP, jedis);
-			}
-
-			serviceName = jedis.hget(CONFIG,SERVICE_NAME);
-			try {
-				service = gson.fromJson(jedis.get(serviceName + "_" + SERVICE), ApipService.class);
-			}catch (Exception ignore){}
-
-			if(configAPIP.getServiceName()==null||service==null||jedis.hget(CONFIG,SERVICE_NAME)==null){
-				System.out.println("No service yet. Find your service.");
-				boolean done = new ServiceManager(esClient,jedis,br,configAPIP).findService();
-				if(!done){
-					newEsClient.shutdownClient();
-					if (mempoolScanner != null) mempoolScanner.shutdown();
-					if (orderScanner != null) orderScanner.shutdown();
-					if (mempoolCleaner != null) mempoolCleaner.shutdown();
-					jedis.close();
-					br.close();
-					return;
+			try(Jedis jedis = jedisPool.getResource()){
+				while (!configAPIP.loadConfigToRedis()) {
+					configAPIP.config(br);
 				}
-			}else freshServiceFromEsToRedis(service,esClient,jedis,configAPIP);
 
-			if(!jedis.exists(serviceName+"_"+Strings.N_PRICE)) Settings.setNPrices(jedis, br);
+				if (esClient == null){
+					esClient = newEsClient.getElasticSearchClient(br, configAPIP, jedis);
+				}
 
-			indicesAPIP = new IndicesAPIP(esClient, jedis,br);
-			indicesAPIP.checkApipIndices();
+				serviceName = jedis.hget(CONFIG,SERVICE_NAME);
+				try {
+					service = gson.fromJson(jedis.get(serviceName + "_" + SERVICE), ApipService.class);
+				}catch (Exception ignore){}
+
+				if(configAPIP.getServiceName()==null||service==null||jedis.hget(CONFIG,SERVICE_NAME)==null){
+					System.out.println("No service yet. Find your service.");
+					boolean done = new ServiceManager(esClient,br,configAPIP).findService();
+					if(!done){
+						newEsClient.shutdownClient();
+						if (mempoolScanner != null) mempoolScanner.shutdown();
+						if (orderScanner != null) orderScanner.shutdown();
+						if (mempoolCleaner != null) mempoolCleaner.shutdown();
+						jedisPool.clear();
+						jedisPool.close();
+						br.close();
+						return;
+					}
+				}else freshServiceFromEsToRedis(service,esClient,jedis,configAPIP);
+
+				if(!jedis.exists(serviceName+"_"+Strings.N_PRICE)) Settings.setNPrices(br);
+
+				indicesAPIP = new IndicesAPIP(esClient, jedis,br);
+				indicesAPIP.checkApipIndices();
+			};
+
 
 			if(orderScanner==null) {
 				startOrderScan(configAPIP, esClient);
@@ -107,11 +112,11 @@ public class StartAPIP {
 				Menu.anyKeyToContinue(br);
 			}
 
-			checkServiceParams(jedis);
+			checkServiceParams();
 
-			checkPublicSessionKey(jedis);
+			checkPublicSessionKey();
 
-			checkRewardParams(jedis);
+			checkRewardParams();
 
 			Menu menu = new Menu();
 
@@ -129,19 +134,20 @@ public class StartAPIP {
 			menu.show();
 			if(orderScanner!=null && orderScanner.isRunning().get()) System.out.println("Order scanner is running.");
 			if(mempoolScanner!=null && mempoolScanner.getRunning().get()) System.out.println("Mempool scanner is running.");
+			if(mempoolScanner!=null && mempoolCleaner.getRunning().get()) System.out.println("Mempool cleaner is running.");
 			if(pusher!=null && pusher.isRunning().get()) System.out.println("Webhook pusher is running.");
 			int choice = menu.choose(br);
 			switch (choice) {
-				case 1 -> new ServiceManager(esClient, jedis,br, configAPIP).menu();
-				case 2 -> new OrderManager(jedis,esClient, br,orderScanner).menu();
-				case 3 -> new BalanceManager(jedis,esClient, br).menu();
-				case 4 -> manageReward(esClient,jedis);
+				case 1 -> new ServiceManager(esClient, br, configAPIP).menu();
+				case 2 -> new OrderManager(esClient, br,orderScanner).menu();
+				case 3 -> new BalanceManager(esClient, br).menu();
+				case 4 -> manageReward(esClient);
 				case 5 -> manageIndices();
-				case 6 -> new Settings(jedis, esClient, br, configAPIP).menu();
+				case 6 -> new Settings(br, configAPIP).menu();
 				case 0 -> {
 					if(orderScanner!=null && orderScanner.isRunning().get()) System.out.println("Order scanner is running.");
 					if(mempoolScanner!=null && mempoolScanner.getRunning().get()) System.out.println("Mempool scanner is running.");
-					if(mempoolCleaner!=null && mempoolScanner.getRunning().get()) System.out.println("Mempool cleaner is running.");
+					if(mempoolCleaner!=null && mempoolCleaner.getRunning().get()) System.out.println("Mempool cleaner is running.");
 					if(pusher!=null && pusher.isRunning().get()) System.out.println("Webhook pusher is running.");
 					System.out.println("Do you want to quit? 'q' to quit.");
 					String input = br.readLine();
@@ -150,10 +156,10 @@ public class StartAPIP {
 						if (orderScanner != null) orderScanner.shutdown();
 						if (mempoolCleaner != null) mempoolCleaner.shutdown();
 						if (pusher!=null)pusher.shutdown();
-						jedis.close();
 						br.close();
 						if(orderScanner==null ||!orderScanner.isRunning().get()) System.out.println("Order scanner is set to stop.");
 						if(mempoolScanner==null|| !mempoolScanner.getRunning().get()) System.out.println("Mempool scanner is set to stop.");
+						if(mempoolCleaner==null|| !mempoolCleaner.getRunning().get()) System.out.println("Mempool cleaner is set to stop.");
 						if(pusher==null ||!pusher.isRunning().get()) System.out.println("Webhook pusher is set to stop.");
 						System.out.println("Exited, see you again.");
 						return;
@@ -173,8 +179,8 @@ public class StartAPIP {
 		}
 		serviceName= serviceNew.getStdName();
 		StartAPIP.service = serviceNew;
-		updateServiceParamsInRedisAndConfig(jedis,configAPIP);
-		setServiceToRedis(serviceName,jedis);
+		updateServiceParamsInRedisAndConfig(configAPIP);
+		setServiceToRedis(serviceName);
 	}
 
 	private static ApipService getServiceFromEsById(ElasticsearchClient esClient, String sid) {
@@ -214,26 +220,30 @@ public class StartAPIP {
 	}
 
 
-	private static void checkRewardParams(Jedis jedis) {
-		RewardParams rewardParams = Rewarder.getRewardParams(jedis);
-		if(rewardParams==null){
-			System.out.println("Reward params aren't set yet.");
-			new Rewarder(esClient, jedis).setRewardParameters(jedis, br);
-			Menu.anyKeyToContinue(br);
+	private static void checkRewardParams() {
+		try(Jedis jedis = jedisPool.getResource()) {
+			RewardParams rewardParams = Rewarder.getRewardParams();
+			if (rewardParams == null) {
+				System.out.println("Reward params aren't set yet.");
+				new Rewarder(esClient).setRewardParameters( br);
+				Menu.anyKeyToContinue(br);
+			}
 		}
 	}
 
-	private static void manageReward(ElasticsearchClient esClient, Jedis jedis) {
-		RewardManager rewardManager = new RewardManager(jedis,esClient, StartAPIP.br);
+	private static void manageReward(ElasticsearchClient esClient) {
+		RewardManager rewardManager = new RewardManager(esClient, StartAPIP.br);
 		rewardManager.menu();
 	}
 
-	private static void checkPublicSessionKey(Jedis jedis) throws IOException {
-		if(jedis.hget(serviceName+"_"+FID_SESSION_NAME,PUBLIC)==null){
-			System.out.println("Public sessionKey for getFreeService API is null. Set it? 'y' to set.");
-			String input = StartAPIP.br.readLine();
-			if("y".equals(input)){
-				Settings.setPublicSessionKey(StartAPIP.br,jedis);
+	private static void checkPublicSessionKey() throws IOException {
+		try(Jedis jedis = jedisPool.getResource()) {
+			if (jedis.hget(serviceName + "_" + FID_SESSION_NAME, PUBLIC) == null) {
+				System.out.println("Public sessionKey for getFreeService API is null. Set it? 'y' to set.");
+				String input = StartAPIP.br.readLine();
+				if ("y".equals(input)) {
+					Settings.setPublicSessionKey(StartAPIP.br);
+				}
 			}
 		}
 	}
@@ -292,55 +302,70 @@ public class StartAPIP {
 		}
 	}
 
-	public static String getNameOfService(Jedis jedis, String name) {
-		return (jedis.hget(CONFIG,SERVICE_NAME)+"_"+name).toLowerCase();
+	public static String getNameOfService(String name) {
+		String finalName=null;
+		try(Jedis jedis = StartAPIP.jedisPool.getResource()) {
+			finalName = (jedis.hget(CONFIG, SERVICE_NAME) + "_" + name).toLowerCase();
+		}
+		return finalName;
 	}
 
-	private static void checkServiceParams(Jedis jedis) {
-
-		if (jedis.hget(serviceName +"_"+ Strings.PARAMS_ON_CHAIN, Strings.ACCOUNT) == null) {
-			writeParamsToRedis(jedis);
-			Menu.anyKeyToContinue(br);
+	private static void checkServiceParams() {
+		try(Jedis jedis = jedisPool.getResource()) {
+			if (jedis.hget(serviceName + "_" + Strings.PARAMS_ON_CHAIN, Strings.ACCOUNT) == null) {
+				writeParamsToRedis();
+				Menu.anyKeyToContinue(br);
+			}
 		}
 	}
 
-	private static void writeParamsToRedis(Jedis jedis) {
+	private static void writeParamsToRedis() {
 
 		Params params = service.getParams();
+		try(Jedis jedis = jedisPool.getResource()) {
+			jedis.hset(StartAPIP.serviceName + "_" + PARAMS_ON_CHAIN, ACCOUNT, params.getAccount());
+			jedis.hset(StartAPIP.serviceName + "_" + PARAMS_ON_CHAIN, CURRENCY, params.getCurrency());
+			jedis.hset(StartAPIP.serviceName + "_" + PARAMS_ON_CHAIN, URL_HEAD, params.getUrlHead());
+			if (params.getMinPayment() != null)
+				jedis.hset(StartAPIP.serviceName + "_" + PARAMS_ON_CHAIN, MIN_PAYMENT, params.getMinPayment());
+			if (params.getPricePerKBytes() != null)
+				jedis.hset(StartAPIP.serviceName + "_" + PARAMS_ON_CHAIN, PRICE_PER_K_BYTES, params.getPricePerKBytes());
+			if (params.getPricePerRequest() != null)
+				jedis.hset(StartAPIP.serviceName + "_" + PARAMS_ON_CHAIN, PRICE_PER_REQUEST, params.getPricePerRequest());
+			if (params.getSessionDays() != null)
+				jedis.hset(StartAPIP.serviceName + "_" + PARAMS_ON_CHAIN, SESSION_DAYS, params.getSessionDays());
+			if (params.getConsumeViaShare() != null)
+				jedis.hset(StartAPIP.serviceName + "_" + PARAMS_ON_CHAIN, CONSUME_VIA_SHARE, params.getConsumeViaShare());
+			if (params.getOrderViaShare() != null)
+				jedis.hset(StartAPIP.serviceName + "_" + PARAMS_ON_CHAIN, ORDER_VIA_SHARE, params.getOrderViaShare());
 
-		jedis.hset(StartAPIP.serviceName+"_"+ PARAMS_ON_CHAIN,ACCOUNT,params.getAccount());
-		jedis.hset(StartAPIP.serviceName+"_"+ PARAMS_ON_CHAIN,CURRENCY,params.getCurrency());
-		jedis.hset(StartAPIP.serviceName+"_"+ PARAMS_ON_CHAIN,URL_HEAD,params.getUrlHead());
-		if(params.getMinPayment()!=null)jedis.hset(StartAPIP.serviceName+"_"+ PARAMS_ON_CHAIN,MIN_PAYMENT,params.getMinPayment());
-		if(params.getPricePerKBytes()!=null)jedis.hset(StartAPIP.serviceName+"_"+ PARAMS_ON_CHAIN,PRICE_PER_K_BYTES,params.getPricePerKBytes());
-		if(params.getPricePerRequest()!=null)jedis.hset(StartAPIP.serviceName+"_"+ PARAMS_ON_CHAIN,PRICE_PER_REQUEST,params.getPricePerRequest());
-		if(params.getSessionDays()!=null)jedis.hset(StartAPIP.serviceName+"_"+ PARAMS_ON_CHAIN,SESSION_DAYS,params.getSessionDays());
-		if(params.getConsumeViaShare()!=null)jedis.hset(StartAPIP.serviceName+"_"+ PARAMS_ON_CHAIN,CONSUME_VIA_SHARE,params.getConsumeViaShare());
-		if(params.getOrderViaShare()!=null)jedis.hset(StartAPIP.serviceName+"_"+ PARAMS_ON_CHAIN,ORDER_VIA_SHARE,params.getOrderViaShare());
-
-		if(params.getPricePerKBytes()==null ||"0".equals(params.getPricePerKBytes())) {
-			jedis.hset(CONFIG,PRICE,params.getPricePerRequest());
-			jedis.hset(CONFIG,IS_PRICE_PER_REQUEST,FALSE);
-		}else {
-			jedis.hset(CONFIG, PRICE, params.getPricePerKBytes());
-			jedis.hset(CONFIG,IS_PRICE_PER_REQUEST,TRUE);
+			if (params.getPricePerKBytes() == null || "0".equals(params.getPricePerKBytes())) {
+				jedis.hset(CONFIG, PRICE, params.getPricePerRequest());
+				jedis.hset(CONFIG, IS_PRICE_PER_REQUEST, FALSE);
+			} else {
+				jedis.hset(CONFIG, PRICE, params.getPricePerKBytes());
+				jedis.hset(CONFIG, IS_PRICE_PER_REQUEST, TRUE);
+			}
 		}
-
 		System.out.println("Service parameters has been wrote into redis.");
 	}
 
-	public static void updateServiceParamsInRedisAndConfig(Jedis jedis, ConfigAPIP configAPIP){
+	public static void updateServiceParamsInRedisAndConfig( ConfigAPIP configAPIP){
 		serviceName = service.getStdName();
-		setServiceToRedis(serviceName,jedis);
-		writeParamsToRedis(jedis);
+		try(Jedis jedis = jedisPool.getResource()) {
+			setServiceToRedis(serviceName);
+			writeParamsToRedis();
+		}
 		configAPIP.setServiceName(serviceName);
 		configAPIP.writeConfigToFile();
 	}
 
-	public static void setServiceToRedis(String serviceName, Jedis jedis) {
+	public static void setServiceToRedis(String serviceName) {
 		Gson gson = new Gson();
-		jedis.set(serviceName +"_"+SERVICE,gson.toJson(service));
-		jedis.hset(CONFIG, SERVICE_NAME, serviceName);
+		try(Jedis jedis = StartAPIP.jedisPool.getResource()) {
+			jedis.set(serviceName + "_" + SERVICE, gson.toJson(service));
+			jedis.hset(CONFIG, SERVICE_NAME, serviceName);
+		}
 	}
 }
 

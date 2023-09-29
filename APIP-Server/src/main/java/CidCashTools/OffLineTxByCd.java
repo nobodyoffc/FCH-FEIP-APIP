@@ -25,7 +25,7 @@ import static constants.Constants.*;
 import static walletTools.CryptoSigner.parseDataForOffLineTxFromOther;
 
 
-@WebServlet(ToolsPath + ApiNames.OffLineTxByCdAPI)
+@WebServlet(ApiNames.ToolsPath + ApiNames.OffLineTxByCdAPI)
 public class OffLineTxByCd extends HttpServlet {
 
 
@@ -95,6 +95,7 @@ public class OffLineTxByCd extends HttpServlet {
         List<Cash> meetList = cashListReturn.getCashList();
         if(meetList==null){
             response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1020OtherError));
+            replier.setData("No cashes meet the request: cd >="+cd+" and amount >="+amount+".");
             writer.write(replier.reply1020OtherError(addr));
             return;
         }

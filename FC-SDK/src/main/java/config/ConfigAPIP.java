@@ -45,8 +45,8 @@ public class ConfigAPIP extends ConfigService {
     }
 
     @Override
-    public boolean loadConfigToRedis(Jedis jedis){
-        try {
+    public boolean loadConfigToRedis(){
+        try(Jedis jedis = new Jedis()) {
             jedis.hset(CONFIG, ES_IP, esIp);
             jedis.hset(CONFIG, ES_PORT, String.valueOf(esPort));
             jedis.hset(CONFIG, CONFIG_FILE_PATH, configFilePath);
@@ -76,15 +76,15 @@ public class ConfigAPIP extends ConfigService {
 
         while (true) {
             if (this.avatarBasePath != null)
-                System.out.println("The base path of avatar making is: " + this.avatarBasePath);
-            System.out.println("Input the base path of avatar making. Press 's' to skip:");
+                System.out.println("The elements path of avatar making is: " + this.avatarBasePath);
+            System.out.println("Input the elements path of avatar making. Press 's' to skip:");
             String str1 = br.readLine();
             if ("s".equals(str1)) return;
             if (!str1.endsWith("/")) str1 = str1 + "/";
             File file = new File(str1);
             if (file.exists()) {
                 this.avatarBasePath = str1;
-                System.out.println("\nThe base path of avatar making was set.");
+                System.out.println("\nThe elements path of avatar making was set.");
                 return;
             } else {
                 System.out.println("\nPath doesn't exist. ");

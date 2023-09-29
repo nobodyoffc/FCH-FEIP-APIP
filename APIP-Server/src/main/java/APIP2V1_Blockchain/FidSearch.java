@@ -18,8 +18,8 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-@WebServlet(ApiNames.APIP2V1Path + ApiNames.AddressSearchAPI)
-public class AddressSearch extends HttpServlet {
+@WebServlet(ApiNames.APIP2V1Path + ApiNames.fidSearchAPI)
+public class FidSearch extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("application/json");
@@ -49,12 +49,6 @@ public class AddressSearch extends HttpServlet {
             meetList = esRequest.doRequest(index,sort, Address.class);
             if(meetList==null){
                 return;
-            }
-            //make addrList
-            for(Address addr1 : meetList ){
-                addr1.setTrxAddr(null);
-                addr1.setDogeAddr(null);
-                addr1.setLtcAddr(null);
             }
         } catch (Exception e) {
             e.printStackTrace();

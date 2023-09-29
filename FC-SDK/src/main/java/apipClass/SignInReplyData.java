@@ -3,6 +3,7 @@ package apipClass;
 public class SignInReplyData {
     private String sessionKey;
     private long expireTime;
+    private String sessionKeyCipher;
 
     public long getExpireTime() {
         return expireTime;
@@ -20,4 +21,11 @@ public class SignInReplyData {
         this.sessionKey = sessionKey;
     }
 
+    public String getSessionKeyCipher() {
+        return sessionKeyCipher;
+    }
+
+    public void setSessionKeyCipher(String sessionKeyCipher) {
+        this.sessionKeyCipher = sessionKeyCipher;
+    }
 }

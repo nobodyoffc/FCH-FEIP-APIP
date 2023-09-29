@@ -9,6 +9,7 @@ import fcTools.ParseTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
+import startAPIP.StartAPIP;
 import walletTools.*;
 import fchClass.Cash;
 import feipClass.FcInfo;
@@ -31,22 +32,24 @@ public class AffairMaker {
     private DataSignTx dataSignTx = new DataSignTx();
 
     private final ElasticsearchClient esClient;
-    private final Jedis jedis;
+
     private Map<String, Long> pendingMap = new HashMap<>();
     private static final Logger log = LoggerFactory.getLogger(AffairMaker.class);
 
-    public AffairMaker(String account, RewardInfo rewardInfo, ElasticsearchClient esClient, Jedis jedis) {
+    public AffairMaker(String account, RewardInfo rewardInfo, ElasticsearchClient esClient) {
         this.rewardInfo = rewardInfo;
         this.account = account;
         this.esClient = esClient;
-        this.jedis = jedis;
+
         getPendingMapFromRedis();
     }
     public Map<String, Long> getPendingMapFromRedis() {
-        Map<String, String> pendingStrMap = jedis.hgetAll(REWARD_PENDING_MAP);
-        for(String key: pendingStrMap.keySet()){
-            Long amount =Long.parseLong( pendingStrMap.get(key));
-            pendingMap.put(key,amount);
+        try(Jedis jedis = StartAPIP.jedisPool.getResource()) {
+            Map<String, String> pendingStrMap = jedis.hgetAll(REWARD_PENDING_MAP);
+            for (String key : pendingStrMap.keySet()) {
+                Long amount = Long.parseLong(pendingStrMap.get(key));
+                pendingMap.put(key, amount);
+            }
         }
         return pendingMap;
     }
@@ -173,7 +176,7 @@ public class AffairMaker {
 
     private void addToPending(String fid, Long amount) {
         Long pendingValue = 0L;
-        try{
+        try(Jedis jedis = StartAPIP.jedisPool.getResource()) {
             pendingValue = Long.parseLong(jedis.hget(REWARD_PENDING_MAP, fid));
         }catch (Exception ignore){}
         if(pendingMap.get(fid)!=null) pendingValue += pendingMap.get(fid);

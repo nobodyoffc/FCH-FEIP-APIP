@@ -6,7 +6,6 @@ public class Constants {
     public static final Long OneDayInterval = 1440L;
     public static final Long BalanceBackupInterval = OneDayInterval;
     public static final Long RewardInterval = OneDayInterval*10;
-    public static final String ToolsPath = "/tools/";
     public static  final String UserDir = "user.dir";
     public static final int MaxRequestSize = 100;
     public static final int DefaultSize = 20;
@@ -53,6 +52,7 @@ public class Constants {
     public static final String SESSION_NAME = "SessionName";
     public static final String METHOD = "Method";
     public static final String BALANCE = "Balance";
+    public static final String BCH_ADDR = "bchAddr";
     public static int RedisDb4Webhook = 4;
     public static final String FCH_TICKET="FCH";
 }

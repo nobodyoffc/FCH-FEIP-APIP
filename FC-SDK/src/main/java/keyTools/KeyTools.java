@@ -52,6 +52,25 @@ public class KeyTools {
         map.put(Constants.FCH_ADDR, fchAddr);
         map.put(Constants.BTC_ADDR, btcAddr);
         map.put(Constants.ETH_ADDR, ethAddr);
+        map.put(Constants.BCH_ADDR, btcAddr);
+        map.put(Constants.LTC_ADDR, ltcAddr);
+        map.put(Constants.DOGE_ADDR, dogeAddr);
+        map.put(Constants.TRX_ADDR, trxAddr);
+
+        return map;
+    }
+
+    public static Map<String, String> hash160ToAddresses(byte[] hash160) {
+        String fchAddr = hash160ToFchAddr(hash160);
+        String btcAddr = hash160ToBtcAddr(hash160);
+        String ltcAddr = pubKeyToLtcAddr(hash160);
+        String dogeAddr = pubKeyToDogeAddr(hash160);
+        String trxAddr = pubKeyToTrxAddr(hash160);
+
+        Map<String, String> map = new HashMap<String, String>();
+        map.put(Constants.FCH_ADDR, fchAddr);
+        map.put(Constants.BTC_ADDR, btcAddr);
+        map.put(Constants.BCH_ADDR, btcAddr);
         map.put(Constants.LTC_ADDR, ltcAddr);
         map.put(Constants.DOGE_ADDR, dogeAddr);
         map.put(Constants.TRX_ADDR, trxAddr);
@@ -134,6 +153,7 @@ public class KeyTools {
     }
 
 
+
     public static String compressPK65ToPK33(byte[] bytesPK65) {
         byte[] pk33 = new byte[33];
         byte[] y = new byte[32];
@@ -151,7 +171,7 @@ public class KeyTools {
         return PK33;
     }
 
-    public static String hash160ToFCHAddr(String hash160Hex) {
+    public static String hash160ToFchAddr(String hash160Hex) {
 
         byte[] b = HexFormat.of().parseHex(hash160Hex);
 
@@ -168,7 +188,7 @@ public class KeyTools {
         return Base58.encode(addrRaw);
     }
 
-    public static String hash160ToFCHAddr(byte[] hash160Bytes) {
+    public static String hash160ToFchAddr(byte[] hash160Bytes) {
 
         byte[] prefixForFch = {0x23};
         byte[] hash160WithPrefix = new byte[21];
@@ -184,7 +204,17 @@ public class KeyTools {
         return Base58.encode(addrRaw);
     }
 
-    public static String hash160ToBTCAddr(String hash160Hex) {
+    public static byte[] addrToHash160(String addr) {
+
+        byte[] addrBytes = Base58.decode(addr);
+        byte[] hash160Bytes = new byte[20];
+        System.arraycopy(addrBytes,1,hash160Bytes,0,20);
+        return hash160Bytes;
+    }
+
+
+
+    public static String hash160ToBtcAddr(String hash160Hex) {
 
         byte[] b = HexFormat.of().parseHex(hash160Hex);
 
@@ -201,7 +231,7 @@ public class KeyTools {
         return Base58.encode(addrRaw);
     }
 
-    public static String hash160ToBTCAddr(byte[] hash160Bytes) {
+    public static String hash160ToBtcAddr(byte[] hash160Bytes) {
         byte[] d = {0x00};
         byte[] e = new byte[21];
         System.arraycopy(d, 0, e, 0, 1);
@@ -215,7 +245,7 @@ public class KeyTools {
         return Base58.encode(addrRaw);
     }
 
-    public static String hash160ToDOGEAddr(String hash160Hex) {
+    public static String hash160ToDogeAddr(String hash160Hex) {
 
         byte[] b = HexFormat.of().parseHex(hash160Hex);
 
@@ -232,7 +262,7 @@ public class KeyTools {
         return Base58.encode(addrRaw);
     }
 
-    public static String hash160ToDOGEAddr(byte[] hash160Bytes) {
+    public static String hash160ToDogeAddr(byte[] hash160Bytes) {
         byte[] d = {0x1e};
         byte[] e = new byte[21];
         System.arraycopy(d, 0, e, 0, 1);
@@ -246,7 +276,7 @@ public class KeyTools {
         return Base58.encode(addrRaw);
     }
 
-    public static String hash160ToLTCAddr(String hash160Hex) {
+    public static String hash160ToLteAddr(String hash160Hex) {
 
         byte[] b = HexFormat.of().parseHex(hash160Hex);
 
@@ -263,7 +293,7 @@ public class KeyTools {
         return Base58.encode(addrRaw);
     }
 
-    public static String hash160ToLTCAddr(byte[] hash160Bytes) {
+    public static String hash160ToLtcAddr(byte[] hash160Bytes) {
 
         byte[] d = {0x30};
         byte[] e = new byte[21];
@@ -278,7 +308,7 @@ public class KeyTools {
         return Base58.encode(addrRaw);
     }
 
-    public static String hash160ToTRXAddr(byte[] hash160Bytes) {
+    public static String hash160ToTrxAddr(byte[] hash160Bytes) {
 
         byte[] d = {0x41};
         byte[] e = new byte[21];
@@ -310,14 +340,14 @@ public class KeyTools {
     public static String pubKeyToFchAddr(String a) {
         byte[] b = SHA.Sha256(HexFormat.of().parseHex(a));
         byte[] h = SHA.Ripemd160(b);
-        String address = KeyTools.hash160ToFCHAddr(h);
+        String address = KeyTools.hash160ToFchAddr(h);
         return address;
     }
 
     public static String pubKeyToFchAddr(byte[] a) {
         byte[] b = SHA.Sha256(a);
         byte[] h = SHA.Ripemd160(b);
-        return KeyTools.hash160ToFCHAddr(h);
+        return KeyTools.hash160ToFchAddr(h);
     }
 
     public static String pubKeyToMultiSigAddr(String a) {
@@ -335,55 +365,55 @@ public class KeyTools {
     public static String pubKeyToBtcAddr(String a) {
         byte[] b = SHA.Sha256(HexFormat.of().parseHex(a));
         byte[] h = SHA.Ripemd160(b);
-        return KeyTools.hash160ToBTCAddr(h);
+        return KeyTools.hash160ToBtcAddr(h);
     }
 
     public static String pubKeyToBtcAddr(byte[] a) {
         byte[] b = SHA.Sha256(a);
         byte[] h = SHA.Ripemd160(b);
-        String address = KeyTools.hash160ToBTCAddr(h);
+        String address = KeyTools.hash160ToBtcAddr(h);
         return address;
     }
 
     public static String pubKeyToTrxAddr(String a) {
         byte[] b = SHA.Sha256(HexFormat.of().parseHex(a));
         byte[] h = SHA.Ripemd160(b);
-        String address = KeyTools.hash160ToTRXAddr(h);
+        String address = KeyTools.hash160ToTrxAddr(h);
         return address;
     }
 
     public static String pubKeyToTrxAddr(byte[] a) {
         byte[] b = SHA.Sha256(a);
         byte[] h = SHA.Ripemd160(b);
-        String address = KeyTools.hash160ToTRXAddr(h);
+        String address = KeyTools.hash160ToTrxAddr(h);
         return address;
     }
 
     public static String pubKeyToDogeAddr(String a) {
         byte[] b = SHA.Sha256(HexFormat.of().parseHex(a));
         byte[] h = SHA.Ripemd160(b);
-        String address = KeyTools.hash160ToDOGEAddr(h);
+        String address = KeyTools.hash160ToDogeAddr(h);
         return address;
     }
 
     public static String pubKeyToDogeAddr(byte[] a) {
         byte[] b = SHA.Sha256(a);
         byte[] h = SHA.Ripemd160(b);
-        String address = KeyTools.hash160ToDOGEAddr(h);
+        String address = KeyTools.hash160ToDogeAddr(h);
         return address;
     }
 
     public static String pubKeyToLtcAddr(String a) {
         byte[] b = SHA.Sha256(HexFormat.of().parseHex(a));
         byte[] h = SHA.Ripemd160(b);
-        String address = KeyTools.hash160ToLTCAddr(h);
+        String address = KeyTools.hash160ToLtcAddr(h);
         return address;
     }
 
     public static String pubKeyToLtcAddr(byte[] a) {
         byte[] b = SHA.Sha256(a);
         byte[] h = SHA.Ripemd160(b);
-        String address = KeyTools.hash160ToLTCAddr(h);
+        String address = KeyTools.hash160ToLtcAddr(h);
         return address;
     }
 
@@ -596,6 +626,73 @@ public class KeyTools {
         }
 
         return HexFormat.of().formatHex(priKey32Bytes);
+    }
+
+    public static byte[] getPriKey32(byte[] priKey) {
+        byte[] priKey32Bytes;
+        byte[] priKeyBytes;
+        byte[] suffix;
+        byte[] priKeyForHash;
+        byte[] hash;
+        byte[] hash4;
+        int len = priKey.length;
+
+        switch (len) {
+            case 32:
+                priKey32Bytes = priKey;
+                break;
+            case 38:
+                priKeyBytes = priKey;
+
+                suffix = new byte[4];
+                priKeyForHash = new byte[34];
+
+                System.arraycopy(priKeyBytes, 0, priKeyForHash, 0, 34);
+                System.arraycopy(priKeyBytes, 34, suffix, 0, 4);
+
+                hash = SHA.Sha256x2(priKeyForHash);
+
+                hash4 = new byte[4];
+                System.arraycopy(hash, 0, hash4, 0, 4);
+
+                if (!Arrays.equals(suffix, hash4)) {
+                    return null;
+                }
+                if (priKeyForHash[0] != (byte) 0x80) {
+                    return null;
+                }
+                priKey32Bytes = new byte[32];
+                System.arraycopy(priKeyForHash, 1, priKey32Bytes, 0, 32);
+                break;
+            case 37:
+                priKeyBytes = priKey;
+
+                suffix = new byte[4];
+                priKeyForHash = new byte[33];
+
+                System.arraycopy(priKeyBytes, 0, priKeyForHash, 0, 33);
+                System.arraycopy(priKeyBytes, 33, suffix, 0, 4);
+
+                hash = SHA.Sha256x2(priKeyForHash);
+
+                hash4 = new byte[4];
+                System.arraycopy(hash, 0, hash4, 0, 4);
+
+                if (!Arrays.equals(suffix, hash4)) {
+                    return null;
+                }
+                if (priKeyForHash[0] != (byte) 0x80) {
+                    return null;
+                }
+                priKey32Bytes = new byte[32];
+                System.arraycopy(priKeyForHash, 1, priKey32Bytes, 0, 32);
+                break;
+            default:
+                System.out.println("It's not a private key.");
+                return null;
+        }
+
+        return priKey32Bytes;
     }
 
     public static boolean checkSum(String str) {

@@ -33,17 +33,15 @@ import static constants.Strings.*;
 public class ServiceManager {
 	private static final Logger log = LoggerFactory.getLogger(ServiceManager.class);
 	Params params = new Params();
-	Jedis jedis;
 	ElasticsearchClient esClient;
 	BufferedReader br;
 	ConfigAPIP configAPIP;
 
-	public ServiceManager(ElasticsearchClient esClient, Jedis jedis, BufferedReader br, ConfigAPIP configAPIP)  {
+	public ServiceManager(ElasticsearchClient esClient, BufferedReader br, ConfigAPIP configAPIP)  {
 
 		if(StartAPIP.service!=null) {
 			params = StartAPIP.service.getParams();
 		}
-		this.jedis = jedis;
 		this.br = br;
 		this.esClient = esClient;
 		this.configAPIP = configAPIP;
@@ -70,11 +68,11 @@ public class ServiceManager {
 			int choice = menu.choose(br);
 
 			switch (choice) {
-				case 1 -> publish(br, jedis);
+				case 1 -> publish(br);
 				case 2 -> findService();
 				case 3 -> showService();
 				case 4 -> update(esClient, br);
-				case 5 -> reloadServiceFromRedis(esClient, jedis, br);
+				case 5 -> reloadServiceFromRedis(esClient, br);
 				case 6 -> stop(esClient, br);
 				case 7 -> recover(esClient, br);
 				case 8 -> close(esClient, br);
@@ -88,13 +86,15 @@ public class ServiceManager {
 	}
 
 	private void showService() {
-		if (jedis.get(StartAPIP.serviceName+"_"+SERVICE) == null) {
-			System.out.println("No service set yet.");
-			return;
+		try(Jedis jedis = StartAPIP.jedisPool.getResource()) {
+			if (jedis.get(StartAPIP.serviceName + "_" + SERVICE) == null) {
+				System.out.println("No service set yet.");
+				return;
+			}
+			Gson gson = new Gson();
+			ApipService service1 = gson.fromJson(jedis.get(StartAPIP.serviceName + "_" + SERVICE), ApipService.class);
+			ParseTools.gsonPrint(service1);
 		}
-		Gson gson = new Gson();
-		ApipService service1 = gson.fromJson(jedis.get(StartAPIP.serviceName+"_"+SERVICE), ApipService.class);
-		ParseTools.gsonPrint(service1);
 	}
 
 	public boolean findService() throws IOException {
@@ -103,32 +103,33 @@ public class ServiceManager {
 			System.out.println("No service found. Publish one? 'y' to publish. Any other key to quit");
 			String input = br.readLine();
 			if("y".equals(input)) {
-				publish(br, jedis);
+				publish(br);
 				System.out.println("Publish your service and try again.");
 			}
 			return false;
 		}
 		params = StartAPIP.service.getParams();
-		StartAPIP.updateServiceParamsInRedisAndConfig(jedis,configAPIP);
+		StartAPIP.updateServiceParamsInRedisAndConfig(configAPIP);
 		return true;
 	}
 
-	private void reloadServiceFromRedis(ElasticsearchClient esClient, Jedis jedis, BufferedReader br) throws IOException {
+	private void reloadServiceFromRedis(ElasticsearchClient esClient, BufferedReader br) throws IOException {
 		if (Menu.askIfNotToDo("Reload the service from ES? ", br)) return;
-
-		String serviceStr = jedis.get(StartAPIP.serviceName+"_"+SERVICE);
-		if(serviceStr==null){
-			System.out.println("Service isn't set yet.");
-		}else {
-			StartAPIP.service = new Gson().fromJson(serviceStr, ApipService.class);
-			GetResponse<ApipService> r = esClient.get(g -> g.index(SERVICE).id(StartAPIP.service.getSid()), ApipService.class);
-			if(r.source()!=null) {
-				String serviceJson = new Gson().toJson(r.source());
-				jedis.set(StartAPIP.serviceName+"_"+SERVICE, serviceJson);
-				params = StartAPIP.service.getParams();
-				System.out.println("Service " + StartAPIP.service.getSid() + " reloaded.");
-			}else{
-				System.out.println("No service found.");
+		try(Jedis jedis = StartAPIP.jedisPool.getResource()) {
+			String serviceStr = jedis.get(StartAPIP.serviceName + "_" + SERVICE);
+			if (serviceStr == null) {
+				System.out.println("Service isn't set yet.");
+			} else {
+				StartAPIP.service = new Gson().fromJson(serviceStr, ApipService.class);
+				GetResponse<ApipService> r = esClient.get(g -> g.index(SERVICE).id(StartAPIP.service.getSid()), ApipService.class);
+				if (r.source() != null) {
+					String serviceJson = new Gson().toJson(r.source());
+					jedis.set(StartAPIP.serviceName + "_" + SERVICE, serviceJson);
+					params = StartAPIP.service.getParams();
+					System.out.println("Service " + StartAPIP.service.getSid() + " reloaded.");
+				} else {
+					System.out.println("No service found.");
+				}
 			}
 		}
 	}
@@ -230,7 +231,7 @@ public class ServiceManager {
 		return apipService;
 	}
 
-	public void publish(BufferedReader br, Jedis jedis) throws IOException {
+	public void publish(BufferedReader br) throws IOException {
 		if (Menu.askIfNotToDo("Get the OpReturn text to publish a new service?", br)) return;
 
 		Feip5 feip5 = new Feip5();

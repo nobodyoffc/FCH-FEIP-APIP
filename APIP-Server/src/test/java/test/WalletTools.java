@@ -1,4 +1,4 @@
-package tools;
+package test;
 
 import APIP0V1_OpenAPI.Replier;
 import constants.IndicesNames;
@@ -18,6 +18,7 @@ import initial.Initiator;
 import javaTools.BytesTools;
 import fcTools.ParseTools;
 import redis.clients.jedis.Jedis;
+import tools.CashToInputsResult;
 
 
 import java.io.BufferedReader;

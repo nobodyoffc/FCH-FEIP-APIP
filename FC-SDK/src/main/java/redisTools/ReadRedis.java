@@ -20,11 +20,11 @@ public class ReadRedis {
     }
 
 
-    public static long readLong(Jedis jedis, String key){
+    public static long readLong(String key){
 
         long var =0;
         String varStr;
-        try {
+        try (Jedis jedis = new Jedis()){
             varStr = jedis.get(key);
         }catch (Exception e){
             varStr=null;

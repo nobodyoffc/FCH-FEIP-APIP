@@ -2,6 +2,7 @@ package cryptoTools;
 
 import com.google.common.hash.Hashing;
 import com.xwc1125.chain5j.utils.Numeric;
+import fcTools.Hash;
 import javaTools.BytesTools;
 import org.bouncycastle.crypto.digests.RIPEMD160Digest;
 import org.bouncycastle.crypto.digests.SHA512Digest;
@@ -17,6 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.HexFormat;
 import java.util.Objects;
 
 import static java.lang.Integer.rotateLeft;
@@ -149,6 +151,19 @@ public class SHA {
         byte[] b = strB.getBytes(charsetB);
         return BytesTools.bytesMerger(a,b);
 
+    }
+
+    public static String getSign(String symKey, String text) {
+        byte[] textBytes = text.getBytes(StandardCharsets.UTF_8);
+        byte[] keyBytes = BytesTools.hexToByteArray(symKey);
+        byte[] bytes = BytesTools.bytesMerger(textBytes,keyBytes);
+        System.out.println("----");
+        System.out.println("Content in hex to be signed: ");
+        System.out.println("----");
+        System.out.println(HexFormat.of().formatHex(bytes));
+//        System.out.println("------");
+        byte[] signBytes = Hash.Sha256x2(bytes);
+        return BytesTools.bytesToHexStringBE(signBytes);
     }
 
 

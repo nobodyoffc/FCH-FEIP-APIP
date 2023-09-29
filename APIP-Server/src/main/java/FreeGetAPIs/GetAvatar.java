@@ -1,8 +1,9 @@
 package FreeGetAPIs;
 
+import APIP0V1_OpenAPI.Replier;
 import avatar.AvatarMaker;
 import constants.ApiNames;
-import data.ReplierForFree;
+import constants.ReplyInfo;
 import initial.Initiator;
 import constants.Strings;
 import redis.clients.jedis.Jedis;
@@ -24,7 +25,7 @@ import static constants.Strings.CONFIG;
 import static initial.Initiator.jedisPool;
 
 
-@WebServlet(ApiNames.FreeGet + ApiNames.GetAvatarAPI)
+@WebServlet(ApiNames.FreeGetPath + ApiNames.GetAvatarAPI)
 public class GetAvatar extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -32,23 +33,19 @@ public class GetAvatar extends HttpServlet {
         String avatarBasePath = null;
         String avatarPngPath = null;
         PrintWriter writer = response.getWriter();
-        ReplierForFree replier = new ReplierForFree();
+        Replier replier = new Replier();
 
-        if (Initiator.isFreeGetForbidden(writer)) {
+        if(Initiator.forbidFreeGet){
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
-            replier.setOther();
-            replier.setData("Error: FreeGet API is not active now.");
-            writer.write(replier.toJson());
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code2001NoFreeGet));
+            writer.write(replier.reply2001NoFreeGet());
             return;
         }
         fidRequested = request.getParameter("fid");
         if (!(fidRequested.charAt(0) == 'F' || fidRequested.charAt(0) == '3')) {
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
-            replier.setOther();
-            replier.setData("Error: It is not a FID.");
-            writer.write(replier.toJson());
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code2003IllegalFid));
+            writer.write(replier.reply2003IllegalFid());
             return;
         }
         try(Jedis jedis0Common= jedisPool.getResource()) {

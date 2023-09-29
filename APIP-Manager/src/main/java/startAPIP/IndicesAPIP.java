@@ -58,11 +58,11 @@ public class IndicesAPIP {
             int choice = menu.choose(br);
             switch (choice) {
                 case 1 -> listIndices(br);
-                case 2 -> recreateApipIndex(br, esClient, jedis, ORDER, orderMappingJsonStr);
-                case 3 -> recreateApipIndex(br, esClient, jedis, BALANCE, balanceMappingJsonStr);
-                case 4 -> recreateApipIndex(br, esClient, jedis, REWARD, rewardMappingJsonStr);
-                case 5 -> recreateApipIndex(br, esClient, jedis, WEBHOOK, webhookMappingJsonStr);
-                case 6 -> recreateAllApipIndex(br, esClient, jedis);
+                case 2 -> recreateApipIndex(br, esClient, ORDER, orderMappingJsonStr);
+                case 3 -> recreateApipIndex(br, esClient, BALANCE, balanceMappingJsonStr);
+                case 4 -> recreateApipIndex(br, esClient, REWARD, rewardMappingJsonStr);
+                case 5 -> recreateApipIndex(br, esClient, WEBHOOK, webhookMappingJsonStr);
+                case 6 -> recreateAllApipIndex(br, esClient);
                 case 0 -> {
                     return;
                 }
@@ -70,15 +70,15 @@ public class IndicesAPIP {
         }
     }
 
-    private void recreateAllApipIndex(BufferedReader br, ElasticsearchClient esClient, Jedis jedis) throws IOException, InterruptedException {
-        recreateApipIndex(br, esClient, jedis, ORDER, orderMappingJsonStr);
-        recreateApipIndex(br, esClient, jedis, BALANCE, balanceMappingJsonStr);
-        recreateApipIndex(br, esClient, jedis, REWARD, rewardMappingJsonStr);
-        recreateApipIndex(br, esClient, jedis, WEBHOOK, webhookMappingJsonStr);
+    private void recreateAllApipIndex(BufferedReader br, ElasticsearchClient esClient) throws IOException, InterruptedException {
+        recreateApipIndex(br, esClient, ORDER, orderMappingJsonStr);
+        recreateApipIndex(br, esClient, BALANCE, balanceMappingJsonStr);
+        recreateApipIndex(br, esClient,REWARD, rewardMappingJsonStr);
+        recreateApipIndex(br, esClient,WEBHOOK, webhookMappingJsonStr);
     }
 
-    public static void recreateApipIndex(BufferedReader br, ElasticsearchClient esClient, Jedis jedis, String indexName, String mappingJsonStr) {
-        String index = getNameOfService(jedis, indexName);
+    public static void recreateApipIndex(BufferedReader br, ElasticsearchClient esClient, String indexName, String mappingJsonStr) {
+        String index = getNameOfService(indexName);
         try {
             recreateIndex(index, esClient,mappingJsonStr);
         } catch (InterruptedException e) {
@@ -116,22 +116,22 @@ public class IndicesAPIP {
 
     public void checkApipIndices() throws IOException {
 
-        String orderIndex = getNameOfService(jedis,ORDER);
+        String orderIndex = getNameOfService(ORDER);
         if ( noSuchIndex(esClient, orderIndex)) {
             createIndex(orderIndex,esClient,orderMappingJsonStr);
         }
 
-        String balanceIndex = getNameOfService(jedis, BALANCE);
+        String balanceIndex = getNameOfService( BALANCE);
         if (noSuchIndex(esClient, balanceIndex)) {
             createIndex(balanceIndex,esClient,balanceMappingJsonStr);
         }
 
-        String rewardIndex = getNameOfService(jedis, REWARD);
+        String rewardIndex = getNameOfService(REWARD);
         if (noSuchIndex(esClient, rewardIndex)) {
             createIndex(rewardIndex,esClient,rewardMappingJsonStr);
         }
 
-        String webhookIndex = getNameOfService(jedis, WEBHOOK);
+        String webhookIndex = getNameOfService( WEBHOOK);
         if (noSuchIndex(esClient, webhookIndex)) {
             createIndex(webhookIndex,esClient,webhookMappingJsonStr);
         }

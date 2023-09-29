@@ -1,17 +1,14 @@
 package FreeGetAPIs;
 
+import APIP0V1_OpenAPI.Replier;
 import apipClass.Sort;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
-import constants.ApiNames;
-import constants.Constants;
-import constants.IndicesNames;
-import data.ReplierForFree;
-import fcTools.ParseTools;
+import constants.*;
 import fchClass.Cash;
 import initial.Initiator;
+import redis.clients.jedis.Jedis;
 import walletTools.CashListReturn;
 
 import javax.servlet.ServletException;
@@ -26,28 +23,24 @@ import java.util.List;
 
 import static walletTools.WalletTools.getCashListForPay;
 
-@WebServlet(ApiNames.FreeGet + ApiNames.GetCashesAPI)
+@WebServlet(ApiNames.FreeGetPath + ApiNames.GetCashesAPI)
 public class GetCashes extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         PrintWriter writer = response.getWriter();
-        ReplierForFree replier = new ReplierForFree();
+        Replier replier = new Replier();
 
-        if (Initiator.isFreeGetForbidden(writer)) {
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
-            replier.setOther();
-            replier.setData("Error: FreeGet API is not active now.");
-            writer.write(replier.toJson());
+        if(Initiator.forbidFreeGet){
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code2001NoFreeGet));
+            writer.write(replier.reply2001NoFreeGet());
             return;
         }
         String idRequested = request.getParameter("fid");
         if (idRequested==null){
-            replier.setOther();
-            replier.setData("Fid is null.");
-            writer.write(replier.toJson());
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code2003IllegalFid));
+            writer.write(replier.reply2003IllegalFid());
             return;
         }
 
@@ -55,15 +48,21 @@ public class GetCashes extends HttpServlet {
             long amount=(long)(Double.parseDouble(request.getParameter("amount"))* Constants.FchToSatoshi);
             CashListReturn cashListReturn = getCashListForPay(amount,idRequested,Initiator.esClient);
             if(cashListReturn.getCode()!=0){
-                replier.setOther();
                 replier.setData(cashListReturn.getMsg());
-                writer.write(replier.toJson());
+                response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1020OtherError));
+                writer.write(replier.reply1020OtherError());
                 return;
             }
 
-            replier.setSuccess();
             replier.setData(cashListReturn.getCashList());
-            writer.write(replier.toJson());
+            int size = cashListReturn.getCashList().size();
+            replier.setTotal(cashListReturn.getTotal());
+            replier.setGot(size);
+            try(Jedis jedis = Initiator.jedisPool.getResource()) {
+                replier.setBestHeight(Long.parseLong(jedis.get(Strings.BEST_HEIGHT)));
+            }
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code0Success));
+            writer.write(replier.reply0Success());
             return;
         }
 
@@ -88,9 +87,8 @@ public class GetCashes extends HttpServlet {
             List<Hit<Cash>> hitList = cashResult.hits().hits();
 
             if(hitList==null || hitList.size()==0){
-                replier.setOther();
-                replier.setData("Cash no found.");
-                writer.write(replier.toJson());
+                response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code2007CashNoFound));
+                writer.write(replier.reply2007CashNoFound());
                 return;
             }
 
@@ -103,13 +101,16 @@ public class GetCashes extends HttpServlet {
             assert cashResult.hits().total() != null;
             replier.setTotal(cashResult.hits().total().value());
             replier.setGot(cashList.size());
-            replier.setSuccess();
             replier.setData(cashList);
-            writer.write(replier.toJson());
+            try(Jedis jedis = Initiator.jedisPool.getResource()) {
+                replier.setBestHeight(Long.parseLong(jedis.get(Strings.BEST_HEIGHT)));
+            }
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code0Success));
+            writer.write(replier.reply0Success());
+            return;
         }else {
-            replier.setOther();
-            replier.setData("Illegal FID.");
-            writer.write(replier.toJson());
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code2003IllegalFid));
+            writer.write(replier.reply2003IllegalFid());
         }
     }
 }

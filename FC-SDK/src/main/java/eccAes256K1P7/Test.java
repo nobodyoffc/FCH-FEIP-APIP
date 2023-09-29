@@ -3,6 +3,7 @@ package eccAes256K1P7;
 import com.google.gson.Gson;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.HexFormat;
 
@@ -147,36 +148,30 @@ public class Test {
         System.out.println("AsyOneWay json:");
         System.out.println("----------");
 
-        eccAesData = new EccAesData();
-
-        eccAesData.setType(EccAesType.AsyOneWay);
-        eccAesData.setMsg(msg);
-        eccAesData.setPubKeyB(pubKeyB);
-        String oneWayJson0 = gson.toJson(eccAesData);
-
-        System.out.println("OneWayJson0: "+oneWayJson0);
-        String encOneWayJson0 = ecc.encryptAsyOneWayJson(oneWayJson0);
+        String encOneWayJson0 = ecc.encrypt(msg, pubKeyB);
         checkResult(eccAesData,"Encrypted: \n"+ encOneWayJson0);
 
-
-        EccAesData eccAesData1 = ecc.decryptAsyJson(encOneWayJson0, priKeyB.toCharArray());
-        checkResult(eccAesData,"Decrypted:\n"+eccAesData1.toJson());
+        String eccAesData1 = ecc.decrypt(encOneWayJson0, priKeyB.toCharArray());
+        checkResult(eccAesData,"Decrypted:\n"+eccAesData1);
 
         System.out.println("----------");
 
         System.out.println("AsyTwoWay json:");
         System.out.println("----------");
+
         eccAesData = new EccAesData();
         eccAesData.setType(EccAesType.AsyTwoWay);
         eccAesData.setMsg(msg);
         eccAesData.setPubKeyB(pubKeyB);
         String twoWayJson1 = gson.toJson(eccAesData);
+
         System.out.println("TwoWayJson1:"+twoWayJson1);
 
-        String encTwoWayJson1 = ecc.encryptAsyTwoWayJson(twoWayJson1,priKeyA.toCharArray());
+
+        String encTwoWayJson1 = ecc.encrypt(msg,pubKeyB,priKeyA.toCharArray());
         checkResult(eccAesData,"Encrypted: \n"+ encTwoWayJson1);
-        eccAesData1 = ecc.decryptAsyJson(encTwoWayJson1, priKeyB.toCharArray());
-        checkResult(eccAesData,"Decrypted:\n"+eccAesData1.toJson());
+        eccAesData1 = ecc.decrypt(encTwoWayJson1, priKeyB.toCharArray());
+        checkResult(eccAesData,"Decrypted:\n"+eccAesData1);
 
         System.out.println("----------");
 
@@ -185,15 +180,16 @@ public class Test {
         eccAesData = new EccAesData();
         eccAesData.setType(EccAesType.SymKey);
         eccAesData.setMsg(msg);
+        symKey = symKeyStr.toCharArray();
         eccAesData.setSymKey(symKey);
 
         String symKeyJson1 = gson.toJson(eccAesData);
         System.out.println("SymKeyJson1:"+symKeyJson1);
-
-        String encSymKeyJson1 = ecc.encryptWithSymKeyJson(symKeyJson1,symKey);
+        System.out.println("SymKey: "+ Arrays.toString(symKey));
+        String encSymKeyJson1 = ecc.encrypt(msg,symKey);
         checkResult(eccAesData,"Encrypted: \n"+ encSymKeyJson1);
 
-        String decSymKeyJson = ecc.decryptWithSymKey(encSymKeyJson1, symKey);
+        String decSymKeyJson = ecc.decrypt(encSymKeyJson1, symKey);
         checkResult(eccAesData,"Decrypted:\n"+decSymKeyJson);
         System.out.println("----------");
 
@@ -207,10 +203,10 @@ public class Test {
         String passwordDataJson1 = gson.toJson(eccAesData);
         System.out.println("PasswordJson1:"+passwordDataJson1 );
 
-        String encPasswordJson1 = ecc.encryptWithPasswordJson(passwordDataJson1 ,passwordStr.toCharArray());
+        String encPasswordJson1 = ecc.encrypt(msg, passwordStr.toCharArray());
         checkResult(eccAesData,"Encrypted: \n"+ encPasswordJson1);
 
-        String decPasswordJson = ecc.decryptWithPasswordJson(encPasswordJson1, passwordStr.toCharArray());
+        String decPasswordJson = ecc.decrypt(encPasswordJson1, passwordStr.toCharArray());
         checkResult(eccAesData,"Decrypted:\n"+decPasswordJson);
         System.out.println("----------------------");
 
@@ -340,7 +336,6 @@ public class Test {
         byte[] symKeyBytes = HexFormat.of().parseHex(symKeyStr);
         bundleBytes = ecc.encryptSymKeyBundle(msgBytes,symKeyBytes);
         System.out.println("Cipher bundle: "+Base64.getEncoder().encodeToString(bundleBytes));
-
         //Reload sensitive parameters
         symKeyBytes = HexFormat.of().parseHex(symKeyStr);
         msgBundleBytes = ecc.decryptSymKeyBundle(bundleBytes, symKeyBytes);

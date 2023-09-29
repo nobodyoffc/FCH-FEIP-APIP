@@ -41,11 +41,11 @@ public class FcRpcMethods {
         return ParseTools.gsonString(result);
     }
 
-    public static String sendTx(JsonRpcHttpClient fcClient, Object rawTx) {
+    public static String sendTx(JsonRpcHttpClient fcClient, String rawTx) {
         if(rawTx==null||"".equals(rawTx))return null;
-        Object result = null;
+        String result = null;
         try {
-            result = fcClient.invoke("sendrawtransaction", new Object[]{rawTx}, Object.class);
+            result = fcClient.invoke("sendrawtransaction", new String[]{rawTx}, String.class);
             return ParseTools.gsonString(result);
         } catch (Throwable e) {
             return e.getMessage();

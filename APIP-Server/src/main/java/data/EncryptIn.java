@@ -2,7 +2,7 @@ package data;
 
 public class EncryptIn {
     private String pubKey;
-    private char[] symKey;
+    private String symKey;
     private String msg;
     private String alg; //aes or ecc
 
@@ -14,11 +14,11 @@ public class EncryptIn {
         this.pubKey = pubKey;
     }
 
-    public char[] getSymKey() {
+    public String getSymKey() {
         return symKey;
     }
 
-    public void setSymKey(char[] symKey) {
+    public void setSymKey(String symKey) {
         this.symKey = symKey;
     }
 

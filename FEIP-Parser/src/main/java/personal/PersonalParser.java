@@ -37,8 +37,7 @@ public class PersonalParser {
 				contact.setContactId(opre.getTxId());
 
             	if (contactRaw.getAlg() != null)contact.setAlg(contactRaw.getAlg());
-				if (contact.getContactId()==null)return false;
-				if (contact.getCipher()==null)return false;
+				if (contactRaw.getCipher()==null)return false;
 				contact.setCipher(contactRaw.getCipher());
 
 				contact.setOwner(opre.getSigner());

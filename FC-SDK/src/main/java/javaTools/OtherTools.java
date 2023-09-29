@@ -1,5 +1,8 @@
 package javaTools;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,5 +17,13 @@ public class OtherTools {
             }
         }
         return integerMap;
+    }
+
+    public static String millisecondToDataTime(long milliTime) {
+
+        Instant instant = Instant.ofEpochMilli(milliTime);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy-MM-dd HH:mm:ss").withZone(ZoneId.systemDefault());
+
+        return formatter.format(instant);
     }
 }

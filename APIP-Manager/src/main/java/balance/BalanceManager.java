@@ -23,15 +23,11 @@ import static startAPIP.IndicesAPIP.recreateApipIndex;
 
 public class BalanceManager {
     private static final Logger log = LoggerFactory.getLogger(BalanceManager.class);
-    private final Jedis jedis;
     private final ElasticsearchClient esClient;
     private final BufferedReader br;
 
 
-    public BalanceManager(Jedis jedis, ElasticsearchClient esClient, BufferedReader br) {
-
-
-        this.jedis = jedis;
+    public BalanceManager(ElasticsearchClient esClient, BufferedReader br) {
         this.esClient = esClient;
         this.br = br;
     }
@@ -55,9 +51,9 @@ public class BalanceManager {
             switch (choice) {
 
                 case 1 -> findUsers(br);
-                case 2 -> BalanceInfo.backupUserBalanceToEs(esClient, jedis);
-                case 3 -> BalanceInfo.recoverUserBalanceFromEs(esClient, jedis);
-                case 4 -> recreateApipIndex(br, esClient, jedis, BALANCE, balanceMappingJsonStr);
+                case 2 -> BalanceInfo.backupUserBalanceToEs(esClient);
+                case 3 -> BalanceInfo.recoverUserBalanceFromEs(esClient);
+                case 4 -> recreateApipIndex(br, esClient,  BALANCE, balanceMappingJsonStr);
                 case 0 -> {
                     return;
                 }

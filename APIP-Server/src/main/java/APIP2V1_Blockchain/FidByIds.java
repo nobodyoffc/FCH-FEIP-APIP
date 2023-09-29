@@ -18,8 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@WebServlet(ApiNames.APIP2V1Path + ApiNames.AddressByIdsAPI)
-public class AddressByIds extends HttpServlet {
+@WebServlet(ApiNames.APIP2V1Path + ApiNames.fidByIdsAPI)
+public class FidByIds extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -54,11 +54,6 @@ public class AddressByIds extends HttpServlet {
                 return;
             }
             //make addrList
-            for(Address addr1 : meetAddrList){
-                addr1.setTrxAddr(null);
-                addr1.setDogeAddr(null);
-                addr1.setLtcAddr(null);
-            }
         } catch (Exception e) {
             e.printStackTrace();
             response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));

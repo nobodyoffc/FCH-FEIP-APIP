@@ -25,7 +25,7 @@ import static walletTools.CryptoSigner.parseDataForOffLineTxFromOther;
 import static walletTools.WalletTools.getCashListForPay;
 
 
-@WebServlet(ToolsPath + ApiNames.OffLineTxAPI)
+@WebServlet(ApiNames.ToolsPath + ApiNames.OffLineTxAPI)
 public class OffLineTx extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

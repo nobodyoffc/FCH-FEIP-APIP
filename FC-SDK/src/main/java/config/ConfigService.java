@@ -58,8 +58,8 @@ public class ConfigService extends ConfigFEIP {
         this.rpcUser = rpcUser;
     }
 
-    public boolean loadConfigToRedis(Jedis jedis){
-        try {
+    public boolean loadConfigToRedis(){
+        try(Jedis jedis = new Jedis()) {
             jedis.hset(CONFIG, ES_IP, esIp);
             jedis.hset(CONFIG, ES_PORT, String.valueOf(esPort));
             jedis.hset(CONFIG, CONFIG_FILE_PATH, configFilePath);

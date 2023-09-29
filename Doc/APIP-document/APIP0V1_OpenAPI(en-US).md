@@ -28,6 +28,8 @@
 
 [totals接口](#totals接口)
 
+[getService接口](#getService接口)
+
 ---
 
 ```
@@ -337,7 +339,7 @@ APP有两种`请求方`设定逻辑：
 ```
 {
 	"type": "APIP",
-	"sn": "1",
+	"sn": "0",
 	"ver": "1",
 	"name": "OpenAPI",
 	"data": {
@@ -716,13 +718,13 @@ Sign = 4d3242031e1a8caab81466734b379e07519ee652e9f096455afca3ea1efedd1e
 查询各索引数据总量
 
 示例：
-URL：http://localhost:8080/APIP/apip1/v1/totals
+URL：http://localhost:8080/APIP/apip0/v1/totals
 
 * Request body
 
 ```
 {
-	"url": "http://localhost:8080/APIP/apip1/v1/totals",
+	"url": "http://localhost:8080/APIP/apip0/v1/totals",
 	"time": 1677673821267,
 	"nonce": 19838
 }
@@ -734,47 +736,94 @@ URL：http://localhost:8080/APIP/apip1/v1/totals
 {
     "code": 0,
     "message": "Success.",
-    "nonce": 19838,
-    "balance": 983000000,
-    "got": 35,
-    "total": 35,
-    "bestHeight": 1782774,
+    "nonce": 0,
+    "balance": 0,
+    "got": 23,
+    "total": 23,
+    "bestHeight": 1929656,
     "data": {
+        "app": "2",
         "code": "1",
-        "mail": "67",
-        "tx": "1953852",
-        "service_history": "6",
-        "cid_history": "1293",
+        "webhook": "0",
+        "address": "104592",
+        "mail": "64",
+        "tx": "2104746",
+        "p2sh": "1",
+        "nid": "1",
         "box": "2",
-        "secret": "306",
-        "parse_mark": "2127",
+        "secret": "312",
+        "team": "4",
         "protocol": "3",
-        "block_mark": "1782759",
+        "service": "5",
         "contact": "3",
         "statement": "2",
-        "code_history": "5",
-        "group_history": "372",
-        "proof_history": "12",
-        "reputation_history": "2",
-        "block": "1782740",
+        "block": "1929657",
         "proof": "7",
-        "cash": "4568712",
-        "group": "48",
-        "order": "2",
-        "app": "2",
-        "protocol_history": "9",
-        "address": "101554",
-        "p2sh": "1",
-        "tx_has": "1953857",
-        "box_history": "6",
-        "balance_history": "1",
-        "team": "4",
-        "block_has": "1782740",
-        "team_history": "23",
-        "service": "3",
-        "opreturn": "21874",
-        "cid": "594",
-        "app_history": "7"
+        "opreturn": "21944",
+        "nobody": "1",
+        "cash": "4870738",
+        "group": "57",
+        "order": "11",
+        "cid": "617"
+    }
+}
+```
+
+## getService 获取当前APIP服务信息接口
+
+查询各索引数据总量
+
+示例：
+URL：https://qm.cash/APIP/apip0/v1/getService
+
+方法：GET
+
+* Response body
+
+```
+{
+    "code": 0,
+    "message": "Success.",
+    "nonce": 0,
+    "balance": 0,
+    "got": 1,
+    "total": 1,
+    "bestHeight": 1929436,
+    "data": {
+        "params": {
+            "urlHead": "https://cid.cash/APIP/",
+            "currency": "fch",
+            "account": "FUmo2eez6VK2sfGWjek9i9aK5y1mdHSnqv",
+            "pricePerKBytes": "0.01",
+            "pricePerRequest": "0.01",
+            "minPayment": "1.0",
+            "sessionDays": "100"
+        },
+        "sid": "46c1df926598cf0b881f0f1ab2ac6340826a5f954dd690786459c36388d6c131",
+        "stdName": "ApipNo1",
+        "localNames": [
+            "APIP服务1"
+        ],
+        "types": [
+            "APIP",
+            "FEIP"
+        ],
+        "urls": [
+            "https://cid.cash"
+        ],
+        "waiters": [
+            "FUmo2eez6VK2sfGWjek9i9aK5y1mdHSnqv"
+        ],
+        "owner": "FJYN3D7x4yiLF692WUAe7Vfo2nQpYDNrC7",
+        "birthTime": 1686025789,
+        "birthHeight": 1775263,
+        "lastTxId": "f3a1d644558d1e2a530dd985db5a56eaca720684c782b60e721a3e71a3509d27",
+        "lastTime": 1694611958,
+        "lastHeight": 1914168,
+        "tCdd": 0,
+        "tRate": 0.0,
+        "active": true,
+        "closed": false
     }
 }
 ```

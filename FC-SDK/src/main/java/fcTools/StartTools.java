@@ -2,6 +2,7 @@ package fcTools;
 
 
 import constants.Constants;
+import cryptoTools.SHA;
 import eccAes256K1P7.EccAes256K1P7;
 import eccAes256K1P7.EccAesData;
 import eccAes256K1P7.EccAesType;
@@ -257,7 +258,7 @@ public class StartTools {
         if(encryptedFile==null||encryptedFile.length()> Constants.MAX_FILE_SIZE_M * Constants.M_BYTES)return;
         String ask = "Input the symKey in hex:";
         char[] symKey = Inputer.input32BytesKey(br, ask);
-        String result = ecc.decryptFileWithSymKey(encryptedFile,symKey);
+        String result = ecc.decrypt(encryptedFile,symKey);
         System.out.println(result);
         Menu.anyKeyToContinue(br);
     }
@@ -269,7 +270,7 @@ public class StartTools {
 
         String ask = "Input the symKey in hex:";
         char[] symKey = Inputer.input32BytesKey(br, ask);
-        System.out.println(ecc.encryptFileSymKey(originalFile, symKey));
+        System.out.println(ecc.encrypt(originalFile, symKey));
         Menu.anyKeyToContinue(br);
     }
 
@@ -319,7 +320,7 @@ public class StartTools {
             System.out.println("The symKey should be 64 characters in hex.");
         }
         EccAes256K1P7 ecc = new EccAes256K1P7();
-        String result = ecc.decryptFileWithPriKey(encryptedFile,javaTools.BytesTools.hexCharArrayToByteArray(priKey));
+        String result = ecc.decrypt(encryptedFile,javaTools.BytesTools.hexCharArrayToByteArray(priKey));
         System.out.println(result);
         Menu.anyKeyToContinue(br);
     }
@@ -332,7 +333,7 @@ public class StartTools {
         pubKeyB = getPubKey(br);
         if (pubKeyB == null) return;
         EccAes256K1P7 ecc = new EccAes256K1P7();
-        System.out.println(ecc.encryptFileAsy(originalFile, pubKeyB));
+        System.out.println(ecc.encrypt(originalFile, pubKeyB));
         Menu.anyKeyToContinue(br);
     }
 
@@ -380,7 +381,7 @@ public class StartTools {
         char[] symKey = Inputer.input32BytesKey(br, ask);
         if(symKey==null)return;
 
-        eccAesDataJson = ecc.decryptWithSymKey(eccAesDataJson,symKey);
+        eccAesDataJson = ecc.decrypt(eccAesDataJson,symKey);
         System.out.println(eccAesDataJson);
         Menu.anyKeyToContinue(br);
     }
@@ -428,7 +429,7 @@ public class StartTools {
 
         EccAes256K1P7 ecc = new EccAes256K1P7();
 
-        System.out.println(ecc.decryptWithPasswordJson(eccAesDataJson,password));
+        System.out.println(ecc.decrypt(eccAesDataJson,password));
 
         Menu.anyKeyToContinue(br);
     }
@@ -462,9 +463,9 @@ public class StartTools {
 
         EccAes256K1P7 ecc = new EccAes256K1P7();
 
-        EccAesData eccAesData = ecc.decryptAsyJson(eccAesDataJson, priKey);
+        String eccAesData = ecc.decrypt(eccAesDataJson, priKey);
 
-        System.out.println(eccAesData.toJson());
+        System.out.println(eccAesData);
     }
 
     private static void decryptWithBtcEcc() {
@@ -765,7 +766,7 @@ public class StartTools {
                 System.out.println("Input text to be signed, enter to input, 'q' to exit:");
                 String text = inputString(br);
                 if("q".equals(text))return;
-                String sign = getSign(symKey,text);
+                String sign = SHA.getSign(symKey,text);
                 System.out.println("----");
                 System.out.println("Signature:");
                 System.out.println("----");
@@ -797,19 +798,5 @@ public class StartTools {
             text = text.substring(0, input.length()-1);
         }
         return text;
-    }
-
-
-    private static String getSign(String symKey,String text) {
-        byte[] textBytes = text.getBytes(StandardCharsets.UTF_8);
-        byte[] keyBytes = BytesTools.hexToByteArray(symKey);
-        byte[] bytes = BytesTools.bytesMerger(textBytes,keyBytes);
-        System.out.println("----");
-        System.out.println("Content in hex to be signed: ");
-        System.out.println("----");
-        System.out.println(HexFormat.of().formatHex(bytes));
-//        System.out.println("------");
-        byte[] signBytes = Hash.Sha256x2(bytes);
-        return BytesTools.bytesToHexStringBE(signBytes);
     }
 }

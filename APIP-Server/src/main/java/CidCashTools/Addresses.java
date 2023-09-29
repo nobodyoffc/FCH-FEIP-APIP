@@ -19,10 +19,9 @@ import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
-import static constants.Constants.*;
 import static initial.Initiator.esClient;
 
-@WebServlet(ToolsPath + ApiNames.AddressesAPI)
+@WebServlet(ApiNames.ToolsPath + ApiNames.AddressesAPI)
 public class Addresses extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, RuntimeException {
         response.setContentType("application/json");
@@ -52,33 +51,29 @@ public class Addresses extends HttpServlet {
         String input = (String)requestBody.getFcdsl().getOther();
 
         Map<String, String> addrMap = new HashMap<>();
-        String pubKey = null;
-        if(input.startsWith("F")){
-            GetResponse<Address> result = esClient.get(g -> g.index(IndicesNames.ADDRESS).id(input), Address.class);
-
-            if(!result.found()){
+        String pubKey=null;
+        if(input.startsWith("F")||input.startsWith("1")||input.startsWith("D")||input.startsWith("T")||input.startsWith("L")){
+            byte[] hash160 = KeyTools.addrToHash160(input);
+            addrMap = KeyTools.hash160ToAddresses(hash160);
+        }else if (input.startsWith("02")||input.startsWith("03")){
+            pubKey = input;
+            addrMap= KeyTools.pubKeyToAddresses(pubKey);
+        }else if(input.startsWith("04")){
+            try {
+                pubKey = KeyTools.compressPk65To33(input);
+                addrMap= KeyTools.pubKeyToAddresses(pubKey);
+            } catch (Exception e) {
                 response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1020OtherError));
-                replier.setData("This FID has never seen on blockchain of Freecash.");
+                replier.setData("Wrong public key.");
                 writer.write(replier.reply1020OtherError(addr));
                 return;
             }
-            pubKey = result.source().getPubKey();
-        }else if (input.startsWith("02")||input.startsWith("03")){
-            pubKey = input;
         }else{
             response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1020OtherError));
             replier.setData("FID or Public Key are needed.");
             writer.write(replier.reply1020OtherError(addr));
             return;
         }
-        addrMap.put("FCH",KeyTools.pubKeyToFchAddr(pubKey));
-        addrMap.put("BTC",KeyTools.pubKeyToBtcAddr(pubKey));
-        addrMap.put("ETH",KeyTools.pubKeyToEthAddr(pubKey));
-        addrMap.put("TRX",KeyTools.pubKeyToTrxAddr(pubKey));
-        addrMap.put("LTC",KeyTools.pubKeyToLtcAddr(pubKey));
-        addrMap.put("DOGE",KeyTools.pubKeyToDogeAddr(pubKey));
-
-
         replier.setData(addrMap);
         replier.setGot(1);
         replier.setTotal(1);

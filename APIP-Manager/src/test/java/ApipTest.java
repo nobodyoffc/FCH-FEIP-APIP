@@ -29,7 +29,7 @@ public class ApipTest {
             e.printStackTrace();
             System.out.println("Creating ES client failed.");
         }
-        BalanceInfo.recoverUserBalanceFromEs(esClient,jedis0Common);
+        BalanceInfo.recoverUserBalanceFromEs(esClient);
 //        BalanceInfo.backupUserBalanceToEs(esClient,jedis0Common);
     }
 }

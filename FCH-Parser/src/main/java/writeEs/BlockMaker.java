@@ -66,6 +66,7 @@ public class BlockMaker {
 
 		for (Cash out : inOldList) {
 			Cash in = inMap.get(out.getCashId());
+			in.setIssuer(out.getIssuer());
 			in.setOwner(out.getOwner());
 			in.setBirthIndex(out.getBirthIndex());
 			in.setType(out.getType());
@@ -83,6 +84,7 @@ public class BlockMaker {
 		for (String id : inNewIdList) {
 			Cash in = inMap.get(id);
 			Cash out = outMap.get(id);
+			in.setIssuer(out.getIssuer());
 			in.setOwner(out.getOwner());
 			in.setBirthIndex(out.getBirthIndex());
 			in.setType(out.getType());

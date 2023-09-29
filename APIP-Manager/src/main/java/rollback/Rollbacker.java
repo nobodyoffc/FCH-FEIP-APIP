@@ -40,10 +40,10 @@ public class Rollbacker {
         return block == null;
     }
 
-    public static void rollback(ElasticsearchClient esClient, Jedis jedis,long height)  {
+    public static void rollback(ElasticsearchClient esClient, long height)  {
         ArrayList<Order> orderList = null;
         try {
-            String index = StartAPIP.getNameOfService(jedis,ORDER);
+            String index = StartAPIP.getNameOfService(ORDER);
             orderList= EsTools.getListSinceHeight(esClient, index,"height",height,Order.class);
 
             if(orderList==null || orderList.size()==0)return;
@@ -61,15 +61,16 @@ public class Rollbacker {
 
     private static void minusFromBalance(ElasticsearchClient esClient, ArrayList<Order> orderList) throws Exception {
         ArrayList<String> idList= new ArrayList<>();
-        Jedis jedis = new Jedis();
-        for(Order order: orderList){
-            String addr = order.getFromFid();
-            long balance = ReadRedis.readHashLong(jedis, StartAPIP.serviceName+"_"+Strings.FID_BALANCE, addr);
-            jedis.hset(StartAPIP.serviceName+"_"+Strings.FID_BALANCE,addr, String.valueOf(balance-order.getAmount()));
+        try(Jedis jedis = StartAPIP.jedisPool.getResource()) {
+            for (Order order : orderList) {
+                String addr = order.getFromFid();
+                long balance = ReadRedis.readHashLong(jedis, StartAPIP.serviceName + "_" + Strings.FID_BALANCE, addr);
+                jedis.hset(StartAPIP.serviceName + "_" + Strings.FID_BALANCE, addr, String.valueOf(balance - order.getAmount()));
 
-            idList.add(order.getOrderId());
+                idList.add(order.getOrderId());
+            }
         }
-        String index = StartAPIP.getNameOfService(jedis,ORDER);
+        String index = StartAPIP.getNameOfService(ORDER);
         EsTools.bulkDeleteList(esClient, index, idList);
     }
 

@@ -21,6 +21,7 @@ import org.apache.http.util.EntityUtils;
 
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HexFormat;
 import java.util.List;
@@ -102,7 +103,14 @@ public class PostRequester {
 
             String requestBodyJson = gson.toJson(dataRequestBody);
 
-            byte[] sign = SHA.Sha256x2(BytesTools.bytesMerger(requestBodyJson.getBytes(StandardCharsets.UTF_8),sessionKey));
+            //TODO
+            System.out.println("Request body: \n"+requestBodyJson);
+            System.out.println("sessionKey: "+ HexFormat.of().formatHex(sessionKey));
+
+            byte[] allBytes=BytesTools.bytesMerger(requestBodyJson.getBytes(StandardCharsets.UTF_8),sessionKey);
+            System.out.println("AllBytes: "+HexFormat.of().formatHex(allBytes));
+
+            byte[] sign = SHA.Sha256x2(allBytes);
             headerMap.put(Strings.Header_SIGN, HexFormat.of().formatHex(sign));
             String responseJson = requestPost(url, headerMap, requestBodyJson);
 

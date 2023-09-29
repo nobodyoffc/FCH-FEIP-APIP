@@ -140,7 +140,6 @@ public class RequestChecker {
 
         if(isBadBalance()){
             response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1004InsufficientBalance));
-
             String buyJson = gson.toJson(Order.getJsonBuyOrder(Initiator.service.getSid()));
             replyInsufficientBalance(buyJson, fid);
             return null;

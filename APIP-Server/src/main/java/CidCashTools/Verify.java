@@ -17,8 +17,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.security.SignatureException;
 
-import static constants.Constants.*;
-@WebServlet(ToolsPath + ApiNames.VerifyAPI)
+@WebServlet(ApiNames.ToolsPath + ApiNames.VerifyAPI)
 public class Verify extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("application/json");
@@ -51,7 +50,7 @@ public class Verify extends HttpServlet {
             //verifyIn =  gson.fromJson(gson.toJson(dataCheckResult.getDataRequestBody().getFcdsl().getOther()), VerifyIn.class);
             String inputJson = gson.toJson(dataCheckResult.getDataRequestBody().getFcdsl().getOther());
             if(inputJson.contains("signature")&&inputJson.contains("message")&&inputJson.contains("address")){
-                SignFull signFull = new SignFull();
+                SignFull signFull;
                 signFull = gson.fromJson(inputJson,SignFull.class);
                 signShort.fid = signFull.address;
                 signShort.msg = signFull.message;
@@ -67,21 +66,20 @@ public class Verify extends HttpServlet {
             writer.write(replier.reply1020OtherError(addr));
             return;
         }
-        boolean isGoodSign = false;
+        boolean isGoodSign;
         if(signShort.fid!=null&& signShort.msg!=null && signShort.sign!=null){
-
             String sign = signShort.sign.replace("\\u003d", "=");
             try {
                 String signPubKey = ECKey.signedMessageToKey(signShort.msg, sign).getPublicKeyAsHex();
-                if(signShort.fid.equals(keyTools.KeyTools.pubKeyToFchAddr(signPubKey))){
-                    isGoodSign=true;
-                }
+                isGoodSign= signShort.fid.equals(keyTools.KeyTools.pubKeyToFchAddr(signPubKey));
             } catch (SignatureException e) {
-                response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1020OtherError));
-                replier.setData("Something wrong when checking signature.");
-                writer.write(replier.reply1020OtherError(addr));
-                return;
+                isGoodSign = false;
             }
+        }else{
+            response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1020OtherError));
+            replier.setData("FID, signature or message missed.");
+            writer.write(replier.reply1020OtherError(addr));
+            return;
         }
 
         replier.setData(isGoodSign);

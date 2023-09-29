@@ -146,7 +146,7 @@ public class EccAesData {
         eccAesData.setError("No pubKeyA or pubKeyB.");
     }
 
-    private void fromJson(String json) {
+    public void fromJson(String json) {
         EccAesData eccAesData = new Gson().fromJson(json,EccAesData.class);
         this.type = eccAesData.getType();
         this.alg = eccAesData.getAlg();

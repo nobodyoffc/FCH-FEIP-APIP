@@ -81,14 +81,13 @@ public class Replier {
                 d.put("currency", params.getCurrency());
                 d.put("sendFrom", userAddr);
                 d.put("sendTo", params.getAccount());
-                d.put("minimumPay", params.getMinPayment());
+                d.put("minPayment", params.getMinPayment());
                 d.put("writeInOpReturn", gson.toJson(Order.getJsonBuyOrder(Initiator.service.getSid())));
                 d.put("note", "When writing OpReturn, remove the escape character!");
 
                 data = d;
                 last = null;
                 balance = 0;
-                jedis0Common.close();
                 return gson.toJson(this);
             } else {
                 jedis0Common.hset(Initiator.serviceName+"_"+Strings.FID_BALANCE, userAddr, String.valueOf(balance));
@@ -106,6 +105,12 @@ public class Replier {
         code = ReplyInfo.Code0Success;
         message = ReplyInfo.Msg0Success;
         return reply(addr);
+    }
+
+    public String reply0Success(){
+        code = ReplyInfo.Code0Success;
+        message = ReplyInfo.Msg0Success;
+        return reply();
     }
 
     public String reply1000MissSign(){
@@ -217,6 +222,61 @@ public class Replier {
     public String reply1020OtherError (){
         code = ReplyInfo.Code1020OtherError;
         message = ReplyInfo.Msg1020OtherError;
+        return reply();
+    }
+
+    public String reply2001NoFreeGet (){
+        code = ReplyInfo.Code2001NoFreeGet;
+        message = ReplyInfo.Msg2001NoFreeGet;
+        return reply();
+    }
+    public String reply2002CidNoFound (){
+        code = ReplyInfo.Code2002CidNoFound;
+        message = ReplyInfo.Msg2002CidNoFound;
+        return reply();
+    }
+    public String reply2003IllegalFid (){
+        code = ReplyInfo.Code2003IllegalFid;
+        message = ReplyInfo.Msg2003IllegalFid;
+        return reply();
+    }
+
+    public String reply2004RawTxNoHex (){
+        code = ReplyInfo.Code2004RawTxNoHex;
+        message = ReplyInfo.Msg2004RawTxNoHex;
+        return reply();
+    }
+
+    public String reply2005SendTxFailed (){
+        code = ReplyInfo.Code2005SendTxFailed;
+        message = ReplyInfo.Msg2005SendTxFailed;
+        return reply();
+    }
+    public String reply2006AppNoFound  (){
+        code = ReplyInfo.Code2006AppNoFound ;
+        message = ReplyInfo.Msg2006AppNoFound ;
+        return reply();
+    }
+    public String reply2007CashNoFound  (){
+        code = ReplyInfo.Code2007CashNoFound;
+        message = ReplyInfo.Msg2007CashNoFound;
+        return reply();
+    }
+    public String reply2008ServiceNoFound(){
+        code = ReplyInfo.Code2008ServiceNoFound;
+        message = ReplyInfo.Msg2008ServiceNoFound;
+        return reply();
+    }
+
+    public String reply2009NoFreeSessionKey(){
+        code = ReplyInfo.Code2009NoFreeSessionKey;
+        message = ReplyInfo.Msg2009NoFreeSessionKey;
+        return reply();
+    }
+
+    public String reply2010ErrorFromFchRpc(){
+        code = ReplyInfo.Code2010ErrorFromFchRpc;
+        message = ReplyInfo.Msg2010ErrorFromFchRpc;
         return reply();
     }
 

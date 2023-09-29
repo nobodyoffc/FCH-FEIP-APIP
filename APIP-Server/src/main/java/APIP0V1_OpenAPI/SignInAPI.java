@@ -4,10 +4,8 @@ import apipClass.SignInReplyData;
 import constants.ApiNames;
 import constants.ReplyInfo;
 import service.ApipService;
-import javaTools.BytesTools;
 import initial.Initiator;
 import redis.clients.jedis.Jedis;
-import service.Params;
 import constants.Strings;
 
 import javax.servlet.ServletException;
@@ -18,11 +16,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.security.*;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Map;
 
 
 import static constants.ApiNames.SignInAPI;
@@ -98,7 +91,7 @@ public class SignInAPI extends HttpServlet {
         try(Jedis jedis = Initiator.jedisPool.getResource()) {
             if ((!jedis.hexists(Initiator.serviceName+"_"+Strings.FID_SESSION_NAME, fid)) || "renew".equals(mode)) {
                 try {
-                    signInReplyData = makeSession();
+                    signInReplyData = new Session().makeSession(jedis, fid);
                 } catch (Exception e) {
                     response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1020OtherError));
                     replier.setData("Some thing wrong when making sessionKey.\n" + e.getMessage());
@@ -106,6 +99,7 @@ public class SignInAPI extends HttpServlet {
                     return;
                 }
             } else {
+                jedis.select(0);
                 String sessionName = jedis.hget(Initiator.serviceName+"_"+Strings.FID_SESSION_NAME, fid);
 
                 jedis.select(1);
@@ -122,7 +116,7 @@ public class SignInAPI extends HttpServlet {
                     }
                 }else {
                     try {
-                        signInReplyData = makeSession();
+                        signInReplyData = new Session().makeSession(jedis, fid);
                     } catch (Exception e) {
                         response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1020OtherError));
                         replier.setData("Some thing wrong when making sessionKey.\n" + e.getMessage());
@@ -138,68 +132,6 @@ public class SignInAPI extends HttpServlet {
         replier.setData(signInReplyData);
         writer.write(replier.reply0Success(fid));
         replier.clean();
-    }
-
-
-    private SignInReplyData makeSession() throws Exception {
-        String sessionKey;
-        String sessionName;
-        SignInReplyData data;
-        try(Jedis jedis = Initiator.jedisPool.getResource()) {
-            jedis.select(1);
-            do {
-                sessionKey = genSessionKey();
-                sessionName = makeSessionName(sessionKey);
-            } while (jedis.exists(sessionName));
-            data = new SignInReplyData();
-            Map<String,String> sessionMap = new HashMap<>();
-            sessionMap.put("sessionKey",sessionKey);
-            sessionMap.put("fid", fid);
-
-        //Delete the old session of the requester.
-            jedis.select(0);
-            String oldSessionName = jedis.hget(Initiator.serviceName+"_"+Strings.FID_SESSION_NAME, fid);
-
-            jedis.select(1);
-            if (oldSessionName != null) jedis.del(oldSessionName);
-
-            //Set the new session
-            jedis.hmset(sessionName, sessionMap);
-            Params params = service.getParams();
-
-            long lifeSeconds = Long.parseLong(params.getSessionDays()) * 86400;
-
-            jedis.expire(sessionName, lifeSeconds);
-            jedis.close();
-
-            data.setSessionKey(sessionKey);
-            long expireTime = System.currentTimeMillis() + (lifeSeconds * 1000);
-
-            data.setExpireTime(expireTime);
-
-            jedis.select(0);
-            jedis.hset(Initiator.serviceName+"_"+Strings.FID_SESSION_NAME, fid, sessionName);
-        }
-        return data;
-    }
-
-    public static String millisecondToDataTime(long milliTime) {
-
-        Instant instant = Instant.ofEpochMilli(milliTime);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy-MM-dd HH:mm:ss").withZone(ZoneId.systemDefault());
-
-        return formatter.format(instant);
-    }
-
-    private String genSessionKey() {
-        SecureRandom random = new SecureRandom();
-
-        byte[] keyBytes = new byte[32];
-        random.nextBytes(keyBytes);
-        return BytesTools.bytesToHexStringBE(keyBytes);
-    }
-    private String makeSessionName(String sessionKey) {
-        return sessionKey.substring(0,12);
     }
 
     @Override

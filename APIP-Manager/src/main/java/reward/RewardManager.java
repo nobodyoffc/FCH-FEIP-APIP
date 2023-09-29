@@ -29,16 +29,14 @@ import static startAPIP.IndicesAPIP.rewardMappingJsonStr;
 public class RewardManager {
     private static final Logger log = LoggerFactory.getLogger(RewardManager.class);
     public static final String UNSIGNED_REWARD_TX_FILE = "unsigned.txt";
-    private final Jedis jedis;
     private final ElasticsearchClient esClient;
     private final BufferedReader br;
     Rewarder rewarder;
 
-    public RewardManager(Jedis jedis, ElasticsearchClient esClient, BufferedReader br) {
-        this.jedis = jedis;
+    public RewardManager( ElasticsearchClient esClient, BufferedReader br) {
         this.esClient = esClient;
         this.br = br;
-        this.rewarder = new Rewarder(esClient,jedis);
+        this.rewarder = new Rewarder(esClient);
     }
 
     public void menu() {
@@ -66,7 +64,7 @@ public class RewardManager {
                 case 4 -> deleteRewards(br, esClient);
                 case 5 -> makeFixedIncomeTReward(br);
                 case 6 -> backupRewardHistorytoFile(br,esClient);
-                case 7 -> new Rewarder(esClient, jedis).setRewardParameters(jedis,br);
+                case 7 -> new Rewarder(esClient).setRewardParameters(br);
                 case 0 -> {
                     return;
                 }
@@ -93,7 +91,7 @@ public class RewardManager {
         int size;
         try {
             result = esClient.search(s -> s
-                            .index(StartAPIP.getNameOfService(jedis, REWARD))
+                            .index(StartAPIP.getNameOfService(REWARD))
                             .size(EsTools.READ_MAX / 10)
                             .sort(sort)
                     , RewardInfo.class);
@@ -115,7 +113,7 @@ public class RewardManager {
             try {
                 List<String> finalLast = last;
                 result = esClient.search(s -> s
-                                .index(StartAPIP.getNameOfService(jedis, REWARD))
+                                .index(StartAPIP.getNameOfService(REWARD))
                                 .size(EsTools.READ_MAX / 10)
                                 .sort(sort)
                                 .searchAfter(finalLast)
@@ -149,7 +147,7 @@ public class RewardManager {
 
         AffairMaker affairMaker;
         String account = null;
-        try {
+        try(Jedis jedis = StartAPIP.jedisPool.getResource()) {
             account = jedis.hget(jedis.hget(CONFIG,SERVICE_NAME)+"_"+ PARAMS_ON_CHAIN, ACCOUNT);
         }catch (Exception e){
             log.error("Get service account wrong. Check redis.");
@@ -178,7 +176,7 @@ public class RewardManager {
         }
 
         for(RewardInfo rewardInfo: unpaidRewardList){
-            affairMaker = new AffairMaker(account, rewardInfo,esClient,jedis);
+            affairMaker = new AffairMaker(account, rewardInfo,esClient);
             String affairSignTxJson = affairMaker.makeAffair();
             byte[] txBytes = (affairSignTxJson+"\n\n").getBytes();
             try {
@@ -235,7 +233,7 @@ public class RewardManager {
         SearchResponse<RewardInfo> result;
         try{
             result = esClient.search(s -> s
-                            .index(StartAPIP.getNameOfService(jedis, REWARD))
+                            .index(StartAPIP.getNameOfService(REWARD))
                             .query(q->q.term(t->t.field(STATE).value(UNPAID)))
                             .size(200)
                             .sort(sortOptionsList)
@@ -299,7 +297,7 @@ public class RewardManager {
         Jedis jedis1 = new Jedis();
         try{
             SearchResponse<RewardInfo> result = esClient.search(s -> s
-                            .index(StartAPIP.getNameOfService(jedis1, REWARD))
+                            .index(StartAPIP.getNameOfService(REWARD))
                             .size(1)
                             .sort(sortOptionsList)
                     , RewardInfo.class);
@@ -318,7 +316,7 @@ public class RewardManager {
 
     private void deleteAllReward(ElasticsearchClient esClient)  {
         try {
-            recreateApipIndex(br, esClient, jedis, REWARD, rewardMappingJsonStr);
+            recreateApipIndex(br, esClient, REWARD, rewardMappingJsonStr);
         } catch (Exception e) {
             log.error("Delete all rewards by recreating reward index error.",e);
         }
@@ -327,7 +325,7 @@ public class RewardManager {
     private void deleteByRewardId(ElasticsearchClient esClient, String rewardId) {
         try{
             DeleteResponse result = esClient.delete(d -> d
-                    .index(StartAPIP.getNameOfService(jedis, REWARD))
+                    .index(StartAPIP.getNameOfService(REWARD))
                     .id(rewardId)
             );
 

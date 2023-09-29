@@ -191,7 +191,7 @@ public class RawTxParser {
                     newCash.setType("P2PKH");
                     newCash.setLockScript(BytesTools.bytesToHexStringBE(bScript));
                     byte[] hash160Bytes = Arrays.copyOfRange(bScript, 3, 23);
-                    newCash.setOwner(KeyTools.hash160ToFCHAddr(hash160Bytes));
+                    newCash.setOwner(KeyTools.hash160ToFchAddr(hash160Bytes));
                 }
                 case OP_RETURN -> {
                     newCash.setType("OP_RETURN");

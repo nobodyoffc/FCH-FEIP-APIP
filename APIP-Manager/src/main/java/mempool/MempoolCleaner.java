@@ -38,4 +38,7 @@ public class MempoolCleaner implements Runnable {
         jedis = new Jedis();
         running.set(true);
     }
+    public AtomicBoolean getRunning() {
+        return running;
+    }
 }

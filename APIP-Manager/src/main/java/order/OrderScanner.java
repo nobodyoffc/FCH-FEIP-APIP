@@ -41,7 +41,6 @@ public class OrderScanner implements Runnable {
     private static final Logger log = LoggerFactory.getLogger(OrderScanner.class);
     public static  String serviceName;
     private final ElasticsearchClient esClient;
-    private Jedis jedis0Common = new Jedis();
     private final Gson gson = new Gson();
     private ApipService service;
 
@@ -60,76 +59,80 @@ public class OrderScanner implements Runnable {
     public void run() {
         log.debug("Order scanner begin");
         ConfigAPIP configAPIP = new ConfigAPIP();
-        configAPIP.setConfigFilePath(jedis0Common.hget(CONFIG,CONFIG_FILE_PATH));
-        try {
-            configAPIP =  configAPIP.getClassInstanceFromFile(ConfigAPIP.class);
-        } catch (IOException e) {
-            log.error("Order scanner read config file wrong.");
-            throw new RuntimeException(e);
-        }
-
-        if (configAPIP.getEsIp() == null || configAPIP.getEsPort() == 0) {
-            log.error("Es IP is null. Config first.");
-            return;
-        }
-        serviceName = configAPIP.getServiceName()+"_";
-
-        service = gson.fromJson(jedis0Common.get(serviceName+Strings.SERVICE), ApipService.class);
-        log.debug("Order scanner got the service. SID: {}",service.getSid());
-
-        params = service.getParams();
-        String serviceAccount = params.getAccount();
-        if (serviceAccount == null) {
-            log.error("No service account.");
-            return;
-        }
-
-        log.debug("SID: " + service.getSid()
-                + "\nService Name: "
-                + service.getStdName()
-                + "\nAccount: " + params.getAccount());
-        System.out.println("Any Key to continue...");
-        int countBackUpBalance = 0;
-        int countReward = 0;
-        Rewarder rewarder = new Rewarder(esClient,jedis0Common);
-
-        while (running.get()) {
-            checkIfNewStart();
-            checkRollback();
-            getNewOrders();
-
-            countBackUpBalance++;
-            countReward++;
-            if (countBackUpBalance == BalanceBackupInterval) {
-                try {
-                    BalanceInfo.backupUserBalanceToEs(esClient,jedis0Common) ;
-                    BalanceInfo.deleteOldBalance(esClient,jedis0Common);
-                } catch (Exception e) {
-                    log.error("Backup user balance, consumeVia, orderVia, or pending reward to ES wrong.",e);
-                }
-                countBackUpBalance = 0;
+        try(Jedis jedis0Common = StartAPIP.jedisPool.getResource()) {
+            configAPIP.setConfigFilePath(jedis0Common.hget(CONFIG, CONFIG_FILE_PATH));
+            try {
+                configAPIP = configAPIP.getClassInstanceFromFile(ConfigAPIP.class);
+            } catch (IOException e) {
+                log.error("Order scanner read config file wrong.");
+                throw new RuntimeException(e);
             }
 
-            if (countReward == RewardInterval) {
-                try {
-                    RewardReturn result = rewarder.doReward();
-                    if(result.getCode()!=0){
-                        log.error(result.getClass()+": ["+result.getCode()+"] " +result.getMsg());
+            if (configAPIP.getEsIp() == null || configAPIP.getEsPort() == 0) {
+                log.error("Es IP is null. Config first.");
+                return;
+            }
+            serviceName = configAPIP.getServiceName() + "_";
+
+            service = gson.fromJson(jedis0Common.get(serviceName + Strings.SERVICE), ApipService.class);
+            log.debug("Order scanner got the service. SID: {}", service.getSid());
+
+            params = service.getParams();
+            String serviceAccount = params.getAccount();
+            if (serviceAccount == null) {
+                log.error("No service account.");
+                return;
+            }
+
+            log.debug("SID: " + service.getSid()
+                    + "\nService Name: "
+                    + service.getStdName()
+                    + "\nAccount: " + params.getAccount());
+            System.out.println("Any Key to continue...");
+            int countBackUpBalance = 0;
+            int countReward = 0;
+            Rewarder rewarder = new Rewarder(esClient);
+
+            while (running.get()) {
+                checkIfNewStart();
+                checkRollback();
+                getNewOrders();
+
+                countBackUpBalance++;
+                countReward++;
+                if (countBackUpBalance == BalanceBackupInterval) {
+                    try {
+                        BalanceInfo.backupUserBalanceToEs(esClient);
+                        BalanceInfo.deleteOldBalance(esClient);
+                    } catch (Exception e) {
+                        log.error("Backup user balance, consumeVia, orderVia, or pending reward to ES wrong.", e);
                     }
-                } catch (Exception e) {
-                    log.error("Do reward wrong.",e);
+                    countBackUpBalance = 0;
                 }
-                countReward = 0;
+
+                if (countReward == RewardInterval) {
+                    try {
+                        RewardReturn result = rewarder.doReward();
+                        if (result.getCode() != 0) {
+                            log.error(result.getClass() + ": [" + result.getCode() + "] " + result.getMsg());
+                        }
+                    } catch (Exception e) {
+                        log.error("Do reward wrong.", e);
+                    }
+                    countReward = 0;
+                }
+                waitNewOrder();
             }
-            waitNewOrder();
         }
     }
 
     private void checkIfNewStart() {
-        String lastHeightStr = jedis0Common.get(StartAPIP.serviceName+"_"+ORDER_LAST_HEIGHT);
-        if(lastHeightStr==null){
-            jedis0Common.set(StartAPIP.serviceName+"_"+ORDER_LAST_HEIGHT,"0");
-            jedis0Common.set(StartAPIP.serviceName+"_"+Strings.ORDER_LAST_BLOCK_ID, Constants.zeroBlockId);
+        try(Jedis jedis0Common = StartAPIP.jedisPool.getResource()) {
+            String lastHeightStr = jedis0Common.get(StartAPIP.serviceName + "_" + ORDER_LAST_HEIGHT);
+            if (lastHeightStr == null) {
+                jedis0Common.set(StartAPIP.serviceName + "_" + ORDER_LAST_HEIGHT, "0");
+                jedis0Common.set(StartAPIP.serviceName + "_" + Strings.ORDER_LAST_BLOCK_ID, Constants.zeroBlockId);
+            }
         }
     }
 
@@ -140,22 +143,24 @@ private void waitNewOrder() {
 }
 
     private void checkRollback() {
-        long lastHeight = ReadRedis.readLong(jedis0Common, StartAPIP.serviceName+"_"+ORDER_LAST_HEIGHT);
-        String lastBlockId = jedis0Common.get(StartAPIP.serviceName+"_"+Strings.ORDER_LAST_BLOCK_ID);
-        try {
-            if (Rollbacker.isRolledBack(esClient, lastHeight, lastBlockId))
-                Rollbacker.rollback(esClient, jedis0Common,lastHeight - 30);
-        } catch (IOException e) {
-            log.debug("Order rollback wrong.");
-            e.printStackTrace();
-        } catch (Exception e) {
-            log.debug("Order rollback wrong.");
-            throw new RuntimeException(e);
+        try(Jedis jedis0Common = StartAPIP.jedisPool.getResource()) {
+            long lastHeight = ReadRedis.readLong(StartAPIP.serviceName + "_" + ORDER_LAST_HEIGHT);
+            String lastBlockId = jedis0Common.get(StartAPIP.serviceName + "_" + Strings.ORDER_LAST_BLOCK_ID);
+            try {
+                if (Rollbacker.isRolledBack(esClient, lastHeight, lastBlockId))
+                    Rollbacker.rollback(esClient, lastHeight - 30);
+            } catch (IOException e) {
+                log.debug("Order rollback wrong.");
+                e.printStackTrace();
+            } catch (Exception e) {
+                log.debug("Order rollback wrong.");
+                throw new RuntimeException(e);
+            }
         }
     }
 
     private void getNewOrders() {
-        long lastHeight = ReadRedis.readLong(jedis0Common, StartAPIP.serviceName+"_"+ORDER_LAST_HEIGHT);
+        long lastHeight = ReadRedis.readLong( StartAPIP.serviceName+"_"+ORDER_LAST_HEIGHT);
         ArrayList<Cash> cashList = getNewCashList(lastHeight,params.getAccount());
         if (cashList != null && cashList.size() > 0) {
             setLastOrderInfoToRedis(cashList);
@@ -164,50 +169,51 @@ private void waitNewOrder() {
     }
 
     private void getValidOrderList(ArrayList<Cash> cashList) {
+        try(Jedis jedis0Common = StartAPIP.jedisPool.getResource()) {
+            ArrayList<Order> orderList = getNewOrderList(cashList);
+            if (orderList.size() == 0) return;
 
-        ArrayList<Order> orderList = getNewOrderList(cashList);
-        if(orderList.size()==0)return;
+            String isCheckOrderOpReturn = jedis0Common.hget(CONFIG, Strings.CHECK_ORDER_OPRETURN);
+            Map<String, OrderInfo> validOpReturnOrderInfoMap;
 
-        String isCheckOrderOpReturn = jedis0Common.hget(CONFIG,Strings.CHECK_ORDER_OPRETURN);
-        Map<String, OrderInfo> validOpReturnOrderInfoMap;
+            if ("true".equals(isCheckOrderOpReturn)) {
+                ArrayList<String> txidList = getTxIdList(orderList);
+                validOpReturnOrderInfoMap = getValidOpReturnOrderInfoMap(txidList);
 
-        if("true".equals(isCheckOrderOpReturn)) {
-            ArrayList<String> txidList = getTxIdList(orderList);
-            validOpReturnOrderInfoMap = getValidOpReturnOrderInfoMap(txidList);
+                if (validOpReturnOrderInfoMap.size() == 0) return;
 
-            if (validOpReturnOrderInfoMap.size() == 0) return;
-
+                for (Order order : orderList) {
+                    OrderInfo orderInfo = validOpReturnOrderInfoMap.get(order.getTxId());
+                    if (orderInfo == null) continue;
+                    String via = orderInfo.getVia();
+                    if (via != null) order.setVia(via);
+                }
+            }
+            ArrayList<String> orderIdList = new ArrayList<>();
             for (Order order : orderList) {
-                OrderInfo orderInfo = validOpReturnOrderInfoMap.get(order.getTxId());
-                if (orderInfo == null) continue;
-                String via = orderInfo.getVia();
-                if(via!=null)order.setVia(via);
+                String payer = order.getFromFid();
+                if (payer != null) {
+                    long balance = readHashLong(jedis0Common, StartAPIP.serviceName + "_" + Strings.FID_BALANCE, payer);
+                    jedis0Common.hset(StartAPIP.serviceName + "_" + Strings.FID_BALANCE, payer, String.valueOf(balance + order.getAmount()));
+                } else continue;
+
+                String via = order.getVia();
+                if (via != null) {
+                    order.setVia(via);
+                    long viaT = ReadRedis.readHashLong(jedis0Common, StartAPIP.serviceName + "_" + Strings.ORDER_VIA, via);
+                    jedis0Common.hset(StartAPIP.serviceName + "_" + Strings.CONSUME_VIA, via, String.valueOf(viaT + order.getAmount()));
+                }
+
+                log.debug("New order from [" + order.getFromFid() + "]: " + order.getAmount() / 100000000 + " F");
+
+                orderIdList.add(order.getOrderId());
             }
-        }
-        ArrayList<String> orderIdList = new ArrayList<>();
-        for(Order order:orderList) {
-            String payer = order.getFromFid();
-            if (payer != null) {
-                long balance = readHashLong(jedis0Common, StartAPIP.serviceName + "_" + Strings.FID_BALANCE, payer);
-                jedis0Common.hset(StartAPIP.serviceName + "_" + Strings.FID_BALANCE, payer, String.valueOf(balance + order.getAmount()));
-            }else continue;
-
-            String via = order.getVia();
-            if (via != null) {
-                order.setVia(via);
-                long viaT = ReadRedis.readHashLong(jedis0Common, StartAPIP.serviceName + "_" + Strings.ORDER_VIA, via);
-                jedis0Common.hset(StartAPIP.serviceName + "_" + Strings.CONSUME_VIA, via, String.valueOf(viaT + order.getAmount()));
+            try {
+                String index = getNameOfService(ORDER);
+                EsTools.bulkWriteList(esClient, index, orderList, orderIdList, Order.class);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-
-            log.debug("New order from [" + order.getFromFid() + "]: " + order.getAmount() / 100000000 + " F");
-
-            orderIdList.add(order.getOrderId());
-        }
-        try {
-            String index = getNameOfService(jedis0Common,ORDER);
-            EsTools.bulkWriteList(esClient, index, orderList, orderIdList, Order.class);
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
@@ -306,8 +312,10 @@ private void waitNewOrder() {
                 lastBlockId = cash.getBirthBlockId();
             }
         }
-        jedis0Common.set(StartAPIP.serviceName+"_"+ORDER_LAST_HEIGHT, String.valueOf(lastHeight));
-        jedis0Common.set(StartAPIP.serviceName+"_"+Strings.ORDER_LAST_BLOCK_ID, lastBlockId);
+        try(Jedis jedis0Common = StartAPIP.jedisPool.getResource()) {
+            jedis0Common.set(StartAPIP.serviceName + "_" + ORDER_LAST_HEIGHT, String.valueOf(lastHeight));
+            jedis0Common.set(StartAPIP.serviceName + "_" + Strings.ORDER_LAST_BLOCK_ID, lastBlockId);
+        }
     }
 
     private ArrayList<Cash> getNewCashList(long lastHeight, String account) {
@@ -352,11 +360,9 @@ private void waitNewOrder() {
         }
     }
     public void shutdown() {
-        jedis0Common.close();
         running.set(false);
     }
     public void restart(){
-        jedis0Common = new Jedis();
         running.set(true);
     }
 

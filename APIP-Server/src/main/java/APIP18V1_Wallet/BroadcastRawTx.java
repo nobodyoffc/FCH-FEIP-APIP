@@ -47,7 +47,7 @@ public class BroadcastRawTx extends HttpServlet {
 
         String result = "";
         try {
-             result = FcRpcMethods.sendTx(fcClient,rawTxHex);
+             result = FcRpcMethods.sendTx(fcClient,(String)rawTxHex);
         } catch (Throwable e) {
             response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1020OtherError));
             replier.setData(e.getMessage());

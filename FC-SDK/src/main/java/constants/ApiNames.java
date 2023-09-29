@@ -1,8 +1,5 @@
 package constants;
 
-import com.google.protobuf.Api;
-import org.checkerframework.checker.units.qual.A;
-
 import java.util.ArrayList;
 
 public class ApiNames {
@@ -28,8 +25,10 @@ public class ApiNames {
     public static final String APIP18V1Path = "/apip18/v1/";
     public static final String APIP19V1Path = "/apip19/v1/";
     public static final String APIP20V1Path = "/apip20/v1/";
-    public static final String FreeGet = "/freeGet/v1/";
+    public static final String FreeGetPath = "/freeGet/v1/";
+    public static final String ToolsPath = "/tools/";
     public static final String SignInAPI = "signIn";
+    public static final String SignInEccAPI = "signInEcc";
     public static final String GeneralAPI = "general";
     public static final String TotalsAPI = "totals";
     public static final String BlockByIdsAPI = "blockByIds";
@@ -45,10 +44,10 @@ public class ApiNames {
     public static final String BlockHasByIdsAPI = "blockHasByIds";
     public static final String TxHasByIdsAPI = "TxHasByIds";
     public static final String CashValidAPI = "cashValid";
-    public static final String AddressByIdsAPI = "addressByIds";
+    public static final String fidByIdsAPI = "fidByIds";
     public static final String CidInfoByIdsAPI = "cidInfoByIds";
     public static final String GetFidCidAPI = "getFidCid";
-    public static final String AddressSearchAPI = "addressSearch";
+    public static final String fidSearchAPI = "fidSearch";
     public static final String FidCidSeekAPI = "fidCidSeek";
     public static final String CidByIdsAPI = "cidByIds";
     public static final String CidInfoSearchAPI = "cidInfoSearch";
@@ -70,6 +69,7 @@ public class ApiNames {
     public static final String CodeRateHistoryAPI = "codeRateHistory";
     public static final String ServiceByIdsAPI = "serviceByIds";
     public static final String GetServicesAPI = "getServices";
+    public static final String GetServiceAPI = "getService";
     public static final String GetFreeServiceAPI = "getFreeService";
     public static final String ServiceSearchAPI = "serviceSearch";
     public static final String ServiceOpHistoryAPI = "serviceOpHistory";
@@ -128,7 +128,11 @@ public class ApiNames {
     public static final String OffLineTxByCdAPI = "offLineTxByCd";
     public static final String AddressesAPI = "addresses";
     public static final String NewCashByFidsAPI = "newCashByFids";
+    public static final String NobodyByIdsAPI ="nobodyByIds";
+
     public static ArrayList<String> freeApiList = new ArrayList<>();
+
+
     static {
         freeApiList.add(ApiNames.GetFreeServiceAPI);
         freeApiList.add(ApiNames.GetAvatarAPI);
@@ -144,6 +148,7 @@ public class ApiNames {
     static {
 
         ApiNames.apiList.add(ApiNames.SignInAPI);
+        ApiNames.apiList.add(ApiNames.SignInEccAPI);
         ApiNames.apiList.add(ApiNames.GeneralAPI);
         ApiNames.apiList.add(ApiNames.TotalsAPI);
 
@@ -158,8 +163,8 @@ public class ApiNames {
         ApiNames.apiList.add(ApiNames.BlockHasByIdsAPI);
         ApiNames.apiList.add(ApiNames.OpReturnByIdsAPI);
         ApiNames.apiList.add(ApiNames.OpReturnSearchAPI);
-        ApiNames.apiList.add(ApiNames.AddressByIdsAPI);
-        ApiNames.apiList.add(ApiNames.AddressSearchAPI);
+        ApiNames.apiList.add(ApiNames.fidByIdsAPI);
+        ApiNames.apiList.add(ApiNames.fidSearchAPI);
         ApiNames.apiList.add(ApiNames.P2shByIdsAPI);
         ApiNames.apiList.add(ApiNames.P2shSearchAPI);
 
@@ -251,5 +256,6 @@ public class ApiNames {
         ApiNames.apiList.add(ApiNames.VerifyAPI);
         ApiNames.apiList.add(ApiNames.AddressesAPI);
         ApiNames.apiList.add(ApiNames.NewCashByFidsAPI);
+        ApiNames.apiList.add(ApiNames.NobodyByIdsAPI);
     }
 }

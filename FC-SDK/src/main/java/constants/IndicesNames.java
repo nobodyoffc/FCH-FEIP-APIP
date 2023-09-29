@@ -38,6 +38,7 @@ public class IndicesNames {
     public static final String NID = "nid";
     public static final String ORDER = "order";
     public static final String WEBHOOK = "webhook";
+    public static final String NOBODY = "nobody";
 
     public static void printIndices() {
         Indices indices = Indices.CID;

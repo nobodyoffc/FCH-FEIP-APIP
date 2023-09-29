@@ -255,7 +255,7 @@ public class BlockParser {
 				out.setType("P2PKH");
 				out.setLockScript(BytesTools.bytesToHexStringBE(bScript));
 				byte[] hash160Bytes = Arrays.copyOfRange(bScript, 3, 23);
-				out.setOwner(KeyTools.hash160ToFCHAddr(hash160Bytes));
+				out.setOwner(KeyTools.hash160ToFchAddr(hash160Bytes));
 				break;
 			case OP_RETURN:
 				out.setType("OP_RETURN");

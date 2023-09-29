@@ -21,7 +21,6 @@ public class IndicesFEIP {
 			return;
 		}
 
-
 		String cidJsonStr = "{\"mappings\":{\"properties\":{\"cid\":{\"type\":\"wildcard\"},\"height\":{\"type\":\"long\"},\"homepages\":{\"type\":\"text\"},\"hot\":{\"type\":\"long\"},\"fid\":{\"type\":\"keyword\"},\"priKey\":{\"type\":\"keyword\"},\"lastHeight\":{\"type\":\"long\"},\"master\":{\"type\":\"wildcard\"},\"nameTime\":{\"type\":\"long\"},\"noticeFee\":{\"type\":\"float\"},\"reputation\":{\"type\":\"long\"},\"usedCids\":{\"type\":\"wildcard\"}}}}";
 		String cidHistJsonStr = "{\"mappings\":{\"properties\":{\"homepages\":{\"type\":\"text\"},\"master\":{\"type\":\"wildcard\"},\"cipherPriKey\":{\"type\":\"keyword\"},\"alg\":{\"type\":\"wildcard\"},\"height\":{\"type\":\"long\"},\"txId\":{\"type\":\"keyword\"},\"index\":{\"type\":\"short\"},\"name\":{\"type\":\"wildcard\"},\"noticeFee\":{\"type\":\"text\"},\"op\":{\"type\":\"wildcard\"},\"priKey\":{\"type\":\"keyword\"},\"signer\":{\"type\":\"wildcard\"},\"sn\":{\"type\":\"short\"},\"time\":{\"type\":\"long\"},\"ver\":{\"type\":\"short\"}}}}";
 		String repuHistJsonStr = "{\"mappings\":{\"properties\":{\"cause\":{\"type\":\"text\"},\"height\":{\"type\":\"long\"},\"hot\":{\"type\":\"long\"},\"txId\":{\"type\":\"keyword\"},\"index\":{\"type\":\"short\"},\"ratee\":{\"type\":\"wildcard\"},\"rater\":{\"type\":\"wildcard\"},\"reputation\":{\"type\":\"long\"},\"time\":{\"type\":\"long\"}}}}";
@@ -82,6 +81,9 @@ public class IndicesFEIP {
 
 		String nidJsonStr = "{\"mappings\":{\"properties\":{\"nameId\":{\"type\":\"keyword\"},\"name\":{\"type\":\"wildcard\"},\"desc\":{\"type\":\"text\"},\"oid\":{\"type\":\"wildcard\"},\"active\":{\"type\":\"boolean\"},\"namer\":{\"type\":\"wildcard\"},\"birthTime\":{\"type\":\"long\"},\"birthHeight\":{\"type\":\"long\"},\"lastTxId\":{\"type\":\"keyword\"},\"lastTime\":{\"type\":\"long\"},\"lastHeight\":{\"type\":\"long\"}}}}";
 		EsTools.createIndex(esClient, IndicesNames.NID, nidJsonStr);
+
+		String nobodyJsonStr = "{\"mappings\":{\"properties\":{\"fid\":{\"type\":\"keyword\"},\"priKey\":{\"type\":\"keyword\"},\"deathTime\":{\"type\":\"long\"},\"deathTxIndex\":{\"type\":\"integer\"},\"deathTxId\":{\"type\":\"keyword\"}}}}";
+		EsTools.createIndex(esClient, IndicesNames.NOBODY, nobodyJsonStr);
 	}
 
 	public static void deleteAllIndices(ElasticsearchClient esClient) throws IOException {
@@ -120,5 +122,6 @@ public class IndicesFEIP {
 		EsTools.deleteIndex(esClient, IndicesNames.PROOF);
 		EsTools.deleteIndex(esClient, IndicesNames.PROOF_HISTORY);
 		EsTools.deleteIndex(esClient, IndicesNames.NID);
+		EsTools.deleteIndex(esClient, IndicesNames.NOBODY);
 	}
 }

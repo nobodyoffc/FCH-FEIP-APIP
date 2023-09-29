@@ -44,5 +44,33 @@ public class ReplyInfo {
     public static final int Code1016IllegalUrl = 1016;
     public static final String Msg1016IllegalUrl  = "Illegal URL.";
     public static final int Code1020OtherError = 1020;
-    public static final String Msg1020OtherError = "Other error, please contact the service provider.";
+    public static final String Msg1020OtherError = "Other error.";
+
+    public static final int Code2001NoFreeGet = 2001;
+    public static final String Msg2001NoFreeGet = "FreeGet API is not active now.";
+    public static final int Code2002CidNoFound = 2002;
+    public static final String Msg2002CidNoFound = "Cid no found.";
+
+    public static final int Code2003IllegalFid = 2003;
+    public static final String Msg2003IllegalFid = "Illegal FID.";
+
+    public static final int Code2004RawTxNoHex = 2004;
+    public static final String Msg2004RawTxNoHex = "Raw TX must be in HEX.";
+
+    public static final int Code2005SendTxFailed = 2005;
+    public static final String Msg2005SendTxFailed = "Send TX failed.";
+
+    public static final int Code2006AppNoFound = 2006;
+    public static final String Msg2006AppNoFound = "App no found.";
+
+    public static final int Code2007CashNoFound = 2007;
+    public static final String Msg2007CashNoFound = "Cash no found.";
+
+    public static final int Code2008ServiceNoFound = 2008;
+    public static final String Msg2008ServiceNoFound= "Cash no found.";
+    public static final int Code2009NoFreeSessionKey= 2009;
+    public static final String Msg2009NoFreeSessionKey= "Can not get free sessionKey.";
+    public static final int Code2010ErrorFromFchRpc= 2010;
+    public static final String Msg2010ErrorFromFchRpc= "Error from freecash RPC.";
+
 }

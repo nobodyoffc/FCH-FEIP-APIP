@@ -1,14 +1,17 @@
 package FreeGetAPIs;
 
+import APIP0V1_OpenAPI.Replier;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import constants.ApiNames;
 import constants.IndicesNames;
-import data.ReplierForFree;
+import constants.ReplyInfo;
+import constants.Strings;
 import feipClass.App;
 import initial.Initiator;
+import redis.clients.jedis.Jedis;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -20,7 +23,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-@WebServlet(ApiNames.FreeGet + ApiNames.GetAppsAPI)
+@WebServlet(ApiNames.FreeGetPath + ApiNames.GetAppsAPI)
 public class GetApps extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -29,16 +32,14 @@ public class GetApps extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
 
         PrintWriter writer = response.getWriter();
-        ReplierForFree replier = new ReplierForFree();
+        Replier replier = new Replier();
 
-        if (Initiator.isFreeGetForbidden(writer)) {
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
-            replier.setOther();
-            replier.setData("Error: FreeGet API is not active now.");
-            writer.write(replier.toJson());
+        if(Initiator.forbidFreeGet){
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code2001NoFreeGet));
+            writer.write(replier.reply2001NoFreeGet());
             return;
         }
+
         ElasticsearchClient esClient = Initiator.esClient;
 
         SearchResponse<App> result = esClient.search(s -> s.index(IndicesNames.APP)
@@ -48,9 +49,8 @@ public class GetApps extends HttpServlet {
                 , App.class);
         List<Hit<App>> hitList = result.hits().hits();
         if(hitList==null || hitList.size()==0){
-            replier.setOther();
-            replier.setData("App no found.");
-            writer.write(replier.toJson());
+            response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code2006AppNoFound));
+            writer.write(replier.reply2006AppNoFound());
             return;
         }
         List<App> foundList = new ArrayList<>();
@@ -61,8 +61,11 @@ public class GetApps extends HttpServlet {
         assert result.hits().total() != null;
         replier.setTotal(result.hits().total().value());
         replier.setGot(foundList.size());
-        replier.setSuccess();
         replier.setData(foundList);
-        writer.write(replier.toJson());
+        try(Jedis jedis = Initiator.jedisPool.getResource()) {
+            replier.setBestHeight(Long.parseLong(jedis.get(Strings.BEST_HEIGHT)));
+        }
+        response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code0Success));
+        writer.write(replier.reply0Success());
     }
 }

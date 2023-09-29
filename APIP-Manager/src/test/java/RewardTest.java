@@ -18,7 +18,7 @@ public class RewardTest {
     public static void main(String[] args) {
         final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         Result result = createClients();
-        rewarder = new Rewarder(result.esClient,result.jedis);
+        rewarder = new Rewarder(result.esClient);
 //        setParams(result,br);
 //        getLastOrderId(result.esClient);//uncheck
 //        getUnpaidRewardInfoMap(result.esClient);//uncheck
@@ -49,19 +49,19 @@ public class RewardTest {
     }
 
     private static RewardInfo makeRewardInfo(long incomeT, RewardParams rewardParams, Jedis jedis) {
-        RewardInfo rewardInfo = rewarder.makeRewardInfo(incomeT, rewardParams, jedis);
+        RewardInfo rewardInfo = rewarder.makeRewardInfo(incomeT, rewardParams);
         ParseTools.gsonPrint(rewardInfo);
         return rewardInfo;
     }
 
     private static RewardParams getRewardParams(Jedis jedis) {
-        RewardParams rewardParams = Rewarder.getRewardParams(jedis);
+        RewardParams rewardParams = Rewarder.getRewardParams();
         ParseTools.gsonPrint(rewardParams);
         return rewardParams;
     }
 
     private static long makeIncomeT(String s, Result result) {
-        Rewarder rewarder = new Rewarder(result.esClient,result.jedis);
+        Rewarder rewarder = new Rewarder(result.esClient);
         return rewarder.makeIncomeT(null,result.esClient);
     }
 
@@ -87,8 +87,8 @@ public class RewardTest {
     }
 
     private static void setParams(Result result, BufferedReader br) {
-        Rewarder rewarder = new Rewarder(result.esClient,result.jedis);
-        rewarder.setRewardParameters(result.jedis,br);
+        Rewarder rewarder = new Rewarder(result.esClient);
+        rewarder.setRewardParameters(br);
     }
 
     private static void close(Result result) {

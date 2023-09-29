@@ -1,5 +1,6 @@
 package identity;
 
+import fchClass.Nobody;
 import feipClass.*;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.ElasticsearchException;
@@ -15,8 +16,7 @@ import startFEIP.StartFEIP;
 import java.io.IOException;
 import java.util.*;
 
-import static constants.IndicesNames.ADDRESS;
-import static constants.IndicesNames.CID;
+import static constants.IndicesNames.*;
 
 public class IdentityParser {
 
@@ -199,10 +199,20 @@ public class IdentityParser {
 
 		if(resultGetCid.found()) {
 			Cid cid  = resultGetCid.source();
+			if(cid==null)return false;
 			if(cid.getPriKey()==null) {
 				cid.setPriKey(cidHist.getPriKey());
 				cid.setLastHeight(cidHist.getHeight());
 				esClient.index(i->i.index(CID).id(cidHist.getSigner()).document(cid));
+
+				Nobody nobody = new Nobody();
+				nobody.setFid(cidHist.getSigner());
+				nobody.setDeathTime(cidHist.getTime());
+				nobody.setDeathHeight(cidHist.getHeight());
+				nobody.setPriKey(cidHist.getPriKey());
+				nobody.setDeathTxId(cidHist.getTxId());
+				nobody.setDeathTxIndex(cidHist.getIndex());
+				esClient.index(i->i.index(NOBODY).id(cidHist.getSigner()).document(nobody));
 				isValid = true;
 			}
 		}

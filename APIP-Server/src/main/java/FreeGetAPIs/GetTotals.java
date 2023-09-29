@@ -1,11 +1,14 @@
 package FreeGetAPIs;
 
+import APIP0V1_OpenAPI.Replier;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.cat.IndicesResponse;
 import co.elastic.clients.elasticsearch.cat.indices.IndicesRecord;
 import constants.ApiNames;
-import data.ReplierForFree;
+import constants.ReplyInfo;
+import constants.Strings;
 import initial.Initiator;
+import redis.clients.jedis.Jedis;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -18,7 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@WebServlet(ApiNames.FreeGet + ApiNames.GetTotalsAPI)
+@WebServlet(ApiNames.FreeGetPath + ApiNames.GetTotalsAPI)
 public class GetTotals extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -27,14 +30,11 @@ public class GetTotals extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
 
         PrintWriter writer = response.getWriter();
-        ReplierForFree replier = new ReplierForFree();
+        Replier replier = new Replier();
 
-        if (Initiator.isFreeGetForbidden(writer)) {
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
-            replier.setOther();
-            replier.setData("Error: FreeGet API is not active now.");
-            writer.write(replier.toJson());
+        if(Initiator.forbidFreeGet){
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code2001NoFreeGet));
+            writer.write(replier.reply2001NoFreeGet());
             return;
         }
 
@@ -48,10 +48,13 @@ public class GetTotals extends HttpServlet {
             if(record.index()==null||record.index().contains("_"))continue;
             docsCountInIndex.put(record.index(),record.docsCount());
         }
-        replier.setSuccess();
         replier.setTotal(docsCountInIndex.size());
         replier.setGot(docsCountInIndex.size());
         replier.setData(docsCountInIndex);
-        writer.write(replier.toJson());
+        try(Jedis jedis = Initiator.jedisPool.getResource()) {
+            replier.setBestHeight(Long.parseLong(jedis.get(Strings.BEST_HEIGHT)));
+        }
+        response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code0Success));
+        writer.write(replier.reply0Success());
     }
 }
