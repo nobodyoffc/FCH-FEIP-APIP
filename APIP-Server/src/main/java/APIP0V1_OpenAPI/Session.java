@@ -1,13 +1,12 @@
 package APIP0V1_OpenAPI;
 
-import apipClass.SignInReplyData;
+import apipRequest.SignInApipReplyData;
 import constants.Strings;
 import eccAes256K1P7.EccAes256K1P7;
 import eccAes256K1P7.EccAesData;
 import eccAes256K1P7.EccAesType;
 import initial.Initiator;
 import javaTools.BytesTools;
-import org.bitcoinj.core.ECKey;
 import redis.clients.jedis.Jedis;
 import service.Params;
 
@@ -20,17 +19,17 @@ public class Session {
     private String sessionKey;
     private String fid;
 
-    public SignInReplyData makeSession(Jedis jedis, String fid) throws Exception {
+    public SignInApipReplyData makeSession(Jedis jedis, String fid) {
         String sessionKey;
         String sessionName;
-        SignInReplyData data;
+        SignInApipReplyData data;
 
         jedis.select(1);
         do {
             sessionKey = genSessionKey();
             sessionName = makeSessionName(sessionKey);
         } while (jedis.exists(sessionName));
-        data = new SignInReplyData();
+        data = new SignInApipReplyData();
         Map<String,String> sessionMap = new HashMap<>();
         sessionMap.put("sessionKey",sessionKey);
         sessionMap.put("fid", fid);
@@ -72,10 +71,7 @@ public class Session {
         return sessionKey.substring(0,12);
     }
 
-    public static String encryptSessionKey(String sessionKey, byte[]requestBodyBytes, String sign) throws Exception {
-        String message = new String(requestBodyBytes);
-        sign = sign.replace("\\u003d", "=");
-        String pubKey = ECKey.signedMessageToKey(message, sign).getPublicKeyAsHex();
+    public static String encryptSessionKey(String sessionKey, String pubKey, String sign) throws Exception {
         EccAes256K1P7 ecc = new EccAes256K1P7();
         EccAesData eccAesData= new EccAesData(EccAesType.AsyOneWay, sessionKey,pubKey);
         ecc.encrypt(eccAesData);

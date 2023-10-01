@@ -2,6 +2,7 @@ package menu;
 
 import fcTools.ParseTools;
 import javaTools.BytesTools;
+import keyTools.KeyTools;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -187,6 +188,20 @@ public static byte[] inputPassword() {
         return items;
     }
 
+
+    public static Map<String,String> inputStringStringMap(BufferedReader br, String askKey, String askValue) {
+        Map<String,String> stringStringMap = new HashMap<>();
+        while(true) {
+            System.out.println(askKey);
+            String key =Inputer.inputString(br);
+            if(key.equals(""))break;
+            System.out.println(askValue);
+            String value = inputString(br);
+            stringStringMap.put(key,value);
+        }
+        return stringStringMap;
+    }
+
     public static String inputShare(BufferedReader br, String share)  {
         float flo;
         String str;
@@ -283,11 +298,12 @@ public static byte[] inputPassword() {
         try {
             num = br.read(input);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.out.println("BufferReader wrong.");
+            return null;
         }
         if(num==0)return null;
-        char[] password = new char[num];
-        System.arraycopy(input, 0, password, 0, num);
+        char[] password = new char[num-1];
+        System.arraycopy(input, 0, password, 0, num-1);
         return password;
     }
 

@@ -5,7 +5,6 @@ import FipaClass.Op;
 import com.google.gson.Gson;
 import constants.Constants;
 import fcTools.Hash;
-import fcTools.ParseTools;
 import fileTools.FileTools;
 import fileTools.JsonFileTools;
 import javaTools.BytesTools;
@@ -40,7 +39,6 @@ import java.util.HexFormat;
  * * ECDH<p>
  * * secp256k1<p>
  * * AES-256-CBC-PKCS7Padding<p>
- * * Cipher structure: [Compressed pubKey 33bytes] + [salt 4bytes] + [cipherOfMsg with variable length]<p>
  * * By No1_NrC7 with the help of chatGPT
  */
 
@@ -93,15 +91,7 @@ public class EccAes256K1P7 {
     public String encrypt(String msg, char[] symKey32OrPassword){
         EccAesData eccAesData;
         if(symKey32OrPassword.length==64){
-            boolean isHex=false;
-            for(char c: symKey32OrPassword){
-                if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')) {
-                    isHex=true;
-                }else {
-                    isHex=false;
-                    break;
-                }
-            }
+            boolean isHex=isCharArrayHex(symKey32OrPassword);
             if(isHex) eccAesData = new EccAesData(EccAesType.SymKey,msg,symKey32OrPassword);
             else eccAesData = new EccAesData(EccAesType.Password,msg,symKey32OrPassword);
         }else eccAesData = new EccAesData(EccAesType.Password,msg,symKey32OrPassword);
@@ -111,61 +101,61 @@ public class EccAes256K1P7 {
         eccAesDataByte.clearAllSensitiveData();
         return EccAesData.fromEccAesDataByte(eccAesDataByte).toJson();
     }
-//
-//    public String encrypt(String eccAesDataJson){
-//        Gson gson = new Gson();
-//        EccAesData eccAesData = gson.fromJson(eccAesDataJson,EccAesData.class);
-//        if(eccAesData.getType()!=EccAesType.AsyOneWay){
-//            eccAesData.setError("Type "+EccAesType.AsyOneWay+" is required. Wrong type: "+eccAesData.getType());
-//        }
-//        EccAesDataByte eccAesDataByte = EccAesDataByte.fromEccAesData(eccAesData);
-//        encrypt(eccAesDataByte);
-//        eccAesDataByte.clearSymKey();
-//        return gson.toJson(EccAesData.fromEccAesDataByte(eccAesDataByte));
-//    }
-//    public String encryptAsyTwoWayJson(String eccAesDataJson, char[] priKeyA){
-//        Gson gson = new Gson();
-//        EccAesData eccAesData = gson.fromJson(eccAesDataJson,EccAesData.class);
-//
-//        if(eccAesData.getType()!=EccAesType.AsyTwoWay){
-//            eccAesData.setError("Type "+EccAesType.AsyTwoWay+" is required. Wrong type: "+eccAesData.getType());
-//        }
-//
-//        eccAesData.setPriKeyA(priKeyA);
-//
-//        EccAesDataByte eccAesDataByte = EccAesDataByte.fromEccAesData(eccAesData);
-//        encrypt(eccAesDataByte);
-//        eccAesDataByte.clearSymKey();
-//        return gson.toJson(EccAesData.fromEccAesDataByte(eccAesDataByte));
-//    }
-//    public String encryptWithSymKeyJson(String eccAesDataJson, char[] symKey){
-//        Gson gson = new Gson();
-//        EccAesData eccAesData = gson.fromJson(eccAesDataJson,EccAesData.class);
-//
-//        if(eccAesData.getType()!=EccAesType.SymKey){
-//            eccAesData.setError("Type "+EccAesType.SymKey+" is required. Wrong type: "+eccAesData.getType());
-//        }
-//        eccAesData.setSymKey(symKey);
-//
-//        EccAesDataByte eccAesDataByte = EccAesDataByte.fromEccAesData(eccAesData);
-//        encrypt(eccAesDataByte);
-//        eccAesDataByte.clearSymKey();
-//        return gson.toJson(EccAesData.fromEccAesDataByte(eccAesDataByte));
-//    }
-//    public String encryptWithPasswordJson(String eccAesDataJson, char[] password){
-//        Gson gson = new Gson();
-//        EccAesData eccAesData = gson.fromJson(eccAesDataJson,EccAesData.class);
-//
-//        if(eccAesData.getType()!=EccAesType.Password){
-//            eccAesData.setError("Type "+EccAesType.Password+" is required. Wrong type: "+eccAesData.getType());
-//        }
-//        eccAesData.setPassword(password);
-//
-//        EccAesDataByte eccAesDataByte = EccAesDataByte.fromEccAesData(eccAesData);
-//        encrypt(eccAesDataByte);
-//        eccAesDataByte.clearSymKey();
-//        return gson.toJson(EccAesData.fromEccAesDataByte(eccAesDataByte));
-//    }
+
+    public String encrypt(char[] msg,String pubKeyB){
+        EccAesDataByte eccAesDataByte = new EccAesDataByte();
+        eccAesDataByte.setType(EccAesType.AsyOneWay);
+        eccAesDataByte.setMsg(BytesTools.charArrayToByteArray(msg,StandardCharsets.UTF_8));
+        eccAesDataByte.setPubKeyB(BytesTools.hexToByteArray(pubKeyB));
+        encrypt(eccAesDataByte);
+        eccAesDataByte.clearAllSensitiveData();
+        return EccAesData.fromEccAesDataByte(eccAesDataByte).toJson();
+    }
+    public String encrypt(char[] msg,String pubKeyB,char[] priKeyA ){
+        EccAesDataByte eccAesDataByte = new EccAesDataByte();
+        eccAesDataByte.setType(EccAesType.AsyTwoWay);
+        eccAesDataByte.setMsg(BytesTools.charArrayToByteArray(msg,StandardCharsets.UTF_8));
+        eccAesDataByte.setPubKeyB(BytesTools.hexToByteArray(pubKeyB));
+        eccAesDataByte.setPriKeyA(BytesTools.hexCharArrayToByteArray(priKeyA));
+        encrypt(eccAesDataByte);
+        eccAesDataByte.clearAllSensitiveData();
+        return EccAesData.fromEccAesDataByte(eccAesDataByte).toJson();
+    }
+    public String encrypt(char[] msg,char[] symKey32OrPassword ){
+        EccAesDataByte eccAesDataByte = new EccAesDataByte();
+        if(symKey32OrPassword.length==64){
+            boolean isHex =isCharArrayHex(symKey32OrPassword);
+            if(isHex) {
+                eccAesDataByte.setType(EccAesType.SymKey);
+                eccAesDataByte.setSymKey(BytesTools.hexCharArrayToByteArray(symKey32OrPassword));
+            }
+            else {
+                eccAesDataByte.setType(EccAesType.Password);
+                eccAesDataByte.setPassword(BytesTools.charArrayToByteArray(symKey32OrPassword,StandardCharsets.UTF_8));
+            }
+        }else {
+            eccAesDataByte.setType(EccAesType.Password);
+            eccAesDataByte.setPassword(BytesTools.charArrayToByteArray(symKey32OrPassword,StandardCharsets.UTF_8));
+        }
+
+        eccAesDataByte.setMsg(BytesTools.charArrayToByteArray(msg,StandardCharsets.UTF_8));
+        encrypt(eccAesDataByte);
+        eccAesDataByte.clearAllSensitiveData();
+        return EccAesData.fromEccAesDataByte(eccAesDataByte).toJson();
+    }
+
+    private boolean isCharArrayHex(char[] symKey32OrPassword) {
+        boolean isHex=false;
+        for(char c: symKey32OrPassword){
+            if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')) {
+                isHex=true;
+            }else {
+                return false;
+            }
+        }
+        return isHex;
+    }
+
     public String encrypt(File originalFile, char[] symKey) {
         EccAesData eccAesData = new EccAesData();
         eccAesData.setType(EccAesType.SymKey);
@@ -275,35 +265,26 @@ public class EccAes256K1P7 {
             return eccAesData.getError();
         }
         decrypt(eccAesData);
-        return eccAesData.toJson();
+        return eccAesData.getMsg();
     }
-//    public String decryptWithSymKey(String eccAesDataJson, char[] symKey){
-//        Gson gson = new Gson();
-//        EccAesData eccAesData = gson.fromJson(eccAesDataJson,EccAesData.class);
-//
-//        if(eccAesData.getType()!=EccAesType.SymKey){
-//            eccAesData.setError("Type "+EccAesType.SymKey+" is required. Wrong type: "+eccAesData.getType());
-//        }
-//        eccAesData.setSymKey(symKey);
-//        EccAesDataByte eccAesDataByte = EccAesDataByte.fromEccAesData(eccAesData);
-//        decrypt(eccAesDataByte);
-//        eccAesDataByte.clearSymKey();
-//        return gson.toJson(EccAesData.fromEccAesDataByte(eccAesDataByte));
-//    }
-//    public String decryptWithPasswordJson(String eccAesDataJson, char[] password){
-//        Gson gson = new Gson();
-//        EccAesData eccAesData = gson.fromJson(eccAesDataJson,EccAesData.class);
-//
-//        if(eccAesData.getType()!=EccAesType.Password){
-//            eccAesData.setError("Type "+EccAesType.Password+" is required. Wrong type: "+eccAesData.getType());
-//        }
-//        eccAesData.setPassword(password);
-//        EccAesDataByte eccAesDataByte = EccAesDataByte.fromEccAesData(eccAesData);
-//        decrypt(eccAesDataByte);
-//        if(eccAesDataByte.getError()!=null)return "Error:"+eccAesDataByte.getError();
-//        eccAesDataByte.clearSymKey();
-//        return EccAesData.fromEccAesDataByte(eccAesDataByte).toJson();
-//    }
+
+    public EccAesDataByte decrypt(String eccAesDataJson,byte[] key){
+        Gson gson = new Gson();
+        EccAesData eccAesData = gson.fromJson(eccAesDataJson,EccAesData.class);
+        EccAesDataByte eccAesDataBytes = EccAesDataByte.fromEccAesData(eccAesData);
+        switch (eccAesDataBytes.getType()){
+            case AsyOneWay, AsyTwoWay -> eccAesDataBytes.setPriKeyB(key);
+            case SymKey -> eccAesDataBytes.setSymKey(key);
+            case Password -> eccAesDataBytes.setPassword(key);
+            default -> eccAesDataBytes.setError("Wrong EccAesType type"+eccAesDataBytes.getType());
+        }
+        if(eccAesDataBytes.getError() !=null){
+            return eccAesDataBytes;
+        }
+        decrypt(eccAesDataBytes);
+        return eccAesDataBytes;
+    }
+
     private String decrypt(File encryptedFile,  EccAesDataByte eccAesDataByte) {
 
     EccAes256K1P7 ecc = new EccAes256K1P7();
@@ -374,19 +355,6 @@ public class EccAes256K1P7 {
         return decrypt(encryptedFile, eccAesDataByte);
     }
 
-//    public EccAesData decryptAsyJson(String eccAesDataJson, char[] priKey){
-//        Gson gson = new Gson();
-//        EccAesData eccAesData = gson.fromJson(eccAesDataJson,EccAesData.class);
-//        if(eccAesData.getType()!=EccAesType.AsyOneWay && eccAesData.getType()!=EccAesType.AsyTwoWay){
-//            eccAesData.setError("Type "+EccAesType.AsyOneWay + "or"+EccAesType.AsyTwoWay+" is required. Wrong type: "+eccAesData.getType());
-//        }
-//        eccAesData.setPriKeyB(priKey);
-//        EccAesDataByte eccAesDataByte = EccAesDataByte.fromEccAesData(eccAesData);
-//        decrypt(eccAesDataByte);
-//        eccAesDataByte.clearSymKey();
-//        return EccAesData.fromEccAesDataByte(eccAesDataByte);
-//    }
-//
     private void decryptAsy(EccAesDataByte eccAesDataByte) {
         if(!isGoodDecryptParams(eccAesDataByte)){
             eccAesDataByte.clearAllSensitiveData();
@@ -403,14 +371,14 @@ public class EccAes256K1P7 {
 
         if(eccAesDataByte.getType()==EccAesType.AsyOneWay){
             priKeyBytes=eccAesDataByte.getPriKeyB();
-            if(priKeyBytes==null || isFilledKey(priKeyBytes)){
+            if(priKeyBytes==null || BytesTools.isFilledKey(priKeyBytes)){
                 eccAesDataByte.setError("The private key is null or filled with 0.");
                 return;
             }
             pubKeyBytes=eccAesDataByte.getPubKeyA();
         }else if(eccAesDataByte.getType()==EccAesType.AsyTwoWay) {
             boolean found = false;
-            if(eccAesDataByte.getPriKeyB() != null && !isFilledKey(eccAesDataByte.getPriKeyB())){
+            if(eccAesDataByte.getPriKeyB() != null && !BytesTools.isFilledKey(eccAesDataByte.getPriKeyB())){
                 if(eccAesDataByte.getPubKeyA()!=null){
                     if(isTheKeyPair(eccAesDataByte.getPubKeyA(),eccAesDataByte.getPriKeyB())){
                         if(isTheKeyPair(eccAesDataByte.getPubKeyB(),eccAesDataByte.getPriKeyB())){
@@ -426,7 +394,7 @@ public class EccAes256K1P7 {
                         pubKeyBytes = eccAesDataByte.getPubKeyA();
                     }
                 }
-            }else if(eccAesDataByte.getPubKeyA()!=null && !isFilledKey(eccAesDataByte.getPriKeyA())){
+            }else if(eccAesDataByte.getPubKeyA()!=null && !BytesTools.isFilledKey(eccAesDataByte.getPriKeyA())){
                 if(isTheKeyPair(eccAesDataByte.getPubKeyA(),eccAesDataByte.getPriKeyA())){
                     if(isTheKeyPair(eccAesDataByte.getPubKeyB(),eccAesDataByte.getPriKeyA())){
                         found = false;
@@ -447,36 +415,8 @@ public class EccAes256K1P7 {
                 eccAesDataByte.setError("Private key or public key absent, or the private key and the public key is a pair.");
                 return;
             }
-//
-//
-//            if (eccAesDataByte.getPriKeyB() != null) {
-//                if (eccAesDataByte.getPubKeyA() != null) {
-//                    if (isTheKeyPair(eccAesDataByte.getPubKeyA(), eccAesDataByte.getPriKeyB())) {
-//                        eccAesDataByte.setError("The pubKey A should belong to another private key.");
-//                        return;
-//                    }
-//                }
-//
-//                if (isTheKeyPair(eccAesDataByte.getPubKeyA(), eccAesDataByte.getPriKeyB())) {
-//                    eccAesDataByte.setError("The pubKey A should belong to another private key.");
-//                    return;
-//                }
-//                priKeyBytes = eccAesDataByte.getPriKeyB();
-//                pubKeyBytes = eccAesDataByte.getPubKeyA();
-//            } else if (eccAesDataByte.getPriKeyA() != null) {
-//                if (eccAesDataByte.getPubKeyB() == null) {
-//                    eccAesDataByte.setError("The pubKey A can not be null as the priKeyB is provided.");
-//                    return;
-//                }
-//                if (isTheKeyPair(eccAesDataByte.getPubKeyB(), eccAesDataByte.getPriKeyA())) {
-//                    eccAesDataByte.setError("The pubKey B should belong to another private key.");
-//                    return;
-//                }
-//                priKeyBytes = eccAesDataByte.getPriKeyA();
-//                pubKeyBytes = eccAesDataByte.getPubKeyB();
-//            }
         }else {
-            eccAesDataByte.setError("No qualified pubKey or priKey when decrypting type:"+eccAesDataByte.getType());
+            eccAesDataByte.setError("Wrong type:"+eccAesDataByte.getType());
             return;
         }
         MessageDigest sha256;
@@ -507,19 +447,6 @@ public class EccAes256K1P7 {
         eccAesDataByte.setSymKey(symKey);
         clearByteArray(sharedSecret);
         eccAesDataByte.clearAllSensitiveDataButSymKey();
-    }
-
-    private boolean isFilledKey(byte[] key) {
-        for(byte b :key){
-            if(b!=(byte)0)return false;
-        }
-        return true;
-    }
-    private boolean isFilledKey(char[] key) {
-        for(char c :key){
-            if(c!=(byte)0)return false;
-        }
-        return true;
     }
 
     private void decryptWithPassword(EccAesDataByte eccAesDataByte) {

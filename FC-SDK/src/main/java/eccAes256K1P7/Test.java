@@ -340,6 +340,26 @@ public class Test {
         symKeyBytes = HexFormat.of().parseHex(symKeyStr);
         msgBundleBytes = ecc.decryptSymKeyBundle(bundleBytes, symKeyBytes);
         System.out.println("Msg from bundle:"+ new String(msgBundleBytes));
+
+        System.out.println("----------------------");
+        System.out.println("Char Array as msg:");
+        System.out.println("----------------------");
+
+        System.out.println("msg: "+symKeyStr);
+        String cipherAsyOne = ecc.encrypt(symKeyStr.toCharArray(),pubKeyB);
+        String cipherAsyTwo = ecc.encrypt(symKeyStr.toCharArray(),pubKeyB,priKeyA.toCharArray());
+        String cipherSymKey = ecc.encrypt(symKeyStr.toCharArray(),symKeyStr.toCharArray());
+        String cipherPassword = ecc.encrypt(symKeyStr.toCharArray(),passwordStr.toCharArray());
+
+        System.out.println("cipherAsyOne:"+cipherAsyOne);
+        System.out.println("cipherAsyTwo:"+cipherAsyTwo);
+        System.out.println("cipherSymKey:"+cipherSymKey);
+        System.out.println("cipherPassword:"+cipherPassword);
+
+        System.out.println("decrypted AsyOne:"+ecc.decrypt(cipherAsyOne,priKeyB.toCharArray()));
+        System.out.println("decrypted AsyTwo:"+ecc.decrypt(cipherAsyTwo,priKeyB.toCharArray()));
+        System.out.println("decrypted SymKey:"+ecc.decrypt(cipherSymKey,symKeyStr.toCharArray()));
+        System.out.println("decrypted Password:"+ecc.decrypt(cipherPassword,passwordStr.toCharArray()));
     }
 
     private static void checkResult(EccAesData eccAesData, String s) {

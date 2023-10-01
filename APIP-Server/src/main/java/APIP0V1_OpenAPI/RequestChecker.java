@@ -128,11 +128,13 @@ public class RequestChecker {
         }
         this.replier.setNonce(signInRequestBody.getNonce());
 
-        if(!isGoodAsySign(sign)){
+        String pubKey = checkAsySignAndGetPubKey(sign);
+        if(null==pubKey){
             response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1008BadSign));
             writer.write(this.replier.reply1008BadSign(fid));
             return null;
         }
+        signInCheckResult.setPubKey(pubKey);
 
         this.paramsInRedis = new ServerParamsInRedis(fid, apiName);
         replier.setParamsInRedis(paramsInRedis);
@@ -189,7 +191,7 @@ public class RequestChecker {
         }
     }
 
-    private boolean isGoodAsySign(String sign) throws SignatureException {
+    private String checkAsySignAndGetPubKey(String sign) throws SignatureException {
         String message = new String(requestBodyBytes);
 
         sign = sign.replace("\\u003d", "=");
@@ -198,7 +200,8 @@ public class RequestChecker {
 
         String signFid = KeyTools.pubKeyToFchAddr(signPubKey);
 
-        return signFid.equals(fid);
+        if(signFid.equals(fid))return signPubKey;
+        return null;
     }
     private SignInRequestBody getSignInRequestBody(byte[] requestBodyBytes) {
         String requestDataJson = new String(requestBodyBytes);

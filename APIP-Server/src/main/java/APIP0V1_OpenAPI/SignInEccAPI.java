@@ -1,13 +1,12 @@
 package APIP0V1_OpenAPI;
 
-import apipClass.SignInReplyData;
+import apipRequest.SignInApipReplyData;
 import constants.ApiNames;
 import constants.Constants;
 import constants.ReplyInfo;
 import constants.Strings;
 import initial.Initiator;
 import redis.clients.jedis.Jedis;
-import service.ApipService;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -55,8 +54,6 @@ import static constants.Strings.SESSION_KEY;
 
 @WebServlet(ApiNames.APIP0V1Path + ApiNames.SignInEccAPI)
 public class SignInEccAPI extends HttpServlet {
-//    private static final Jedis jedis1 = Initiator.jedis1Session;
-    private static final ApipService service = Initiator.service;
     private String fid = null;
     private final Replier replier = new Replier();
 
@@ -83,7 +80,7 @@ public class SignInEccAPI extends HttpServlet {
 
         fid = signInCheckResult.getFid();
 
-        SignInReplyData signInReplyData = new SignInReplyData();
+        SignInApipReplyData signInReplyData = new SignInApipReplyData();
 
         String mode = signInCheckResult.getSignInRequestBody().getMode();
 
@@ -126,9 +123,8 @@ public class SignInEccAPI extends HttpServlet {
                 }
             }
         }
-
         try {
-            String result =Session.encryptSessionKey(signInReplyData.getSessionKey(),request.getInputStream().readAllBytes(), request.getHeader(Constants.SIGN));
+            String result =Session.encryptSessionKey(signInReplyData.getSessionKey(),signInCheckResult.getPubKey(),request.getHeader(Constants.SIGN));
             if(result.startsWith("Error")){
                 response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1020OtherError));
                 replier.setData(result);

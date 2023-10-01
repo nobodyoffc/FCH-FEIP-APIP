@@ -364,6 +364,63 @@ public class BytesTools {
         }
     }
 
+    public static boolean isBase64Encoded(char[] chars) {
+        int length = chars.length;
+
+        // Check if length is a multiple of 4
+        if (length % 4 != 0) {
+            return false;
+        }
+
+        int countPadding = 0;
+
+        for (int i = 0; i < length; i++) {
+            char c = chars[i];
+
+            boolean isBase64Char = (c >= 'A' && c <= 'Z') ||
+                    (c >= 'a' && c <= 'z') ||
+                    (c >= '0' && c <= '9') ||
+                    (c == '+') ||
+                    (c == '/');
+
+            // Handle padding characters
+            if (c == '=') {
+                countPadding++;
+                // Padding characters should only be at the end
+                if (i < length - 2) {
+                    return false;
+                }
+            } else if (countPadding > 0) {
+                // If we have seen a padding character, no other character is allowed after it
+                return false;
+            }
+
+            if (!isBase64Char && c != '=') {
+                return false;
+            }
+        }
+
+        // Check if there are no more than 2 padding characters
+        if (countPadding > 2) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static boolean isFilledKey(byte[] key) {
+        for(byte b :key){
+            if(b!=(byte)0)return false;
+        }
+        return true;
+    }
+
+    public static boolean isFilledKey(char[] key) {
+        for(char c :key){
+            if(c!=(byte)0)return false;
+        }
+        return true;
+    }
 }
 
 

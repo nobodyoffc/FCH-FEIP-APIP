@@ -61,7 +61,7 @@ public class PostRequester {
         System.out.println(requestPost(requestUrl, headerMap,requestBody));
     }
 
-    public static String requestPost(String requestUrl, HashMap<String, String> headerMap,  String requestBody) {
+    public static String requestPost(String requestUrl, HashMap<String, String> headerMap, String requestBody) {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpPost httpPost = new HttpPost(requestUrl);
             if(headerMap!=null) {
@@ -103,12 +103,7 @@ public class PostRequester {
 
             String requestBodyJson = gson.toJson(dataRequestBody);
 
-            //TODO
-            System.out.println("Request body: \n"+requestBodyJson);
-            System.out.println("sessionKey: "+ HexFormat.of().formatHex(sessionKey));
-
             byte[] allBytes=BytesTools.bytesMerger(requestBodyJson.getBytes(StandardCharsets.UTF_8),sessionKey);
-            System.out.println("AllBytes: "+HexFormat.of().formatHex(allBytes));
 
             byte[] sign = SHA.Sha256x2(allBytes);
             headerMap.put(Strings.Header_SIGN, HexFormat.of().formatHex(sign));

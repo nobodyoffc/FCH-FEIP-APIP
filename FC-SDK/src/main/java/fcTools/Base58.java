@@ -50,6 +50,7 @@ import java.util.Arrays;
  */
 public class Base58 {
     public static final char[] ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz".toCharArray();
+    private static final BigInteger FIFTY_EIGHT = BigInteger.valueOf(58);
     private static final char ENCODED_ZERO = ALPHABET[0];
     private static final int[] INDEXES = new int[128];
 
@@ -60,6 +61,37 @@ public class Base58 {
         }
     }
 
+    public static byte[] base58CharArrayToByteArray(char[] input) {
+        BigInteger bi = BigInteger.ZERO;
+
+        // Convert Base58 string to BigInteger
+        for (char c : input) {
+            int index = indexOf(ALPHABET, c);
+            if (index == -1) {
+                throw new IllegalArgumentException("Invalid Base58 input character: " + c);
+            }
+            bi = bi.multiply(FIFTY_EIGHT).add(BigInteger.valueOf(index));
+        }
+
+        // Convert BigInteger to byte array
+        byte[] bytes = bi.toByteArray();
+
+        // Remove leading 0 byte if it exists (due to sign bit of BigInteger)
+        if (bytes[0] == 0) {
+            bytes = Arrays.copyOfRange(bytes, 1, bytes.length);
+        }
+
+        return bytes;
+    }
+
+    private static int indexOf(char[] array, char c) {
+        for (int i = 0; i < array.length; i++) {
+            if (array[i] == c) {
+                return i;
+            }
+        }
+        return -1;
+    }
     /**
      * Encodes the given bytes as a base58 string (no checksum is appended).
      *

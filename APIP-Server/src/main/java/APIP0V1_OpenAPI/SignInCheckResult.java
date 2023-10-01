@@ -6,6 +6,7 @@ public class SignInCheckResult {
 
     private SignInRequestBody signInRequestBody;
     private String fid;
+    private String pubKey;
 //    private String pubKey;
 //    private String sessionName;
 //    private String sessionKey;
@@ -43,6 +44,13 @@ public class SignInCheckResult {
 //    }
 
 
+    public String getPubKey() {
+        return pubKey;
+    }
+
+    public void setPubKey(String pubKey) {
+        this.pubKey = pubKey;
+    }
 
     public SignInRequestBody getSignInRequestBody() {
         return signInRequestBody;

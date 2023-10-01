@@ -15,9 +15,9 @@ public class JsonFileTools {
         cid.setFid("fffff");
         cid.setHot(10000);
         String fileName = "cid.json";
-        writeObjectToJsonFile(cid,fileName,true,Cid.class);
+        writeObjectToJsonFile(cid,fileName,true);
         cid.setFid("FFFFFF");
-        writeObjectToJsonFile(cid,fileName,true,Cid.class);
+        writeObjectToJsonFile(cid,fileName,true);
 
         File file = new File(fileName);
         FileInputStream fis = new FileInputStream(file);
@@ -53,7 +53,7 @@ public class JsonFileTools {
         return t;
     }
 
-    public static  <T> void writeObjectToJsonFile(T obj,String fileName, boolean append,Class<T> tClass) {
+    public static  <T> void writeObjectToJsonFile(T obj,String fileName, boolean append) {
         Gson gson = new Gson();
         try (Writer writer = new FileWriter(fileName,append)) {
             gson.toJson(obj, writer);

@@ -13,6 +13,7 @@ import menu.Inputer;
 import menu.Menu;
 import org.bitcoinj.core.ECKey;
 import org.bitcoinj.params.MainNetParams;
+import org.bouncycastle.crypto.generators.BaseKDFBytesGenerator;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -389,24 +390,16 @@ public class StartTools {
     private static void encryptWithPassword(BufferedReader br) throws IOException, InvalidKeyException, InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, NoSuchProviderException {
         // TODO Auto-generated method stub
 
-        System.out.println("Input the password no longer than 64:");
-        char[] passwordBuffer = new char[64];
-        int num = br.read(passwordBuffer);
-
-        if(num==0){
-            System.out.println("Get your password wrong.");
-            return;
-        }
-
-        char[] password = new char[num];
-        System.arraycopy(passwordBuffer, 0, password, 0, num);
+        String ask = "Input the password no longer than 64:";
+        char[] password = Inputer.inputPassword(br, ask);
+        System.out.println("Password:"+Arrays.toString(password));
 
         System.out.println("Input the plaintext:");
         String msg = br.readLine();
         EccAes256K1P7 ecc = new EccAes256K1P7();
-        EccAesData eccAesData = new EccAesData(EccAesType.Password,msg,password);
-        ecc.encrypt(eccAesData);
-        System.out.println(eccAesData.toJson());
+//        EccAesData eccAesData = new EccAesData(EccAesType.Password,msg,password);
+//        ecc.encrypt(eccAesData);
+        System.out.println(ecc.encrypt(msg,password));
 
         Menu.anyKeyToContinue(br);
     }

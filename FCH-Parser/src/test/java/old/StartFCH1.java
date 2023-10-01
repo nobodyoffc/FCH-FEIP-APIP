@@ -1,29 +1,29 @@
-package startFCH;
+package old;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import config.ConfigFCH;
 import constants.Constants;
-import esTools.NewEsClient;
 import fchClass.Block;
-import fileTools.OpReFileTools;
+import config.ConfigFCH;
 import menu.Menu;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import parser.ChainParser;
+import fileTools.OpReFileTools;
 import parser.Preparer;
+import esTools.NewEsClient;
+import startFCH.IndicesFCH;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
-public class StartFCH {
+public class StartFCH1 {
 
-    private static final Logger log = LoggerFactory.getLogger(StartFCH.class);
+    private static final Logger log = LoggerFactory.getLogger(StartFCH1.class);
 
     static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
@@ -88,11 +88,7 @@ public class StartFCH {
 
                             java.util.concurrent.TimeUnit.SECONDS.sleep(3);
                             IndicesFCH.createAllIndices(esClient);
-                            try {
-                                new Preparer().prepare(esClient, path, bestHeight);
-                            } catch (Exception e) {
-                                restart(esClient,configFCH);
-                            }
+                            new Preparer().prepare(esClient, path, bestHeight);
                             break;
                         } else break;
                     } else break;
@@ -102,7 +98,16 @@ public class StartFCH {
                     String restart = br.readLine();
 
                     if (restart.equals("y")) {
-                        restart(esClient, configFCH);
+
+                        Block bestBlock = ChainParser.getBestBlock(esClient);
+                        bestHeight = bestBlock.getHeight();
+
+                        log.debug("Restarting from BestHeight: " + (bestHeight - 1) + " ...");
+
+                        path = configFCH.getBlockFilePath();
+                        bestHeight = bestHeight - 1;
+
+                        new Preparer().prepare(esClient, path, bestHeight);
                         break;
                     } else break;
 
@@ -118,11 +123,7 @@ public class StartFCH {
                             System.out.println("Input the height you want to rolling back to:");
                         }
                     }
-                    try {
-                        new Preparer().prepare(esClient, path, bestHeight);
-                    } catch (Exception e) {
-                        restart(esClient, configFCH);
-                    }
+                    new Preparer().prepare(esClient, path, bestHeight);
                     break;
                 case 4:
                     configFCH.config(br);
@@ -135,29 +136,6 @@ public class StartFCH {
                     br.close();
                     return;
             }
-        }
-    }
-
-    private static void restart(ElasticsearchClient esClient, ConfigFCH configFCH) {
-        long bestHeight;
-        String path;
-        Block bestBlock = null;
-        try {
-            bestBlock = ChainParser.getBestBlock(esClient);
-        } catch (IOException e) {
-            restart(esClient,configFCH);
-        }
-        bestHeight = bestBlock.getHeight();
-
-        log.debug("Restarting from BestHeight: " + (bestHeight - 1) + " ...");
-
-        path = configFCH.getBlockFilePath();
-        bestHeight = bestHeight - 1;
-
-        try {
-            new Preparer().prepare(esClient, path, bestHeight);
-        } catch (Exception e) {
-            restart(esClient,configFCH);
         }
     }
 

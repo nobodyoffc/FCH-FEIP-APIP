@@ -1,6 +1,6 @@
 package APIP0V1_OpenAPI;
 
-import apipClass.SignInReplyData;
+import apipRequest.SignInApipReplyData;
 import constants.ApiNames;
 import constants.ReplyInfo;
 import service.ApipService;
@@ -84,7 +84,7 @@ public class SignInAPI extends HttpServlet {
 
         fid = signInCheckResult.getFid();
 
-        SignInReplyData signInReplyData = new SignInReplyData();
+        SignInApipReplyData signInReplyData = new SignInApipReplyData();
 
         String mode = signInCheckResult.getSignInRequestBody().getMode();
 
