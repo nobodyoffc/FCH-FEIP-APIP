@@ -28,8 +28,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
-import static constants.Constants.FALSE;
-import static constants.Constants.TRUE;
+import static constants.Strings.FALSE;
+import static constants.Strings.TRUE;
 import static constants.Strings.*;
 
 public class StartAPIP {

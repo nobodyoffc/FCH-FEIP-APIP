@@ -22,13 +22,9 @@ public class Constants {
     public static final String BTC_ADDR = "btcAddr";
     public static final String ETH_ADDR = "ethAddr";
     public static final String LTC_ADDR = "ltcAddr";
+    public static final String BCH_ADDR = "bchAddr";
     public static final String DOGE_ADDR = "dogeAddr";
     public static final String TRX_ADDR = "trxAddr";
-
-    public static final String ORDER = "order";
-
-    public static final String TRUE = "true";
-    public static final String FALSE = "false";
     public static final String REWARD_HTML_FILE = "index.html";
     public static final String REWARD_HISTORY_FILE = "rewardHistory.json";
     public static final int FCH_LENGTH = 17;
@@ -46,13 +42,6 @@ public class Constants {
     public static final int MAX_FILE_SIZE_M = 200;
     public static final String DOT_FV = ".fv";
     public static final int MaxOpFileSize = 200*1024*1024;//251658240;
-    public static final String WEBHOOK_FIDS_PREFIX = "Fids_";
-    public static final String RECEIVER = "Receiver";
-    public static final String SIGN = "Sign";
-    public static final String SESSION_NAME = "SessionName";
-    public static final String METHOD = "Method";
-    public static final String BALANCE = "Balance";
-    public static final String BCH_ADDR = "bchAddr";
     public static int RedisDb4Webhook = 4;
     public static final String FCH_TICKET="FCH";
 }

@@ -18,7 +18,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
-import static constants.Constants.ORDER;
+import static constants.Strings.ORDER;
 import static constants.IndicesNames.WEBHOOK;
 import static constants.Strings.BALANCE;
 import static constants.Strings.REWARD;

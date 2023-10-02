@@ -50,7 +50,7 @@ public class SignInAPIP {
         System.out.println();
         System.out.println("Request signInEcc:");
 
-        result = signInEcc(urlHead,null,priKey32Bytes);
+        result = signInEcc(urlHead,null,priKey32Bytes,Strings.RENEW);
         String sessionKeyCipher = result.getSessionKeyCipher();
         System.out.println("SessionKeyCipher: "+sessionKeyCipher);
 
@@ -74,7 +74,7 @@ public class SignInAPIP {
             Gson gson = new Gson();
             String url = urlHead + ApiNames.APIP0V1Path + ApiNames.SignInAPI;
 
-            signInRequestBody.makeRequestBody(url, via);
+            signInRequestBody.makeRequestBody(url, via,Strings.RENEW);
 
             HashMap<String, String> headerMap = new HashMap<>();
             headerMap.put(Strings.FID, fid);
@@ -104,7 +104,7 @@ public class SignInAPIP {
         return signInReplyData;
     }
 
-    public static SignInApipReplyData signInEcc(String urlHead, String via, byte[]priKey){
+    public static SignInApipReplyData signInEcc(String urlHead, String via, byte[]priKey,String mode){
 //TODO
         System.out.println("PriKey:"+HexFormat.of().formatHex(priKey));
 
@@ -116,7 +116,7 @@ public class SignInAPIP {
             Gson gson = new Gson();
             String url = urlHead + ApiNames.APIP0V1Path + ApiNames.SignInEccAPI;
 
-            signInRequestBody.makeRequestBody(url, via);
+            signInRequestBody.makeRequestBody(url, via,mode);
 
             HashMap<String, String> headerMap = new HashMap<>();
             headerMap.put(Strings.FID, fid);

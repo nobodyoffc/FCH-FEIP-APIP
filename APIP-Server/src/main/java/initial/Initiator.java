@@ -40,18 +40,12 @@ public class Initiator extends HttpServlet {
     public static boolean isPricePerRequest;
     public static boolean forbidFreeGet;
     private final NewEsClient newEsClient = new NewEsClient();
-    private BufferedReader br;
     public static JsonRpcHttpClient fcClient;
 
     @Override
     public void destroy(){
         log.debug("Destroy APIP server...");
         jedisPool.close();
-        try {
-            br.close();
-        } catch (IOException e) {
-            log.debug("Close bufferedReader wrong.");
-        }
         try {
             newEsClient.shutdownClient();
         } catch (IOException e) {
@@ -63,8 +57,6 @@ public class Initiator extends HttpServlet {
     @Override
     public void init(ServletConfig config) {
         log.debug("init starting...");
-
-        br = new BufferedReader(new InputStreamReader(System.in));
 
         jedisPool = GetJedis.createJedisPool();
 
@@ -81,7 +73,7 @@ public class Initiator extends HttpServlet {
 
             boolean failed = false;
             try {
-                configAPIP = configAPIP.getClassInstanceFromFile(br, ConfigAPIP.class);
+                configAPIP = configAPIP.getClassInstanceFromFile(ConfigAPIP.class);
                 if (configAPIP.getEsIp() == null || configAPIP.getEsPort() == 0 || configAPIP.getConfigFilePath() == null) {
                     log.debug("Config is not ready when initiating APIP web.");
                     failed = true;
@@ -136,13 +128,5 @@ public class Initiator extends HttpServlet {
         }
 
         log.debug("APIP server initiated successfully.");
-    }
-
-    public static boolean isFreeGetForbidden(PrintWriter writer) {
-        if(forbidFreeGet){
-            writer.write("Sorry, the freeGet APIs were closed.");
-            return true;
-        }
-        return false;
     }
 }

@@ -1,10 +1,7 @@
 package APIP0V1_OpenAPI;
 
 import apipRequest.SignInApipReplyData;
-import constants.ApiNames;
-import constants.Constants;
-import constants.ReplyInfo;
-import constants.Strings;
+import constants.*;
 import initial.Initiator;
 import redis.clients.jedis.Jedis;
 
@@ -124,7 +121,7 @@ public class SignInEccAPI extends HttpServlet {
             }
         }
         try {
-            String result =Session.encryptSessionKey(signInReplyData.getSessionKey(),signInCheckResult.getPubKey(),request.getHeader(Constants.SIGN));
+            String result =Session.encryptSessionKey(signInReplyData.getSessionKey(),signInCheckResult.getPubKey(),request.getHeader(UpStrings.SIGN));
             if(result.startsWith("Error")){
                 response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1020OtherError));
                 replier.setData(result);

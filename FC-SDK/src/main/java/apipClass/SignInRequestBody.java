@@ -59,10 +59,11 @@ public class SignInRequestBody {
         this.nonce = nonce;
     }
 
-    public void makeRequestBody(String url, String via) {
+    public void makeRequestBody(String url, String via,String mode) {
         setTime(System.currentTimeMillis());
         setNonce((BytesTools.bytes4ToLongBE(BytesTools.getRandomBytes(4))));
         setVia(via);
         setUrl(url);
+        if(mode!=null)setMode(mode);
     }
 }

@@ -1,7 +1,6 @@
 package apipRequest;
 
 import apipClass.*;
-import constants.Constants;
 import constants.Strings;
 
 import java.util.ArrayList;
@@ -34,7 +33,7 @@ public class FcdslMaker {
             Except except = new Except();
             Terms terms2 = new Terms();
             String[] terms2Fields = new String[]{Strings.ACTIVE};
-            String[] terms2Values = new String[]{Constants.FALSE};
+            String[] terms2Values = new String[]{Strings.FALSE};
             terms2.setFields(terms2Fields);
             terms2.setValues(terms2Values);
             except.setTerms(terms2);
@@ -43,7 +42,7 @@ public class FcdslMaker {
             Except except = new Except();
             Terms terms2 = new Terms();
             String[] terms2Fields = new String[]{Strings.CLOSED};
-            String[] terms2Values = new String[]{Constants.TRUE};
+            String[] terms2Values = new String[]{Strings.TRUE};
             terms2.setFields(terms2Fields);
             terms2.setValues(terms2Values);
             except.setTerms(terms2);

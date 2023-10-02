@@ -93,4 +93,9 @@ public class Strings {
     public static final String DOT_JSON = ".json";
     public static final String CASH_ID = "cashId";
     public static final String BIRTH_HEIGHT = "birthHeight";
+    public static final String ORDER = "order";
+    public static final String TRUE = "true";
+    public static final String FALSE = "false";
+    public static final String NONCE = "nonce";
+    public static final String RENEW = "renew";
 }

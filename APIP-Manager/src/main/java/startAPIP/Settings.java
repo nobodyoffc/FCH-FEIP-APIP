@@ -1,6 +1,5 @@
 package startAPIP;
 
-import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import config.ConfigAPIP;
 import constants.ApiNames;
 import constants.Strings;
@@ -17,8 +16,8 @@ import java.util.HashMap;
 import java.util.HexFormat;
 import java.util.Map;
 
-import static constants.Constants.FALSE;
-import static constants.Constants.TRUE;
+import static constants.Strings.FALSE;
+import static constants.Strings.TRUE;
 import static constants.Strings.*;
 
 public class Settings {
