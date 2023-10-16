@@ -1,4 +1,4 @@
-package FipaClass;
+package fipaClass;
 
 public class DataSign {
 

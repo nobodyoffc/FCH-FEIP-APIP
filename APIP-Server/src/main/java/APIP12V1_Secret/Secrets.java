@@ -5,7 +5,9 @@ import apipClass.*;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
+import constants.Strings;
 import feipClass.Secret;
+import tools.ApipTools;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -39,35 +41,12 @@ public class Secrets extends HttpServlet {
         DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
 
         //Check API
-//        if(!isThisApiRequest(requestBody)){
-//            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
-//            writer.write(replier.reply1012BadQuery(addr));
-//            return;
-//        }
 
         //Set default sort.
         ArrayList<Sort> sort = Sort.makeSortList("birthHeight",false,"secretId",true,null,null);
 
         //Add condition
-        Fcdsl fcdsl;
-        if(requestBody.getFcdsl()!=null) {
-            fcdsl = requestBody.getFcdsl();
-        }else fcdsl= new Fcdsl();
-
-        Filter filter;
-        if(fcdsl.getFilter()!=null) {
-            filter = fcdsl.getFilter();
-        }else filter=new Filter();
-
-        Terms terms;
-        if(filter.getTerms()!=null) {
-            terms = filter.getTerms();
-        }else terms=new Terms();
-
-        terms.setFields(new String[]{"active"});
-        terms.setValues(new String[]{"true"});
-        filter.setTerms(terms);
-        fcdsl.setFilter(filter);
+        Fcdsl fcdsl = ApipTools.addExceptTermsToFcdsl(requestBody, Strings.ACTIVE,Strings.FALSE);
         requestBody.setFcdsl(fcdsl);
 
         //Request

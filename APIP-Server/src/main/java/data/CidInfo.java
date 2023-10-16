@@ -56,9 +56,13 @@ public class CidInfo {
         List<CidInfo> cidInfoList = new ArrayList<>();
         Map<String,Cid> cidMap = new HashMap<>();
 
-        for(Cid cid:meetCidList){
-            cidMap.put(cid.getFid(),cid);
+        if(meetCidList!=null&& !meetCidList.isEmpty()) {
+            for (Cid cid : meetCidList) {
+                cidMap.put(cid.getFid(), cid);
+            }
         }
+
+        if(meetAddrList==null&& meetAddrList.isEmpty()) return null;
 
         for(Address addr : meetAddrList){
             CidInfo cidInfo = new CidInfo();

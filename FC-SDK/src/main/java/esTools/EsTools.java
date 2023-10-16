@@ -9,7 +9,9 @@ import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.elasticsearch.indices.CreateIndexResponse;
 import co.elastic.clients.elasticsearch.indices.DeleteIndexResponse;
 import co.elastic.clients.json.JsonData;
+import constants.IndicesNames;
 import constants.Strings;
+import fchClass.Block;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,6 +22,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+
+import static constants.IndicesNames.BLOCK;
 
 public class EsTools {
 
@@ -472,6 +476,15 @@ public class EsTools {
             } else break;
         }
         return historyList;
+    }
+
+    public static Block getBestBlock(ElasticsearchClient esClient) throws ElasticsearchException, IOException {
+        SearchResponse<Block> result = esClient.search(s->s
+                        .index(BLOCK)
+                        .size(1)
+                        .sort(so->so.field(f->f.field("height").order(SortOrder.Desc)))
+                , Block.class);
+        return result.hits().hits().get(0).source();
     }
 
     public static class MgetResult<E> {

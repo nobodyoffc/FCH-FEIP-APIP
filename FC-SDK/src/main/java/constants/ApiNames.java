@@ -131,6 +131,7 @@ public class ApiNames {
     public static final String NobodyByIdsAPI ="nobodyByIds";
 
     public static ArrayList<String> freeApiList = new ArrayList<>();
+    public static final String GetFreeKeyAPI="getFreeKey";
 
 
     static {

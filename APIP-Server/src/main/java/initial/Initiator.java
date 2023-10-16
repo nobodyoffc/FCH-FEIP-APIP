@@ -31,6 +31,7 @@ public class Initiator extends HttpServlet {
     private static final Logger log = LoggerFactory.getLogger(Initiator.class);
     public static  String serviceName;
     public static ElasticsearchClient esClient= null;
+
     public static JedisPool jedisPool;
 
     //Can be changed:
@@ -89,7 +90,6 @@ public class Initiator extends HttpServlet {
                 failed = true;
             }
             if(failed){
-                jedis.close();
                 jedisPool.close();
                 return;
             }
@@ -107,7 +107,6 @@ public class Initiator extends HttpServlet {
 
             }catch (Exception e){
                 log.error("Get service or nPrice from redis wrong.");
-                jedis.close();
                 jedisPool.close();
                 return;
             }

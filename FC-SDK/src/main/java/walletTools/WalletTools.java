@@ -3,14 +3,22 @@ package walletTools;
 //import APIP0V1_OpenAPI.Replier;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.SortOrder;
+import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import co.elastic.clients.elasticsearch._types.query_dsl.TermsQuery;
+import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
 import com.google.gson.Gson;
 import com.googlecode.jsonrpc4j.JsonRpcHttpClient;
+import constants.Constants;
 import constants.IndicesNames;
+import constants.Strings;
 import fcTools.ParseTools;
+import fcTools.TxTool;
 import fchClass.Cash;
 import freecashRPC.FcRpcMethods;
 import freecashRPC.NewFcRpcClient;
@@ -67,7 +75,7 @@ public class WalletTools {
         }
 
         //
-        long fee = calcFee(inputs,outputs,opLength);
+        long fee = TxTool.calcFee(inputs.size(),outputs.size(),opLength);
         long change = 0;
         double outValue;
         if(!"".equals(toAddr)&&!toAddr.equals(fromAddr)) {
@@ -109,22 +117,6 @@ public class WalletTools {
         cashToInputsResult.setCdSum(cdSum);
 
         return cashToInputsResult;
-    }
-
-    private static long calcFee(List<Map<String, Object>> inputs, Map<String, Object> outputs, int opLength) {
-        long priceInSatoshi =1;
-        int inputNum = inputs.size();
-        int outputNum = outputs.size();
-        long length = 0 ;
-        if(opLength==0) {
-            length = 6+ (long) (32 + 4 + 3 + 66 + 66 + 4) *inputNum + (long) (8 + 1 + 25 + 4) *(outputNum+1);
-        }else{
-            length= 6+ (long) (32 + 4 + 3 + 66 + 66 + 4) *inputNum + (long) (8 + 1 + 25 + 4) *(outputNum+1)+ opLength+11;
-        }
-
-        long fee = priceInSatoshi*length;
-        if(fee<546)fee=546;
-        return fee;
     }
 
     public static List<Cash> getCashListForCd(ElasticsearchClient esClient, String addr, long cd) throws IOException {
@@ -173,8 +165,8 @@ public class WalletTools {
     public static void checkUnconfirmed(String addr, List<Cash> meetList) {
         Gson gson = new Gson();
         try(Jedis jedis3Mempool = new Jedis()) {
-            jedis3Mempool.select(3);
-            String spendCashIdStr = jedis3Mempool.hget(addr, "spendCashes");
+            jedis3Mempool.select(Constants.RedisDb3Mempool);
+            String spendCashIdStr = jedis3Mempool.hget(addr, Strings.SPEND_CASHES);
             if (spendCashIdStr != null) {
                 String[] spendCashIdList = gson.fromJson(spendCashIdStr, String[].class);
                 Iterator<Cash> iter = meetList.iterator();
@@ -187,11 +179,11 @@ public class WalletTools {
                 }
             }
 
-            String newCashIdStr = jedis3Mempool.hget(addr, "newCashes");
+            String newCashIdStr = jedis3Mempool.hget(addr, Strings.NEW_CASHES);
             if (newCashIdStr != null) {
                 String[] newCashIdList = gson.fromJson(newCashIdStr, String[].class);
                 for (String id : newCashIdList) {
-                    Cash cash = gson.fromJson(jedis3Mempool.hget("newCashes", id), Cash.class);
+                    Cash cash = gson.fromJson(jedis3Mempool.hget(Strings.NEW_CASHES, id), Cash.class);
                     if (cash != null) meetList.add(cash);
                 }
             }
@@ -240,12 +232,6 @@ public class WalletTools {
 
         return FcRpcMethods.createRawTx(fcClient, inputs, outputs);
 
-//        SignResult signedRawTxResult = FcRpcMethods.signRawTxWithWallet(fcClient, unsignedRawTx);
-//
-//        String sighedRawTx = signedRawTxResult.getHex();
-//
-//        FcRpcMethods.sendTx(fcClient,sighedRawTx);
-
     }
 
     private static Map<String, Object> splitToOutputs(String addr,int outCount, CashToInputsResult inputResult) throws Throwable {
@@ -264,31 +250,10 @@ public class WalletTools {
         }
         Map<String,Object> outputs = new LinkedHashMap<>();
 
-//        for(int i=0;i<outCount-1;i++){
-//            outputs.put(addr,valueEach/Million);
-//        }
 
         List<Map<String, Object>> inputs = inputResult.getInputs();
-        long fee = calcFee(inputs, outputs, 0);
+        long fee = TxTool.calcFee(inputs.size(), outputs.size(), 0);
         outputs.put(addr,(valueSum-valueEach*(outCount-1)-fee)/Million);
-
-//        ParseTools.gsonPrint(outputs);
-//        System.out.println("spent cashes: "+inputs.size());
-//        System.out.println("total input: "+inputSum/Million);
-//        System.out.println("spent FCH:"+(inputSum-change-fee)/Million);
-//        System.out.println("cdd:"+cdSum);
-//        System.out.println("fee:"+fee/Million);
-
-
-//        String unsignedRawTx = FcRpcMethods.createRawTx(fcClient, inputs, outputs);
-//
-//        SignResult signedRawTxResult = FcRpcMethods.signRawTxWithWallet(fcClient, unsignedRawTx);
-//
-//        String sighedRawTx = signedRawTxResult.getHex();
-//
-//        String result = FcRpcMethods.sendTx(fcClient, sighedRawTx);
-//
-//        System.out.println("Sent. "+result);
 
         return outputs;
     }
@@ -298,7 +263,7 @@ public class WalletTools {
 
         cashListReturn = getCdFromOneCash(addrRequested, cd, esClient);
 
-        if(cashListReturn!=null && cashListReturn.getCashList()!=null && cashListReturn.getCashList().size()==1)return cashListReturn;
+        if(cashListReturn.getCashList() != null && cashListReturn.getCashList().size() == 1)return cashListReturn;
 
         return getCdFromCashList(cd, addrRequested, esClient);
     }
@@ -307,27 +272,41 @@ public class WalletTools {
         CashListReturn cashListReturn = new CashListReturn();
         SearchResponse<Cash> result = esClient.search(s -> s.index(index)
                 .query(q ->q.bool(b->b
-                                .must(m->m.term(t -> t.field("owner").value(addrRequested)))
-                                .must(m1->m1.term(t1->t1.field("valid").value(true)))
-                                .must(m2->m2.range(r1->r1.field("cd").gte(JsonData.of(cd))))
+                                .must(m->m.term(t -> t.field(Strings.OWNER).value(addrRequested)))
+                                .must(m1->m1.term(t1->t1.field(Strings.VALUE).value(true)))
+                                .must(m2->m2.range(r1->r1.field(Strings.CD).gte(JsonData.of(cd))))
                         )
                 )
                 .trackTotalHits(tr->tr.enabled(true))
-                .aggregations("sum",a->a.sum(s1->s1.field("cd")))
-                .sort(s1->s1.field(f->f.field("cd").order(SortOrder.Asc)))
-                .size(1), Cash.class);
+//                .aggregations(Strings.SUM,a->a.sum(s1->s1.field(Strings.CD)))
+                .sort(s1->s1.field(f->f.field(Strings.CD).order(SortOrder.Asc)))
+                .size(100), Cash.class);
 
-        Cash cash =null;
-        try {
-            cash = result.hits().hits().get(0).source();
-        }catch (Exception e){
-            return null;
+        List<Cash> cashList = new ArrayList<>();
+
+        List<Hit<Cash>> hitList = result.hits().hits();
+        for(Hit<Cash> hit : hitList){
+            Cash cash = hit.source();
+            cashList.add(cash);
         }
+
+        checkUnconfirmed(addrRequested,cashList);
+
+        Cash goodCash =null;
+        List<Cash> meetList = new ArrayList<>();
+        long adding = 0;
+        for(Cash cash:cashList){
+            if(cash.getCd()>cd){
+                goodCash=cash;
+                break;
+            }
+        }
+
         assert result.hits().total() != null;
         cashListReturn.setTotal(result.hits().total().value());
-        List<Cash> cashList = new ArrayList<>();
-        cashList.add(cash);
-        cashListReturn.setCashList(cashList);
+        List<Cash> newCashList = new ArrayList<>();
+        cashList.add(goodCash);
+        cashListReturn.setCashList(newCashList);
         return cashListReturn;
     }
     private static CashListReturn getCdFromCashList(long cd, String addrRequested, ElasticsearchClient esClient) throws IOException {
@@ -397,7 +376,7 @@ public class WalletTools {
         return cashListReturn;
     }
 
-    public static CashListReturn getCashListForPay(long value, String addrRequested, ElasticsearchClient esClient) {
+    public static CashListReturn getCashListForPayOld(long value, String addrRequested, ElasticsearchClient esClient) {
 
         CashListReturn cashListReturn = new CashListReturn();
 
@@ -407,14 +386,13 @@ public class WalletTools {
         try {
             result = esClient.search(s -> s.index(index)
                     .query(q ->q.bool(b->b
-                                    .must(m->m.term(t -> t.field("owner").value(addrRequested)))
-                                    .must(m1->m1.term(t1->t1.field("valid").value(true)))
-    //                                .must(m2->m2.range(r1->r1.field("value").lte(JsonData.of(value))))
+                                    .must(m->m.term(t -> t.field(Strings.OWNER).value(addrRequested)))
+                                    .must(m1->m1.term(t1->t1.field(Strings.VALID).value(true)))
                             )
                     )
                     .trackTotalHits(tr->tr.enabled(true))
-                    .aggregations("sum",a->a.sum(s1->s1.field("value")))
-                    .sort(s1->s1.field(f->f.field("cd").order(SortOrder.Asc)))
+                    .aggregations(Strings.SUM,a->a.sum(s1->s1.field(Strings.VALUE)))
+                    .sort(s1->s1.field(f->f.field(Strings.CD).order(SortOrder.Asc)))
                     .size(100), Cash.class);
         } catch (IOException e) {
             cashListReturn.setCode(1);
@@ -431,11 +409,11 @@ public class WalletTools {
         assert result.hits().total() != null;
         cashListReturn.setTotal(result.hits().total().value());
 
-        long sum = (long)result.aggregations().get("sum").sum().value();
+        long sum = (long)result.aggregations().get(Strings.SUM).sum().value();
 
         if(sum<value){
             cashListReturn.setCode(2);
-            cashListReturn.setMsg("No enough balance: "+sum+ " fch");
+            cashListReturn.setMsg("No enough balance: "+sum/Constants.FchToSatoshi+ " fch");
             return cashListReturn;
         }
 
@@ -471,4 +449,103 @@ public class WalletTools {
         cashListReturn.setCashList(meetList);
         return cashListReturn;
     }
+    public static CashListReturn getCashListForPay(long value, String addrRequested, ElasticsearchClient esClient) {
+
+        CashListReturn cashListReturn = new CashListReturn();
+
+        String index = IndicesNames.CASH;
+
+        SearchResponse<Cash> result;
+        try {
+            SearchRequest.Builder searchBuilder = new SearchRequest.Builder();
+            searchBuilder.index(index);
+            searchBuilder.trackTotalHits(tr->tr.enabled(true));
+            searchBuilder.aggregations(Strings.SUM,a->a.sum(s1->s1.field(Strings.VALUE)));
+            searchBuilder.sort(s1->s1.field(f->f.field(Strings.CD).order(SortOrder.Asc)));
+            searchBuilder.size(100);
+
+            BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
+
+            boolQueryBuilder.must(m->m.term(t -> t.field(Strings.OWNER).value(addrRequested)));
+            boolQueryBuilder.must(m1->m1.term(t1->t1.field(Strings.VALID).value(true)));
+
+            searchBuilder.query(q->q.bool(boolQueryBuilder.build()));
+
+            result = esClient.search(searchBuilder.build(),Cash.class);
+
+        } catch (IOException e) {
+            cashListReturn.setCode(1);
+            cashListReturn.setMsg("Can't get cashes. Check ES.");
+            return cashListReturn;
+        }
+
+        if(result==null){
+            cashListReturn.setCode(1);
+            cashListReturn.setMsg("Can't get cashes.Check ES.");
+            return cashListReturn;
+        }
+
+        assert result.hits().total() != null;
+        long total = result.hits().total().value();
+
+        long sum = (long)result.aggregations().get(Strings.SUM).sum().value();
+
+        if(sum<value){
+            cashListReturn.setCode(2);
+            cashListReturn.setMsg("No enough balance: "+sum/Constants.FchToSatoshi+ " fch");
+            return cashListReturn;
+        }
+
+        List<Hit<Cash>> hitList = result.hits().hits();
+        if(hitList.size()==0){
+            cashListReturn.setCode(3);
+            cashListReturn.setMsg("Get cashes failed.");
+            return cashListReturn;
+        }
+
+        List<Cash> cashList = new ArrayList<>();
+
+        for(Hit<Cash> hit : hitList){
+            Cash cash = hit.source();
+            cashList.add(cash);
+        }
+
+        checkUnconfirmed(addrRequested,cashList);
+
+        List<Cash> meetList = new ArrayList<>();
+        long adding = 0;
+        long fee=0;
+        for(Cash cash:cashList){
+            adding+=cash.getValue();
+            meetList.add(cash);
+            //Add tx fee
+            fee = 10 + meetList.size() * 141L;
+            if (adding>value+fee)break;
+        }
+        if(adding<value+fee){
+            cashListReturn.setCode(4);
+            cashListReturn.setMsg("Can't get enough amount from 100 cashes. Merge cashes with small cd first. "+adding/Million + "f can be paid."+ "Request "+ value/Million+". Fee "+fee/Million);
+            return cashListReturn;
+        }
+        cashListReturn.setTotal(total);
+        cashListReturn.setCashList(meetList);
+        return cashListReturn;
+    }
+
+    private static void makeUnconfirmedFilter(List<String> spendCashList, BoolQuery.Builder boolQueryBuilder) {
+        List<FieldValue> valueList = new ArrayList<>();
+        for (String v : spendCashList) {
+            if (v.isBlank()) continue;
+            valueList.add(FieldValue.of(v));
+        }
+
+        TermsQuery tQuery = TermsQuery.of(t -> t
+                .field(Strings.CASH_ID)
+                .terms(t1 -> t1
+                        .value(valueList)
+                ));
+
+        boolQueryBuilder.filter(new Query.Builder().terms(tQuery).build());
+    }
+
 }

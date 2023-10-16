@@ -5,6 +5,7 @@ import apipClass.SignInRequestBody;
 import com.google.gson.Gson;
 import constants.ApiNames;
 import constants.ReplyInfo;
+import constants.Strings;
 import cryptoTools.SHA;
 import initial.Initiator;
 import initial.ServerParamsInRedis;
@@ -227,7 +228,9 @@ public class RequestChecker {
         }
         if("".equals(apiName)){
             response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1020OtherError));
-            replier.setData("No such API. Check the API name in request url.");
+            Map<String,String> dataMap= new HashMap<>();
+            dataMap.put(Strings.ERROR,"No such API. Check the API name in request url.");
+            replier.setData(dataMap);
             writer.write(replier.reply1020OtherError());
             return null;
         }

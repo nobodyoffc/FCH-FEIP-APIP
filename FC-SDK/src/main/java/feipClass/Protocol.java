@@ -12,19 +12,9 @@ public class Protocol {
 	private String desc;
 	private String prePid;
 	private String[] fileUrls;
-	
 	private String title;
 	private String owner;
 	private String[] waiters;
-
-	public String[] getWaiters() {
-		return waiters;
-	}
-
-	public void setWaiters(String[] waiters) {
-		this.waiters = waiters;
-	}
-
 	private String birthTxId;
 	private long birthTime;
 	private long birthHeight;
@@ -175,6 +165,14 @@ public class Protocol {
 	public void setCloseStatement(String closeStatement) {
 		this.closeStatement = closeStatement;
 	}
-	
-	
+
+
+	public String[] getWaiters() {
+		return waiters;
+	}
+
+	public void setWaiters(String[] waiters) {
+		this.waiters = waiters;
+	}
+
 }

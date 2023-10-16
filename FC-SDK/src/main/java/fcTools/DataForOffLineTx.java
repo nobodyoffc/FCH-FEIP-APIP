@@ -1,5 +1,7 @@
 package fcTools;
 
+import walletTools.SendTo;
+
 import java.util.List;
 
 public class DataForOffLineTx {
@@ -16,7 +18,7 @@ public class DataForOffLineTx {
         this.fromFid = fromFid;
     }
 
-    public List<SendTo> getSendToList() {
+    public List<SendTo>  getSendToList() {
         return sendToList;
     }
 

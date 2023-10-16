@@ -5,9 +5,11 @@ import apipClass.DataRequestBody;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
+import esTools.EsTools;
 import fchClass.Address;
 import data.CidInfo;
 import feipClass.Cid;
+import initial.Initiator;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -16,9 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @WebServlet(ApiNames.APIP3V1Path + ApiNames.CidInfoByIdsAPI)
 public class CidInfoByIds extends HttpServlet {
@@ -59,9 +59,10 @@ public class CidInfoByIds extends HttpServlet {
                 return;
             }
 
-            meetCidList = esRequest.doRequest(IndicesNames.CID,null, Cid.class);
+            EsTools.MgetResult<Cid> multiResult = EsTools.getMultiByIdList(Initiator.esClient, IndicesNames.CID, Arrays.asList(requestBody.getFcdsl().getIds()), Cid.class);
+            meetCidList = multiResult.getResultList();
+            //            meetCidList = esRequest.doRequest(IndicesNames.CID,null, Cid.class);
 
-        //make addrList
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -72,7 +73,7 @@ public class CidInfoByIds extends HttpServlet {
 
         List<CidInfo> cidInfoList = CidInfo.mergeCidInfoList(meetCidList,meetAddrList);
 
-        if(cidInfoList.size() == 0){
+        if(cidInfoList==null || cidInfoList.size() == 0){
             response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1011DataNotFound));
             writer.write(replier.reply1011DataNotFound(addr));
             return;
@@ -92,10 +93,6 @@ public class CidInfoByIds extends HttpServlet {
     }
 
     private boolean isThisApiRequest(DataRequestBody requestBody) {
-        if(requestBody.getFcdsl().getIds()==null)
-            return false;
-        return true;
+        return requestBody.getFcdsl().getIds() != null;
     }
-
-
 }

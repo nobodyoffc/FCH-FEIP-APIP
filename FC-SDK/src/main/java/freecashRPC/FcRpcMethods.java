@@ -52,7 +52,6 @@ public class FcRpcMethods {
         }
     }
 
-//createrawtransaction "[{\"txid\":\"9f5d54e8e134b145753de35c2417b9d21df5e06a072a0f780a99af9d5298a515\",\"vout\":2}]" "[{\"data\":\"00010203\"}]"
     public static String createRawTx(JsonRpcHttpClient fcClient, List<Map<String, Object>> inputs,Map<String, Object> outputs) throws Throwable {
 
         Object[] params = new Object[]{inputs, outputs};

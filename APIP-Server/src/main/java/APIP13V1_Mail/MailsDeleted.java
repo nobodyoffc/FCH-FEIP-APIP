@@ -5,7 +5,9 @@ import apipClass.*;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
+import constants.Strings;
 import feipClass.Mail;
+import tools.ApipTools;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -50,25 +52,9 @@ public class MailsDeleted extends HttpServlet {
         ArrayList<Sort> sort = Sort.makeSortList("lastHeight",false,"mailId",true,null,null);
 
         //Add condition
-        Fcdsl fcdsl;
-        if(requestBody.getFcdsl()!=null) {
-            fcdsl = requestBody.getFcdsl();
-        }else fcdsl= new Fcdsl();
 
-        Filter filter;
-        if(fcdsl.getFilter()!=null) {
-            filter = fcdsl.getFilter();
-        }else filter=new Filter();
+        Fcdsl fcdsl = ApipTools.addExceptTermsToFcdsl(requestBody, Strings.ACTIVE,Strings.FALSE);
 
-        Terms terms;
-        if(filter.getTerms()!=null) {
-            terms = filter.getTerms();
-        }else terms=new Terms();
-
-        terms.setFields(new String[]{"active"});
-        terms.setValues(new String[]{"false"});
-        filter.setTerms(terms);
-        fcdsl.setFilter(filter);
         requestBody.setFcdsl(fcdsl);
 
         //Request

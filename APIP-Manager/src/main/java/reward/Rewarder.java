@@ -697,7 +697,7 @@ public class Rewarder {
         }
         log.debug("Backup rewardInfo into ES success. BestHeight.");
 
-        JsonFileTools.writeObjectToJsonFile(rewardInfo,REWARD_HISTORY_FILE,true,RewardInfo.class);
+        JsonFileTools.writeObjectToJsonFile(rewardInfo,REWARD_HISTORY_FILE,true);
 
         log.debug("Backup rewardInfo into "+REWARD_HISTORY_FILE+" success. BestHeight {}.",rewardInfo.getBestHeight());
         return true;

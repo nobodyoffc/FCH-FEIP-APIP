@@ -72,8 +72,8 @@ public class Test {
         System.out.println("AsyTwoWay:");
         System.out.println("----------");
 
-        String pubKeyA = "03f0145ddf5debc7169952b17b5c6a8a566b38742b6aa7b33b667c0a7fa73762e2";
-        String priKeyA = "46f27f1fc4c6371d8b78e8bd8bcd31c50da5edbe2fce1c68c4b25b710cab5ab3";
+        String pubKeyA = "030be1d7e633feb2338a74a860e76d893bac525f35a5813cb7b21e27ba1bc8312a";
+        String priKeyA = "a048f6c843f92bfe036057f7fc2bf2c27353c624cf7ad97e98ed41432f700575";
 
         eccAesData = new EccAesData();
         eccAesData.setType(EccAesType.AsyTwoWay);

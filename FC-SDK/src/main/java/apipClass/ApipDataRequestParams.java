@@ -6,9 +6,11 @@ import eccAes256K1P7.EccAesData;
 import eccAes256K1P7.EccAesDataByte;
 import eccAes256K1P7.EccAesType;
 import fcTools.Base58;
+import feipClass.Service;
 import javaTools.BytesTools;
 import keyTools.KeyTools;
 import menu.Inputer;
+import org.checkerframework.checker.units.qual.A;
 
 import java.io.BufferedReader;
 import java.nio.charset.StandardCharsets;
@@ -21,6 +23,8 @@ public class ApipDataRequestParams {
     private String apipBuyerPriKeyCipher;
     private String sessionKeyCipher;
     private String sessionName;
+
+
 
 
     public String getApipBuyer() {

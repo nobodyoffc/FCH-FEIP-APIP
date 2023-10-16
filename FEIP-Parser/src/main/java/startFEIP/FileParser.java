@@ -25,6 +25,7 @@ import organize.GroupHistory;
 import organize.OrganizationParser;
 import organize.OrganizationRollbacker;
 import organize.TeamHistory;
+import parser.Preparer;
 import personal.BoxHistory;
 import personal.PersonalParser;
 import personal.PersonalRollbacker;
@@ -42,6 +43,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class FileParser {
 
@@ -135,7 +137,9 @@ public class FileParser {
 					System.out.print(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis())));
 					System.out.println(" Waiting for new item ...");
 					fis.close();
-					ParseTools.waitForNewItemInFile(path+fileName);
+					AtomicBoolean running = new AtomicBoolean();
+					running.set(true);
+					ParseTools.waitForChangeInDirectory(path,running);
 					fis = openFile();
 					long result = fis.skip(pointer);
 					continue;
@@ -218,7 +222,7 @@ public class FileParser {
 					System.out.println("Protocol.");
 					ProtocolHistory freeProtocolHist = constructParser.makeProtocol(opre, feip);
 					if (freeProtocolHist == null) break;
-					isValid = constructParser.parseFreeProtocol(esClient, freeProtocolHist);
+					isValid = constructParser.parseProtocol(esClient, freeProtocolHist);
 					if (isValid)
 						esClient.index(i -> i.index(IndicesNames.PROTOCOL_HISTORY).id(freeProtocolHist.getTxId()).document(freeProtocolHist));
 				}
@@ -433,7 +437,7 @@ public class FileParser {
 				ArrayList<ProtocolHistory> reparseFreeProtocolList = getReparseHistList(esClient, IndicesNames.PROTOCOL_HISTORY,idList,"pid", ProtocolHistory.class);
 
 				for(ProtocolHistory idHist: reparseFreeProtocolList) {
-					new ConstructParser().parseFreeProtocol(esClient, idHist);
+					new ConstructParser().parseProtocol(esClient, idHist);
 				}
 				break;
 			case IndicesNames.CODE:

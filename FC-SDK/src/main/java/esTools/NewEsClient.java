@@ -32,6 +32,21 @@ public class NewEsClient {
     RestClientTransport transport;
     private static final Logger log = LoggerFactory.getLogger(NewEsClient.class);
 
+    public ElasticsearchClient getSimpleEsClient() throws IOException {
+
+        return getClientHttp("127.0.0.1",9200);
+    }
+
+    public ElasticsearchClient getSimpleEsClientSSL(BufferedReader br) throws IOException, NoSuchAlgorithmException, KeyManagementException {
+
+        System.out.println("Input username: ");
+        String user = br.readLine();
+        System.out.println("Input password:");
+        String password = br.readLine();
+
+        return getClientHttps("127.0.0.1",9200,user,password);
+    }
+
     public ElasticsearchClient getElasticSearchClient(BufferedReader br,  ConfigBase config, Jedis jedis) throws Exception {
 
         boolean isSSL = true;

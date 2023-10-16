@@ -42,6 +42,11 @@ public class Constants {
     public static final int MAX_FILE_SIZE_M = 200;
     public static final String DOT_FV = ".fv";
     public static final int MaxOpFileSize = 200*1024*1024;//251658240;
+    public static final String FBBP = "FBBP";
+    public static final String SESSION_NAME = "SessionName";
+    public static final String WEBHOOK_FILE = "webhook.json";
     public static int RedisDb4Webhook = 4;
     public static final String FCH_TICKET="FCH";
+    public static int RedisDb3Mempool=3;
+    public static int RedisDb0Common=0;
 }

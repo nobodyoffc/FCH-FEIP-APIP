@@ -77,7 +77,7 @@ public class RewardManager {
         ArrayList<RewardInfo> rewardInfoList = getRewardInfoList(esClient);
         if(rewardInfoList==null)return;
         for(RewardInfo rewardInfo:rewardInfoList){
-            JsonFileTools.writeObjectToJsonFile(rewardInfo,REWARD_HISTORY_FILE,true,RewardInfo.class);
+            JsonFileTools.writeObjectToJsonFile(rewardInfo,REWARD_HISTORY_FILE,true);
         }
         log.debug(rewardInfoList.size() +"reward records saved to "+REWARD_HISTORY_FILE+ ".");
         Menu.anyKeyToContinue(br);

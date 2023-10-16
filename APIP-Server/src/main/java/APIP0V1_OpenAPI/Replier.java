@@ -3,16 +3,19 @@ package APIP0V1_OpenAPI;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import constants.Constants;
 import constants.ReplyInfo;
-import fcTools.ParseTools;
 import initial.Initiator;
 import initial.ServerParamsInRedis;
 import order.Order;
 import redis.clients.jedis.Jedis;
 import redisTools.ReadRedis;
 import constants.Strings;
+import walletTools.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static initial.Initiator.*;
@@ -82,8 +85,30 @@ public class Replier {
                 d.put("sendFrom", userAddr);
                 d.put("sendTo", params.getAccount());
                 d.put("minPayment", params.getMinPayment());
-                d.put("writeInOpReturn", gson.toJson(Order.getJsonBuyOrder(Initiator.service.getSid())));
+                String buyJson = gson.toJson(Order.getJsonBuyOrder(service.getSid()));
+                d.put("writeInOpReturn", buyJson);
                 d.put("note", "When writing OpReturn, remove the escape character!");
+
+                long value = (long) (Double.parseDouble(params.getMinPayment()) * Constants.FchToSatoshi);
+
+                CashListReturn cashListReturn = WalletTools.getCashListForPay(value, userAddr, esClient);
+
+                if(cashListReturn.getCode()==0) {
+                    DataForOffLineTx dataForOffLineTx = new DataForOffLineTx();
+                    dataForOffLineTx.setMsg(buyJson);
+
+                    List<SendTo> sendToList = new ArrayList<>();
+                    SendTo sendTo1 = new SendTo();
+                    sendTo1.setFid(params.getAccount());
+                    sendTo1.setAmount(Double.parseDouble(params.getMinPayment()));
+                    sendToList.add(sendTo1);
+                    dataForOffLineTx.setSendToList(sendToList);
+
+                    String offLingTxJson = CryptoSigner.makeRawTxForCs(dataForOffLineTx, cashListReturn.getCashList());
+                    d.put(Strings.UNSIGNED_TX_FOR_CS, offLingTxJson);
+                }else{
+                    d.put(Strings.UNSIGNED_TX_FOR_CS,cashListReturn.getMsg());
+                }
 
                 data = d;
                 last = null;

@@ -11,15 +11,20 @@ import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.UpdateByQueryResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
+import constants.Strings;
+import esTools.NewEsClient;
 import fcTools.ParseTools;
 import fchClass.Address;
 import fchClass.Block;
+import menu.Inputer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import parser.WeightMethod;
 import esTools.EsTools;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
 
 import static constants.IndicesNames.ADDRESS;
@@ -27,6 +32,25 @@ import static constants.IndicesNames.CASH;
 
 public class CdMaker {
 	private static final Logger log = LoggerFactory.getLogger(CdMaker.class);
+	static NewEsClient newEsClient = new NewEsClient();
+	public static void main(String[] args) throws Exception {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		System.out.println("Is SSL EsClient? 'y' to confirm. Other to create http EsClient:");
+		String input = Inputer.inputString(br);
+		ElasticsearchClient esClient;
+		if("y".equals(input))esClient= newEsClient.getSimpleEsClientSSL(br);
+		else esClient = newEsClient.getSimpleEsClient();
+		System.out.println(esClient.info());
+
+		writeEs.CdMaker cdMaker = new writeEs.CdMaker();
+		Block bestBlock = new Block();
+		bestBlock.setTime((long)(System.currentTimeMillis()/1000));
+		cdMaker.makeUtxoCd(esClient,bestBlock);
+		cdMaker.makeAddrCd(esClient);
+		System.out.println("CDs of cashes and addresses were made.");
+		br.close();
+		newEsClient.shutdownClient();
+	}
 
 	public void makeUtxoCd(ElasticsearchClient esClient, Block bestBlock)
 			throws ElasticsearchException, IOException, InterruptedException {
@@ -41,7 +65,7 @@ public class CdMaker {
 				.timeout(Time.of(t->t.time("1800s")))
 				.index(CASH)
 				.query(q -> q.bool(b -> b
-						.filter(f -> f.term(t -> t.field("valid").value(true)))))
+						.filter(f -> f.term(t -> t.field(Strings.VALID).value(true)))))
 				.script(s -> s.inline(i1 -> i1.source(
 								"ctx._source.cd = (long)(((long)((params.bestBlockTime - ctx._source.birthTime)/86400)*ctx._source.value)/100000000)")
 						.params("bestBlockTime", JsonData.of(bestBlockTime)))));
@@ -49,7 +73,7 @@ public class CdMaker {
 				response.updated()
 						+" utxo updated within "
 						+response.took()/1000
-						+" seconds. Version confilcts: "
+						+" seconds. Version conflicts: "
 						+response.versionConflicts());
 	}
 
@@ -61,7 +85,7 @@ public class CdMaker {
 		long count = 0;
 
 		SearchResponse<Address> response = esClient.search(
-				s -> s.index(ADDRESS).size(EsTools.READ_MAX).sort(sort -> sort.field(f -> f.field("fid"))),
+				s -> s.index(ADDRESS).size(EsTools.READ_MAX).sort(sort -> sort.field(f -> f.field(Strings.FID))),
 				Address.class);
 
 		ArrayList<Address> addrOldList = getResultAddrList(response);
@@ -80,7 +104,7 @@ public class CdMaker {
 			Hit<Address> last = response.hits().hits().get(response.hits().hits().size() - 1);
 			String lastId = last.id();
 			response = esClient.search(s -> s.index(ADDRESS).size(EsTools.READ_MAX)
-					.sort(sort -> sort.field(f -> f.field("fid"))).searchAfter(lastId), Address.class);
+					.sort(sort -> sort.field(f -> f.field(Strings.FID))).searchAfter(lastId), Address.class);
 
 			addrOldList = getResultAddrList(response);
 			addrOldMap = new HashMap<>();
@@ -133,9 +157,9 @@ public class CdMaker {
 		SearchResponse<Address> response = esClient.search(
 				s -> s.index(CASH).size(0).query(q -> q.term(t -> t.field("valid").value(true)))
 						.aggregations("filterByAddr",
-								a -> a.filter(f -> f.terms(t -> t.field("fid").terms(t1 -> t1.value(fieldValueList))))
+								a -> a.filter(f -> f.terms(t -> t.field(Strings.OWNER).terms(t1 -> t1.value(fieldValueList))))
 										.aggregations("termByAddr",
-												a1 -> a1.terms(t3 -> t3.field("fid").size(addrOldList.size()))
+												a1 -> a1.terms(t3 -> t3.field(Strings.OWNER).size(addrOldList.size()))
 														.aggregations("cdSum", a2 -> a2.sum(su -> su.field("cd"))))),
 				Address.class);
 

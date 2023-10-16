@@ -2,7 +2,8 @@ package keyTools;
 
 import constants.Constants;
 import cryptoTools.SHA;
-import fcTools.Hash;
+import cryptoTools.Hash;
+import fcTools.ParseTools;
 import javaTools.BytesTools;
 import org.bitcoinj.core.Base58;
 import org.bitcoinj.core.ECKey;
@@ -32,23 +33,34 @@ public class KeyTools {
             byte[] hash4 = new byte[4];
             System.arraycopy(hash, 0, hash4, 0, 4);
 
-            if (addrNaked[0] == (byte) 0x23 && Arrays.equals(suffix, hash4)) {
-                return true;
-            }else return false;
+            return addrNaked[0] == (byte) 0x23 && Arrays.equals(suffix, hash4);
         }catch (Exception ignore){
             return  false;
         }
     }
 
-    public static Map<String, String> pubKeyToAddresses(String pubkey) {
-        String fchAddr = pubKeyToFchAddr(pubkey);
-        String btcAddr = pubKeyToBtcAddr(pubkey);
-        String ethAddr = pubKeyToEthAddr(pubkey);
-        String ltcAddr = pubKeyToLtcAddr(pubkey);
-        String dogeAddr = pubKeyToDogeAddr(pubkey);
-        String trxAddr = pubKeyToTrxAddr(pubkey);
+    public static Map<String, String> pubKeyToAddresses(String pubKey) {
 
-        Map<String, String> map = new HashMap<String, String>();
+        String pubKey33;
+
+        if (pubKey.length() == 130) {
+            try {
+                pubKey33 = compressPk65To33(pubKey);
+            } catch (Exception e) {
+                return null;
+            }
+        } else {
+            pubKey33 = pubKey;
+        }
+
+        String fchAddr = pubKeyToFchAddr(pubKey33);
+        String btcAddr = pubKeyToBtcAddr(pubKey33);
+        String ethAddr = pubKeyToEthAddr(pubKey);
+        String ltcAddr = pubKeyToLtcAddr(pubKey33);
+        String dogeAddr = pubKeyToDogeAddr(pubKey33);
+        String trxAddr = pubKeyToTrxAddr(pubKey33);
+
+        Map<String, String> map = new HashMap<>();
         map.put(Constants.FCH_ADDR, fchAddr);
         map.put(Constants.BTC_ADDR, btcAddr);
         map.put(Constants.ETH_ADDR, ethAddr);
@@ -63,17 +75,17 @@ public class KeyTools {
     public static Map<String, String> hash160ToAddresses(byte[] hash160) {
         String fchAddr = hash160ToFchAddr(hash160);
         String btcAddr = hash160ToBtcAddr(hash160);
-        String ltcAddr = pubKeyToLtcAddr(hash160);
-        String dogeAddr = pubKeyToDogeAddr(hash160);
-        String trxAddr = pubKeyToTrxAddr(hash160);
+        String ltcAddr = hash160ToLtcAddr(hash160);
+        String dogeAddr = hash160ToDogeAddr(hash160);
 
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put(Constants.FCH_ADDR, fchAddr);
         map.put(Constants.BTC_ADDR, btcAddr);
         map.put(Constants.BCH_ADDR, btcAddr);
         map.put(Constants.LTC_ADDR, ltcAddr);
+        map.put(Constants.ETH_ADDR,null);
+        map.put(Constants.TRX_ADDR,null);
         map.put(Constants.DOGE_ADDR, dogeAddr);
-        map.put(Constants.TRX_ADDR, trxAddr);
 
         return map;
     }
@@ -83,10 +95,10 @@ public class KeyTools {
         int sigLen = Byte.toUnsignedInt(bScript[0]);//Length of signature;
         //Skip signature/跳过签名。
         //Read pubKey./读公钥
-        byte pubkeyLenB = bScript[sigLen + 1]; //公钥长度
-        int pubkeyLen = Byte.toUnsignedInt(pubkeyLenB);
-        byte[] pubKeyBytes = new byte[pubkeyLen];
-        System.arraycopy(bScript, sigLen + 2, pubKeyBytes, 0, pubkeyLen);
+        byte pubKeyLenB = bScript[sigLen + 1]; //公钥长度
+        int pubKeyLen = Byte.toUnsignedInt(pubKeyLenB);
+        byte[] pubKeyBytes = new byte[pubKeyLen];
+        System.arraycopy(bScript, sigLen + 2, pubKeyBytes, 0, pubKeyLen);
         return HexFormat.of().formatHex(pubKeyBytes);//HexFormat.of().formatHex(pubKeyBytes);
     }
 
@@ -127,12 +139,15 @@ public class KeyTools {
 
     public static byte[] recoverPK33ToPK65(byte[] PK33) {
         String str = HexFormat.of().formatHex(PK33);
-        return HexFormat.of().parseHex(recoverPK33ToPK65(str));
+        String pubKey65 = recoverPK33ToPK65(str);
+        if(pubKey65!=null)
+            return HexFormat.of().parseHex(pubKey65);
+        else return null;
     }
     
 
     public static String compressPk65To33(String pk64_65) throws Exception {
-        String publicKey = null;
+        String publicKey;
         if (pk64_65.length() == 130 && pk64_65.startsWith("04")) {
             publicKey = pk64_65.substring(2);
         } else if (pk64_65.length() == 128) {
@@ -162,13 +177,12 @@ public class KeyTools {
         BigInteger Y = new BigInteger(y);
         BigInteger TWO = new BigInteger("2");
         BigInteger ZERO = new BigInteger("0");
-        if (Y.mod(TWO) == ZERO) {
+        if (Y.mod(TWO).equals(ZERO)) {
             pk33[0] = 0x02;
         } else {
             pk33[0] = 0x03;
         }
-        String PK33 = BytesTools.bytesToHexStringLE(BytesTools.invertArray(pk33));
-        return PK33;
+        return BytesTools.bytesToHexStringLE(BytesTools.invertArray(pk33));
     }
 
     public static String hash160ToFchAddr(String hash160Hex) {
@@ -308,20 +322,20 @@ public class KeyTools {
         return Base58.encode(addrRaw);
     }
 
-    public static String hash160ToTrxAddr(byte[] hash160Bytes) {
-
-        byte[] d = {0x41};
-        byte[] e = new byte[21];
-        System.arraycopy(d, 0, e, 0, 1);
-        System.arraycopy(hash160Bytes, 0, e, 1, 20);
-
-        byte[] c = SHA.Sha256x2(e);
-        byte[] f = new byte[4];
-        System.arraycopy(c, 0, f, 0, 4);
-        byte[] addrRaw = BytesTools.bytesMerger(e, f);
-
-        return Base58.encode(addrRaw);
-    }
+//    public static String hash160ToTrxAddr(byte[] hash160Bytes) {
+//
+//        byte[] d = {0x41};
+//        byte[] e = new byte[21];
+//        System.arraycopy(d, 0, e, 0, 1);
+//        System.arraycopy(hash160Bytes, 0, e, 1, 20);
+//
+//        byte[] c = SHA.Sha256x2(e);
+//        byte[] f = new byte[4];
+//        System.arraycopy(c, 0, f, 0, 4);
+//        byte[] addrRaw = BytesTools.bytesMerger(e, f);
+//
+//        return Base58.encode(addrRaw);
+//    }
 
     public static String hash160ToMultiAddr(byte[] hash160Bytes) {
         byte[] d = {0x05};
@@ -340,8 +354,7 @@ public class KeyTools {
     public static String pubKeyToFchAddr(String a) {
         byte[] b = SHA.Sha256(HexFormat.of().parseHex(a));
         byte[] h = SHA.Ripemd160(b);
-        String address = KeyTools.hash160ToFchAddr(h);
-        return address;
+        return KeyTools.hash160ToFchAddr(h);
     }
 
     public static String pubKeyToFchAddr(byte[] a) {
@@ -371,43 +384,51 @@ public class KeyTools {
     public static String pubKeyToBtcAddr(byte[] a) {
         byte[] b = SHA.Sha256(a);
         byte[] h = SHA.Ripemd160(b);
-        String address = KeyTools.hash160ToBtcAddr(h);
-        return address;
+        return KeyTools.hash160ToBtcAddr(h);
     }
 
     public static String pubKeyToTrxAddr(String a) {
-        byte[] b = SHA.Sha256(HexFormat.of().parseHex(a));
-        byte[] h = SHA.Ripemd160(b);
-        String address = KeyTools.hash160ToTrxAddr(h);
-        return address;
-    }
+        if(a==null)return null;
+        String pubKey65;
+        if (a.length() == 130) {
+            pubKey65 = a;
+        } else {
+            pubKey65 = recoverPK33ToPK65(a);
+        }
+        if(pubKey65==null)return null;
+        String pubKey64 = pubKey65.substring(2);
 
-    public static String pubKeyToTrxAddr(byte[] a) {
-        byte[] b = SHA.Sha256(a);
-        byte[] h = SHA.Ripemd160(b);
-        String address = KeyTools.hash160ToTrxAddr(h);
-        return address;
+        byte[] pubKey64Bytes = HexFormat.of().parseHex(pubKey64);
+        byte[] pukHash64Hash = SHA.sha3(pubKey64Bytes);
+
+        byte[] pukHashWithPrefix = new byte[21];
+        pukHashWithPrefix[0] = 0x41;
+        System.arraycopy(pukHash64Hash, 12, pukHashWithPrefix, 1, 20);
+
+        byte[] c = SHA.Sha256x2(pukHashWithPrefix);
+        byte[] f = new byte[4];
+        System.arraycopy(c, 0, f, 0, 4);
+        byte[] addrRaw = BytesTools.bytesMerger(pukHashWithPrefix, f);
+
+        return Base58.encode(addrRaw);
     }
 
     public static String pubKeyToDogeAddr(String a) {
         byte[] b = SHA.Sha256(HexFormat.of().parseHex(a));
         byte[] h = SHA.Ripemd160(b);
-        String address = KeyTools.hash160ToDogeAddr(h);
-        return address;
+        return KeyTools.hash160ToDogeAddr(h);
     }
 
     public static String pubKeyToDogeAddr(byte[] a) {
         byte[] b = SHA.Sha256(a);
         byte[] h = SHA.Ripemd160(b);
-        String address = KeyTools.hash160ToDogeAddr(h);
-        return address;
+        return KeyTools.hash160ToDogeAddr(h);
     }
 
     public static String pubKeyToLtcAddr(String a) {
         byte[] b = SHA.Sha256(HexFormat.of().parseHex(a));
         byte[] h = SHA.Ripemd160(b);
-        String address = KeyTools.hash160ToLtcAddr(h);
-        return address;
+        return KeyTools.hash160ToLtcAddr(h);
     }
 
     public static String pubKeyToLtcAddr(byte[] a) {
@@ -431,9 +452,8 @@ public class KeyTools {
         byte[] pubKey64Bytes = HexFormat.of().parseHex(pubKey64);
         byte[] pukHash64Hash = SHA.sha3(pubKey64Bytes);
         String fullHash = HexFormat.of().formatHex(pukHash64Hash);
-        String address = "0x" + fullHash.substring(24);
 
-        return address;
+        return "0x" + fullHash.substring(24);
     }
 
     public static String pubKeyToEthAddr(byte[] b) {
@@ -446,9 +466,8 @@ public class KeyTools {
         byte[] pubKey64Bytes = HexFormat.of().parseHex(pubKey64);
         byte[] pukHash64Hash = SHA.sha3(pubKey64Bytes);
         String fullHash = HexFormat.of().formatHex(pukHash64Hash);
-        String address = "0x" + fullHash.substring(24);
 
-        return address;
+        return "0x" + fullHash.substring(24);
     }
 
     public static String pubKeyToAtomAddr(String a) {
@@ -460,8 +479,7 @@ public class KeyTools {
     public static String scriptToMultiAddr(String script) {
         byte[] b = SHA.Sha256(HexFormat.of().parseHex(script));
         byte[] h = SHA.Ripemd160(b);
-        String address = KeyTools.hash160ToMultiAddr(h);
-        return address;
+        return KeyTools.hash160ToMultiAddr(h);
     }
     public static byte[] priKeyToPubKey(byte[] priKey32Bytes) {
         ECKey eckey = ECKey.fromPrivate(priKey32Bytes);
@@ -472,7 +490,7 @@ public class KeyTools {
     public static String priKeyToPubKey(String priKey) {
         // TODO Auto-generated method stub
         //私钥如果长度为38字节，则为压缩格式。构成为：前缀80+32位私钥+压缩标志01+4位校验位。
-        byte[] priKey32Bytes = new byte[32];
+        byte[] priKey32Bytes;
         byte[] priKeyBytes;
         byte[] suffix;
         byte[] priKeyForHash;
@@ -482,27 +500,20 @@ public class KeyTools {
         int len = priKey.length();
 
         switch (len) {
-            case 64:
-                priKey32Bytes = HexFormat.of().parseHex(priKey);
-                break;
-            case 52:
-                if (!(priKey.substring(0, 1).equals("L") || priKey.substring(0, 1).equals("K"))) {
+            case 64 -> priKey32Bytes = HexFormat.of().parseHex(priKey);
+            case 52 -> {
+                if (!(priKey.charAt(0) == 'L' || priKey.charAt(0) == 'K')) {
                     System.out.println("It's not a private key.");
                     return null;
                 }
                 priKeyBytes = Base58.decode(priKey);
-
                 suffix = new byte[4];
                 priKeyForHash = new byte[34];
-
                 System.arraycopy(priKeyBytes, 0, priKeyForHash, 0, 34);
                 System.arraycopy(priKeyBytes, 34, suffix, 0, 4);
-
                 hash = SHA.Sha256x2(priKeyForHash);
-
                 hash4 = new byte[4];
                 System.arraycopy(hash, 0, hash4, 0, 4);
-
                 if (!Arrays.equals(suffix, hash4)) {
                     return null;
                 }
@@ -511,26 +522,20 @@ public class KeyTools {
                 }
                 priKey32Bytes = new byte[32];
                 System.arraycopy(priKeyForHash, 1, priKey32Bytes, 0, 32);
-                break;
-            case 51:
-                if (!priKey.substring(0, 1).equals("5")) {
+            }
+            case 51 -> {
+                if (priKey.charAt(0) != '5') {
                     System.out.println("It's not a private key.");
                     return null;
                 }
-
                 priKeyBytes = Base58.decode(priKey);
-
                 suffix = new byte[4];
                 priKeyForHash = new byte[33];
-
                 System.arraycopy(priKeyBytes, 0, priKeyForHash, 0, 33);
                 System.arraycopy(priKeyBytes, 33, suffix, 0, 4);
-
                 hash = SHA.Sha256x2(priKeyForHash);
-
                 hash4 = new byte[4];
                 System.arraycopy(hash, 0, hash4, 0, 4);
-
                 if (!Arrays.equals(suffix, hash4)) {
                     return null;
                 }
@@ -539,21 +544,22 @@ public class KeyTools {
                 }
                 priKey32Bytes = new byte[32];
                 System.arraycopy(priKeyForHash, 1, priKey32Bytes, 0, 32);
-                break;
-            default:
+            }
+            default -> {
                 System.out.println("It's not a private key.");
                 return null;
+            }
         }
 
         ECKey eckey = ECKey.fromPrivate(priKey32Bytes);
 
-        String pubkey = HexFormat.of().formatHex(eckey.getPubKey());
+        String pubKey = HexFormat.of().formatHex(eckey.getPubKey());
 
-        return pubkey;
+        return pubKey;
     }
 
     public static String getPriKey32(String priKey) {
-        byte[] priKey32Bytes = new byte[32];
+        byte[] priKey32Bytes;
         byte[] priKeyBytes;
         byte[] suffix;
         byte[] priKeyForHash;
@@ -638,23 +644,16 @@ public class KeyTools {
         int len = priKey.length;
 
         switch (len) {
-            case 32:
-                priKey32Bytes = priKey;
-                break;
-            case 38:
+            case 32 -> priKey32Bytes = priKey;
+            case 38 -> {
                 priKeyBytes = priKey;
-
                 suffix = new byte[4];
                 priKeyForHash = new byte[34];
-
                 System.arraycopy(priKeyBytes, 0, priKeyForHash, 0, 34);
                 System.arraycopy(priKeyBytes, 34, suffix, 0, 4);
-
                 hash = SHA.Sha256x2(priKeyForHash);
-
                 hash4 = new byte[4];
                 System.arraycopy(hash, 0, hash4, 0, 4);
-
                 if (!Arrays.equals(suffix, hash4)) {
                     return null;
                 }
@@ -663,21 +662,16 @@ public class KeyTools {
                 }
                 priKey32Bytes = new byte[32];
                 System.arraycopy(priKeyForHash, 1, priKey32Bytes, 0, 32);
-                break;
-            case 37:
+            }
+            case 37 -> {
                 priKeyBytes = priKey;
-
                 suffix = new byte[4];
                 priKeyForHash = new byte[33];
-
                 System.arraycopy(priKeyBytes, 0, priKeyForHash, 0, 33);
                 System.arraycopy(priKeyBytes, 33, suffix, 0, 4);
-
                 hash = SHA.Sha256x2(priKeyForHash);
-
                 hash4 = new byte[4];
                 System.arraycopy(hash, 0, hash4, 0, 4);
-
                 if (!Arrays.equals(suffix, hash4)) {
                     return null;
                 }
@@ -686,10 +680,11 @@ public class KeyTools {
                 }
                 priKey32Bytes = new byte[32];
                 System.arraycopy(priKeyForHash, 1, priKey32Bytes, 0, 32);
-                break;
-            default:
+            }
+            default -> {
                 System.out.println("It's not a private key.");
                 return null;
+            }
         }
 
         return priKey32Bytes;
@@ -705,17 +700,15 @@ public class KeyTools {
         int len = str.length();
 
         suffix = new byte[4];
-        byte[] strNake = new byte[len - 4];
+        byte[] strNaked = new byte[len - 4];
 
-        System.arraycopy(strBytes, 0, strNake, 0, len - 4);
+        System.arraycopy(strBytes, 0, strNaked, 0, len - 4);
         System.arraycopy(strBytes, len - 4, suffix, 0, 4);
 
-        hash = SHA.Sha256x2(strNake);
+        hash = SHA.Sha256x2(strNaked);
         System.arraycopy(hash, 0, hash4, 0, 4);
 
-        if (Arrays.equals(suffix, hash4)) {
-            return true;
-        } else return false;
+        return Arrays.equals(suffix, hash4);
     }
 
     public static boolean isValidPubKey(String puk) {
@@ -723,31 +716,31 @@ public class KeyTools {
         String prefix = "";
         if (puk.length() > 2) prefix = puk.substring(0, 2);
         if (puk.length() == 66) {
-            if (prefix.equals("02") || prefix.equals("03")) return true;
+            return prefix.equals("02") || prefix.equals("03");
         } else if (puk.length() == 130) {
-            if (prefix.equals("04")) return true;
+            return prefix.equals("04");
         }
         return false;
     }
 
 
-    public static String priKey32To38(String prikey32){
+    public static String priKey32To38(String priKey32){
         /*
         26字节长度为WIF compressed私钥格式。过程：
         在32位私钥加入版本号前缀0x80
         再加入压缩标志后缀0x01
-        sha256x2(80+prikey32+01)取前4字节checksum
-        对80+prikey32+01+checksum取base58编码
+        sha256x2(80+priKey32+01)取前4字节checksum
+        对80+priKey32+01+checksum取base58编码
          */
 
-        String priKey26 = null;
-        if(prikey32.length()!=64){
+        String priKey26;
+        if(priKey32.length()!=64){
             System.out.println("Private keys must be 32 bytes");
             return null;
         }
         // Keys that have compressed public components have an extra 1 byte on the end in dumped form.
         byte[] bytes34 = new byte[34];
-        byte[] bytes32 = BytesTools.hexToByteArray(prikey32);
+        byte[] bytes32 = BytesTools.hexToByteArray(priKey32);
         bytes34[0]= (byte) 0x80;
         System.arraycopy(bytes32, 0, bytes34, 1, 32);
         bytes34[33] = 1;
@@ -765,22 +758,22 @@ public class KeyTools {
         return priKey26;
     }
 
-    public static String priKey32To37(String prikey32) {
+    public static String priKey32To37(String priKey32) {
         /*
         26字节长度为WIF compressed私钥格式。过程：
         在32位私钥加入版本号前缀0x80
-        sha256x2(80+prikey32+01)取前4字节checksum
-        对80+prikey32+01+checksum取base58编码
+        sha256x2(80+priKey32+01)取前4字节checksum
+        对80+priKey32+01+checksum取base58编码
          */
 
-        String priKey37 = null;
-        if(prikey32.length()!=64){
+        String priKey37;
+        if(priKey32.length()!=64){
             System.out.println("Private keys must be 32 bytes");
             return null;
         }
         // Keys that have compressed public components have an extra 1 byte on the end in dumped form.
         byte[] bytes33 = new byte[33];
-        byte[] bytes32 = BytesTools.hexToByteArray(prikey32);
+        byte[] bytes32 = BytesTools.hexToByteArray(priKey32);
         bytes33[0]= (byte) 0x80;
         System.arraycopy(bytes32, 0, bytes33, 1, 32);
 

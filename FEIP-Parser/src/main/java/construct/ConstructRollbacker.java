@@ -96,7 +96,7 @@ public class ConstructRollbacker {
 		// TODO Auto-generated method stub
 		if(reparseHistList==null)return;
 		for(ProtocolHistory freeProtocolHist: reparseHistList) {
-			new ConstructParser().parseFreeProtocol(esClient, freeProtocolHist);
+			new ConstructParser().parseProtocol(esClient, freeProtocolHist);
 		}
 	}
 

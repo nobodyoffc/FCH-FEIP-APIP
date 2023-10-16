@@ -2,10 +2,11 @@ package fcTools;
 
 import fchClass.Cash;
 import com.google.gson.Gson;
+import walletTools.SendTo;
 
 import java.util.List;
 
-public class CryptoSigner {
+public class CryptoSign {
     public static String makeRawTxForCs(DataForOffLineTx sendRequestForCs, List<Cash> meetList) {
         Gson gson = new Gson();
         StringBuilder RawTx = new StringBuilder("[");

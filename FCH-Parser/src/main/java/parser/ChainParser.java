@@ -2,10 +2,9 @@ package parser;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.ElasticsearchException;
-import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch.core.BulkRequest;
-import co.elastic.clients.elasticsearch.core.SearchResponse;
 import constants.Constants;
+import esTools.EsTools;
 import fchClass.Block;
 import fchClass.BlockMark;
 import fileTools.BlockFileTools;
@@ -24,8 +23,8 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-import static constants.IndicesNames.BLOCK;
 import static constants.IndicesNames.BLOCK_MARK;
 
 public class ChainParser {
@@ -39,15 +38,6 @@ public class ChainParser {
 	private static final Logger log = LoggerFactory.getLogger(ChainParser.class);
 
 	private OpReFileTools opReFile = new OpReFileTools();
-
-	public static Block getBestBlock(ElasticsearchClient esClient) throws ElasticsearchException, IOException {
-		SearchResponse<Block> result = esClient.search(s->s
-						.index(BLOCK)
-						.size(1)
-						.sort(so->so.field(f->f.field("height").order(SortOrder.Desc)))
-				, Block.class);
-		return result.hits().hits().get(0).source();
-	}
 
 	public int startParse(ElasticsearchClient esClient) throws Exception {
 
@@ -107,7 +97,9 @@ public class ChainParser {
 			}else if(blockLength == WAIT_MORE) {
 				System.out.print(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis())));
 				System.out.println(" Waiting for new block...");
-				ParseTools.waitForNewItemInFile(Preparer.Path+Preparer.CurrentFile);
+				AtomicBoolean running = new AtomicBoolean();
+				running.set(true);
+				ParseTools.waitForChangeInDirectory(Preparer.Path, running);
 				fis.close();
 				fis = new FileInputStream(file);
 				fis.skip(Preparer.Pointer);
@@ -123,7 +115,7 @@ public class ChainParser {
 
 			long now = System.currentTimeMillis();
 			if( now - cdMakeTime > (1000*60*60*12)) {
-				Block bestBlock = getBestBlock(esClient);
+				Block bestBlock = EsTools.getBestBlock(esClient);
 
 				CdMaker cdMaker = new CdMaker();
 

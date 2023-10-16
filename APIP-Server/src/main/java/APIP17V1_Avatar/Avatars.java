@@ -62,16 +62,16 @@ public class Avatars extends HttpServlet {
             return;
         }
 
-        String avatarBasePath = null;
+        String avatarElementsPath = null;
         String avatarPngPath= null;
         try(Jedis jedis = Initiator.jedisPool.getResource()) {
-            avatarBasePath = jedis.hget(CONFIG, Strings.AVATAR_BASE_PATH);
+            avatarElementsPath = jedis.hget(CONFIG, Strings.AVATAR_ELEMENTS_PATH);
             avatarPngPath = jedis.hget(CONFIG, Strings.AVATAR_PNG_PATH);
         }
         if(!avatarPngPath.endsWith("/"))avatarPngPath  = avatarPngPath+"/";
-        if(!avatarBasePath.endsWith("/"))avatarBasePath = avatarBasePath+"/";
+        if(!avatarElementsPath.endsWith("/"))avatarElementsPath = avatarElementsPath+"/";
 
-        AvatarMaker.getAvatars(addrs,avatarBasePath,avatarPngPath);
+        AvatarMaker.getAvatars(addrs,avatarElementsPath,avatarPngPath);
 
         Base64.Encoder encoder = Base64.getEncoder();
         Map<String,String> addrPngBase64Map = new HashMap<>();

@@ -32,7 +32,7 @@ public class DecodeRawTx extends HttpServlet {
 
         String addr = dataCheckResult.getAddr();
 
-        if (RequestChecker.isPublicSessionKey(response, replier, writer, addr)) return;
+//        if (RequestChecker.isPublicSessionKey(response, replier, writer, addr)) return;
 
         DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
         replier.setNonce(requestBody.getNonce());

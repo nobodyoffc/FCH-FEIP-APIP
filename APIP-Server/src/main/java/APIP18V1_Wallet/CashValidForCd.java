@@ -68,16 +68,6 @@ public class CashValidForCd extends HttpServlet {
 
         DataRequestHandler esRequest = new DataRequestHandler(dataCheckResult.getAddr(),requestBody,response,replier);
 
-//        //Set default sort.
-//        ArrayList<Sort> defaultSort = Sort.makeSortList("cd", true, "value", true, "cashId", true);
-//
-//        List<SortOptions> sortOptionsList;
-//        if(requestBody.getFcdsl().getSort()!=null) {
-//            sortOptionsList = esRequest.getSortList(requestBody.getFcdsl().getSort());
-//        } else {
-//            sortOptionsList = esRequest.getSortList(defaultSort);
-//        }
-
         CashListReturn cashListReturn = WalletTools.getCashForCd(addrRequested, cd,Initiator.esClient);
         List<Cash> meetList = cashListReturn.getCashList();
 

@@ -5,6 +5,7 @@ import apipClass.DataRequestBody;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
+import fcTools.ParseTools;
 import fchClass.Address;
 import co.elastic.clients.elasticsearch.core.GetResponse;
 import keyTools.KeyTools;
@@ -37,7 +38,7 @@ public class Addresses extends HttpServlet {
 
         String addr = dataCheckResult.getAddr();
 
-        if (RequestChecker.isPublicSessionKey(response, replier, writer, addr)) return;
+//        if (RequestChecker.isPublicSessionKey(response, replier, writer, addr)) return;
 
         DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
         replier.setNonce(requestBody.getNonce());
@@ -52,7 +53,8 @@ public class Addresses extends HttpServlet {
 
         Map<String, String> addrMap = new HashMap<>();
         String pubKey=null;
-        if(input.startsWith("F")||input.startsWith("1")||input.startsWith("D")||input.startsWith("T")||input.startsWith("L")){
+
+        if(input.startsWith("F")||input.startsWith("1")||input.startsWith("D")||input.startsWith("L")){
             byte[] hash160 = KeyTools.addrToHash160(input);
             addrMap = KeyTools.hash160ToAddresses(hash160);
         }else if (input.startsWith("02")||input.startsWith("03")){

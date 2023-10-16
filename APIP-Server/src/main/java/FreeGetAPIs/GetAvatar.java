@@ -49,7 +49,7 @@ public class GetAvatar extends HttpServlet {
             return;
         }
         try(Jedis jedis0Common= jedisPool.getResource()) {
-            avatarBasePath = jedis0Common.hget(CONFIG, Strings.AVATAR_BASE_PATH);
+            avatarBasePath = jedis0Common.hget(CONFIG, Strings.AVATAR_ELEMENTS_PATH);
             avatarPngPath = jedis0Common.hget(CONFIG, Strings.AVATAR_PNG_PATH);
         }catch (Exception e){
              e.printStackTrace();

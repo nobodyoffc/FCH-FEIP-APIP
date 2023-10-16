@@ -5,7 +5,9 @@ import apipClass.*;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
+import constants.Strings;
 import feipClass.Contact;
+import tools.ApipTools;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -50,25 +52,7 @@ public class Contacts extends HttpServlet {
         ArrayList<Sort> sort = Sort.makeSortList("birthHeight",false,"contactId",true,null,null);
 
         //Add condition
-        Fcdsl fcdsl;
-        if(requestBody.getFcdsl()!=null) {
-            fcdsl = requestBody.getFcdsl();
-        }else fcdsl= new Fcdsl();
-
-        Filter filter;
-        if(fcdsl.getFilter()!=null) {
-            filter = fcdsl.getFilter();
-        }else filter=new Filter();
-
-        Terms terms;
-        if(filter.getTerms()!=null) {
-            terms = filter.getTerms();
-        }else terms=new Terms();
-
-        terms.setFields(new String[]{"active"});
-        terms.setValues(new String[]{"true"});
-        filter.setTerms(terms);
-        fcdsl.setFilter(filter);
+        Fcdsl fcdsl = ApipTools.addExceptTermsToFcdsl(requestBody, Strings.ACTIVE,Strings.FALSE);
         requestBody.setFcdsl(fcdsl);
 
         //Request
@@ -97,7 +81,7 @@ public class Contacts extends HttpServlet {
         esRequest.writeSuccess(dataCheckResult.getSessionKey());
     }
 
-//    private boolean isThisApiRequest(DataRequestBody requestBody) {
+    //    private boolean isThisApiRequest(DataRequestBody requestBody) {
 //        if(requestBody.getFcdsl()==null)
 //            return false;
 //        if(requestBody.getFcdsl().getQuery()==null)

@@ -16,6 +16,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.security.*;
+import java.util.HashMap;
+import java.util.Map;
 
 
 import static constants.ApiNames.SignInAPI;
@@ -94,7 +96,9 @@ public class SignInAPI extends HttpServlet {
                     signInReplyData = new Session().makeSession(jedis, fid);
                 } catch (Exception e) {
                     response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1020OtherError));
-                    replier.setData("Some thing wrong when making sessionKey.\n" + e.getMessage());
+                    Map<String,String> dataMap= new HashMap<>();
+                    dataMap.put(Strings.ERROR,"Some thing wrong when making sessionKey.\n" + e.getMessage());
+                    replier.setData(dataMap);
                     writer.write(replier.reply1020OtherError(fid));
                     return;
                 }
@@ -119,7 +123,9 @@ public class SignInAPI extends HttpServlet {
                         signInReplyData = new Session().makeSession(jedis, fid);
                     } catch (Exception e) {
                         response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1020OtherError));
-                        replier.setData("Some thing wrong when making sessionKey.\n" + e.getMessage());
+                        Map<String,String> dataMap= new HashMap<>();
+                        dataMap.put(Strings.ERROR,"Some thing wrong when making sessionKey.\n" + e.getMessage());
+                        replier.setData(dataMap);
                         writer.write(replier.reply1020OtherError(fid));
                         return;
                     }

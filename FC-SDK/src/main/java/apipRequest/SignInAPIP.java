@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import constants.ApiNames;
 import constants.Strings;
+import constants.UpStrings;
 import eccAes256K1P7.EccAes256K1P7;
 import eccAes256K1P7.EccAesDataByte;
 import fcTools.Base58;
@@ -83,7 +84,7 @@ public class SignInAPIP {
             ECKey ecKey = ECKey.fromPrivate(priKey);
             String sign = ecKey.signMessage(requestBodyJson);
 
-            headerMap.put(Strings.Header_SIGN, sign);
+            headerMap.put(UpStrings.SIGN, sign);
             String responseJson = requestPost(url, headerMap, requestBodyJson);
 
             responseBody = gson.fromJson(responseJson, ResponseBody.class);
@@ -126,7 +127,7 @@ public class SignInAPIP {
 
             String sign = ecKey.signMessage(requestBodyJson);
 
-            headerMap.put(Strings.Header_SIGN, sign);
+            headerMap.put(UpStrings.SIGN, sign);
             String responseJson = requestPost(url, headerMap, requestBodyJson);
 
             responseBody = gson.fromJson(responseJson, ResponseBody.class);

@@ -96,27 +96,24 @@ public class StartAPIP {
 				indicesAPIP.checkApipIndices();
 			};
 
+			if(orderScanner==null) startOrderScan(configAPIP, esClient);
 
-			if(orderScanner==null) {
-				startOrderScan(configAPIP, esClient);
-				Menu.anyKeyToContinue(br);
-			}
+			if(mempoolScanner==null) startMempoolScan(configAPIP, esClient);
 
-			if(mempoolScanner==null){
-				startMempoolScan(configAPIP,esClient);
-				Menu.anyKeyToContinue(br);
-			}
-
-			if(pusher == null){
-				startPusher(configAPIP,esClient);
-				Menu.anyKeyToContinue(br);
-			}
+			if(pusher == null) startPusher(configAPIP, esClient);
 
 			checkServiceParams();
 
 			checkPublicSessionKey();
 
 			checkRewardParams();
+
+			System.out.println();
+			if(orderScanner!=null && orderScanner.isRunning().get()) System.out.println("Order scanner is running...");
+			if(mempoolScanner!=null && mempoolScanner.getRunning().get()) System.out.println("Mempool scanner is running...");
+			if(mempoolScanner!=null && mempoolCleaner.getRunning().get()) System.out.println("Mempool cleaner is running...");
+			if(pusher!=null && pusher.isRunning().get()) System.out.println("Webhook pusher is running.");
+			System.out.println();
 
 			Menu menu = new Menu();
 
@@ -132,10 +129,7 @@ public class StartAPIP {
 			menu.add(menuItemList);
 			System.out.println(" << " + configAPIP.getServiceName() + " manager>> \n");
 			menu.show();
-			if(orderScanner!=null && orderScanner.isRunning().get()) System.out.println("Order scanner is running.");
-			if(mempoolScanner!=null && mempoolScanner.getRunning().get()) System.out.println("Mempool scanner is running.");
-			if(mempoolScanner!=null && mempoolCleaner.getRunning().get()) System.out.println("Mempool cleaner is running.");
-			if(pusher!=null && pusher.isRunning().get()) System.out.println("Webhook pusher is running.");
+
 			int choice = menu.choose(br);
 			switch (choice) {
 				case 1 -> new ServiceManager(esClient, br, configAPIP).menu();
@@ -221,13 +215,11 @@ public class StartAPIP {
 
 
 	private static void checkRewardParams() {
-		try(Jedis jedis = jedisPool.getResource()) {
-			RewardParams rewardParams = Rewarder.getRewardParams();
-			if (rewardParams == null) {
-				System.out.println("Reward params aren't set yet.");
-				new Rewarder(esClient).setRewardParameters( br);
-				Menu.anyKeyToContinue(br);
-			}
+		RewardParams rewardParams = Rewarder.getRewardParams();
+		if (rewardParams == null) {
+			System.out.println("Reward params aren't set yet.");
+			new Rewarder(esClient).setRewardParameters( br);
+			Menu.anyKeyToContinue(br);
 		}
 	}
 
@@ -252,58 +244,58 @@ public class StartAPIP {
 		indicesAPIP.menu();
 	}
 
-	private static void startMempoolClean(ConfigAPIP configAPIP) {
-		mempoolCleaner = new MempoolCleaner(configAPIP.getBlockFilePath());
+	private static void startMempoolClean(ConfigAPIP configAPIP, ElasticsearchClient esClient) {
+		mempoolCleaner = new MempoolCleaner(configAPIP.getBlockFilePath(), esClient);
 		log.debug("Clean mempool data in Redis...");
 		Thread thread = new Thread(mempoolCleaner);
 		thread.start();
 	}
 
 	private static void startOrderScan(ConfigAPIP configAPIP, ElasticsearchClient esClient) throws IOException {
-		String input;
-		System.out.println("Start order scanning? 'y' to start. Other to ignore");
-		input = StartAPIP.br.readLine();
-		if("y".equals(input)) {
-			log.debug("Start order scanner...");
-			String listenPath = configAPIP.getListenPath();
+//		String input;
+//		System.out.println("Start order scanning? 'y' to start. Other to ignore");
+//		input = StartAPIP.br.readLine();
+//		if("y".equals(input)) {
+		log.debug("Start order scanner...");
+		String listenPath = configAPIP.getListenPath();
 
-			orderScanner = new OrderScanner(listenPath,esClient);
-			Thread thread2 = new Thread(orderScanner);
-			thread2.start();
-			log.debug("Order scanner is running.");
-		}
+		orderScanner = new OrderScanner(listenPath,esClient);
+		Thread thread2 = new Thread(orderScanner);
+		thread2.start();
+		log.debug("Order scanner is running.");
+//		}
 	}
 
 	private static void startPusher(ConfigAPIP configAPIP, ElasticsearchClient esClient) throws IOException {
-		System.out.println("Start webhook pusher? 'y' to start. Other to ignore");
-		String input = StartAPIP.br.readLine();
-		if("y".equals(input)) {
-			String listenPath = configAPIP.getListenPath();
+//		System.out.println("Start webhook pusher? 'y' to start. Other to ignore");
+//		String input = StartAPIP.br.readLine();
+//		if("y".equals(input)) {
+		String listenPath = configAPIP.getListenPath();
 
-			pusher = new Pusher(listenPath, esClient);
-			Thread thread3 = new Thread(pusher);
-			thread3.start();
+		pusher = new Pusher(listenPath, esClient);
+		Thread thread3 = new Thread(pusher);
+		thread3.start();
 
-			log.debug("Webhook pusher is running.");
-		}
+		log.debug("Webhook pusher is running.");
+//		}
 	}
 
 	private static void startMempoolScan(ConfigAPIP configAPIP, ElasticsearchClient esClient) throws IOException {
 
-		System.out.println("Start mempool scanning? 'y' to start. Other to ignore");
-		String input = StartAPIP.br.readLine();
-		if("y".equals(input)) {
-			startMempoolClean(configAPIP);
+//		System.out.println("Start mempool scanning? 'y' to start. Other to ignore");
+//		String input = StartAPIP.br.readLine();
+//		if("y".equals(input)) {
+		startMempoolClean(configAPIP,esClient);
 
-			mempoolScanner = new MempoolScanner(esClient);
-			Thread thread1 = new Thread(mempoolScanner);
-			thread1.start();
-			log.debug("Mempool scanner is running.");
-		}
+		mempoolScanner = new MempoolScanner(esClient);
+		Thread thread1 = new Thread(mempoolScanner);
+		thread1.start();
+		log.debug("Mempool scanner is running.");
+//		}
 	}
 
 	public static String getNameOfService(String name) {
-		String finalName=null;
+		String finalName;
 		try(Jedis jedis = StartAPIP.jedisPool.getResource()) {
 			finalName = (jedis.hget(CONFIG, SERVICE_NAME) + "_" + name).toLowerCase();
 		}
@@ -352,10 +344,10 @@ public class StartAPIP {
 
 	public static void updateServiceParamsInRedisAndConfig( ConfigAPIP configAPIP){
 		serviceName = service.getStdName();
-		try(Jedis jedis = jedisPool.getResource()) {
-			setServiceToRedis(serviceName);
-			writeParamsToRedis();
-		}
+
+		setServiceToRedis(serviceName);
+		writeParamsToRedis();
+
 		configAPIP.setServiceName(serviceName);
 		configAPIP.writeConfigToFile();
 	}

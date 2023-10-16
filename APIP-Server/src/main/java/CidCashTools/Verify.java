@@ -5,6 +5,7 @@ import apipClass.DataRequestBody;
 import com.google.gson.Gson;
 import constants.ApiNames;
 import constants.ReplyInfo;
+import constants.Strings;
 import fcTools.ParseTools;
 import org.bitcoinj.core.ECKey;
 
@@ -16,6 +17,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.security.SignatureException;
+import java.util.HashMap;
+import java.util.Map;
 
 @WebServlet(ApiNames.ToolsPath + ApiNames.VerifyAPI)
 public class Verify extends HttpServlet {
@@ -33,7 +36,7 @@ public class Verify extends HttpServlet {
 
         String addr = dataCheckResult.getAddr();
 
-        if (RequestChecker.isPublicSessionKey(response, replier, writer, addr)) return;
+//        if (RequestChecker.isPublicSessionKey(response, replier, writer, addr)) return;
 
         DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
         replier.setNonce(requestBody.getNonce());
@@ -62,7 +65,9 @@ public class Verify extends HttpServlet {
             }
         }catch (Exception e){
             response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1020OtherError));
-            replier.setData("Can't get parameters correctly from Json string.");
+            Map<String,String> dataMap= new HashMap<>();
+            dataMap.put(Strings.ERROR,"Can't get parameters correctly from Json string.");
+            replier.setData(dataMap);
             writer.write(replier.reply1020OtherError(addr));
             return;
         }
@@ -77,7 +82,9 @@ public class Verify extends HttpServlet {
             }
         }else{
             response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1020OtherError));
-            replier.setData("FID, signature or message missed.");
+            Map<String,String> dataMap= new HashMap<>();
+            dataMap.put(Strings.ERROR,"FID, signature or message missed.");
+            replier.setData(dataMap);
             writer.write(replier.reply1020OtherError(addr));
             return;
         }

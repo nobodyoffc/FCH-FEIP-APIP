@@ -2,6 +2,7 @@ package APIP18V1_Wallet;
 
 import APIP0V1_OpenAPI.*;
 import apipClass.DataRequestBody;
+import com.google.gson.Gson;
 import constants.ApiNames;
 import constants.ReplyInfo;
 import freecashRPC.FcRpcMethods;
@@ -33,7 +34,7 @@ public class BroadcastRawTx extends HttpServlet {
 
         String addr = dataCheckResult.getAddr();
 
-        if (RequestChecker.isPublicSessionKey(response, replier, writer, addr)) return;
+//        if (RequestChecker.isPublicSessionKey(response, replier, writer, addr)) return;
 
         DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
         replier.setNonce(requestBody.getNonce());
@@ -43,11 +44,14 @@ public class BroadcastRawTx extends HttpServlet {
             writer.write(replier.reply1012BadQuery(addr));
             return;
         }
+
         Object rawTxHex = dataCheckResult.getDataRequestBody().getFcdsl().getOther();
+        Gson gson = new Gson();
+        String rawTx = gson.fromJson(gson.toJson(rawTxHex),String.class);
 
         String result = "";
         try {
-             result = FcRpcMethods.sendTx(fcClient,(String)rawTxHex);
+             result = FcRpcMethods.sendTx(fcClient,rawTx);
         } catch (Throwable e) {
             response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1020OtherError));
             replier.setData(e.getMessage());

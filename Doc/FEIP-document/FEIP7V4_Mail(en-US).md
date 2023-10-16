@@ -66,14 +66,14 @@ UpdateDate: 2023-05-22
 
 When user sends a mail, the data object contains:
 
-| field         | type   | content                                                     | required |
-|:--------------|:-------|:------------------------------------------------------------|:---------|
-| op            | string | operation: "send"                                           | Y        |
-| alg           | string | The encrypt algorithm.                                      | Y        |
-| ciphertext    | string | mail encrypted with sender's priKey and recipient's pubKey. | N        |
-| cipherSend| string | mail encrypted with the public key of the sender            | N        |
-| cipherReci| string | mail encrypted with the public key of the recipient         | N        |
-| textId        | string | Double sha256 hash value of the plain text of the mail      | N        |
+| field      | type   | content                                                     | required |
+|:-----------|:-------|:------------------------------------------------------------|:---------|
+| op         | string | operation: "send"                                           | Y        |
+| alg        | string | The encrypt algorithm.                                      | Y        |
+| cipher     | string | mail encrypted with sender's priKey and recipient's pubKey. | N        |
+| cipherSend | string | mail encrypted with the public key of the sender            | N        |
+| cipherReci | string | mail encrypted with the public key of the recipient         | N        |
+| textId     | string | Double sha256 hash value of the plain text of the mail      | N        |
 
 * Example
 
@@ -91,15 +91,31 @@ When user sends a mail, the data object contains:
 	"sn": 7,
 	"ver": 4,
 	"name": "Mail",
-	"pid": "",
 	"data": {
 		"op": "send",
 		"alg": "EccAes256BitPay@No1_NrC7",
-		"ciphertextSend": "AtpfHV/b+P2TMG8eFYpwdR7FCOhRjsK5I9UiZBIwUBtBAzi+B/tS5lMv27T9ofORhmSTYRYEfMIaffEwkwtfgEdormE5u4YKnBf001bWPeIQIXEz8HAj7XVt1rYLciJPdQ==",
-		"ciphertextReci": "Avmexwg3OUjOPl7KyAcu1VcAYy1ln90DmqLH/POOPtwDD6PhiitBd/aRjRBZR9Tx9khysbQLHXKFL4BJ6Af0J6iKiDLZXOfvlzdXNM+TzADj0ryOsX9vtVXPsiljS6PjFg==";
+		"cipherSend": "AtpfHV/b+P2TMG8eFYpwdR7FCOhRjsK5I9UiZBIwUBtBAzi+B/tS5lMv27T9ofORhmSTYRYEfMIaffEwkwtfgEdormE5u4YKnBf001bWPeIQIXEz8HAj7XVt1rYLciJPdQ==",
+		"cipherReci": "Avmexwg3OUjOPl7KyAcu1VcAYy1ln90DmqLH/POOPtwDD6PhiitBd/aRjRBZR9Tx9khysbQLHXKFL4BJ6Af0J6iKiDLZXOfvlzdXNM+TzADj0ryOsX9vtVXPsiljS6PjFg==";
 		"textId":"c269f3b03960a695e1e2e4ab451bd645c7134d3328a327c98c00ed102f76b451"
 	}
 }
+```
+
+```json
+
+{
+	"type": "FEIP",
+	"sn": 7,
+	"ver": 4,
+	"name": "Mail",
+	"data": {
+		"op": "send",
+		"alg": "EccAes256K1P7@No1_NrC7",
+		"cipher": "fxBWByu7+7Kbie34w/9ICyWSEFopeMou5+sm/eRhdFw=",
+		"textId":"1332f5132b45de03e729e764b38f9a2e4057d6760a8807662331b37ddea936e4"
+	}
+}
+
 ```
 
 ## Delete

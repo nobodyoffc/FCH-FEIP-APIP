@@ -432,6 +432,49 @@ Request body
 }
 ```
 
+Response body
+```登录者fid有足够余额
+{
+    "code": 1004,
+    "message": "Insufficient balance. Buy the service please.",
+    "nonce": 124,
+    "balance": 0,
+    "got": 0,
+    "total": 0,
+    "bestHeight": 1948819,
+    "data": {
+        "note": "When writing OpReturn, remove the escape character!",
+        "sendTo": "FUmo2eez6VK2sfGWjek9i9aK5y1mdHSnqv",
+        "unsignedTxForCs": "[{\"address\":\"FAmwSZVNKEwG6Nt5sHJJyovfGnGj4ZPdNH\",\"amount\":20.0,\"txid\":\"bf9f366d8e207928c90c819e81276c69864dbd42466798f53d33ad974cb0fb6b\",\"dealType\":1,\"index\":0,\"seq\":0},{\"address\":\"FUmo2eez6VK2sfGWjek9i9aK5y1mdHSnqv\",\"amount\":1.0,\"dealType\":2,\"index\":0,\"seq\":0},{\"msg\":\"{\\n  \\\"type\\\": \\\"APIP\\\",\\n  \\\"sn\\\": \\\"0\\\",\\n  \\\"ver\\\": \\\"1\\\",\\n  \\\"name\\\": \\\"OpenAPI\\\",\\n  \\\"pid\\\": \\\"\\\",\\n  \\\"data\\\": {\\n    \\\"op\\\": \\\"buy\\\",\\n    \\\"sid\\\": \\\"46c1df926598cf0b881f0f1ab2ac6340826a5f954dd690786459c36388d6c131\\\"\\n  }\\n}\",\"seq\":1,\"msgType\":2,\"dealType\":3}]",
+        "sendFrom": "FAmwSZVNKEwG6Nt5sHJJyovfGnGj4ZPdNH",
+        "minPayment": "1.0",
+        "writeInOpReturn": "{\n  \"type\": \"APIP\",\n  \"sn\": \"0\",\n  \"ver\": \"1\",\n  \"name\": \"OpenAPI\",\n  \"pid\": \"\",\n  \"data\": {\n    \"op\": \"buy\",\n    \"sid\": \"46c1df926598cf0b881f0f1ab2ac6340826a5f954dd690786459c36388d6c131\"\n  }\n}",
+        "currency": "fch"
+    }
+}
+```
+
+```登录者fid没有足够余额
+{
+    "code": 1004,
+    "message": "Insufficient balance. Buy the service please.",
+    "nonce": 1114,
+    "balance": 0,
+    "got": 0,
+    "total": 0,
+    "bestHeight": 1948813,
+    "data": {
+        "note": "When writing OpReturn, remove the escape character!",
+        "sendTo": "FUmo2eez6VK2sfGWjek9i9aK5y1mdHSnqv",
+        "unsignedTxForCs": "No enough balance: 0 fch",
+        "sendFrom": "FNizPfVrFBtnXZKC32etR7JYHEVzYowBf6",
+        "minPayment": "1.0",
+        "writeInOpReturn": "{\n  \"type\": \"APIP\",\n  \"sn\": \"0\",\n  \"ver\": \"1\",\n  \"name\": \"OpenAPI\",\n  \"pid\": \"\",\n  \"data\": {\n    \"op\": \"buy\",\n    \"sid\": \"46c1df926598cf0b881f0f1ab2ac6340826a5f954dd690786459c36388d6c131\"\n  }\n}",
+        "currency": "fch"
+    }
+}
+```
+
 ### 请求方保存API服务信息
 
 请求方保存API服务相关信息：

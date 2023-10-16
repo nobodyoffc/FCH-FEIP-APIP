@@ -1,4 +1,4 @@
-package fcTools;
+package cryptoTools;
 
 import com.google.common.hash.Hashing;
 import com.xwc1125.chain5j.utils.Numeric;
@@ -33,8 +33,12 @@ public class Hash {
     }
 
     public static String Sha256x2(File file) throws IOException {
-        FileInputStream fis = new FileInputStream(file);
-        return Hashing.sha256().hashBytes(Hashing.sha256().hashBytes(fis.readAllBytes()).asBytes()).toString();
+        String str;
+        try(FileInputStream fis = new FileInputStream(file)){
+            byte[] bytes = fis.readAllBytes();
+            str = Hashing.sha256().hashBytes(Hashing.sha256().hashBytes(bytes).asBytes()).toString();
+        }
+        return str;
     }
 
     public static byte[] Sha512x2(byte[] b) {
@@ -42,8 +46,12 @@ public class Hash {
     }
 
     public static String Sha256(File file) throws IOException {
-        FileInputStream fis = new FileInputStream(file);
-        return Hashing.sha256().hashBytes(fis.readAllBytes()).toString();
+        String str;
+        try(FileInputStream fis = new FileInputStream(file)){
+        byte[] bytes = fis.readAllBytes();
+        str = Hashing.sha256().hashBytes(bytes).toString();
+        }
+        return str;
     }
 
     public static String Sha256(String s) {
@@ -275,7 +283,7 @@ public class Hash {
     }
 }
 
-	
-	
-	
+
+
+
 

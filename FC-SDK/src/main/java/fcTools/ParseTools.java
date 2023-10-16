@@ -26,7 +26,7 @@ import static constants.Constants.FchToSatoshi;
 public class ParseTools {
 
     public static VarintResult parseVarint(ByteArrayInputStream blockInputStream) throws IOException {
-        //Byte[] List for merge all bytes readed./用于保存所读取字节数组的列表。
+        //Byte[] List for merge all bytes read./用于保存所读取字节数组的列表。
         ArrayList<byte[]> bl = new ArrayList<byte[]>();
         //Read 1 byte and turn it into unsigned./读1个字节并转换成整型。
         byte[] b = new byte[1];
@@ -37,6 +37,14 @@ public class ParseTools {
 
         int size = Byte.toUnsignedInt(b[0]);
         long number = 0;
+
+        /*
+            Value	        Storage length	    Format
+            < 0xFD	        1	                uint8_t
+            <= 0xFFFF	    3	                0xFD followed by the length as uint16_t
+            <= 0xFFFFFFFF	5	                0xFE followed by the length as uint32_t
+            -	            9	                0xFF followed by the length as uint64_t
+         */
 
         if (size >= 0 && size <= 252) {
             number = (long) size;

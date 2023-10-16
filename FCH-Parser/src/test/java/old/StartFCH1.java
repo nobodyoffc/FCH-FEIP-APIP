@@ -2,12 +2,12 @@ package old;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import constants.Constants;
+import esTools.EsTools;
 import fchClass.Block;
 import config.ConfigFCH;
 import menu.Menu;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import parser.ChainParser;
 import fileTools.OpReFileTools;
 import parser.Preparer;
 import esTools.NewEsClient;
@@ -99,7 +99,7 @@ public class StartFCH1 {
 
                     if (restart.equals("y")) {
 
-                        Block bestBlock = ChainParser.getBestBlock(esClient);
+                        Block bestBlock = EsTools.getBestBlock(esClient);
                         bestHeight = bestBlock.getHeight();
 
                         log.debug("Restarting from BestHeight: " + (bestHeight - 1) + " ...");

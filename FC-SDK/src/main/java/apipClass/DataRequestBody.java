@@ -14,6 +14,11 @@ public class DataRequestBody{
     private String via;
     private Fcdsl fcdsl;
 
+
+    public String toJson(){
+        Gson gson = new Gson();
+        return gson.toJson(this);
+    }
     public void makeRequestBody(String url, String via) {
         setTime(System.currentTimeMillis());
         setNonce((BytesTools.bytes4ToLongBE(BytesTools.getRandomBytes(4))));

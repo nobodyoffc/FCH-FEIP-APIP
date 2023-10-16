@@ -1,10 +1,10 @@
 package eccAes256K1P7;
 
-import FipaClass.Affair;
-import FipaClass.Op;
+import fipaClass.Affair;
+import fipaClass.Op;
 import com.google.gson.Gson;
 import constants.Constants;
-import fcTools.Hash;
+import cryptoTools.Hash;
 import fileTools.FileTools;
 import fileTools.JsonFileTools;
 import javaTools.BytesTools;

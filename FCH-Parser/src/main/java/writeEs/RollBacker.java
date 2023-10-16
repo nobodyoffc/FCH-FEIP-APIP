@@ -31,7 +31,7 @@ public class RollBacker {
 
 	public boolean rollback(ElasticsearchClient esClient, long lastHeight) throws Exception {
 
-		long bestHeight = getBestHeight(esClient);
+		long bestHeight = EsTools.getBestBlock(esClient).getHeight();
 		if(bestHeight==lastHeight) {
 			System.out.println("The height you are rollbacking to is the best height:" +bestHeight );
 			return true;
@@ -166,11 +166,6 @@ public class RollBacker {
 			last = response.hits().hits().get(hitSize - 1).sort();
 		}
 		return new ArrayList<>(addrSet);
-	}
-
-	public long getBestHeight(ElasticsearchClient esClient) throws ElasticsearchException, IOException {
-		SearchResponse<Void> response = esClient.search(s->s.index(IndicesNames.BLOCK).aggregations("bestHeight", a->a.max(m->m.field("height"))), void.class);
-		return (long)response.aggregations().get("bestHeight").max().value();
 	}
 
 

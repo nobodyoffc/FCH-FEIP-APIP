@@ -1,7 +1,5 @@
 package constants;
 
-import cryptoTools.Sha256Hash;
-
 public class Strings {
 
     //Redis keys
@@ -35,7 +33,7 @@ public class Strings {
     public static final String BEST_BLOCK_ID = "bestBlockId";
     public static final String WINDOW_TIME ="windowTime";
     public static final String CHECK_ORDER_OPRETURN ="checkOrderOpReturn";
-    public static final String AVATAR_BASE_PATH = "avatarBasePath";
+    public static final String AVATAR_ELEMENTS_PATH = "avatarElementsPath";
     public static final String AVATAR_PNG_PATH = "avatarPngPath";
     public static final String FORBID_FREE_GET = "forbidFreeGet";
     public static final String CONFIG_FILE_PATH = "configFilePath";
@@ -60,7 +58,6 @@ public class Strings {
     public static final String REWARD = "reward";
     public static final String WEBHOOK = "webhook";
     public static final String REWARD_ID = "rewardId";
-    public static final String FBBP = "FBBP";
 
     public static final String ANY_KEY = "Any key to continue...";
     public static final String BUILDER_SHARE_MAP = "builderShareMap";
@@ -74,8 +71,6 @@ public class Strings {
     public static final String OP_RETURN_FILE_PATH = "opReturnFilePath";
     public static final String LISTEN_PATH = "listenPath";
     public static final String FIELDS = "fields";
-    public static final String MAKER ="Maker";
-    public static final String Header_SIGN = "Sign";
     public static final String SESSION_NAME = "sessionName";
     public static final String VIA = "via";
     public static final String OWNER = "owner";
@@ -98,4 +93,16 @@ public class Strings {
     public static final String FALSE = "false";
     public static final String NONCE = "nonce";
     public static final String RENEW = "renew";
+    public static final String SUBSCRIBE = "subscribe";
+    public static final String UNSUBSCRIBE = "unsubscribe";
+    public static final String OP = "op";
+    public static final String ERROR = "error";
+    public static final String PARAMS = "params";
+    public static final String UNSIGNED_TX_FOR_CS = "unsignedTxForCs";
+    public static final String VALID = "valid";
+    public static final String CD = "cd";
+    public static final String VALUE = "value";
+    public static final String SUM = "sum";
+    public static final String SPEND_CASHES = "spendCashes";
+    public static final String NEW_CASHES = "newCashes";
 }

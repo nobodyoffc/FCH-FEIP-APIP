@@ -8,6 +8,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import constants.ApiNames;
 import constants.Strings;
+import constants.UpStrings;
 import cryptoTools.SHA;
 import feipClass.Service;
 import javaTools.BytesTools;
@@ -21,7 +22,6 @@ import org.apache.http.util.EntityUtils;
 
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HexFormat;
 import java.util.List;
@@ -37,8 +37,6 @@ public class PostRequester {
                 + "\"fcdsl\":{"
                 + "\"ids\":[\"FEk41Kqjar45fLDriztUDTUkdki7mmcjWK\", \"FPL44YJRwPdd2ipziFvqq6y2tw4VnVvpAv\"]"
                 + "}}";
-
-
 
         String requestUrl = "https://cid.cash/APIP/apip3/v1/cidInfoByIds";
 
@@ -106,7 +104,7 @@ public class PostRequester {
             byte[] allBytes=BytesTools.bytesMerger(requestBodyJson.getBytes(StandardCharsets.UTF_8),sessionKey);
 
             byte[] sign = SHA.Sha256x2(allBytes);
-            headerMap.put(Strings.Header_SIGN, HexFormat.of().formatHex(sign));
+            headerMap.put(UpStrings.SIGN, HexFormat.of().formatHex(sign));
             String responseJson = requestPost(url, headerMap, requestBodyJson);
 
             dataResponseBody = gson.fromJson(responseJson, ResponseBody.class);

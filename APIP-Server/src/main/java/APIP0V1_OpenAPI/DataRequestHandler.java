@@ -43,15 +43,15 @@ public class DataRequestHandler {
     public <T> List<T> doRequest(String index, ArrayList<Sort> sort, Class<T> tClass) {
         if(index==null||tClass==null)return null;
 
-        SearchRequest.Builder builder = new SearchRequest.Builder();
+        SearchRequest.Builder searchBuilder = new SearchRequest.Builder();
         SearchRequest searchRequest;
-        builder.index(index);
+        searchBuilder.index(index);
 
         Fcdsl fcdsl;
 
         if(dataRequestBody.getFcdsl()==null){
             MatchAllQuery matchAllQuery = getMatchAllQuery();
-            builder.query(q->q.matchAll(matchAllQuery));
+            searchBuilder.query(q->q.matchAll(matchAllQuery));
         }else{
             fcdsl = dataRequestBody.getFcdsl();
 
@@ -60,7 +60,7 @@ public class DataRequestHandler {
 
             if(fcdsl.getQuery() == null && fcdsl.getExcept()==null && fcdsl.getFilter()==null){
                 MatchAllQuery matchAllQuery = getMatchAllQuery();
-                builder.query(q->q.matchAll(matchAllQuery));
+                searchBuilder.query(q->q.matchAll(matchAllQuery));
             }else {
                 List<Query> queryList = null;
                 if(fcdsl.getQuery()!=null) {
@@ -88,7 +88,7 @@ public class DataRequestHandler {
                 if(exceptList!=null && exceptList.size()>0)
                     bBuilder.mustNot(exceptList);
 
-                builder.query(q -> q.bool(bBuilder.build()));
+                searchBuilder.query(q -> q.bool(bBuilder.build()));
             }
 
             int size=0;
@@ -103,26 +103,26 @@ public class DataRequestHandler {
                 return null;
             }
             if(size==0 || size> Constants.MaxRequestSize) size= Constants.DefaultSize;
-            builder.size(size);
+            searchBuilder.size(size);
 
             if(fcdsl.getSort()!=null) {
                 sort = fcdsl.getSort();
             }
             if(sort!=null) {
                 if (sort.size() > 0) {
-                    builder.sort(Sort.getSortList(sort));
+                    searchBuilder.sort(Sort.getSortList(sort));
                 }
             }
             if(fcdsl.getAfter()!=null){
                 List<String>  after = fcdsl.getAfter();
-                builder.searchAfter(after);
+                searchBuilder.searchAfter(after);
             }
         }
 
         TrackHits.Builder tb = new TrackHits.Builder();
         tb.enabled(true);
-        builder.trackTotalHits(tb.build());
-        searchRequest = builder.build();
+        searchBuilder.trackTotalHits(tb.build());
+        searchRequest = searchBuilder.build();
 
         SearchResponse<T> result;
         try {
@@ -408,7 +408,7 @@ public class DataRequestHandler {
     }
 
     private BoolQuery getTermsQuery(Terms terms) {
-        BoolQuery.Builder termsBoolBuider;
+        BoolQuery.Builder termsBoolBuilder;
 
         List<FieldValue> valueList = new ArrayList<>();
         for(String value : terms.getValues()){
@@ -416,9 +416,9 @@ public class DataRequestHandler {
             valueList.add(FieldValue.of(value));
         }
 
-        termsBoolBuider = makeBoolShouldTermsQuery(terms.getFields(),valueList);
-        termsBoolBuider.queryName("terms");
-        return termsBoolBuider.build();
+        termsBoolBuilder = makeBoolShouldTermsQuery(terms.getFields(),valueList);
+        termsBoolBuilder.queryName("terms");
+        return termsBoolBuilder.build();
     }
 
     private BoolQuery.Builder makeBoolShouldTermsQuery(String[] fields, List<FieldValue> valueList) {
@@ -444,16 +444,6 @@ public class DataRequestHandler {
         return queryBuilder.build();
     }
 
-//    public void writeSuccess(String sessionKey, int nPrice) {
-//
-//        response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code0Success));
-//        String reply = replier.reply0Success(addr,nPrice);
-//        if(reply==null)return;
-//        String sign = symSign(reply,sessionKey);
-//        if(sign==null)return;
-//        response.setHeader(ReplyInfo.SignInHeader,sign);
-//        writer.write(reply);
-//    }
 
     public void writeSuccess(String sessionKey) {
         response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code0Success));

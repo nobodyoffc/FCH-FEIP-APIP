@@ -40,7 +40,7 @@ public class ConstructParser {
 		switch(protocolRaw.getOp()) {
 
 		case "publish":
-			if(protocolRaw.getSn()==null|| protocolRaw.getName()==null)	return null;
+			if(protocolRaw.getSn()==null|| protocolRaw.getName()==null||"".equals(protocolRaw.getName()))	return null;
             if (opre.getHeight() > StartFEIP.CddCheckHeight && opre.getCdd() < StartFEIP.CddRequired * 100) return null;
 			protocolHist.setTxId(opre.getTxId());
 			
@@ -65,7 +65,7 @@ public class ConstructParser {
 			
 		case "update":
 			
-			if(protocolRaw.getPid()==null|| protocolRaw.getSn()==null|| protocolRaw.getName()==null)	return null;
+			if(protocolRaw.getPid()==null|| protocolRaw.getSn()==null|| protocolRaw.getName()==null||"".equals(protocolRaw.getName()))	return null;
 			protocolHist.setTxId(opre.getTxId());
 			protocolHist.setHeight(opre.getHeight());
 			protocolHist.setIndex(opre.getTxIndex());
@@ -147,7 +147,7 @@ public class ConstructParser {
 
 		switch(serviceRaw.getOp()) {
 		case "publish":
-			if(serviceRaw.getStdName()==null)	return null;
+			if(serviceRaw.getStdName()==null||"".equals(serviceRaw.getStdName()))return null;
 			if(serviceRaw.getSid()!=null) return null;
             if (opre.getHeight() > StartFEIP.CddCheckHeight && opre.getCdd() < StartFEIP.CddRequired * 100) return null;
 			serviceHist.setTxId(opre.getTxId());
@@ -170,7 +170,7 @@ public class ConstructParser {
 			break;
 		case "update":
 			if(serviceRaw.getSid()==null)	return null;
-			if(serviceRaw.getStdName()==null)	return null;
+			if(serviceRaw.getStdName()==null||"".equals(serviceRaw.getStdName()))	return null;
 			
 			serviceHist.setTxId(opre.getTxId());
 			serviceHist.setSid(serviceRaw.getSid());
@@ -259,7 +259,7 @@ public class ConstructParser {
 		switch(appRaw.getOp()) {
 		
 		case "publish":
-			if(appRaw.getStdName()==null)	return null;
+			if(appRaw.getStdName()==null||"".equals(appRaw.getStdName()))	return null;
 			if(appRaw.getAid()!=null) return null;
             if (opre.getHeight() > StartFEIP.CddCheckHeight && opre.getCdd() < StartFEIP.CddRequired * 100) return null;
 			appHist.setTxId(opre.getTxId());
@@ -283,7 +283,7 @@ public class ConstructParser {
 			
 		case "update":
 			if(appRaw.getAid()==null)	return null;
-			if(appRaw.getStdName()==null)	return null;
+			if(appRaw.getStdName()==null||"".equals(appRaw.getStdName()))	return null;
 			
 			appHist.setAid(appRaw.getAid());
 			appHist.setTxId(opre.getTxId());
@@ -375,7 +375,7 @@ public class ConstructParser {
 
 		switch(codeRaw.getOp()) {
 		case "publish":
-			if(codeRaw.getName()==null)	return null;
+			if(codeRaw.getName()==null||"".equals(codeRaw.getName()))	return null;
 			if(codeRaw.getCodeId()!=null) return null;
             if (opre.getHeight() > StartFEIP.CddCheckHeight && opre.getCdd() < StartFEIP.CddRequired * 100) return null;
 			codeHist.setTxId(opre.getTxId());
@@ -397,7 +397,7 @@ public class ConstructParser {
 			break;
 		case "update":
 			if(codeRaw.getCodeId()==null)	return null;
-			if(codeRaw.getName()==null)	return null;
+			if(codeRaw.getName()==null||"".equals(codeRaw.getName()))return null;
 			
 			codeHist.setTxId(opre.getTxId());
 			codeHist.setCodeId(codeRaw.getCodeId());
@@ -465,43 +465,43 @@ public class ConstructParser {
 		return codeHist; 
 	}
 
-	public boolean parseFreeProtocol(ElasticsearchClient esClient, ProtocolHistory freeProtocolHist) throws ElasticsearchException, IOException, InterruptedException {
+	public boolean parseProtocol(ElasticsearchClient esClient, ProtocolHistory protocolHist) throws ElasticsearchException, IOException, InterruptedException {
 		// TODO Auto-generated method stub
 		boolean isValid = false;
 		Protocol protocol;
-		switch(freeProtocolHist.getOp()) {
+		switch(protocolHist.getOp()) {
 		case "publish":			
-			protocol = EsTools.getById(esClient, IndicesNames.PROTOCOL, freeProtocolHist.getPid(), Protocol.class);
+			protocol = EsTools.getById(esClient, IndicesNames.PROTOCOL, protocolHist.getPid(), Protocol.class);
 			if(protocol ==null) {
 				protocol = new Protocol();
-				protocol.setPid(freeProtocolHist.getPid());
-				protocol.setType(freeProtocolHist.getType());
-				protocol.setSn(freeProtocolHist.getSn());
-				protocol.setVer(freeProtocolHist.getVer());
-				protocol.setDid(freeProtocolHist.getDid());
-				protocol.setName(freeProtocolHist.getName());
+				protocol.setPid(protocolHist.getPid());
+				protocol.setType(protocolHist.getType());
+				protocol.setSn(protocolHist.getSn());
+				protocol.setVer(protocolHist.getVer());
+				protocol.setDid(protocolHist.getDid());
+				protocol.setName(protocolHist.getName());
 				
-				protocol.setLang(freeProtocolHist.getLang());
-				protocol.setDesc(freeProtocolHist.getDesc());
-				protocol.setPrePid(freeProtocolHist.getPrePid());
-				protocol.setFileUrls(freeProtocolHist.getFileUrls());
+				protocol.setLang(protocolHist.getLang());
+				protocol.setDesc(protocolHist.getDesc());
+				protocol.setPrePid(protocolHist.getPrePid());
+				protocol.setFileUrls(protocolHist.getFileUrls());
 				
-				protocol.setTitle(freeProtocolHist.getType()+freeProtocolHist.getSn()+"V"+freeProtocolHist.getVer()+"_"+freeProtocolHist.getName()+"("+freeProtocolHist.getLang()+")");
-				protocol.setOwner(freeProtocolHist.getSigner());
+				protocol.setTitle(protocolHist.getType()+protocolHist.getSn()+"V"+protocolHist.getVer()+"_"+protocolHist.getName()+"("+protocolHist.getLang()+")");
+				protocol.setOwner(protocolHist.getSigner());
 				
-				protocol.setBirthTxId(freeProtocolHist.getTxId());
-				protocol.setBirthTime(freeProtocolHist.getTime());
-				protocol.setBirthHeight(freeProtocolHist.getHeight());
+				protocol.setBirthTxId(protocolHist.getTxId());
+				protocol.setBirthTime(protocolHist.getTime());
+				protocol.setBirthHeight(protocolHist.getHeight());
 				
-				protocol.setLastTxId(freeProtocolHist.getTxId());
-				protocol.setLastTime(freeProtocolHist.getTime());
-				protocol.setLastHeight(freeProtocolHist.getHeight());
+				protocol.setLastTxId(protocolHist.getTxId());
+				protocol.setLastTime(protocolHist.getTime());
+				protocol.setLastHeight(protocolHist.getHeight());
 				
 				protocol.setActive(true);
 				
 				Protocol protocol1 = protocol;
 				
-				esClient.index(i->i.index(IndicesNames.PROTOCOL).id(freeProtocolHist.getPid()).document(protocol1));
+				esClient.index(i->i.index(IndicesNames.PROTOCOL).id(protocolHist.getPid()).document(protocol1));
 				isValid = true;
 			}else {
 				isValid = false;
@@ -510,7 +510,7 @@ public class ConstructParser {
 			
 		case "stop":
 			
-			protocol = EsTools.getById(esClient, IndicesNames.PROTOCOL, freeProtocolHist.getPid(), Protocol.class);
+			protocol = EsTools.getById(esClient, IndicesNames.PROTOCOL, protocolHist.getPid(), Protocol.class);
 			
 			if(protocol ==null) {
 				isValid = false;
@@ -522,7 +522,7 @@ public class ConstructParser {
 				break;
 			}
 			
-			if(! protocol.getOwner().equals(freeProtocolHist.getSigner())) {
+			if(! protocol.getOwner().equals(protocolHist.getSigner())) {
 				isValid = false;
 				break;
 			}
@@ -530,10 +530,10 @@ public class ConstructParser {
 			if(protocol.isActive()) {
 				Protocol protocol1 = protocol;
 				protocol1.setActive(false);
-				protocol1.setLastTxId(freeProtocolHist.getTxId());
-				protocol1.setLastTime(freeProtocolHist.getTime());
-				protocol1.setLastHeight(freeProtocolHist.getHeight());
-				esClient.index(i->i.index(IndicesNames.PROTOCOL).id(freeProtocolHist.getPid()).document(protocol1));
+				protocol1.setLastTxId(protocolHist.getTxId());
+				protocol1.setLastTime(protocolHist.getTime());
+				protocol1.setLastHeight(protocolHist.getHeight());
+				esClient.index(i->i.index(IndicesNames.PROTOCOL).id(protocolHist.getPid()).document(protocol1));
 				isValid = true;
 			}else isValid = false;
 
@@ -541,7 +541,7 @@ public class ConstructParser {
 			
 		case "recover":
 			
-			protocol = EsTools.getById(esClient, IndicesNames.PROTOCOL, freeProtocolHist.getPid(), Protocol.class);
+			protocol = EsTools.getById(esClient, IndicesNames.PROTOCOL, protocolHist.getPid(), Protocol.class);
 			
 			if(protocol ==null) {
 				isValid = false;
@@ -553,7 +553,7 @@ public class ConstructParser {
 				break;
 			}
 			
-			if(! protocol.getOwner().equals(freeProtocolHist.getSigner())) {
+			if(! protocol.getOwner().equals(protocolHist.getSigner())) {
 				isValid = false;
 				break;
 			}
@@ -561,15 +561,15 @@ public class ConstructParser {
 			if(!protocol.isActive()) {
 				Protocol protocol1 = protocol;
 				protocol1.setActive(true);
-				protocol1.setLastTxId(freeProtocolHist.getTxId());
-				protocol1.setLastTime(freeProtocolHist.getTime());
-				protocol1.setLastHeight(freeProtocolHist.getHeight());
-				esClient.index(i->i.index(IndicesNames.PROTOCOL).id(freeProtocolHist.getPid()).document(protocol1));
+				protocol1.setLastTxId(protocolHist.getTxId());
+				protocol1.setLastTime(protocolHist.getTime());
+				protocol1.setLastHeight(protocolHist.getHeight());
+				esClient.index(i->i.index(IndicesNames.PROTOCOL).id(protocolHist.getPid()).document(protocol1));
 				isValid = true;
 			}else isValid = false;
 			break;	
 		case "update":	
-			protocol = EsTools.getById(esClient, IndicesNames.PROTOCOL, freeProtocolHist.getPid(), Protocol.class);
+			protocol = EsTools.getById(esClient, IndicesNames.PROTOCOL, protocolHist.getPid(), Protocol.class);
 			
 			if(protocol ==null) {
 				isValid = false;
@@ -581,7 +581,7 @@ public class ConstructParser {
 				break;
 			}
 			
-			if(! protocol.getOwner().equals(freeProtocolHist.getSigner())) {
+			if(! protocol.getOwner().equals(protocolHist.getSigner())) {
 				isValid = false;
 				break;
 			}
@@ -591,32 +591,32 @@ public class ConstructParser {
 				break;
 			}
 			
-			protocol.setType(freeProtocolHist.getType());
-			protocol.setSn(freeProtocolHist.getSn());
-			protocol.setVer(freeProtocolHist.getVer());
-			protocol.setDid(freeProtocolHist.getDid());
-			protocol.setName(freeProtocolHist.getName());
+			protocol.setType(protocolHist.getType());
+			protocol.setSn(protocolHist.getSn());
+			protocol.setVer(protocolHist.getVer());
+			protocol.setDid(protocolHist.getDid());
+			protocol.setName(protocolHist.getName());
 			
-			protocol.setLang(freeProtocolHist.getLang());
-			protocol.setDesc(freeProtocolHist.getDesc());
-			protocol.setPrePid(freeProtocolHist.getPrePid());
-			protocol.setFileUrls(freeProtocolHist.getFileUrls());
+			protocol.setLang(protocolHist.getLang());
+			protocol.setDesc(protocolHist.getDesc());
+			protocol.setPrePid(protocolHist.getPrePid());
+			protocol.setFileUrls(protocolHist.getFileUrls());
 			
-			protocol.setTitle(freeProtocolHist.getType()+freeProtocolHist.getSn()+"V"+freeProtocolHist.getVer()+"_"+freeProtocolHist.getName()+"("+freeProtocolHist.getLang()+")");
+			protocol.setTitle(protocolHist.getType()+protocolHist.getSn()+"V"+protocolHist.getVer()+"_"+protocolHist.getName()+"("+protocolHist.getLang()+")");
 			
-			protocol.setLastTxId(freeProtocolHist.getTxId());
-			protocol.setLastTime(freeProtocolHist.getTime());
-			protocol.setLastHeight(freeProtocolHist.getHeight());
+			protocol.setLastTxId(protocolHist.getTxId());
+			protocol.setLastTime(protocolHist.getTime());
+			protocol.setLastHeight(protocolHist.getHeight());
 			
 			Protocol protocol2 = protocol;
 			
-			esClient.index(i->i.index(IndicesNames.PROTOCOL).id(freeProtocolHist.getPid()).document(protocol2));
+			esClient.index(i->i.index(IndicesNames.PROTOCOL).id(protocolHist.getPid()).document(protocol2));
 			isValid = true;
 			break;
 		
 		case "close":	
 			
-			protocol = EsTools.getById(esClient, IndicesNames.PROTOCOL, freeProtocolHist.getPid(), Protocol.class);
+			protocol = EsTools.getById(esClient, IndicesNames.PROTOCOL, protocolHist.getPid(), Protocol.class);
 			
 			if(protocol ==null) {
 				isValid = false;
@@ -628,10 +628,10 @@ public class ConstructParser {
 				break;
 			}
 			
-			if(! protocol.getOwner().equals(freeProtocolHist.getSigner())) {
-				Cid resultCid = EsTools.getById(esClient, IndicesNames.CID, freeProtocolHist.getSigner(), Cid.class);
+			if(! protocol.getOwner().equals(protocolHist.getSigner())) {
+				Cid resultCid = EsTools.getById(esClient, IndicesNames.CID, protocolHist.getSigner(), Cid.class);
 				if(resultCid.getMaster()!=null) {
-					if(! resultCid.getMaster().equals(freeProtocolHist.getSigner())) {
+					if(! resultCid.getMaster().equals(protocolHist.getSigner())) {
 					isValid = false;
 					break;
 					}
@@ -645,37 +645,37 @@ public class ConstructParser {
 			Protocol protocol1 = protocol;
 			protocol1.setClosed(true);
 			protocol1.setActive(false);
-			protocol1.setLastTxId(freeProtocolHist.getTxId());
-			protocol1.setLastTime(freeProtocolHist.getTime());
-			protocol1.setLastHeight(freeProtocolHist.getHeight());
-			esClient.index(i->i.index(IndicesNames.PROTOCOL).id(freeProtocolHist.getPid()).document(protocol1));
+			protocol1.setLastTxId(protocolHist.getTxId());
+			protocol1.setLastTime(protocolHist.getTime());
+			protocol1.setLastHeight(protocolHist.getHeight());
+			esClient.index(i->i.index(IndicesNames.PROTOCOL).id(protocolHist.getPid()).document(protocol1));
 			isValid = true;
 			break;
 		case "rate":
-			protocol = EsTools.getById(esClient, IndicesNames.PROTOCOL, freeProtocolHist.getPid(), Protocol.class);
+			protocol = EsTools.getById(esClient, IndicesNames.PROTOCOL, protocolHist.getPid(), Protocol.class);
 			if(protocol ==null) {
 				isValid = false;
 				break;
 			}
-			if(protocol.getOwner().equals(freeProtocolHist.getSigner())) {
+			if(protocol.getOwner().equals(protocolHist.getSigner())) {
 				isValid = false;
 				break;
 			}
-			if(protocol.gettCdd()+freeProtocolHist.getCdd()==0) {
+			if(protocol.gettCdd()+protocolHist.getCdd()==0) {
 				protocol.settRate(0);
 			}else {
 				protocol.settRate(
-						(protocol.gettRate()* protocol.gettCdd()+freeProtocolHist.getRate()*freeProtocolHist.getCdd())
-						/(protocol.gettCdd()+freeProtocolHist.getCdd())
+						(protocol.gettRate()* protocol.gettCdd()+protocolHist.getRate()*protocolHist.getCdd())
+						/(protocol.gettCdd()+protocolHist.getCdd())
 						);
 			}
-			protocol.settCdd(protocol.gettCdd()+freeProtocolHist.getCdd());
-			protocol.setLastTxId(freeProtocolHist.getTxId());
-			protocol.setLastTime(freeProtocolHist.getTime());
-			protocol.setLastHeight(freeProtocolHist.getHeight());
+			protocol.settCdd(protocol.gettCdd()+protocolHist.getCdd());
+			protocol.setLastTxId(protocolHist.getTxId());
+			protocol.setLastTime(protocolHist.getTime());
+			protocol.setLastHeight(protocolHist.getHeight());
 			
 			Protocol protocol3 = protocol;
-			esClient.index(i->i.index(IndicesNames.PROTOCOL).id(freeProtocolHist.getPid()).document(protocol3));
+			esClient.index(i->i.index(IndicesNames.PROTOCOL).id(protocolHist.getPid()).document(protocol3));
 			isValid = true;
 			
 			TimeUnit.SECONDS.sleep(10);

@@ -3,13 +3,13 @@ package startFCH;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import config.ConfigFCH;
 import constants.Constants;
+import esTools.EsTools;
 import esTools.NewEsClient;
 import fchClass.Block;
 import fileTools.OpReFileTools;
 import menu.Menu;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import parser.ChainParser;
 import parser.Preparer;
 
 import java.io.BufferedReader;
@@ -143,9 +143,9 @@ public class StartFCH {
         String path;
         Block bestBlock = null;
         try {
-            bestBlock = ChainParser.getBestBlock(esClient);
+            bestBlock = EsTools.getBestBlock(esClient);
         } catch (IOException e) {
-            restart(esClient,configFCH);
+            log.error("Get bestHeight wrong.",e);
         }
         bestHeight = bestBlock.getHeight();
 

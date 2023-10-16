@@ -54,7 +54,7 @@ public class Avatars extends HttpServlet {
         String avatarBasePath;
         String avatarPngPath;
         try(Jedis jedis = Initiator.jedisPool.getResource()) {
-            avatarBasePath = jedis.hget(CONFIG, Strings.AVATAR_BASE_PATH);
+            avatarBasePath = jedis.hget(CONFIG, Strings.AVATAR_ELEMENTS_PATH);
             avatarPngPath = jedis.hget(CONFIG, Strings.AVATAR_PNG_PATH);
         }
         if(!avatarPngPath.endsWith("/"))avatarPngPath  = avatarPngPath+"/";

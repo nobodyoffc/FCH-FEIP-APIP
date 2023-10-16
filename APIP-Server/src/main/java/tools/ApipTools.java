@@ -1,5 +1,6 @@
 package tools;
 
+import apipClass.*;
 import constants.ApiNames;
 import initial.Initiator;
 import redis.clients.jedis.Jedis;
@@ -33,4 +34,49 @@ public class ApipTools {
         }
     }
 
+    public static Fcdsl addFilterTermsToFcdsl(DataRequestBody requestBody, String field, String value) {
+        Fcdsl fcdsl;
+        if(requestBody.getFcdsl()!=null) {
+            fcdsl = requestBody.getFcdsl();
+        }else fcdsl= new Fcdsl();
+
+        Filter filter;
+        if(fcdsl.getFilter()!=null) {
+            filter = fcdsl.getFilter();
+        }else filter=new Filter();
+
+        Terms terms;
+        if(filter.getTerms()!=null) {
+            terms = filter.getTerms();
+        }else terms=new Terms();
+
+        terms.setFields(new String[]{field});
+        terms.setValues(new String[]{value});
+        filter.setTerms(terms);
+        fcdsl.setFilter(filter);
+        return fcdsl;
+    }
+
+    public static Fcdsl addExceptTermsToFcdsl(DataRequestBody requestBody, String field, String value) {
+        Fcdsl fcdsl;
+        if(requestBody.getFcdsl()!=null) {
+            fcdsl = requestBody.getFcdsl();
+        }else fcdsl= new Fcdsl();
+
+        Except except;
+        if(fcdsl.getExcept()!=null) {
+            except = fcdsl.getExcept();
+        }else except=new Except();
+
+        Terms terms;
+        if(except.getTerms()!=null) {
+            terms = except.getTerms();
+        }else terms=new Terms();
+
+        terms.setFields(new String[]{field});
+        terms.setValues(new String[]{value});
+        except.setTerms(terms);
+        fcdsl.setExcept(except);
+        return fcdsl;
+    }
 }

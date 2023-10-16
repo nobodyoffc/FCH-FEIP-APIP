@@ -2,6 +2,7 @@ package fcTools;
 
 
 import constants.Constants;
+import cryptoTools.Hash;
 import cryptoTools.SHA;
 import eccAes256K1P7.EccAes256K1P7;
 import eccAes256K1P7.EccAesData;
@@ -13,7 +14,6 @@ import menu.Inputer;
 import menu.Menu;
 import org.bitcoinj.core.ECKey;
 import org.bitcoinj.params.MainNetParams;
-import org.bouncycastle.crypto.generators.BaseKDFBytesGenerator;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -649,12 +649,16 @@ public class StartTools {
         }
         Map<String, String> addrMap = KeyTools.pubKeyToAddresses(pubKey);
 
-
         System.out.println("----");
 
         System.out.println("FCH"+": "+ addrMap.get("fchAddr"));
         System.out.println("BTC"+": "+ addrMap.get("btcAddr"));
         System.out.println("ETH"+": "+ addrMap.get("ethAddr"));
+        System.out.println("BCH"+": "+ addrMap.get("bchAddr"));
+        System.out.println("DOGE"+": "+ addrMap.get("dogeAddr"));
+        System.out.println("TRX"+": "+ addrMap.get("trxAddr"));
+        System.out.println("LTC"+": "+ addrMap.get("ltcAddr"));
+
         
         System.out.println("----");
         Menu.anyKeyToContinue(br);

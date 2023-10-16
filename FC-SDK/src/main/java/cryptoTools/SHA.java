@@ -2,7 +2,6 @@ package cryptoTools;
 
 import com.google.common.hash.Hashing;
 import com.xwc1125.chain5j.utils.Numeric;
-import fcTools.Hash;
 import javaTools.BytesTools;
 import org.bouncycastle.crypto.digests.RIPEMD160Digest;
 import org.bouncycastle.crypto.digests.SHA512Digest;
@@ -153,6 +152,15 @@ public class SHA {
 
     }
 
+    public static byte[] getSign(byte[] text,byte[] symKey) {
+        byte[] bytes = BytesTools.bytesMerger(text,symKey);
+        return Hash.Sha256x2(bytes);
+    }
+    public static String getSign(String text,byte[] symKey) {
+        byte[] textBytes = text.getBytes(StandardCharsets.UTF_8);
+        byte[] signBytes = getSign(textBytes,symKey);
+        return BytesTools.bytesToHexStringBE(signBytes);
+    }
     public static String getSign(String symKey, String text) {
         byte[] textBytes = text.getBytes(StandardCharsets.UTF_8);
         byte[] keyBytes = BytesTools.hexToByteArray(symKey);

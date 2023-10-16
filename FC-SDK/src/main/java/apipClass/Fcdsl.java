@@ -17,6 +17,19 @@ public class Fcdsl{
     private Object other;
 
 
+    public void setQueryTerms(String field, String value) {
+        Query query = new Query();
+        Terms terms;
+        if(query.getTerms()!=null) {
+            terms = query.getTerms();
+        }else terms=new Terms();
+
+        terms.setFields(new String[]{field});
+        terms.setValues(new String[]{value});
+        query.setTerms(terms);
+        this.query=query;
+    }
+
     public void setFilterTerms(String field, String value) {
         Filter filter = new Filter();
         Terms terms;
@@ -47,7 +60,7 @@ public class Fcdsl{
         return other;
     }
 
-    public void setOther(String other) {
+    public void setOther(Object other) {
         this.other = other;
     }
 

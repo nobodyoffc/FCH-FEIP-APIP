@@ -1,8 +1,8 @@
 package reward;
 
-import FipaClass.Affair;
-import FipaClass.DataSignTx;
-import FipaClass.Op;
+import fipaClass.Affair;
+import fipaClass.DataSignTx;
+import fipaClass.Op;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import com.google.gson.Gson;
 import fcTools.ParseTools;
