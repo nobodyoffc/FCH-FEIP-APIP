@@ -104,7 +104,7 @@ public class Replier {
                     sendToList.add(sendTo1);
                     dataForOffLineTx.setSendToList(sendToList);
 
-                    String offLingTxJson = CryptoSigner.makeRawTxForCs(dataForOffLineTx, cashListReturn.getCashList());
+                    String offLingTxJson = CryptoSign.makeRawTxForCs(dataForOffLineTx, cashListReturn.getCashList());
                     d.put(Strings.UNSIGNED_TX_FOR_CS, offLingTxJson);
                 }else{
                     d.put(Strings.UNSIGNED_TX_FOR_CS,cashListReturn.getMsg());

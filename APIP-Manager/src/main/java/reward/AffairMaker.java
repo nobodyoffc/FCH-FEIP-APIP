@@ -95,7 +95,7 @@ public class AffairMaker {
         dataForOffLineTx.setCd(0);
         dataForOffLineTx.setMsg(msg);
 
-        String rawTxStr = CryptoSigner.makeRawTxForCs(dataForOffLineTx,cashList);
+        String rawTxStr = CryptoSign.makeRawTxForCs(dataForOffLineTx,cashList);
 
         dataSignTx.setUnsignedTxCs(rawTxStr);
         dataSignTx.setAlg(ALG_SIGN_TX_BY_CRYPTO_SIGN);

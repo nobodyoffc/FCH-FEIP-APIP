@@ -5,7 +5,7 @@ import apipClass.DataRequestBody;
 import constants.ApiNames;
 import constants.ReplyInfo;
 import fchClass.Cash;
-import walletTools.CryptoSigner;
+import walletTools.CryptoSign;
 import walletTools.DataForOffLineTx;
 import walletTools.SendTo;
 import initial.Initiator;
@@ -22,7 +22,7 @@ import java.io.PrintWriter;
 import java.util.List;
 
 import static constants.Constants.*;
-import static walletTools.CryptoSigner.parseDataForOffLineTxFromOther;
+import static walletTools.CryptoSign.parseDataForOffLineTxFromOther;
 
 
 @WebServlet(ApiNames.ToolsPath + ApiNames.OffLineTxByCdAPI)
@@ -112,7 +112,7 @@ public class OffLineTxByCd extends HttpServlet {
             return;
         }
 
-        String rawTxForCs = CryptoSigner.makeRawTxForCs(dataForSignInCs,meetList);
+        String rawTxForCs = CryptoSign.makeRawTxForCs(dataForSignInCs,meetList);
 
         replier.setData(rawTxForCs);
         replier.setGot(1);

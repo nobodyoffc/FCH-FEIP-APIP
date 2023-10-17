@@ -222,7 +222,7 @@ public class WalletTools {
             cashList.add(cash);
         }
 
-        //checkUnconfirmed(addr,cashList);
+        checkUnconfirmed(addr,cashList);
 
         CashToInputsResult inputResult = cashListToInputs(cashList);
 

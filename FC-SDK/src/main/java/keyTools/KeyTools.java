@@ -739,8 +739,15 @@ public class KeyTools {
             return null;
         }
         // Keys that have compressed public components have an extra 1 byte on the end in dumped form.
-        byte[] bytes34 = new byte[34];
         byte[] bytes32 = BytesTools.hexToByteArray(priKey32);
+        byte[] bytes38 = priKey32To38Compressed(bytes32);
+
+        priKey26 = Base58.encode(bytes38);
+        return priKey26;
+    }
+
+    private static byte[] priKey32To38Compressed(byte[] bytes32) {
+        byte[] bytes34 = new byte[34];
         bytes34[0]= (byte) 0x80;
         System.arraycopy(bytes32, 0, bytes34, 1, 32);
         bytes34[33] = 1;
@@ -753,9 +760,7 @@ public class KeyTools {
 
         System.arraycopy(bytes34, 0, bytes38, 0, 34);
         System.arraycopy(hash4, 0, bytes38, 34, 4);
-
-        priKey26 = Base58.encode(bytes38);
-        return priKey26;
+        return bytes38;
     }
 
     public static String priKey32To37(String priKey32) {

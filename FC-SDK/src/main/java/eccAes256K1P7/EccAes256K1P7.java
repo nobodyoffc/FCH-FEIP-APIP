@@ -262,7 +262,7 @@ public class EccAes256K1P7 {
             default -> eccAesData.setError("Wrong EccAesType type"+eccAesData.getType());
         }
         if(eccAesData.getError() !=null){
-            return eccAesData.getError();
+            return "Error:"+eccAesData.getError();
         }
         decrypt(eccAesData);
         return eccAesData.getMsg();
