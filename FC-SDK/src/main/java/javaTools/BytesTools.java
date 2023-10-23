@@ -36,30 +36,24 @@ public class BytesTools {
     public static byte[] charArrayToByteArray(char[] chars,Charset charset) {
         CharBuffer charBuffer = CharBuffer.wrap(chars);
         ByteBuffer byteBuffer = charset.encode(charBuffer);
-        byte[] bytes = Arrays.copyOfRange(byteBuffer.array(),
+        return Arrays.copyOfRange(byteBuffer.array(),
                 byteBuffer.position(), byteBuffer.limit());
-        Arrays.fill(charBuffer.array(), '\0'); // Clear sensitive data
-        return bytes;
     }
 
     public static char[] byteArrayToUtf8CharArray(byte[] bytes) {
         Charset charset = StandardCharsets.UTF_8;
         ByteBuffer byteBuffer = ByteBuffer.wrap(bytes);
         CharBuffer charBuffer = charset.decode(byteBuffer);
-        char[] chars = Arrays.copyOfRange(charBuffer.array(),
+        return Arrays.copyOfRange(charBuffer.array(),
                 charBuffer.position(), charBuffer.limit());
-        Arrays.fill(byteBuffer.array(), (byte) 0); // Clear sensitive data
-        return chars;
     }
 
     public static byte[] utf8CharArrayToByteArray(char[] chars) {
         Charset charset = StandardCharsets.UTF_8;
         CharBuffer charBuffer = CharBuffer.wrap(chars);
         ByteBuffer byteBuffer = charset.encode(charBuffer);
-        byte[] bytes = Arrays.copyOfRange(byteBuffer.array(),
+        return Arrays.copyOfRange(byteBuffer.array(),
                 byteBuffer.position(), byteBuffer.limit());
-        Arrays.fill(charBuffer.array(), '\0'); // Clear sensitive data
-        return bytes;
     }
 
     public static byte[] hexCharArrayToByteArray(char[] hex) {

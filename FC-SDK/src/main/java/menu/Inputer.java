@@ -14,20 +14,38 @@ import java.io.Console;
 
 public class Inputer {
 
-public static byte[] inputPassword() {
-    Console console = System.console();
-    if (console == null) {
-        System.out.println("Couldn't get Console instance. Maybe you're running this from within an IDE, which doesn't support Console.");
-        return null;
+    public static byte[] inputPassword() {
+        char[] passwordChars = inputPasswordChars();
+        if (passwordChars == null) return null;
+        byte[] passwordBytes = BytesTools.utf8CharArrayToByteArray(passwordChars);
+        Arrays.fill(passwordChars, (char) 0);
+        return passwordBytes;
     }
 
-    char[] passwordChars = console.readPassword("Enter your password: ");
-    byte[] passwordBytes = new String(passwordChars).getBytes();
-    // Clear the password characters immediately after using them for security reasons.
-    Arrays.fill(passwordChars, (char) 0);
-    return passwordBytes;
-}
+    private static char[] inputPasswordChars() {
+        Console console = System.console();
+        if (console == null) {
+            System.out.println("Couldn't get Console instance. Maybe you're running this from within an IDE, which doesn't support Console.");
+            return null;
+        }
+        return console.readPassword("Enter your password: ");
+    }
 
+    public static char[] inputPassword(BufferedReader br, String ask)  {
+        System.out.println(ask);
+        char[] input = new char[64];
+        int num = 0;
+        try {
+            num = br.read(input);
+        } catch (IOException e) {
+            System.out.println("BufferReader wrong.");
+            return null;
+        }
+        if(num==0)return null;
+        char[] password = new char[num-1];
+        System.arraycopy(input, 0, password, 0, num-1);
+        return password;
+    }
 
     public static String inputString(BufferedReader br) {
         String input = null;
@@ -289,22 +307,6 @@ public static byte[] inputPassword() {
             throw new RuntimeException(e);
         }
         return symKey;
-    }
-
-    public static char[] inputPassword(BufferedReader br, String ask)  {
-        System.out.println(ask);
-        char[] input = new char[64];
-        int num = 0;
-        try {
-            num = br.read(input);
-        } catch (IOException e) {
-            System.out.println("BufferReader wrong.");
-            return null;
-        }
-        if(num==0)return null;
-        char[] password = new char[num-1];
-        System.arraycopy(input, 0, password, 0, num-1);
-        return password;
     }
 
     public static String inputMsg(BufferedReader br) {

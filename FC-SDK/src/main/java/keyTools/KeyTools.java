@@ -290,7 +290,7 @@ public class KeyTools {
         return Base58.encode(addrRaw);
     }
 
-    public static String hash160ToLteAddr(String hash160Hex) {
+    public static String hash160ToLtcAddr(String hash160Hex) {
 
         byte[] b = HexFormat.of().parseHex(hash160Hex);
 
@@ -643,6 +643,13 @@ public class KeyTools {
         byte[] hash4;
         int len = priKey.length;
 
+        if(len==52){
+            char[] priKeyUtf8Chars = BytesTools.byteArrayToUtf8CharArray(priKey);
+            BytesTools.clearByteArray(priKey);
+            priKey = fcTools.Base58.base58CharArrayToByteArray(priKeyUtf8Chars);
+            len = priKey.length;
+        }
+
         switch (len) {
             case 32 -> priKey32Bytes = priKey;
             case 38 -> {
@@ -795,6 +802,11 @@ public class KeyTools {
         return priKey37;
     }
 
+    public static String priKeyToFid(byte[] priKey) {
+        byte[] priKey32 = getPriKey32(priKey);
+        byte[] pubKey = priKeyToPubKey(priKey32);
+        return pubKeyToFchAddr(pubKey);
+    }
 }
 
 

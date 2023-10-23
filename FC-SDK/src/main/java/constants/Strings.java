@@ -105,4 +105,9 @@ public class Strings {
     public static final String SUM = "sum";
     public static final String SPEND_CASHES = "spendCashes";
     public static final String NEW_CASHES = "newCashes";
+    public static final String ACCEPTER = "accepter";
+    public static final String REFRESH = "refresh";
+    public static final String BUY = "buy";
+    public static final String IGNORE = "ignore";
+    public static final String INIT_SYM_KEY_CIPHER = "initSymKeyCipher";
 }

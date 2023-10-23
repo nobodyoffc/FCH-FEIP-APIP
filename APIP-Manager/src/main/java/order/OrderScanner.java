@@ -24,8 +24,6 @@ import service.Params;
 import startAPIP.StartAPIP;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -277,24 +275,22 @@ private void waitNewOrder() {
                 String goodOp = ParseTools.strToJson(opReturn.getOpReturn());
                 order.OrderOpReturn orderOpreturn = gson.fromJson(goodOp, OrderOpReturn.class);
 
-                if(orderOpreturn == null){
-                    log.debug("Invalid order. ID:"+opReturn.getTxId());
+                if(orderOpreturn != null && orderOpreturn.getType().equals("APIP")
+                        && orderOpreturn.getSn().equals("0")
+                        && orderOpreturn.getData().getOp().equals(Strings.IGNORE)){
                     continue;
                 }
-
-                if (orderOpreturn.getType().equals("APIP")
+                OrderInfo orderInfo = new OrderInfo();
+                orderInfo.setId(opReturn.getTxId());
+                if (orderOpreturn != null
+                        && orderOpreturn.getType().equals("APIP")
                         && orderOpreturn.getSn().equals("0")
-                        && orderOpreturn.getData().getOp().equals("buy")
+                        && orderOpreturn.getData().getOp().equals(Strings.BUY)
                         && orderOpreturn.getData().getSid().equals(this.service.getSid())
                 ) {
-                    OrderInfo orderInfo = new OrderInfo();
-                    orderInfo.setId(opReturn.getTxId());
                     orderInfo.setVia(orderOpreturn.getData().getVia());
-                    validOrderInfoMap.put(opReturn.getTxId(), orderInfo);
-                }else{
-                    //TODO
-                    log.debug("Invalid order OpReturn. ID:"+opReturn.getTxId());
                 }
+                validOrderInfoMap.put(opReturn.getTxId(), orderInfo);
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new RuntimeException(e);

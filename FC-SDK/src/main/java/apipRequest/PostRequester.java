@@ -1,6 +1,6 @@
 package apipRequest;
 
-import apipClass.ApipDataRequestParams;
+import apipClass.InitApipParams;
 import apipClass.DataRequestBody;
 import apipClass.ResponseBody;
 import apipClass.Fcdsl;
@@ -57,6 +57,7 @@ public class PostRequester {
         headerMap.put(headerSessionNameKey,headerSessionNameValue);
 
         System.out.println(requestPost(requestUrl, headerMap,requestBody));
+        System.out.println(requestPostCheck(requestUrl, headerMap,requestBody,sessionKeyBytes));
     }
 
     public static String requestPost(String requestUrl, HashMap<String, String> headerMap, String requestBody) {
@@ -84,7 +85,45 @@ public class PostRequester {
         return null;
     }
 
-    public static List<Service> searchService(ApipDataRequestParams apipDataRequestParams, byte[]sessionKey,String owner, String type,boolean onlyActive,boolean ignoreClosed) {
+    public static String requestPostCheck(String requestUrl, HashMap<String, String> headerMap, String requestBody,byte[]sessionKey) {
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            HttpPost httpPost = new HttpPost(requestUrl);
+            if(headerMap!=null) {
+                for (String key : headerMap.keySet()) {
+                    httpPost.setHeader(key, headerMap.get(key));
+                }
+            }
+            httpPost.setHeader("Content-Type", "application/json");
+
+            StringEntity entity = new StringEntity(requestBody);
+            httpPost.setEntity(entity);
+
+            HttpResponse response = httpClient.execute(httpPost);
+            String sign = response.getHeaders(UpStrings.SIGN)[0].getValue();
+
+            HttpEntity responseEntity = response.getEntity();
+            byte[] responseBody = EntityUtils.toByteArray(responseEntity );
+
+            if(!DataRequestAPIP.isGoodSign(responseBody,sign,sessionKey)){
+                System.out.println("Bad sign of the data from APIP.");
+                return null;
+            }
+
+            String code = response.getHeaders(UpStrings.CODE)[0].getValue();
+
+            if (code.equals("0")) {
+                return EntityUtils.toString(responseEntity);
+            }
+
+            System.out.println(EntityUtils.toString(responseEntity));
+            return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static List<Service> searchService(InitApipParams apipDataRequestParams, byte[]sessionKey, String owner, String type, boolean onlyActive, boolean ignoreClosed) {
         DataRequestBody dataRequestBody = new DataRequestBody();
         ResponseBody dataResponseBody;
         List<Service> serviceList = null;

@@ -81,7 +81,7 @@ data:
     "name": "Homepages",
     "data":{
         "op": "register",
-        "homepages": ["https://cid.cash","127.0.0.1:8080"]
+        "homepages": ["https://cid.cash/cid.html?address=FEk41Kqjar45fLDriztUDTUkdki7mmcjWK"]
     }
 }
 ```

@@ -53,7 +53,7 @@ import static constants.Strings.*;
  * 1. FID = 用户签名中的fid、addr或address项的值
  *    Sign = 用户签名中的sign或signature项的值
  * 2. Request body：严格等于展示给用户签名的信息
- * 3. 加入mode项，值为renew时，用新sessionKey取代旧的，否则返回sessionKey。
+ * 3. 加入mode项，值为clear时，用新sessionKey取代旧的，否则返回sessionKey。
  */
 
 @WebServlet(ApiNames.APIP0V1Path + SignInAPI)
@@ -91,7 +91,7 @@ public class SignInAPI extends HttpServlet {
         String mode = signInCheckResult.getSignInRequestBody().getMode();
 
         try(Jedis jedis = Initiator.jedisPool.getResource()) {
-            if ((!jedis.hexists(Initiator.serviceName+"_"+Strings.FID_SESSION_NAME, fid)) || "renew".equals(mode)) {
+            if ((!jedis.hexists(Initiator.serviceName+"_"+Strings.FID_SESSION_NAME, fid)) || Strings.REFRESH.equals(mode)) {
                 try {
                     signInReplyData = new Session().makeSession(jedis, fid);
                 } catch (Exception e) {

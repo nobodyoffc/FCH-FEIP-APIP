@@ -106,8 +106,6 @@ public class SignInAPIP {
     }
 
     public static SignInApipReplyData signInEcc(String urlHead, String via, byte[]priKey,String mode){
-//TODO
-        System.out.println("PriKey:"+HexFormat.of().formatHex(priKey));
 
         SignInRequestBody signInRequestBody = new SignInRequestBody();
         ResponseBody responseBody;

@@ -46,10 +46,6 @@ public class RequestChecker {
     private byte[] requestBodyBytes;
     private transient ServerParamsInRedis paramsInRedis;
 
-    public ServerParamsInRedis getParamsInRedis() {
-        return paramsInRedis;
-    }
-
     public RequestChecker(HttpServletRequest request, HttpServletResponse response, Replier replier) throws IOException {
         this.replier = replier;
         this.request = request;
@@ -282,8 +278,7 @@ public class RequestChecker {
             return null;
         }
         DataRequestBody dataRequestBody = getDataRequestBody(requestBodyBytes);
-
-        assert dataRequestBody != null;
+        if(dataRequestBody==null)return null;
 
         replier.setNonce(dataRequestBody.getNonce());
 
@@ -374,7 +369,6 @@ public class RequestChecker {
             dataRequestBody = gson.fromJson(requestDataJson, DataRequestBody.class);
         }catch(Exception e){
             response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1013BadRequest));
-            replier.setData(e);
             writer.write(replier.reply1013BadRequst(fid));
             return null;
         }
@@ -417,5 +411,8 @@ public class RequestChecker {
 
     public void setPubKey(String pubKey) {
         this.pubKey = pubKey;
+    }
+    public ServerParamsInRedis getParamsInRedis() {
+        return paramsInRedis;
     }
 }
