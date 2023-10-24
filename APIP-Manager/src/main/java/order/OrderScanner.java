@@ -178,8 +178,6 @@ private void waitNewOrder() {
                 ArrayList<String> txidList = getTxIdList(orderList);
                 validOpReturnOrderInfoMap = getValidOpReturnOrderInfoMap(txidList);
 
-                if (validOpReturnOrderInfoMap.size() == 0) return;
-
                 for (Order order : orderList) {
                     OrderInfo orderInfo = validOpReturnOrderInfoMap.get(order.getTxId());
                     if (orderInfo == null) continue;
@@ -187,6 +185,7 @@ private void waitNewOrder() {
                     if (via != null) order.setVia(via);
                 }
             }
+
             ArrayList<String> orderIdList = new ArrayList<>();
             for (Order order : orderList) {
                 String payer = order.getFromFid();

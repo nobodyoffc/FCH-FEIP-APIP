@@ -4,17 +4,13 @@ import eccAes256K1P7.EccAes256K1P7;
 import eccAes256K1P7.EccAesData;
 import eccAes256K1P7.EccAesDataByte;
 import eccAes256K1P7.EccAesType;
-import fcTools.Base58;
 import javaTools.BytesTools;
 import keyTools.KeyTools;
 import menu.Inputer;
-import org.bouncycastle.util.encoders.Hex;
 
 import java.io.BufferedReader;
-import java.util.Arrays;
-import java.util.HexFormat;
 
-public class InitApipParams {
+public class ApipParamsForUser {
     private String urlHead;
     private String apipBuyer;
     private String apipBuyerPriKeyCipher;

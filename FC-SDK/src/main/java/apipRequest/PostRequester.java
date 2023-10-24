@@ -1,6 +1,6 @@
 package apipRequest;
 
-import apipClass.InitApipParams;
+import apipClass.ApipParamsForUser;
 import apipClass.DataRequestBody;
 import apipClass.ResponseBody;
 import apipClass.Fcdsl;
@@ -123,7 +123,7 @@ public class PostRequester {
         }
     }
 
-    public static List<Service> searchService(InitApipParams apipDataRequestParams, byte[]sessionKey, String owner, String type, boolean onlyActive, boolean ignoreClosed) {
+    public static List<Service> searchService(ApipParamsForUser apipDataRequestParams, byte[]sessionKey, String owner, String type, boolean onlyActive, boolean ignoreClosed) {
         DataRequestBody dataRequestBody = new DataRequestBody();
         ResponseBody dataResponseBody;
         List<Service> serviceList = null;
