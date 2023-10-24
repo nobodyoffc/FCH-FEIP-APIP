@@ -1,4 +1,4 @@
-package apipClass;
+package apipRequest;
 
 import eccAes256K1P7.EccAes256K1P7;
 import eccAes256K1P7.EccAesData;

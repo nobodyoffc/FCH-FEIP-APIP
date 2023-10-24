@@ -1,6 +1,5 @@
 package apipRequest;
 
-import apipClass.ApipParamsForUser;
 import apipClass.DataRequestBody;
 import apipClass.ResponseBody;
 import apipClass.Fcdsl;
