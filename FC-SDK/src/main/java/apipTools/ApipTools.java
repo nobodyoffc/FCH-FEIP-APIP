@@ -1,13 +1,15 @@
-package tools;
+package apipTools;
 
 import apipClass.*;
-import constants.ApiNames;
-import initial.Initiator;
+import cryptoTools.SHA;
+import javaTools.BytesTools;
 import redis.clients.jedis.Jedis;
+
+import java.nio.charset.StandardCharsets;
+import java.util.HexFormat;
 
 import static constants.ApiNames.apiList;
 import static constants.ApiNames.freeApiList;
-import static constants.Constants.FchToSatoshi;
 import static constants.Strings.*;
 
 public class ApipTools {
@@ -78,5 +80,21 @@ public class ApipTools {
         except.setTerms(terms);
         fcdsl.setExcept(except);
         return fcdsl;
+    }
+
+    public static String getSessionKeySign(byte[] sessionKeyBytes, byte[] dataBytes) {
+        return HexFormat.of().formatHex(SHA.Sha256x2(BytesTools.bytesMerger(dataBytes, sessionKeyBytes)));
+    }
+
+    public static boolean isGoodSign(String requestBody, String sign, String symKey){
+        byte[] requestBodyBytes = requestBody.getBytes(StandardCharsets.UTF_8);
+        return isGoodSign(requestBodyBytes,sign,HexFormat.of().parseHex(symKey));
+    }
+
+    public static boolean isGoodSign(byte[] requestBodyBytes, String sign, byte[] symKey){
+        if(sign==null||requestBodyBytes==null)return false;
+        byte[] signBytes = BytesTools.bytesMerger(requestBodyBytes, symKey);
+        String doubleSha256Hash = HexFormat.of().formatHex(SHA.Sha256x2(signBytes));
+        return (sign.equals(doubleSha256Hash));
     }
 }

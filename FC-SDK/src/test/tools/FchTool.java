@@ -1,4 +1,4 @@
-package tools;
+package apipTools;
 
 import org.bitcoinj.core.*;
 import org.bitcoinj.crypto.SchnorrSignature;

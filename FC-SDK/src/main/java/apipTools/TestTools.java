@@ -1,4 +1,4 @@
-package tools;
+package apipTools;
 
 import apipClass.*;
 import com.google.gson.Gson;

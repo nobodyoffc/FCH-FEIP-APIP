@@ -152,18 +152,6 @@ public class ApipParamsForUser {
         System.out.println("SessionKeyCipher is: "+sessionKeyCipher);
     }
 
-    public String encryptKey(byte[] keyBytes, byte[] initSymKey) {
-        EccAes256K1P7 ecc = new EccAes256K1P7();
-
-        EccAesDataByte eccAesDataByte = new EccAesDataByte();
-        eccAesDataByte.setType(EccAesType.SymKey);
-        eccAesDataByte.setMsg(keyBytes);
-        eccAesDataByte.setSymKey(initSymKey);
-        ecc.encrypt(eccAesDataByte);
-        if(eccAesDataByte.getError()==null) return EccAesData.fromEccAesDataByte(eccAesDataByte).toJson();
-        return "Error:"+eccAesDataByte.getError();
-    }
-
     public byte[] decryptInitSessionKey(final byte[] initSymKey) {
         EccAes256K1P7 ecc = new EccAes256K1P7();
         EccAesDataByte eccAesDataByte = ecc.decrypt(sessionKeyCipher, initSymKey.clone());

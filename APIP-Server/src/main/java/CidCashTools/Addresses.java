@@ -3,11 +3,7 @@ package CidCashTools;
 import APIP0V1_OpenAPI.*;
 import apipClass.DataRequestBody;
 import constants.ApiNames;
-import constants.IndicesNames;
 import constants.ReplyInfo;
-import fcTools.ParseTools;
-import fchClass.Address;
-import co.elastic.clients.elasticsearch.core.GetResponse;
 import keyTools.KeyTools;
 
 import javax.servlet.ServletException;
@@ -19,8 +15,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
-
-import static initial.Initiator.esClient;
 
 @WebServlet(ApiNames.ToolsPath + ApiNames.AddressesAPI)
 public class Addresses extends HttpServlet {
@@ -77,17 +71,9 @@ public class Addresses extends HttpServlet {
             return;
         }
         replier.setData(addrMap);
-        replier.setGot(1);
-        replier.setTotal(1);
+        if (Replier.makeSingleReplier(response, replier, dataCheckResult, addr)) return;
 
-        response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code0Success));
-        String reply = replier.reply0Success(addr);
-        if(reply==null)return;
-        String sign = DataRequestHandler.symSign(reply,dataCheckResult.getSessionKey());
-        if(sign==null)return;
-        response.setHeader(ReplyInfo.SignInHeader,sign);
-
-        writer.write(reply);
+        writer.write(replier.reply0Success(addr));
     }
 
     private boolean isThisApiRequest(DataRequestBody requestBody) {

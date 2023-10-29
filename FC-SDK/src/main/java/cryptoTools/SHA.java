@@ -145,7 +145,7 @@ public class SHA {
         return out;
     }
 
-    public static byte[] stringMerge2Utf8(String strA, Charset charsetA, String strB, Charset charsetB) {
+    public static byte[] stringMergeToBytes(String strA, Charset charsetA, String strB, Charset charsetB) {
         byte[] a = strA.getBytes(charsetA);
         byte[] b = strB.getBytes(charsetB);
         return BytesTools.bytesMerger(a,b);

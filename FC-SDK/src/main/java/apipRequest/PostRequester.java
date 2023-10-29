@@ -1,8 +1,8 @@
 package apipRequest;
 
 import apipClass.DataRequestBody;
-import apipClass.ResponseBody;
 import apipClass.Fcdsl;
+import apipClass.ResponseBody;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import constants.ApiNames;
@@ -11,6 +11,7 @@ import constants.UpStrings;
 import cryptoTools.SHA;
 import feipClass.Service;
 import javaTools.BytesTools;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -19,15 +20,18 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.HexFormat;
 import java.util.List;
 
+import static apipTools.ApipTools.isGoodSign;
+
 public class PostRequester {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         String requestBody = "{"
                 + "\"url\": \"https://cid.cash/APIP/apip3/v1/cidInfoByIds\","
                 + "\"time\": 1688888076895,"
@@ -55,11 +59,62 @@ public class PostRequester {
         headerMap.put(headerSignKey,headerSignValue);
         headerMap.put(headerSessionNameKey,headerSessionNameValue);
 
-        System.out.println(requestPost(requestUrl, headerMap,requestBody));
-        System.out.println(requestPostCheck(requestUrl, headerMap,requestBody,sessionKeyBytes));
+        System.out.println("no check:"+ new String(postRequest(requestUrl, headerMap,requestBody).getEntity().getContent().readAllBytes()));
+
+        System.out.println("checked:"+new String(postRequestCheckSign(requestUrl, headerMap,requestBody,sessionKeyBytes).getEntity().getContent().readAllBytes()));
     }
 
+//    private static String getResponseBodyString(HttpResponse response) {
+//        String result;
+//        try {
+//            result = new String(response.getEntity().getContent().readAllBytes());
+//            return result;
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            return null;
+//        }
+//    }
+
+//    private static String getResponseBodyString(HttpResponse response) {
+//        try (InputStream in = response.getEntity().getContent()) {
+//            ByteArrayOutputStream result = new ByteArrayOutputStream();
+//            byte[] buffer = new byte[1024];
+//            int length;
+//            while ((length = in.read(buffer)) != -1) {
+//                result.write(buffer, 0, length);
+//            }
+//            return result.toString(StandardCharsets.UTF_8);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            return null;
+//        }
+//    }
     public static String requestPost(String requestUrl, HashMap<String, String> headerMap, String requestBody) {
+    try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+        HttpPost httpPost = new HttpPost(requestUrl);
+        if(headerMap!=null) {
+            for (String key : headerMap.keySet()) {
+                httpPost.setHeader(key, headerMap.get(key));
+            }
+        }
+        httpPost.setHeader("Content-Type", "application/json");
+
+        StringEntity entity = new StringEntity(requestBody);
+        httpPost.setEntity(entity);
+
+        HttpResponse response = httpClient.execute(httpPost);
+        HttpEntity responseEntity = response.getEntity();
+
+        if (responseEntity != null) {
+            return EntityUtils.toString(responseEntity);
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return null;
+}
+
+    public static HttpResponse postRequest(String requestUrl, HashMap<String, String> headerMap, String requestBody) {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpPost httpPost = new HttpPost(requestUrl);
             if(headerMap!=null) {
@@ -72,57 +127,75 @@ public class PostRequester {
             StringEntity entity = new StringEntity(requestBody);
             httpPost.setEntity(entity);
 
-            HttpResponse response = httpClient.execute(httpPost);
-            HttpEntity responseEntity = response.getEntity();
-
-            if (responseEntity != null) {
-                return EntityUtils.toString(responseEntity);
-            }
+            return httpClient.execute(httpPost);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    public static String requestPostCheck(String requestUrl, HashMap<String, String> headerMap, String requestBody,byte[]sessionKey) {
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            HttpPost httpPost = new HttpPost(requestUrl);
-            if(headerMap!=null) {
-                for (String key : headerMap.keySet()) {
-                    httpPost.setHeader(key, headerMap.get(key));
+    public static ResponseFc parseApipResponse(HttpResponse response){
+        Gson gson = new Gson();
+        Reply replier;
+        String sign;
+        byte[] bodyBytes;
+        ResponseFc responseFc = new ResponseFc();
+        try{
+            sign = response.getHeaders(UpStrings.SIGN)[0].getValue();
+
+            bodyBytes = response.getEntity().getContent().readAllBytes();
+            String responseBody = new String(bodyBytes);
+            System.out.println("checked:"+responseBody);
+
+            replier = gson.fromJson(responseBody, Reply.class);
+            System.out.println(replier.getMessage());
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+        responseFc.setSign(sign);
+        responseFc.setReplyBytes(bodyBytes);
+        responseFc.setReply(replier);
+        return responseFc;
+    }
+
+
+
+    public static HttpResponse postRequestCheckSign(String requestUrl, HashMap<String, String> headerMap, String requestBody, byte[]sessionKey) {
+        HttpResponse response = postRequest(requestUrl, headerMap, requestBody);
+        if(response==null)return null;
+
+        Header[] headers = response.getHeaders(UpStrings.SIGN);
+
+        if(headers == null||headers.length==0){
+            return response;
+        }
+
+        String sign;
+
+        sign = response.getHeaders(UpStrings.SIGN)[0].getValue();
+
+        byte[] responseBody;
+
+        try {
+            responseBody = response.getEntity().getContent().readAllBytes();//EntityUtils.toByteArray(responseEntity);
+
+            if(sign!=null) {
+                if (!isGoodSign(responseBody, sign, sessionKey)) {
+                    System.out.println("Bad sign of the data from APIP.");
+                    return null;
                 }
             }
-            httpPost.setHeader("Content-Type", "application/json");
-
-            StringEntity entity = new StringEntity(requestBody);
-            httpPost.setEntity(entity);
-
-            HttpResponse response = httpClient.execute(httpPost);
-            String sign = response.getHeaders(UpStrings.SIGN)[0].getValue();
-
-            HttpEntity responseEntity = response.getEntity();
-            byte[] responseBody = EntityUtils.toByteArray(responseEntity );
-
-            if(!DataRequestAPIP.isGoodSign(responseBody,sign,sessionKey)){
-                System.out.println("Bad sign of the data from APIP.");
-                return null;
-            }
-
-            String code = response.getHeaders(UpStrings.CODE)[0].getValue();
-
-            if (code.equals("0")) {
-                return EntityUtils.toString(responseEntity);
-            }
-
-            System.out.println(EntityUtils.toString(responseEntity));
-            return null;
-        } catch (Exception e) {
+            return response;
+        } catch (IOException e) {
             e.printStackTrace();
             return null;
         }
     }
 
     public static List<Service> searchService(ApipParamsForUser apipDataRequestParams, byte[]sessionKey, String owner, String type, boolean onlyActive, boolean ignoreClosed) {
+        System.out.println("Search your maker services...");
+
         DataRequestBody dataRequestBody = new DataRequestBody();
         ResponseBody dataResponseBody;
         List<Service> serviceList = null;

@@ -78,7 +78,7 @@ public class Strings {
     public static final String CLOSED = "closed";
     public static final String ACTIVE = "active";
     public static final String TYPES = "types";
-    public static final String HOOK_ID = "hookId";
+    public static final String HOOK_USER_ID = "hookUserId";
     public static final String ENDPOINT = "endpoint";
     public static final String TARGET_API = "targetApi";
     public static final String HOOK_INFO_ = "hookInfo_";
@@ -105,9 +105,13 @@ public class Strings {
     public static final String SUM = "sum";
     public static final String SPEND_CASHES = "spendCashes";
     public static final String NEW_CASHES = "newCashes";
-    public static final String ACCEPTER = "accepter";
     public static final String REFRESH = "refresh";
     public static final String BUY = "buy";
     public static final String IGNORE = "ignore";
     public static final String INIT_SYM_KEY_CIPHER = "initSymKeyCipher";
+    public static final String ARB = "arb";
+    public static final String API = "api";
+    public static final String USER_ID = "userId";
+    public static final String CHECK = "check";
+    public static final String FOUND = "found";
 }

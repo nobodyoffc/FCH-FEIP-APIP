@@ -7,4 +7,8 @@ public class UpStrings {
     public static final String BALANCE = "Balance";
     public static final String MAKER ="Maker";
     public static final String CODE = "Code";
+    public static final String ETH = "Eth";
+    public static final String HOOK = "Hook";
+    public static final String LISTENER = "Listener";
+    public static final String PROVIDER = "Provider";
 }

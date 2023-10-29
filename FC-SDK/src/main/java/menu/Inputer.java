@@ -1,5 +1,6 @@
 package menu;
 
+import fcTools.Base58;
 import fcTools.ParseTools;
 import javaTools.BytesTools;
 import keyTools.KeyTools;
@@ -307,6 +308,23 @@ public class Inputer {
             throw new RuntimeException(e);
         }
         return symKey;
+    }
+
+    public static char[] inputPriKeyWif(BufferedReader br)  {
+        char[] priKey = new char[52];
+        int num = 0;
+        try {
+            num = br.read(priKey);
+
+            if(num!=52 || !Base58.isBase58Encoded(priKey)){
+                System.out.println("The key should be 52 characters and Base58 encoded.");
+                return null;
+            }
+            br.read();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return priKey;
     }
 
     public static String inputMsg(BufferedReader br) {

@@ -1,11 +1,11 @@
 package apipClass;
 
-public class WebhookUser {
-    private String hookId;
-    private String owner;
+public class WebhookRequestBody {
+    private String hookUserId;
+    private String userName;
+    private String method;
     private String endpoint;
     private Object data;
-    private String method;
     private String op;
     public String getOp() {
         return op;
@@ -15,20 +15,20 @@ public class WebhookUser {
         this.op = op;
     }
 
-    public String getHookId() {
-        return hookId;
+    public String getHookUserId() {
+        return hookUserId;
     }
 
-    public void setHookId(String hookId) {
-        this.hookId = hookId;
+    public void setHookUserId(String hookUserId) {
+        this.hookUserId = hookUserId;
     }
 
-    public String getOwner() {
-        return owner;
+    public String getUserName() {
+        return userName;
     }
 
-    public void setOwner(String owner) {
-        this.owner = owner;
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     public String getEndpoint() {

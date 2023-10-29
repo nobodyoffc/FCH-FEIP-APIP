@@ -7,7 +7,7 @@ import constants.IndicesNames;
 import constants.ReplyInfo;
 import constants.Strings;
 import feipClass.Mail;
-import tools.ApipTools;
+import apipTools.ApipTools;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

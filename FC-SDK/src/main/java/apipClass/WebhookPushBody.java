@@ -6,8 +6,7 @@ public class WebhookPushBody {
     private String sessionName;
     private String data;
     private String sign;
-    private String balance;
-    private String bestHeight;
+
 
     public String getFromSid() {
         return fromSid;
@@ -49,19 +48,5 @@ public class WebhookPushBody {
         this.sign = sign;
     }
 
-    public String getBalance() {
-        return balance;
-    }
 
-    public void setBalance(String balance) {
-        this.balance = balance;
-    }
-
-    public String getBestHeight() {
-        return bestHeight;
-    }
-
-    public void setBestHeight(String bestHeight) {
-        this.bestHeight = bestHeight;
-    }
 }

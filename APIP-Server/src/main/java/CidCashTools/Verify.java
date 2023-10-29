@@ -90,17 +90,9 @@ public class Verify extends HttpServlet {
         }
 
         replier.setData(isGoodSign);
-        replier.setGot(1);
-        replier.setTotal(1);
+        if (Replier.makeSingleReplier(response, replier, dataCheckResult, addr)) return;
 
-        response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code0Success));
-        String reply = replier.reply0Success(addr);
-        if(reply==null)return;
-        String sign = DataRequestHandler.symSign(reply,dataCheckResult.getSessionKey());
-        if(sign==null)return;
-        response.setHeader(ReplyInfo.SignInHeader,sign);
-
-        writer.write(reply);
+        writer.write(replier.reply0Success(addr));
     }
 
     private boolean isThisApiRequest(DataRequestBody requestBody) {

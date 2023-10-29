@@ -13,6 +13,7 @@ import redisTools.ReadRedis;
 import constants.Strings;
 import walletTools.*;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +35,18 @@ public class Replier {
     private String[] last;
     private transient ServerParamsInRedis paramsInRedis;
     private transient final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+    public static boolean makeSingleReplier(HttpServletResponse response, Replier replier, DataCheckResult dataCheckResult, String addr) {
+        replier.setGot(1);
+        replier.setTotal(1);
+        response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code0Success));
+        String reply = replier.reply0Success(addr);
+        if(reply==null) return true;
+        String sign = DataRequestHandler.symSign(reply,dataCheckResult.getSessionKey());
+        if(sign==null) return true;
+        response.setHeader(ReplyInfo.SignInHeader,sign);
+        return false;
+    }
 
     public String reply(String userAddr) {
         if(userAddr==null)

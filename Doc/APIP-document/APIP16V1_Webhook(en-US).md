@@ -1,3 +1,69 @@
+
+
+
+订购：
+   请求：
+```header
+Sign
+SessionName
+```
+
+```body
+{
+	"url": "http://localhost:8080/APIP/apip20/v1/newCashByFids",
+	"time": 1690673821267,
+	"nonce": 1,
+	"fcdsl":{
+		"other":{
+            "op":"subscribe",
+            "endpoint":"http://localhost/newCashByFids/endpoint",
+            "data":{
+                "fids":["FPL44YJRwPdd2ipziFvqq6y2tw4VnVvpAv","FMZsWGT5hEUqhnZhLhXrxNXXG6uDHcarmX"]
+            }
+        }
+	}
+}
+```
+   响应：
+```header
+   Sign = ....
+```
+
+```body
+{
+    "code": 0,
+    "message": "Success.",
+    "nonce": 1987697,
+    "balance": 35579828799,
+    "got": 1,
+    "total": 1,
+    "bestHeight": 1738162,
+    "data": {
+      "op": "subscribe" or "unsubscribe",
+      "userId": "....." //
+    }
+}
+```
+
+推送：
+
+```
+String fromSid
+String method;
+String sessionName;
+String sign;
+
+String data: //Map<string,object> of below:
+      String balance;
+      String bestHeight;
+      List<Cash> newCashes;
+
+```
+
+
+
+
+
 ```
 Type:APIP
 SerialNumber:16

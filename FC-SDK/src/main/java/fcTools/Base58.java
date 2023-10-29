@@ -49,7 +49,8 @@ import java.util.Arrays;
  * numbers), and finally represent the resulting base-58 digits as alphanumeric ASCII characters.
  */
 public class Base58 {
-    public static final char[] ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz".toCharArray();
+    public static final String BASE58_ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+    public static final char[] ALPHABET = BASE58_ALPHABET.toCharArray();
     private static final BigInteger FIFTY_EIGHT = BigInteger.valueOf(58);
     private static final char ENCODED_ZERO = ALPHABET[0];
     private static final int[] INDEXES = new int[128];
@@ -59,6 +60,24 @@ public class Base58 {
         for (int i = 0; i < ALPHABET.length; i++) {
             INDEXES[ALPHABET[i]] = i;
         }
+    }
+
+    public static boolean isBase58Encoded(char[] input) {
+        for (char c : input) {
+            if (!BASE58_ALPHABET.contains(String.valueOf(c))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static boolean isBase58Encoded(String input) {
+        for (int i = 0; i < input.length(); i++) {
+            if (!BASE58_ALPHABET.contains(String.valueOf(input.charAt(i)))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public static byte[] base58CharArrayToByteArray(char[] input) {

@@ -18,7 +18,7 @@ import initial.Initiator;
 import javaTools.BytesTools;
 import fcTools.ParseTools;
 import redis.clients.jedis.Jedis;
-import tools.CashToInputsResult;
+import apipTools.CashToInputsResult;
 
 
 import java.io.BufferedReader;
