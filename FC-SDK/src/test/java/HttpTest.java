@@ -1,4 +1,4 @@
-import apipRequest.Reply;
+import apipClass.ResponseBody;
 import com.google.gson.Gson;
 import cryptoTools.SHA;
 import javaTools.BytesTools;
@@ -47,12 +47,12 @@ public class HttpTest {
         System.out.println("no check response body:\n"+ responseBody);
         Header[] headers = response.getHeaders("Code");
         Header header1 = headers[0];
+        System.out.println("code header len:"+headers.length);
         System.out.println("header[0]:");
         System.out.println("name:"+header1.getName());
         System.out.println("value:"+header1.getValue());
 
-        System.out.println("code header len:"+headers.length);
-
+        System.out.println();
         Header[] allHeaders = response.getAllHeaders();
         for(Header header:allHeaders){
             System.out.print(header.getName());
@@ -65,12 +65,8 @@ public class HttpTest {
         System.out.println("checked:"+responseBody);
 
         Gson gson = new Gson();
-        Reply replier = gson.fromJson(responseBody, Reply.class);
+        ResponseBody replier = gson.fromJson(responseBody, ResponseBody.class);
         System.out.println(replier.getMessage());
 
     }
-
-
-
-
 }

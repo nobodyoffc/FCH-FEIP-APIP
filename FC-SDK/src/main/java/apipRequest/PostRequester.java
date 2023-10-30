@@ -135,8 +135,9 @@ public class PostRequester {
     }
 
     public static ResponseFc parseApipResponse(HttpResponse response){
+        if(response==null)return null;
         Gson gson = new Gson();
-        Reply replier;
+        ResponseBody replier;
         String sign;
         byte[] bodyBytes;
         ResponseFc responseFc = new ResponseFc();
@@ -147,7 +148,7 @@ public class PostRequester {
             String responseBody = new String(bodyBytes);
             System.out.println("checked:"+responseBody);
 
-            replier = gson.fromJson(responseBody, Reply.class);
+            replier = gson.fromJson(responseBody, ResponseBody.class);
             System.out.println(replier.getMessage());
         } catch (IOException e) {
             e.printStackTrace();
@@ -155,11 +156,9 @@ public class PostRequester {
         }
         responseFc.setSign(sign);
         responseFc.setReplyBytes(bodyBytes);
-        responseFc.setReply(replier);
+        responseFc.setResponseBody(replier);
         return responseFc;
     }
-
-
 
     public static HttpResponse postRequestCheckSign(String requestUrl, HashMap<String, String> headerMap, String requestBody, byte[]sessionKey) {
         HttpResponse response = postRequest(requestUrl, headerMap, requestBody);
@@ -168,12 +167,11 @@ public class PostRequester {
         Header[] headers = response.getHeaders(UpStrings.SIGN);
 
         if(headers == null||headers.length==0){
+            System.out.println("No sign in header.");
             return response;
         }
 
-        String sign;
-
-        sign = response.getHeaders(UpStrings.SIGN)[0].getValue();
+        String sign = headers[0].getValue();
 
         byte[] responseBody;
 
@@ -197,7 +195,7 @@ public class PostRequester {
         System.out.println("Search your maker services...");
 
         DataRequestBody dataRequestBody = new DataRequestBody();
-        ResponseBody dataResponseBody;
+        apipClass.ResponseBody dataResponseBody;
         List<Service> serviceList = null;
         try {
             Gson gson = new Gson();
@@ -218,7 +216,7 @@ public class PostRequester {
             headerMap.put(UpStrings.SIGN, HexFormat.of().formatHex(sign));
             String responseJson = requestPost(url, headerMap, requestBodyJson);
 
-            dataResponseBody = gson.fromJson(responseJson, ResponseBody.class);
+            dataResponseBody = gson.fromJson(responseJson, apipClass.ResponseBody.class);
             if(dataResponseBody.getCode()!=0){
                 System.out.println(responseJson);
             }else {

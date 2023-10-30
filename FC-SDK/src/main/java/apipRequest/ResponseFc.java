@@ -1,10 +1,12 @@
 package apipRequest;
 
+import apipClass.ResponseBody;
+
 public class ResponseFc {
     private String from;
     private String to;
     private String sign;
-    private Reply reply;
+    private ResponseBody responseBody;
     private byte[] replyBytes;
 
     public String getFrom() {
@@ -31,12 +33,12 @@ public class ResponseFc {
         this.sign = sign;
     }
 
-    public Reply getReply() {
-        return reply;
+    public ResponseBody getResponseBody() {
+        return responseBody;
     }
 
-    public void setReply(Reply reply) {
-        this.reply = reply;
+    public void setResponseBody(ResponseBody responseBody) {
+        this.responseBody = responseBody;
     }
 
     public byte[] getReplyBytes() {
