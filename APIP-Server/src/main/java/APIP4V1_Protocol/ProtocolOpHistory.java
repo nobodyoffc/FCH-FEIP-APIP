@@ -1,7 +1,7 @@
 package APIP4V1_Protocol;
 
 import APIP0V1_OpenAPI.*;
-import apipClass.DataRequestBody;
+import apipClass.RequestBody;
 import apipClass.Sort;
 import constants.ApiNames;
 import constants.IndicesNames;
@@ -37,7 +37,7 @@ public class ProtocolOpHistory extends HttpServlet {
 
         String addr = dataCheckResult.getAddr();
 
-        DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
+        RequestBody requestBody = dataCheckResult.getDataRequestBody();
 
         //Check API
         //Set default sort.

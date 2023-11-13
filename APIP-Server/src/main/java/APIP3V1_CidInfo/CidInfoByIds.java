@@ -1,13 +1,13 @@
 package APIP3V1_CidInfo;
 
 import APIP0V1_OpenAPI.*;
-import apipClass.DataRequestBody;
+import apipClass.RequestBody;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
 import esTools.EsTools;
 import fchClass.Address;
-import data.CidInfo;
+import apipClass.CidInfo;
 import feipClass.Cid;
 import initial.Initiator;
 
@@ -39,7 +39,7 @@ public class CidInfoByIds extends HttpServlet {
 
         String addr = dataCheckResult.getAddr();
 
-        DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
+        RequestBody requestBody = dataCheckResult.getDataRequestBody();
 
         if(!isThisApiRequest(requestBody)){
             response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
@@ -92,7 +92,7 @@ public class CidInfoByIds extends HttpServlet {
         esRequest.writeSuccess(dataCheckResult.getSessionKey());
     }
 
-    private boolean isThisApiRequest(DataRequestBody requestBody) {
+    private boolean isThisApiRequest(RequestBody requestBody) {
         return requestBody.getFcdsl().getIds() != null;
     }
 }

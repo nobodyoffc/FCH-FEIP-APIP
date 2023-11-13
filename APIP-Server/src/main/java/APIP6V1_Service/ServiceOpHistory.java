@@ -1,7 +1,7 @@
 package APIP6V1_Service;
 
 import APIP0V1_OpenAPI.*;
-import apipClass.DataRequestBody;
+import apipClass.RequestBody;
 import apipClass.Sort;
 import constants.ApiNames;
 import constants.IndicesNames;
@@ -37,7 +37,7 @@ public class ServiceOpHistory extends HttpServlet {
 
         String addr = dataCheckResult.getAddr();
 
-        DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
+        RequestBody requestBody = dataCheckResult.getDataRequestBody();
 
         //Check API
 

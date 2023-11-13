@@ -1,7 +1,7 @@
 package APIP17V1_Avatar;
 
 import APIP0V1_OpenAPI.*;
-import apipClass.DataRequestBody;
+import apipClass.RequestBody;
 import apipClass.Fcdsl;
 import avatar.AvatarMaker;
 import constants.ApiNames;
@@ -43,7 +43,7 @@ public class Avatars extends HttpServlet {
 
         String addr = dataCheckResult.getAddr();
 
-        DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
+        RequestBody requestBody = dataCheckResult.getDataRequestBody();
         replier.setNonce(requestBody.getNonce());
 
         //Check API
@@ -98,7 +98,7 @@ public class Avatars extends HttpServlet {
         writer.write(reply);
     }
 
-    private String[] checkBody(DataRequestBody requestBody) {
+    private String[] checkBody(RequestBody requestBody) {
 
         if(requestBody.getFcdsl()==null) return null;
         Fcdsl fcdsl = requestBody.getFcdsl();

@@ -267,9 +267,6 @@ public class StartAPIP {
 	}
 
 	private static void startPusher(ConfigAPIP configAPIP, ElasticsearchClient esClient) throws IOException {
-//		System.out.println("Start webhook pusher? 'y' to start. Other to ignore");
-//		String input = StartAPIP.br.readLine();
-//		if("y".equals(input)) {
 		String listenPath = configAPIP.getListenPath();
 
 		pusher = new Pusher(listenPath, esClient);
@@ -277,7 +274,6 @@ public class StartAPIP {
 		thread3.start();
 
 		log.debug("Webhook pusher is running.");
-//		}
 	}
 
 	private static void startMempoolScan(ConfigAPIP configAPIP, ElasticsearchClient esClient) throws IOException {

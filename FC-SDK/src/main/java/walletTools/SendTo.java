@@ -1,8 +1,33 @@
 package walletTools;
 
+import menu.Inputer;
+
+import java.io.BufferedReader;
+import java.util.ArrayList;
+import java.util.List;
+
 public class SendTo {
     private String fid;
     private Double amount;
+
+    public static List<SendTo> inputSendToList(BufferedReader br){
+        List<SendTo> sendToList = new ArrayList<>();
+        while (true){
+            SendTo sendTo = new SendTo();
+            String fid = Inputer.inputGoodFid(br,"Input the recipient's fid. Enter to end:");
+            if("".equals(fid))return sendToList;
+            if("d".equals(fid)){
+                System.out.println("Wrong input. Try again.");
+                continue;
+            }
+            Double amount = Inputer.inputDouble(br,"Input the amount. Enter to end:");
+            if(amount==null)return sendToList;
+
+            sendTo.setFid(fid);
+            sendTo.setAmount(amount);
+            sendToList.add(sendTo);
+        }
+    }
 
     public String getFid() {
         return fid;

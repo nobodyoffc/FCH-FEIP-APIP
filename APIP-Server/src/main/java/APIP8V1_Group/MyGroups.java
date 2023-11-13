@@ -1,7 +1,7 @@
 package APIP8V1_Group;
 
 import APIP0V1_OpenAPI.*;
-import apipClass.DataRequestBody;
+import apipClass.RequestBody;
 import apipClass.Sort;
 import constants.ApiNames;
 import constants.IndicesNames;
@@ -36,7 +36,7 @@ public class MyGroups extends HttpServlet {
 
         String addr = dataCheckResult.getAddr();
 
-        DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
+        RequestBody requestBody = dataCheckResult.getDataRequestBody();
 
         //Check API
         if(!isThisApiRequest(requestBody)){
@@ -92,7 +92,7 @@ public class MyGroups extends HttpServlet {
         long tCdd;
     }
 
-    private boolean isThisApiRequest(DataRequestBody requestBody) {
+    private boolean isThisApiRequest(RequestBody requestBody) {
         if(requestBody.getFcdsl()==null)
             return false;
         if(requestBody.getFcdsl().getQuery()==null)
@@ -113,6 +113,6 @@ public class MyGroups extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setContentType("text/plain");
         resp.setCharacterEncoding("UTF-8");
-        resp.getWriter().write("This API accepts only POST request. 抱歉！");
+        resp.getWriter().write("This API accepts only POST request. Sorry！");
     }
 }

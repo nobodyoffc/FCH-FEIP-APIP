@@ -1,11 +1,13 @@
 package apipTools;
 
-import apipClass.*;
 import cryptoTools.SHA;
+import eccAes256K1P7.EccAes256K1P7;
+import eccAes256K1P7.EccAesDataByte;
 import javaTools.BytesTools;
 import redis.clients.jedis.Jedis;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HexFormat;
 
 import static constants.ApiNames.apiList;
@@ -36,52 +38,6 @@ public class ApipTools {
         }
     }
 
-    public static Fcdsl addFilterTermsToFcdsl(DataRequestBody requestBody, String field, String value) {
-        Fcdsl fcdsl;
-        if(requestBody.getFcdsl()!=null) {
-            fcdsl = requestBody.getFcdsl();
-        }else fcdsl= new Fcdsl();
-
-        Filter filter;
-        if(fcdsl.getFilter()!=null) {
-            filter = fcdsl.getFilter();
-        }else filter=new Filter();
-
-        Terms terms;
-        if(filter.getTerms()!=null) {
-            terms = filter.getTerms();
-        }else terms=new Terms();
-
-        terms.setFields(new String[]{field});
-        terms.setValues(new String[]{value});
-        filter.setTerms(terms);
-        fcdsl.setFilter(filter);
-        return fcdsl;
-    }
-
-    public static Fcdsl addExceptTermsToFcdsl(DataRequestBody requestBody, String field, String value) {
-        Fcdsl fcdsl;
-        if(requestBody.getFcdsl()!=null) {
-            fcdsl = requestBody.getFcdsl();
-        }else fcdsl= new Fcdsl();
-
-        Except except;
-        if(fcdsl.getExcept()!=null) {
-            except = fcdsl.getExcept();
-        }else except=new Except();
-
-        Terms terms;
-        if(except.getTerms()!=null) {
-            terms = except.getTerms();
-        }else terms=new Terms();
-
-        terms.setFields(new String[]{field});
-        terms.setValues(new String[]{value});
-        except.setTerms(terms);
-        fcdsl.setExcept(except);
-        return fcdsl;
-    }
-
     public static String getSessionKeySign(byte[] sessionKeyBytes, byte[] dataBytes) {
         return HexFormat.of().formatHex(SHA.Sha256x2(BytesTools.bytesMerger(dataBytes, sessionKeyBytes)));
     }
@@ -96,5 +52,22 @@ public class ApipTools {
         byte[] signBytes = BytesTools.bytesMerger(requestBodyBytes, symKey);
         String doubleSha256Hash = HexFormat.of().formatHex(SHA.Sha256x2(signBytes));
         return (sign.equals(doubleSha256Hash));
+    }
+
+    public static String getSessionName(byte[] sessionKey) {
+        if (sessionKey==null)return null;
+        return HexFormat.of().formatHex(Arrays.copyOf(sessionKey,6));
+    }
+
+    public static byte[] decryptSessionKeyWithPriKey(String cipher, byte[] priKey) {
+        EccAes256K1P7 ecc = new EccAes256K1P7();
+        EccAesDataByte eccAesDataBytes = ecc.decrypt(cipher, priKey.clone());
+        if(eccAesDataBytes.getError()!=null){
+            System.out.println("Decrypt sessionKey wrong: "+eccAesDataBytes.getError());
+            BytesTools.clearByteArray(priKey);
+            return null;
+        }
+        String sessionKeyHex = new String(eccAesDataBytes.getMsg(), StandardCharsets.UTF_8);
+        return HexFormat.of().parseHex(sessionKeyHex);
     }
 }

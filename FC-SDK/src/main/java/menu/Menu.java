@@ -59,6 +59,12 @@ public class Menu {
         }
     }
 
+    public void add(String... strings) {
+        for (int i = 1; i <= strings.length; i++) {
+            this.itemMap.put(i, strings[i - 1]);
+        }
+    }
+
     public void show() {
         System.out.println(
                 "	-----------------------------\n"
@@ -98,4 +104,6 @@ public class Menu {
         }
         return choice;
     }
+
+
 }

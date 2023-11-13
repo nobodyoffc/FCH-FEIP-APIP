@@ -10,7 +10,7 @@ import com.google.gson.Gson;
 import fchClass.Address;
 import keyTools.KeyTools;
 import fchClass.OpReturn;
-import parser.WeightMethod;
+import fcTools.WeightMethod;
 import startFEIP.StartFEIP;
 
 import java.io.IOException;

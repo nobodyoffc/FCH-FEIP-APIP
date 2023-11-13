@@ -1,7 +1,7 @@
 package CidCashTools;
 
 import APIP0V1_OpenAPI.*;
-import apipClass.DataRequestBody;
+import apipClass.RequestBody;
 import constants.ApiNames;
 import constants.ReplyInfo;
 import fchClass.Cash;
@@ -44,7 +44,7 @@ public class OffLineTx extends HttpServlet {
 
 //        if (RequestChecker.isPublicSessionKey(response, replier, writer, addr)) return;
 
-        DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
+        RequestBody requestBody = dataCheckResult.getDataRequestBody();
         replier.setNonce(requestBody.getNonce());
 
         DataForOffLineTx dataForSignInCs = parseDataForOffLineTxFromOther(requestBody.getFcdsl().getOther());

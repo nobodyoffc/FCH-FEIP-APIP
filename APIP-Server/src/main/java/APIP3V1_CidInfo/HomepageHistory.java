@@ -1,7 +1,7 @@
 package APIP3V1_CidInfo;
 
 import APIP0V1_OpenAPI.*;
-import apipClass.DataRequestBody;
+import apipClass.RequestBody;
 import apipClass.Fcdsl;
 import apipClass.Sort;
 import constants.ApiNames;
@@ -37,7 +37,7 @@ public class HomepageHistory extends HttpServlet {
 
         String addr = dataCheckResult.getAddr();
 
-        DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
+        RequestBody requestBody = dataCheckResult.getDataRequestBody();
 
         //Check API
 

@@ -82,7 +82,7 @@ public class TestTools {
     }
 
     private static void makeEquals() {
-        DataRequestBody dataRequestBody = new DataRequestBody();
+        RequestBody dataRequestBody = new RequestBody();
         Query query = makeEmptyQury(dataRequestBody);
         String urlTail = setUrlAndVia(dataRequestBody);
         if (urlTail == null) return;
@@ -90,7 +90,7 @@ public class TestTools {
         askSizeSortAfterThenPrint(dataRequestBody, query);
     }
     private static void makeUnexists() {
-        DataRequestBody dataRequestBody = new DataRequestBody();
+        RequestBody dataRequestBody = new RequestBody();
         Query query = makeEmptyQury(dataRequestBody);
         String urlTail = setUrlAndVia(dataRequestBody);
         if (urlTail == null) return;
@@ -98,7 +98,7 @@ public class TestTools {
         askSizeSortAfterThenPrint(dataRequestBody, query);
     }
 
-    private static Query makeEmptyQury(DataRequestBody dataRequestBody) {
+    private static Query makeEmptyQury(RequestBody dataRequestBody) {
         Fcdsl fcdsl = new Fcdsl();
         Query query = new Query();
         fcdsl.setQuery(query);
@@ -106,7 +106,7 @@ public class TestTools {
         return query;
     }
 
-    private static void askSizeSortAfterThenPrint(DataRequestBody dataRequestBody, Query query) {
+    private static void askSizeSortAfterThenPrint(RequestBody dataRequestBody, Query query) {
         dataRequestBody.getFcdsl().setQuery(query);
 
         askSize(dataRequestBody);
@@ -120,7 +120,7 @@ public class TestTools {
     }
 
     private static void makeExists() {
-        DataRequestBody dataRequestBody = new DataRequestBody();
+        RequestBody dataRequestBody = new RequestBody();
         Query query = makeEmptyQury(dataRequestBody);
 
         String urlTail = setUrlAndVia(dataRequestBody);
@@ -131,7 +131,7 @@ public class TestTools {
     }
 
     private static void makePart() {
-        DataRequestBody dataRequestBody = new DataRequestBody();
+        RequestBody dataRequestBody = new RequestBody();
         Query query = makeEmptyQury(dataRequestBody);
 
         String urlTail = setUrlAndVia(dataRequestBody);
@@ -142,7 +142,7 @@ public class TestTools {
     }
 
     private static void makeRange() {
-        DataRequestBody dataRequestBody = new DataRequestBody();
+        RequestBody dataRequestBody = new RequestBody();
         Query query = makeEmptyQury(dataRequestBody);
 
         String urlTail = setUrlAndVia(dataRequestBody);
@@ -153,7 +153,7 @@ public class TestTools {
     }
 
     private static void makeMatch() {
-        DataRequestBody dataRequestBody = new DataRequestBody();
+        RequestBody dataRequestBody = new RequestBody();
         Query query = makeEmptyQury(dataRequestBody);
 
         String urlTail = setUrlAndVia(dataRequestBody);
@@ -165,7 +165,7 @@ public class TestTools {
 
     private static void makeTerms() {
 
-        DataRequestBody dataRequestBody = new DataRequestBody();
+        RequestBody dataRequestBody = new RequestBody();
         Query query = makeEmptyQury(dataRequestBody);
 
         String urlTail = setUrlAndVia(dataRequestBody);
@@ -176,7 +176,7 @@ public class TestTools {
     }
 
     private static void makeByIds() {
-        DataRequestBody dataRequestBody = new DataRequestBody();
+        RequestBody dataRequestBody = new RequestBody();
 
         String urlTail = setUrlAndVia(dataRequestBody);
         if (urlTail == null) return;
@@ -192,7 +192,7 @@ public class TestTools {
     }
 
     private static void makeMatchAll() {
-        DataRequestBody dataRequestBody = new DataRequestBody();
+        RequestBody dataRequestBody = new RequestBody();
         Fcdsl fcdsl = new Fcdsl();
         dataRequestBody.setFcdsl(fcdsl);
 
@@ -209,7 +209,7 @@ public class TestTools {
         System.out.println(result);
     }
 
-    private static String setUrlAndVia(DataRequestBody dataRequestBody) {
+    private static String setUrlAndVia(RequestBody dataRequestBody) {
         String urlTail = inputUrlTail();
         if (urlTail == null) return null;
         dataRequestBody.makeRequestBody(urlHead+urlTail,via);
@@ -233,7 +233,7 @@ public class TestTools {
     }
 
     private static void allManual() {
-        DataRequestBody dataRequestBody = new DataRequestBody();
+        RequestBody dataRequestBody = new RequestBody();
 
         String urlTail = setUrlAndVia(dataRequestBody);
         if (urlTail == null) return;
@@ -255,7 +255,7 @@ public class TestTools {
         System.out.println(gson.toJson(dataRequestBody));
     }
 
-    private static boolean askAfter(DataRequestBody dataRequestBody) {
+    private static boolean askAfter(RequestBody dataRequestBody) {
         while(true) {
             System.out.println("Add After? 'y' or 'n':");
             String input = Inputer.inputString(br);
@@ -268,7 +268,7 @@ public class TestTools {
         }
     }
 
-    private static void inputAfter(DataRequestBody dataRequestBody) {
+    private static void inputAfter(RequestBody dataRequestBody) {
         String[] after;
         Gson gson = new Gson();
         try {
@@ -288,7 +288,7 @@ public class TestTools {
         }
     }
 
-    private static boolean askSort(DataRequestBody dataRequestBody) {
+    private static boolean askSort(RequestBody dataRequestBody) {
         while(true) {
             System.out.println("Add Sort? 'y' or 'n':");
             String input = Inputer.inputString(br);
@@ -301,12 +301,12 @@ public class TestTools {
         }
     }
 
-    private static void inputSort(DataRequestBody dataRequestBody) {
+    private static void inputSort(RequestBody dataRequestBody) {
         ArrayList<Sort> sortList = Sort.inputSortList(br);
         dataRequestBody.getFcdsl().setSort(sortList);
     }
 
-    private static boolean askSize(DataRequestBody dataRequestBody) {
+    private static boolean askSize(RequestBody dataRequestBody) {
         while(true) {
             System.out.println("Add Size? 'y' or 'n':");
             String input = Inputer.inputString(br);
@@ -319,7 +319,7 @@ public class TestTools {
         }
     }
 
-    private static void inputSize(DataRequestBody dataRequestBody) {
+    private static void inputSize(RequestBody dataRequestBody) {
         String ask = "Input the size you want in one request:";
         String size = Inputer.inputIntegerStr(br, ask);
         dataRequestBody.getFcdsl().setSize(size);
@@ -337,7 +337,7 @@ public class TestTools {
         }
     }
 
-    private static boolean askByIds(DataRequestBody dataRequestBody) {
+    private static boolean askByIds(RequestBody dataRequestBody) {
         while(true) {
             System.out.println("Is ByIds? 'y' or 'n':");
             String input = Inputer.inputString(br);
@@ -351,13 +351,13 @@ public class TestTools {
         }
     }
 
-    private static void askIndex(DataRequestBody dataRequestBody) {
+    private static void askIndex(RequestBody dataRequestBody) {
         System.out.println("General request need the name of index. Input it:");
         String index = Inputer.inputString(br);
         dataRequestBody.getFcdsl().setIndex(index);
     }
 
-    private static void askQuery(DataRequestBody dataRequestBody) {
+    private static void askQuery(RequestBody dataRequestBody) {
         while(true) {
             System.out.println("Is ByIds? 'y' or 'n':");
             String input = Inputer.inputString(br);
@@ -370,7 +370,7 @@ public class TestTools {
         }
     }
 
-    private static void askFilter(DataRequestBody dataRequestBody) {
+    private static void askFilter(RequestBody dataRequestBody) {
         while(true) {
             System.out.println("Is Filter? 'y' or 'n':");
             String input = Inputer.inputString(br);
@@ -383,7 +383,7 @@ public class TestTools {
         }
     }
 
-    private static void askExcept(DataRequestBody dataRequestBody) {
+    private static void askExcept(RequestBody dataRequestBody) {
         while(true) {
             System.out.println("Is Except? 'y' or 'n':");
             String input = Inputer.inputString(br);
@@ -397,7 +397,7 @@ public class TestTools {
     }
 
 
-    private static void setExcept(DataRequestBody dataRequestBody) {
+    private static void setExcept(RequestBody dataRequestBody) {
         Except filter = new Except();
         dataRequestBody.getFcdsl().setQuery(filter);
 
@@ -429,7 +429,7 @@ public class TestTools {
         }
     }
 
-    private static void setFilter(DataRequestBody dataRequestBody) {
+    private static void setFilter(RequestBody dataRequestBody) {
         Filter filter = new Filter();
         dataRequestBody.getFcdsl().setFilter(filter);
 
@@ -461,7 +461,7 @@ public class TestTools {
             }
         }
     }
-    private static void setQuery(DataRequestBody dataRequestBody) {
+    private static void setQuery(RequestBody dataRequestBody) {
         Query query = new Query();
         dataRequestBody.getFcdsl().setQuery(query);
 

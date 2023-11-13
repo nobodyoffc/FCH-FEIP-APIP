@@ -3,7 +3,7 @@ package APIP20V1_Webhook;
 import APIP0V1_OpenAPI.DataCheckResult;
 import APIP0V1_OpenAPI.Replier;
 import APIP0V1_OpenAPI.RequestChecker;
-import apipClass.DataRequestBody;
+import apipClass.RequestBody;
 import apipClass.WebhookRequestBody;
 import com.google.gson.Gson;
 import constants.*;
@@ -41,7 +41,7 @@ public class NewCashByFids extends HttpServlet {
 
         if (RequestChecker.isPublicSessionKey(response, replier, writer, addr)) return;
 
-        DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
+        RequestBody requestBody = dataCheckResult.getDataRequestBody();
         replier.setNonce(requestBody.getNonce());
         //Check API
         if(!isThisApiRequest(requestBody)){
@@ -156,7 +156,7 @@ public class NewCashByFids extends HttpServlet {
         }
     }
 
-    private boolean isThisApiRequest(DataRequestBody requestBody) {
+    private boolean isThisApiRequest(RequestBody requestBody) {
         if(requestBody.getFcdsl()==null)
             return false;
         return requestBody.getFcdsl().getOther() != null;

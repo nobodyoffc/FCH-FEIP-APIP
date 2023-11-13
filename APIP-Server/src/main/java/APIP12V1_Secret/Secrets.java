@@ -7,7 +7,6 @@ import constants.IndicesNames;
 import constants.ReplyInfo;
 import constants.Strings;
 import feipClass.Secret;
-import apipTools.ApipTools;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -38,7 +37,7 @@ public class Secrets extends HttpServlet {
 
         if (RequestChecker.isPublicSessionKey(response, replier, writer, addr)) return;
 
-        DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
+        RequestBody requestBody = dataCheckResult.getDataRequestBody();
 
         //Check API
 
@@ -46,7 +45,7 @@ public class Secrets extends HttpServlet {
         ArrayList<Sort> sort = Sort.makeSortList("birthHeight",false,"secretId",true,null,null);
 
         //Add condition
-        Fcdsl fcdsl = ApipTools.addExceptTermsToFcdsl(requestBody, Strings.ACTIVE,Strings.FALSE);
+        Fcdsl fcdsl = Fcdsl.addExceptTermsToFcdsl(requestBody, Strings.ACTIVE,Strings.FALSE);
         requestBody.setFcdsl(fcdsl);
 
         //Request

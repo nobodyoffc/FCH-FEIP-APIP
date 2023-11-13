@@ -1,7 +1,7 @@
 package APIP14V1_Proof;
 
 import APIP0V1_OpenAPI.*;
-import apipClass.DataRequestBody;
+import apipClass.RequestBody;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
@@ -36,7 +36,7 @@ public class ProofByIds extends HttpServlet {
 
         String addr = dataCheckResult.getAddr();
 
-        DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
+        RequestBody requestBody = dataCheckResult.getDataRequestBody();
 
         //Check API
         if(!isThisApiRequest(requestBody)){
@@ -76,7 +76,7 @@ public class ProofByIds extends HttpServlet {
         esRequest.writeSuccess(dataCheckResult.getSessionKey());
     }
 
-    private boolean isThisApiRequest(DataRequestBody requestBody) {
+    private boolean isThisApiRequest(RequestBody requestBody) {
         if(requestBody.getFcdsl()==null)
             return false;
         if(requestBody.getFcdsl().getIds()==null)

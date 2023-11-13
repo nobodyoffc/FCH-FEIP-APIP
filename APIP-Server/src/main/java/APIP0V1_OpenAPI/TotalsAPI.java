@@ -1,6 +1,6 @@
 package APIP0V1_OpenAPI;
 
-import apipClass.DataRequestBody;
+import apipClass.RequestBody;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.cat.IndicesResponse;
 import co.elastic.clients.elasticsearch.cat.indices.IndicesRecord;
@@ -35,7 +35,7 @@ public class TotalsAPI extends HttpServlet {
         if(dataCheckResult==null)return;
 
         String addr = dataCheckResult.getAddr();
-        DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
+        RequestBody requestBody = dataCheckResult.getDataRequestBody();
         DataRequestHandler esRequest = new DataRequestHandler(dataCheckResult.getAddr(),requestBody,response,replier);
 
         ElasticsearchClient esClient = Initiator.esClient;

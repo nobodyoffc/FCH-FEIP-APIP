@@ -1,7 +1,7 @@
 package test;
 
 import APIP0V1_OpenAPI.*;
-import apipClass.DataRequestBody;
+import apipClass.RequestBody;
 import apipClass.Sort;
 import fchClass.Tx;
 
@@ -29,7 +29,7 @@ public class Exists extends HttpServlet {
 
         DataCheckResult dataCheckResult = requestChecker.checkDataRequest();
 
-        DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
+        RequestBody requestBody = dataCheckResult.getDataRequestBody();
 
         DataRequestHandler esRequest = new DataRequestHandler(dataCheckResult.getAddr(),requestBody,response,replier);
 

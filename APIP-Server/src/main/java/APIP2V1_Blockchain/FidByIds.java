@@ -1,7 +1,7 @@
 package APIP2V1_Blockchain;
 
 import APIP0V1_OpenAPI.*;
-import apipClass.DataRequestBody;
+import apipClass.RequestBody;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@WebServlet(ApiNames.APIP2V1Path + ApiNames.fidByIdsAPI)
+@WebServlet(ApiNames.APIP2V1Path + ApiNames.FidByIdsAPI)
 public class FidByIds extends HttpServlet {
 
     @Override
@@ -36,7 +36,7 @@ public class FidByIds extends HttpServlet {
 
         String addr = dataCheckResult.getAddr();
 
-        DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
+        RequestBody requestBody = dataCheckResult.getDataRequestBody();
 
         if(!isThisApiRequest(requestBody)){
             response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
@@ -73,7 +73,7 @@ public class FidByIds extends HttpServlet {
     }
 
 
-    private boolean isThisApiRequest(DataRequestBody requestBody) {
+    private boolean isThisApiRequest(RequestBody requestBody) {
         if(requestBody.getFcdsl().getIds()==null)
             return false;
         return true;

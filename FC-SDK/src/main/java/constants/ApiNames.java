@@ -3,6 +3,16 @@ package constants;
 import java.util.ArrayList;
 
 public class ApiNames {
+    public static String[] OpenAPIs;
+    public static String[] FreeGetAPIs;
+    public static String[] BlockchainAPIs;
+    public static String[] IdentityAPIs;
+    public static String[] OrganizeAPIs;
+    public static String[] ConstructAPIs;
+    public static String[] PersonalAPIs;
+    public static String[] PublishAPIs;
+    public static String[] WalletAPIs;
+    public static String[] CryptoToolsAPIs;
     //APIP path
     public static final String APIP0V1Path = "/apip0/v1/";
     public static final String APIP1V1Path = "/apip1/v1/";
@@ -25,6 +35,7 @@ public class ApiNames {
     public static final String APIP18V1Path = "/apip18/v1/";
     public static final String APIP19V1Path = "/apip19/v1/";
     public static final String APIP20V1Path = "/apip20/v1/";
+    public static final String APIP21V1Path = "/apip21/v1/";
     public static final String FreeGetPath = "/freeGet/v1/";
     public static final String ToolsPath = "/tools/";
     public static final String SignInAPI = "signIn";
@@ -44,10 +55,10 @@ public class ApiNames {
     public static final String BlockHasByIdsAPI = "blockHasByIds";
     public static final String TxHasByIdsAPI = "TxHasByIds";
     public static final String CashValidAPI = "cashValid";
-    public static final String fidByIdsAPI = "fidByIds";
+    public static final String FidByIdsAPI = "fidByIds";
     public static final String CidInfoByIdsAPI = "cidInfoByIds";
     public static final String GetFidCidAPI = "getFidCid";
-    public static final String fidSearchAPI = "fidSearch";
+    public static final String FidSearchAPI = "fidSearch";
     public static final String FidCidSeekAPI = "fidCidSeek";
     public static final String CidByIdsAPI = "cidByIds";
     public static final String CidInfoSearchAPI = "cidInfoSearch";
@@ -56,7 +67,7 @@ public class ApiNames {
     public static final String HomepageHistoryAPI = "homepageHistory";
     public static final String NoticeFeeHistoryAPI = "noticeFeeHistory";
     public static final String ReputationHistoryAPI = "reputationHistory";
-    public static final String NobodysAPI = "nobodys";
+    public static final String NobodySearchAPI = "nobodySearch";
     public static final String P2shByIdsAPI = "p2shByIds";
     public static final String P2shSearchAPI = "p2shSearch";
     public static final String ProtocolByIdsAPI = "protocolByIds";
@@ -123,6 +134,10 @@ public class ApiNames {
     public static final String GetTotalsAPI = "getTotals";
     public static final String NidSearchAPI = "nidSearch";
     public static final String EncryptAPI = "encrypt";
+    public static final String Sha256API = "sha256";
+    public static final String Sha256x2API = "sha256x2";
+    public static final String Sha256BytesAPI = "sha256Bytes";
+    public static final String Sha256x2BytesAPI = "sha256x2Bytes";
     public static final String VerifyAPI = "verify";
     public static final String OffLineTxAPI = "offLineTx";
     public static final String OffLineTxByCdAPI = "offLineTxByCd";
@@ -134,7 +149,75 @@ public class ApiNames {
     public static final String GetFreeKeyAPI="getFreeKey";
 
 
+
+
     static {
+
+        OpenAPIs = new String[]{
+                GetServiceAPI,SignInAPI,SignInEccAPI,TotalsAPI,GeneralAPI
+        };
+
+        BlockchainAPIs = new String[]{
+                BlockByIdsAPI, BlockSearchAPI,
+                CashByIdsAPI, CashSearchAPI,CashValidAPI,
+                FidByIdsAPI,FidSearchAPI,
+                OpReturnByIdsAPI,OpReturnSearchAPI,
+                P2shByIdsAPI,P2shSearchAPI,
+                TxByIdsAPI,TxSearchAPI
+        };
+
+        IdentityAPIs = new String[]{
+                CidInfoByIdsAPI,CidInfoSearchAPI,CidHistoryAPI,
+                FidCidSeekAPI,GetFidCidAPI,
+                NobodyByIdsAPI, NobodySearchAPI,
+                HomepageHistoryAPI,NoticeFeeHistoryAPI,ReputationHistoryAPI,
+                AvatarsAPI,GetAvatarAPI
+        };
+
+        OrganizeAPIs = new String[]{
+                GroupByIdsAPI,GroupSearchAPI,GroupMembersAPI,GroupOpHistoryAPI,MyGroupsAPI,
+                TeamByIdsAPI,TeamSearchAPI,TeamMembersAPI,TeamExMembersAPI,
+                TeamOpHistoryAPI,TeamRateHistoryAPI,TeamOtherPersonsAPI,MyTeamsAPI
+        };
+
+        ConstructAPIs = new String[]{
+                ProtocolByIdsAPI,ProtocolSearchAPI,ProtocolOpHistoryAPI,ProtocolRateHistoryAPI,
+                CodeByIdsAPI,CodeSearchAPI,CodeOpHistoryAPI,CodeRateHistoryAPI,
+                ServiceByIdsAPI,ServiceSearchAPI,ServiceOpHistoryAPI,ServiceRateHistoryAPI,
+                AppByIdsAPI,AppSearchAPI,AppOpHistoryAPI,AppRateHistoryAPI
+        };
+
+        PersonalAPIs = new String[]{
+                BoxByIdsAPI,BoxSearchAPI,BoxHistoryAPI,
+                ContactByIdsAPI,ContactsAPI,ContactsDeletedAPI,
+                SecretByIdsAPI,SecretsAPI,SecretsDeletedAPI,
+                MailByIdsAPI,MailsAPI,MailsDeletedAPI,MailThreadAPI
+        };
+
+        PublishAPIs = new String[]{
+                ProofByIdsAPI,ProofSearchAPI,ProofHistoryAPI,
+                StatementByIdsAPI,StatementSearchAPI,
+                NidSearchAPI
+        };
+
+        WalletAPIs = new String[]{
+                BroadcastTxAPI,DecodeRawTxAPI,
+                CashValidForPayAPI,CashValidForCdAPI,
+                UnconfirmedAPI
+        };
+
+        CryptoToolsAPIs = new String[]{
+                AddressesAPI,
+                EncryptAPI,VerifyAPI,
+                Sha256API,Sha256x2API,Sha256BytesAPI,Sha256x2BytesAPI,
+                OffLineTxAPI,OffLineTxByCdAPI
+        };
+
+        FreeGetAPIs = new String[]{
+                BroadcastAPI,GetAppsAPI,GetServicesAPI,GetAvatarAPI,GetCashesAPI,
+                GetFidCidAPI,GetFreeServiceAPI,GetServicesAPI,GetTotalsAPI
+        };
+
         freeApiList.add(ApiNames.GetFreeServiceAPI);
         freeApiList.add(ApiNames.GetAvatarAPI);
         freeApiList.add(ApiNames.GetTotalsAPI);
@@ -164,8 +247,8 @@ public class ApiNames {
         ApiNames.apiList.add(ApiNames.BlockHasByIdsAPI);
         ApiNames.apiList.add(ApiNames.OpReturnByIdsAPI);
         ApiNames.apiList.add(ApiNames.OpReturnSearchAPI);
-        ApiNames.apiList.add(ApiNames.fidByIdsAPI);
-        ApiNames.apiList.add(ApiNames.fidSearchAPI);
+        ApiNames.apiList.add(ApiNames.FidByIdsAPI);
+        ApiNames.apiList.add(ApiNames.FidSearchAPI);
         ApiNames.apiList.add(ApiNames.P2shByIdsAPI);
         ApiNames.apiList.add(ApiNames.P2shSearchAPI);
 
@@ -177,8 +260,8 @@ public class ApiNames {
         ApiNames.apiList.add(ApiNames.HomepageHistoryAPI);
         ApiNames.apiList.add(ApiNames.NoticeFeeHistoryAPI);
         ApiNames.apiList.add(ApiNames.ReputationHistoryAPI);
-        ApiNames.apiList.add(ApiNames.NobodysAPI);
-
+        ApiNames.apiList.add(ApiNames.NobodySearchAPI);
+        ApiNames.apiList.add(ApiNames.NobodyByIdsAPI);
 
         ApiNames.apiList.add(ApiNames.ProtocolByIdsAPI);
         ApiNames.apiList.add(ApiNames.ProtocolSearchAPI);
@@ -256,7 +339,11 @@ public class ApiNames {
         ApiNames.apiList.add(ApiNames.EncryptAPI);
         ApiNames.apiList.add(ApiNames.VerifyAPI);
         ApiNames.apiList.add(ApiNames.AddressesAPI);
+        ApiNames.apiList.add(ApiNames.Sha256API);
+        ApiNames.apiList.add(ApiNames.Sha256x2API);
+        ApiNames.apiList.add(ApiNames.Sha256BytesAPI);
+        ApiNames.apiList.add(ApiNames.Sha256x2BytesAPI);
+
         ApiNames.apiList.add(ApiNames.NewCashByFidsAPI);
-        ApiNames.apiList.add(ApiNames.NobodyByIdsAPI);
     }
 }

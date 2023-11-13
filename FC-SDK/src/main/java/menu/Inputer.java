@@ -4,6 +4,7 @@ import fcTools.Base58;
 import fcTools.ParseTools;
 import javaTools.BytesTools;
 import keyTools.KeyTools;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -330,7 +331,6 @@ public class Inputer {
     public static String inputMsg(BufferedReader br) {
         System.out.println("Input the plaintext:");
         String msg = null;
-        char[] symKey;
         try {
             msg = br.readLine();
         } catch (IOException e) {
@@ -338,5 +338,27 @@ public class Inputer {
             return null;
         }
         return msg;
+    }
+
+    public static byte[] getPasswordBytes(BufferedReader br) {
+        String ask = "Input password:";
+        char[] password = inputPassword(br, ask);
+        byte[] passwordBytes = BytesTools.utf8CharArrayToByteArray(password);
+        BytesTools.clearCharArray(password);
+        return passwordBytes;
+    }
+
+    @NotNull
+    public static byte[] inputAndCheckNewPassword(BufferedReader br) {
+        byte[] passwordBytesNew;
+        while(true){
+            System.out.print("Set the new password. ");
+            passwordBytesNew = getPasswordBytes(br);
+            System.out.print("Recheck the new password.");
+            byte[] checkPasswordByte = getPasswordBytes(br);
+            if(Arrays.equals(passwordBytesNew, checkPasswordByte))break;
+            System.out.println("They are not the same. Try again.");
+        }
+        return passwordBytesNew;
     }
 }

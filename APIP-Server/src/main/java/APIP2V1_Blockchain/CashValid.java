@@ -7,7 +7,6 @@ import constants.IndicesNames;
 import constants.ReplyInfo;
 import constants.Strings;
 import fchClass.Cash;
-import apipTools.ApipTools;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -37,7 +36,7 @@ public class CashValid extends HttpServlet {
 
         String addr = dataCheckResult.getAddr();
 
-        DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
+        RequestBody requestBody = dataCheckResult.getDataRequestBody();
 
         //Check API
         if(!isThisApiRequest(requestBody)){
@@ -50,7 +49,7 @@ public class CashValid extends HttpServlet {
         ArrayList<Sort> sort = Sort.makeSortList("cd",true,"value",false,"cashId",true);
 
         //Add condition
-        Fcdsl fcdsl = ApipTools.addExceptTermsToFcdsl(requestBody, Strings.VALID,Strings.FALSE);
+        Fcdsl fcdsl = Fcdsl.addExceptTermsToFcdsl(requestBody, Strings.VALID,Strings.FALSE);
         requestBody.setFcdsl(fcdsl);
 
         //Request
@@ -78,7 +77,7 @@ public class CashValid extends HttpServlet {
         esRequest.writeSuccess(dataCheckResult.getSessionKey());
     }
 
-    private boolean isThisApiRequest(DataRequestBody requestBody) {
+    private boolean isThisApiRequest(RequestBody requestBody) {
         if(requestBody.getFcdsl()==null)
             return false;
         if(requestBody.getFcdsl().getQuery()==null)

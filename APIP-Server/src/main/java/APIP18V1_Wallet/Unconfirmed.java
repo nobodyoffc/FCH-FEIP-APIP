@@ -1,7 +1,7 @@
 package APIP18V1_Wallet;
 
 import APIP0V1_OpenAPI.*;
-import apipClass.DataRequestBody;
+import apipClass.RequestBody;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import constants.ApiNames;
@@ -43,7 +43,7 @@ public class Unconfirmed extends HttpServlet {
 
         String addr = dataCheckResult.getAddr();
 
-        DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
+        RequestBody requestBody = dataCheckResult.getDataRequestBody();
         replier.setNonce(requestBody.getNonce());
         //Check API
         if(!isThisApiRequest(requestBody)){
@@ -107,7 +107,7 @@ public class Unconfirmed extends HttpServlet {
 
     }
 
-    private boolean isThisApiRequest(DataRequestBody requestBody) {
+    private boolean isThisApiRequest(RequestBody requestBody) {
         if(requestBody.getFcdsl()==null)
             return false;
         if(requestBody.getFcdsl().getIds()==null)

@@ -1,7 +1,7 @@
 package APIP10V1_Box;
 
 import APIP0V1_OpenAPI.*;
-import apipClass.DataRequestBody;
+import apipClass.RequestBody;
 import apipClass.Sort;
 import constants.ApiNames;
 import constants.IndicesNames;
@@ -37,7 +37,7 @@ public class BoxSearch extends HttpServlet {
 
         if (RequestChecker.isPublicSessionKey(response, replier, writer, addr)) return;
 
-        DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
+        RequestBody requestBody = dataCheckResult.getDataRequestBody();
 
         //Check API
 

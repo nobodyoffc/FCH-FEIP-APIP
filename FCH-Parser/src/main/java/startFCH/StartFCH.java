@@ -157,6 +157,7 @@ public class StartFCH {
         try {
             new Preparer().prepare(esClient, path, bestHeight);
         } catch (Exception e) {
+            e.printStackTrace();
             restart(esClient,configFCH);
         }
     }

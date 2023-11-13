@@ -1,7 +1,7 @@
 package APIP13V1_Mail;
 
 import APIP0V1_OpenAPI.*;
-import apipClass.DataRequestBody;
+import apipClass.RequestBody;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
@@ -38,7 +38,7 @@ public class MailByIds extends HttpServlet {
 
         if (RequestChecker.isPublicSessionKey(response, replier, writer, addr)) return;
 
-        DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
+        RequestBody requestBody = dataCheckResult.getDataRequestBody();
 
         //Check API
         if (!isThisApiRequest(requestBody)) {
@@ -77,7 +77,7 @@ public class MailByIds extends HttpServlet {
         esRequest.writeSuccess(dataCheckResult.getSessionKey());
     }
 
-    private boolean isThisApiRequest(DataRequestBody requestBody) {
+    private boolean isThisApiRequest(RequestBody requestBody) {
         if (requestBody.getFcdsl() == null)
             return false;
         if (requestBody.getFcdsl().getIds() == null)

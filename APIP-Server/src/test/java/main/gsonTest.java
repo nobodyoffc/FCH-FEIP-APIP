@@ -1,13 +1,13 @@
 package main;
 
 
-import apipClass.DataRequestBody;
+import apipClass.RequestBody;
 import com.google.gson.Gson;
 import fcTools.ParseTools;
 
 public class gsonTest {
     public static void main(String[] args) {
-        DataRequestBody dataRequestBody = new DataRequestBody();
+        RequestBody dataRequestBody = new RequestBody();
 //
 //        Fcdsl fcdsl = new Fcdsl();
 //
@@ -38,7 +38,7 @@ public class gsonTest {
         Gson gson = new Gson();
         //String str = gson.toJson(dataRequestBody);
         ///System.out.println(str);
-        gson.fromJson(str,DataRequestBody.class);
+        gson.fromJson(str, RequestBody.class);
 
         ParseTools.gsonPrint(dataRequestBody);
 

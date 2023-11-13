@@ -1,7 +1,7 @@
 package APIP2V1_Blockchain;
 
 import APIP0V1_OpenAPI.*;
-import apipClass.DataRequestBody;
+import apipClass.RequestBody;
 import apipClass.Sort;
 import constants.ApiNames;
 import constants.IndicesNames;
@@ -18,7 +18,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-@WebServlet(ApiNames.APIP2V1Path + ApiNames.fidSearchAPI)
+@WebServlet(ApiNames.APIP2V1Path + ApiNames.FidSearchAPI)
 public class FidSearch extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -35,7 +35,7 @@ public class FidSearch extends HttpServlet {
 
         String addr = dataCheckResult.getAddr();
 
-        DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
+        RequestBody requestBody = dataCheckResult.getDataRequestBody();
 
         //Set default sort.
         ArrayList<Sort> sort = Sort.makeSortList("lastHeight",false,"fid",true,null,null);

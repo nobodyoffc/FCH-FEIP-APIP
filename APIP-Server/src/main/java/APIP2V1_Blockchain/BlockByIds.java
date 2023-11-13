@@ -1,14 +1,14 @@
 package APIP2V1_Blockchain;
 
 import APIP0V1_OpenAPI.*;
-import apipClass.DataRequestBody;
+import apipClass.RequestBody;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
 import esTools.EsTools;
 import fchClass.Block;
 import fchClass.BlockHas;
-import data.BlockInfo;
+import apipClass.BlockInfo;
 import initial.Initiator;
 
 import javax.servlet.ServletException;
@@ -40,7 +40,7 @@ public class BlockByIds extends HttpServlet {
 
         String addr = dataCheckResult.getAddr();
 
-        DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
+        RequestBody requestBody = dataCheckResult.getDataRequestBody();
 
         //Check API
         if(!isThisApiRequest(requestBody)){
@@ -98,7 +98,7 @@ public class BlockByIds extends HttpServlet {
         return;
     }
 
-    private boolean isThisApiRequest(DataRequestBody requestBody) {
+    private boolean isThisApiRequest(RequestBody requestBody) {
         if(requestBody.getFcdsl()==null)
             return false;
         if(requestBody.getFcdsl().getIds()==null)

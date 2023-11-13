@@ -19,7 +19,7 @@ import fchClass.Block;
 import menu.Inputer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import parser.WeightMethod;
+import fcTools.WeightMethod;
 import esTools.EsTools;
 
 import java.io.BufferedReader;

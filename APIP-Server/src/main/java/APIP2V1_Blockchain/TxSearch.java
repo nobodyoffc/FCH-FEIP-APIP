@@ -1,15 +1,16 @@
 package APIP2V1_Blockchain;
 
 import APIP0V1_OpenAPI.*;
-import apipClass.DataRequestBody;
+import apipClass.RequestBody;
 import apipClass.Sort;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
 import esTools.EsTools;
+import fcTools.ParseTools;
 import fchClass.Tx;
 import fchClass.TxHas;
-import data.TxInfo;
+import apipClass.TxInfo;
 import initial.Initiator;
 
 import javax.servlet.ServletException;
@@ -39,7 +40,7 @@ public class TxSearch extends HttpServlet {
 
         String addr = dataCheckResult.getAddr();
 
-        DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
+        RequestBody requestBody = dataCheckResult.getDataRequestBody();
 
         //Check API
 
@@ -50,31 +51,60 @@ public class TxSearch extends HttpServlet {
 
         //Request
         DataRequestHandler esRequest = new DataRequestHandler(dataCheckResult.getAddr(),requestBody,response,replier);
-        List<TxHas> txHasList;
-        try {
-            txHasList = esRequest.doRequest(IndicesNames.TX_HAS,sort, TxHas.class);
-            if(txHasList==null){
-                return;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
-            writer.write(replier.reply1012BadQuery(addr));
-            return;
-        }
 
-        List<String> idList = new ArrayList<>();
-        for(TxHas txhas :txHasList){
-            idList.add(txhas.getTxId());
-        }
+        String fcdslQuery = ParseTools.gsonString(requestBody.getFcdsl().getQuery());
 
         List<Tx> txList = null;
-        try {
-            txList = EsTools.getMultiByIdList(Initiator.esClient, IndicesNames.TX, idList, Tx.class).getResultList();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        List<TxHas> txHasList = null;
 
+        if(fcdslQuery.contains("Marks")) {
+            try {
+                txHasList = esRequest.doRequest(IndicesNames.TX_HAS, sort, TxHas.class);
+                if (txHasList == null) {
+                    return;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1012BadQuery));
+                writer.write(replier.reply1012BadQuery(addr));
+                return;
+            }
+
+            List<String> idList = new ArrayList<>();
+            for (TxHas txhas : txHasList) {
+                idList.add(txhas.getTxId());
+            }
+
+            try {
+                txList = EsTools.getMultiByIdList(Initiator.esClient, IndicesNames.TX, idList, Tx.class).getResultList();
+                if(txList==null)return;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }else {
+            try {
+                txList = esRequest.doRequest(IndicesNames.TX, sort, Tx.class);
+            } catch (Exception e) {
+                e.printStackTrace();
+                response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1012BadQuery));
+                writer.write(replier.reply1012BadQuery(addr));
+                return;
+            }
+
+            List<String> idList = new ArrayList<>();
+            for (Tx tx : txList) {
+                idList.add(tx.getTxId());
+            }
+
+            try {
+                txHasList = EsTools.getMultiByIdList(Initiator.esClient, IndicesNames.TX_HAS, idList, TxHas.class).getResultList();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        if (txList == null) {
+            return;
+        }
         List<TxInfo> meetList = TxInfo.mergeTxAndTxHas(txList, txHasList);
 
         //response
@@ -83,5 +113,4 @@ public class TxSearch extends HttpServlet {
         esRequest.writeSuccess(dataCheckResult.getSessionKey());
 
     }
-
 }

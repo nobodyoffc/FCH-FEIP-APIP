@@ -1,10 +1,10 @@
 package APIP0V1_OpenAPI;
 
-import apipClass.SignInRequestBody;
+import apipClass.RequestBody;
 
 public class SignInCheckResult {
 
-    private SignInRequestBody signInRequestBody;
+    private RequestBody signInRequestBody;
     private String fid;
     private String pubKey;
 //    private String pubKey;
@@ -52,11 +52,11 @@ public class SignInCheckResult {
         this.pubKey = pubKey;
     }
 
-    public SignInRequestBody getSignInRequestBody() {
+    public RequestBody getSignInRequestBody() {
         return signInRequestBody;
     }
 
-    public void setSignInRequestBody(SignInRequestBody signInRequestBody) {
+    public void setSignInRequestBody(RequestBody signInRequestBody) {
         this.signInRequestBody = signInRequestBody;
     }
 }

@@ -7,7 +7,6 @@ import constants.IndicesNames;
 import constants.ReplyInfo;
 import constants.Strings;
 import feipClass.Mail;
-import apipTools.ApipTools;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -39,7 +38,7 @@ public class Mails extends HttpServlet {
 
         if (RequestChecker.isPublicSessionKey(response, replier, writer, addr)) return;
 
-        DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
+        RequestBody requestBody = dataCheckResult.getDataRequestBody();
 
         //Check API
 //        if(!isThisApiRequest(requestBody)){
@@ -53,7 +52,7 @@ public class Mails extends HttpServlet {
 
 
         //Add condition
-        Fcdsl fcdsl = ApipTools.addExceptTermsToFcdsl(requestBody, Strings.ACTIVE,Strings.FALSE);
+        Fcdsl fcdsl = Fcdsl.addExceptTermsToFcdsl(requestBody, Strings.ACTIVE,Strings.FALSE);
 
         requestBody.setFcdsl(fcdsl);
 

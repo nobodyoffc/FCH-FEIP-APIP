@@ -1,7 +1,7 @@
 package APIP18V1_Wallet;
 
 import APIP0V1_OpenAPI.*;
-import apipClass.DataRequestBody;
+import apipClass.RequestBody;
 import constants.ApiNames;
 import constants.ReplyInfo;
 import fchClass.Cash;
@@ -37,7 +37,7 @@ public class CashValidForPay extends HttpServlet {
 
         String addr = dataCheckResult.getAddr();
 
-        DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
+        RequestBody requestBody = dataCheckResult.getDataRequestBody();
         replier.setNonce(requestBody.getNonce());
         //Check API
         if (!isThisApiRequest(requestBody)) {
@@ -88,14 +88,12 @@ public class CashValidForPay extends HttpServlet {
 
     }
 
-    private boolean isThisApiRequest(DataRequestBody requestBody) {
+    private boolean isThisApiRequest(RequestBody requestBody) {
         if(requestBody.getFcdsl()==null)
             return false;
         if(requestBody.getFcdsl().getQuery()==null)
             return false;
         if(requestBody.getFcdsl().getQuery().getTerms()==null)
-            return false;
-        if(!requestBody.getFcdsl().getQuery().getTerms().getFields()[0].equals("fid"))
             return false;
         if(requestBody.getFcdsl().getQuery().getTerms().getValues().length!=1)
             return false;

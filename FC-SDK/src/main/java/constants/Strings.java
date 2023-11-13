@@ -114,4 +114,7 @@ public class Strings {
     public static final String USER_ID = "userId";
     public static final String CHECK = "check";
     public static final String FOUND = "found";
+    public static final String PRE_KEY = "priKey";
+    public static final String SYM_SIGN = "symSign";
+    public static final String SYM_KEY_NAME = "symKeyName";
 }

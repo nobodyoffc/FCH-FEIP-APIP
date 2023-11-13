@@ -1,14 +1,14 @@
 package APIP3V1_CidInfo;
 
 import APIP0V1_OpenAPI.*;
-import apipClass.DataRequestBody;
+import apipClass.RequestBody;
 import apipClass.Sort;
 import co.elastic.clients.elasticsearch.core.MgetResponse;
 import co.elastic.clients.elasticsearch.core.mget.MultiGetResponseItem;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
-import data.CidInfo;
+import apipClass.CidInfo;
 import fchClass.Address;
 import feipClass.Cid;
 import initial.Initiator;
@@ -40,7 +40,7 @@ public class CidSearch extends HttpServlet {
 
         String addr = dataCheckResult.getAddr();
 
-        DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
+        RequestBody requestBody = dataCheckResult.getDataRequestBody();
 
         //Set default sort.
         ArrayList<Sort> sort = Sort.makeSortList("lastHeight",false,"fid",true,null,null);

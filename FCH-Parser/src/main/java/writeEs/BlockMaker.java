@@ -5,7 +5,7 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import keyTools.KeyTools;
 import fcTools.ParseTools;
 import parser.ReadyBlock;
-import parser.WeightMethod;
+import fcTools.WeightMethod;
 import esTools.EsTools;
 import esTools.EsTools.MgetResult;
 

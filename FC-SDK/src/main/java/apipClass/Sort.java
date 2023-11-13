@@ -3,6 +3,7 @@ package apipClass;
 import co.elastic.clients.elasticsearch._types.FieldSort;
 import co.elastic.clients.elasticsearch._types.SortOptions;
 import co.elastic.clients.elasticsearch._types.SortOrder;
+import constants.Strings;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,7 +14,14 @@ import static constants.Strings.*;
 
 public class Sort {
     private String field;
-    private String order = "desc";
+    private String order = DESC;
+    public Sort(){}
+    public Sort(String field,String order){
+        if(order.equals(DESC)||order.equals(ASC)) {
+            this.field = field;
+            this.order = order;
+        }
+    }
 
     public static List<SortOptions> makeHeightTxIndexSort() {
         return makeTwoFieldsSort(HEIGHT,DESC,TX_INDEX,DESC);
@@ -47,7 +55,7 @@ public class Sort {
                 sort.setField(input);
 
                 while(true) {
-                    System.out.println("Input the order. 'desc' or 'asc': ");
+                    System.out.println("Input the order. "+DESC+" or "+ASC+": ");
                     input = br.readLine();
                     if ("q".equals(input)) break;
                     if("desc".equals(input)){
@@ -73,9 +81,9 @@ public class Sort {
         List<SortOptions> soList = new ArrayList<>();
         for(Sort sort1: sortList){
             SortOrder order;
-            if(sort1.getOrder().equals("asc")){
+            if(sort1.getOrder().equals(ASC)){
                 order = SortOrder.Asc;
-            }else if(sort1.getOrder().equals("desc")){
+            }else if(sort1.getOrder().equals(DESC)){
                 order = SortOrder.Desc;
             }else {
                 order = null;
@@ -93,20 +101,20 @@ public class Sort {
         Sort sort = new Sort();
         sort.setField(field1);
         if(isAsc1)
-            sort.setOrder("asc");
+            sort.setOrder(ASC);
         sortList.add(sort);
 
         if(field2!=null) {
             Sort sort1 = new Sort();
             sort1.setField(field2);
-            if(isAsc2)sort1.setOrder("asc");
+            if(isAsc2)sort1.setOrder(ASC);
             sortList.add(sort1);
         }
 
         if(field3!=null) {
             Sort sort1 = new Sort();
             sort1.setField(field3);
-            if(isAsc3)sort1.setOrder("asc");
+            if(isAsc3)sort1.setOrder(ASC);
             sortList.add(sort1);
         }
         return sortList;

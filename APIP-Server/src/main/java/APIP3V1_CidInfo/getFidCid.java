@@ -7,7 +7,7 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.GetResponse;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
-import data.CidInfo;
+import apipClass.CidInfo;
 import fcTools.ParseTools;
 import feipClass.Cid;
 import initial.Initiator;
@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
-import static data.CidInfo.mergeCidInfo;
+import static apipClass.CidInfo.mergeCidInfo;
 
 @WebServlet(ApiNames.APIP3V1Path + ApiNames.GetFidCidAPI)
 public class getFidCid extends HttpServlet {

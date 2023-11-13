@@ -1,7 +1,7 @@
 package CidCashTools;
 
 import APIP0V1_OpenAPI.*;
-import apipClass.DataRequestBody;
+import apipClass.RequestBody;
 import constants.ApiNames;
 import constants.ReplyInfo;
 import keyTools.KeyTools;
@@ -34,7 +34,7 @@ public class Addresses extends HttpServlet {
 
 //        if (RequestChecker.isPublicSessionKey(response, replier, writer, addr)) return;
 
-        DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
+        RequestBody requestBody = dataCheckResult.getDataRequestBody();
         replier.setNonce(requestBody.getNonce());
         //Check API
         if(!isThisApiRequest(requestBody)){
@@ -76,7 +76,7 @@ public class Addresses extends HttpServlet {
         writer.write(replier.reply0Success(addr));
     }
 
-    private boolean isThisApiRequest(DataRequestBody requestBody) {
+    private boolean isThisApiRequest(RequestBody requestBody) {
         if(requestBody.getFcdsl()==null)
             return false;
         if(requestBody.getFcdsl().getOther()==null)

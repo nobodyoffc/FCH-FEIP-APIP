@@ -9,6 +9,15 @@ public class Affair {
     private String fidB;
     private String oidB;
     private Object data;
+    private String dataBase64;
+
+    public String getDataBase64() {
+        return dataBase64;
+    }
+
+    public void setDataBase64(String dataBase64) {
+        this.dataBase64 = dataBase64;
+    }
 
     public String getRelation() {
         return relation;

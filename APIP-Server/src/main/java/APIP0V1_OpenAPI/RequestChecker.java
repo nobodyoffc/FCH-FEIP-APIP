@@ -1,7 +1,6 @@
 package APIP0V1_OpenAPI;
 
-import apipClass.DataRequestBody;
-import apipClass.SignInRequestBody;
+import apipClass.RequestBody;
 import com.google.gson.Gson;
 import constants.ApiNames;
 import constants.ReplyInfo;
@@ -114,7 +113,7 @@ public class RequestChecker {
             return null;
         }
 
-        SignInRequestBody signInRequestBody = getSignInRequestBody(requestBodyBytes);
+        RequestBody signInRequestBody = getSignInRequestBody(requestBodyBytes);
         if(signInRequestBody==null)return null;
 
         if(isBadNonce(signInRequestBody.getNonce())){
@@ -200,11 +199,11 @@ public class RequestChecker {
         if(signFid.equals(fid))return signPubKey;
         return null;
     }
-    private SignInRequestBody getSignInRequestBody(byte[] requestBodyBytes) {
+    private RequestBody getSignInRequestBody(byte[] requestBodyBytes) {
         String requestDataJson = new String(requestBodyBytes);
-        SignInRequestBody connectRequestBody;
+        RequestBody connectRequestBody;
         try {
-            connectRequestBody = gson.fromJson(requestDataJson, SignInRequestBody.class);
+            connectRequestBody = gson.fromJson(requestDataJson, RequestBody.class);
         }catch(Exception e){
             response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1013BadRequest));
             writer.write(replier.reply1013BadRequst(fid));
@@ -277,7 +276,7 @@ public class RequestChecker {
             writer.write(replier.reply1003MissBody(fid));
             return null;
         }
-        DataRequestBody dataRequestBody = getDataRequestBody(requestBodyBytes);
+        RequestBody dataRequestBody = getDataRequestBody(requestBodyBytes);
         if(dataRequestBody==null)return null;
 
         replier.setNonce(dataRequestBody.getNonce());
@@ -360,13 +359,13 @@ public class RequestChecker {
     private byte[] getRequestBodyBytes(HttpServletRequest request) throws IOException {
         return request.getInputStream().readAllBytes();
     }
-    private DataRequestBody getDataRequestBody(byte[] requestBodyBytes) {
+    private RequestBody getDataRequestBody(byte[] requestBodyBytes) {
 
         String requestDataJson = new String(requestBodyBytes);
 
-        DataRequestBody dataRequestBody;
+        RequestBody dataRequestBody;
         try {
-            dataRequestBody = gson.fromJson(requestDataJson, DataRequestBody.class);
+            dataRequestBody = gson.fromJson(requestDataJson, RequestBody.class);
         }catch(Exception e){
             response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1013BadRequest));
             writer.write(replier.reply1013BadRequst(fid));

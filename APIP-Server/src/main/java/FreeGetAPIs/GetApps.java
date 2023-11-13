@@ -10,6 +10,7 @@ import constants.IndicesNames;
 import constants.ReplyInfo;
 import constants.Strings;
 import feipClass.App;
+import feipClass.Service;
 import initial.Initiator;
 import redis.clients.jedis.Jedis;
 
@@ -41,13 +42,23 @@ public class GetApps extends HttpServlet {
         }
 
         ElasticsearchClient esClient = Initiator.esClient;
+        String aid = request.getParameter("id");
+        SearchResponse<App> result;
+        List<Hit<App>> hitList;
+        if(aid!=null){
+            result = esClient.search(s -> s.index(IndicesNames.SERVICE)
+                            .query(q -> q.term(t -> t.field("aid").value(aid)))
+                    , App.class);
+            hitList = result.hits().hits();
+        }else {
+            result = esClient.search(s -> s.index(IndicesNames.APP)
+                            .query(q -> q.term(t -> t.field("active").value(true)))
+                            .size(20)
+                            .sort(so -> so.field(f -> f.field("tRate").order(SortOrder.Desc).field("tCdd").order(SortOrder.Desc)))
+                    , App.class);
 
-        SearchResponse<App> result = esClient.search(s -> s.index(IndicesNames.APP)
-                .query(q -> q.term(t -> t.field("active").value(true)))
-                .size(20)
-                .sort(so -> so.field(f -> f.field("tRate").order(SortOrder.Desc).field("tCdd").order(SortOrder.Desc)))
-                , App.class);
-        List<Hit<App>> hitList = result.hits().hits();
+            hitList = result.hits().hits();
+        }
         if(hitList==null || hitList.size()==0){
             response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code2006AppNoFound));
             writer.write(replier.reply2006AppNoFound());

@@ -1,20 +1,22 @@
-import eccAes256K1P7.Aes256CbcP7;
 import eccAes256K1P7.EccAes256K1P7;
 import eccAes256K1P7.EccAesData;
 import eccAes256K1P7.EccAesType;
 import fcTools.ParseTools;
+import fipaClass.Algorithm;
 import javaTools.BytesTools;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.HexFormat;
 
-import static constants.Strings.CONFIG;
-import static constants.Strings.CONFIG_FILE_PATH;
-
 public class SimpleTest {
     public static void main(String[] args) {
+        System.out.println(Algorithm.EcdsaBtcMsg_No1_NrC7.ordinal());
+        System.out.println(Algorithm.EcdsaBtcMsg_No1_NrC7.getStr());
+        System.out.println(Algorithm.ECC256k1_AES256CBC.ordinal());
+    }
+
+    private static void eccAesDataTest() {
         String pubKeyAStr = "pubKeyA";
         String ivStr = "iv";
         String cipherStr = "Aj25FHwyKPtHT4XzvYLEBrNHi9Z519Mx33W2SP49DO8Tohkl0q0kI5zdEIAOHh0Qb/+SbJ8Z5PAruXFYCuo0t/2owcxaZ5d6oLG6gZgQtOtUvokff7W5AILR5Mqrw0iIrw==";

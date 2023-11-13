@@ -1,10 +1,7 @@
 package test;
 
-import APIP0V1_OpenAPI.DataCheckResult;
-import APIP0V1_OpenAPI.DataRequestHandler;
 import APIP0V1_OpenAPI.Replier;
-import APIP0V1_OpenAPI.RequestChecker;
-import apipClass.DataRequestBody;
+import apipClass.RequestBody;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import constants.ApiNames;
@@ -118,7 +115,7 @@ public class Unconfirmed extends HttpServlet {
 
     }
 
-    private boolean isThisApiRequest(DataRequestBody requestBody) {
+    private boolean isThisApiRequest(RequestBody requestBody) {
         if(requestBody.getFcdsl()==null)
             return false;
         if(requestBody.getFcdsl().getIds()==null)

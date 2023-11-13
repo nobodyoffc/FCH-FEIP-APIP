@@ -1,20 +1,20 @@
 package APIP0V1_OpenAPI;
 
-import apipClass.DataRequestBody;
+import apipClass.RequestBody;
 
 public class DataCheckResult {
 
-    private DataRequestBody dataRequestBody;
+    private RequestBody dataRequestBody;
     private String addr;
     private String pubKey;
     private String sessionName;
     private String sessionKey;
 
-    public DataRequestBody getDataRequestBody() {
+    public RequestBody getDataRequestBody() {
         return dataRequestBody;
     }
 
-    public void setDataRequestBody(DataRequestBody dataRequestBody) {
+    public void setDataRequestBody(RequestBody dataRequestBody) {
         this.dataRequestBody = dataRequestBody;
     }
 

@@ -28,10 +28,10 @@ public class DataRequestHandler {
     private final HttpServletResponse response;
     private final ElasticsearchClient esClient;
     private final String addr;
-    private final DataRequestBody dataRequestBody;
+    private final RequestBody dataRequestBody;
     private final PrintWriter writer;
 
-    public DataRequestHandler(String addr, DataRequestBody dataRequestBody, HttpServletResponse response, Replier replier) throws IOException {
+    public DataRequestHandler(String addr, RequestBody dataRequestBody, HttpServletResponse response, Replier replier) throws IOException {
         this.dataRequestBody = dataRequestBody;
         this.addr = addr;
         this.esClient = Initiator.esClient;

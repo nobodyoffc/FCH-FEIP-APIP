@@ -9,7 +9,7 @@ import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
 import constants.Strings;
-import data.CidInfo;
+import apipClass.CidInfo;
 import fchClass.Address;
 import feipClass.Cid;
 import initial.Initiator;
@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
-import static data.CidInfo.mergeCidInfo;
+import static apipClass.CidInfo.mergeCidInfo;
 
 @WebServlet(ApiNames.FreeGetPath + ApiNames.GetFidCidAPI)
 public class GetFidCid extends HttpServlet {

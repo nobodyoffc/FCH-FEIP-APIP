@@ -1,7 +1,5 @@
 package walletTools;
 
-//import APIP0V1_OpenAPI.Replier;
-
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.SortOrder;
@@ -18,8 +16,9 @@ import constants.Constants;
 import constants.IndicesNames;
 import constants.Strings;
 import fcTools.ParseTools;
-import fcTools.TxTool;
+import txTools.FchTool;
 import fchClass.Cash;
+
 import freecashRPC.FcRpcMethods;
 import freecashRPC.NewFcRpcClient;
 import javaTools.BytesTools;
@@ -75,7 +74,7 @@ public class WalletTools {
         }
 
         //
-        long fee = TxTool.calcFee(inputs.size(),outputs.size(),opLength);
+        long fee = FchTool.calcFee(inputs.size(),outputs.size(),opLength);
         long change = 0;
         double outValue;
         if(!"".equals(toAddr)&&!toAddr.equals(fromAddr)) {
@@ -252,7 +251,7 @@ public class WalletTools {
 
 
         List<Map<String, Object>> inputs = inputResult.getInputs();
-        long fee = TxTool.calcFee(inputs.size(), outputs.size(), 0);
+        long fee = FchTool.calcFee(inputs.size(), outputs.size(), 0);
         outputs.put(addr,(valueSum-valueEach*(outCount-1)-fee)/Million);
 
         return outputs;
@@ -261,11 +260,21 @@ public class WalletTools {
     public static CashListReturn getCashForCd(String addrRequested, long cd,ElasticsearchClient esClient) throws IOException {
         CashListReturn cashListReturn;
 
+        cashListReturn = getCdFromCashList(cd, addrRequested, esClient);
+
+        if(cashListReturn.getCashList() != null)return cashListReturn;
+
+        int code = cashListReturn.getCode();
+        String msg = cashListReturn.getMsg();
+
         cashListReturn = getCdFromOneCash(addrRequested, cd, esClient);
 
-        if(cashListReturn.getCashList() != null && cashListReturn.getCashList().size() == 1)return cashListReturn;
+        if(cashListReturn.getCashList().isEmpty()){
+            cashListReturn.setCode(code);
+            cashListReturn.setMsg(msg);
+        }
 
-        return getCdFromCashList(cd, addrRequested, esClient);
+        return cashListReturn;
     }
     private static CashListReturn getCdFromOneCash(String addrRequested, long cd, ElasticsearchClient esClient) throws IOException {
         String index = IndicesNames.CASH;
@@ -273,18 +282,20 @@ public class WalletTools {
         SearchResponse<Cash> result = esClient.search(s -> s.index(index)
                 .query(q ->q.bool(b->b
                                 .must(m->m.term(t -> t.field(Strings.OWNER).value(addrRequested)))
-                                .must(m1->m1.term(t1->t1.field(Strings.VALUE).value(true)))
+                                .must(m1->m1.term(t1->t1.field(Strings.VALID).value(true)))
                                 .must(m2->m2.range(r1->r1.field(Strings.CD).gte(JsonData.of(cd))))
                         )
                 )
                 .trackTotalHits(tr->tr.enabled(true))
-//                .aggregations(Strings.SUM,a->a.sum(s1->s1.field(Strings.CD)))
                 .sort(s1->s1.field(f->f.field(Strings.CD).order(SortOrder.Asc)))
-                .size(100), Cash.class);
+                .size(1), Cash.class);
 
         List<Cash> cashList = new ArrayList<>();
 
         List<Hit<Cash>> hitList = result.hits().hits();
+
+        if(hitList==null || hitList.size()==0)return cashListReturn;
+
         for(Hit<Cash> hit : hitList){
             Cash cash = hit.source();
             cashList.add(cash);
@@ -292,21 +303,9 @@ public class WalletTools {
 
         checkUnconfirmed(addrRequested,cashList);
 
-        Cash goodCash =null;
-        List<Cash> meetList = new ArrayList<>();
-        long adding = 0;
-        for(Cash cash:cashList){
-            if(cash.getCd()>cd){
-                goodCash=cash;
-                break;
-            }
-        }
-
         assert result.hits().total() != null;
         cashListReturn.setTotal(result.hits().total().value());
-        List<Cash> newCashList = new ArrayList<>();
-        cashList.add(goodCash);
-        cashListReturn.setCashList(newCashList);
+        cashListReturn.setCashList(cashList);
         return cashListReturn;
     }
     private static CashListReturn getCdFromCashList(long cd, String addrRequested, ElasticsearchClient esClient) throws IOException {
@@ -315,14 +314,14 @@ public class WalletTools {
 
         SearchResponse<Cash> result = esClient.search(s -> s.index(index)
                 .query(q ->q.bool(b->b
-                                .must(m->m.term(t -> t.field("owner").value(addrRequested)))
-                                .must(m1->m1.term(t1->t1.field("valid").value(true)))
-                                .must(m2->m2.range(r1->r1.field("cd").lte(JsonData.of(cd))))
+                                .must(m->m.term(t -> t.field(Strings.OWNER).value(addrRequested)))
+                                .must(m1->m1.term(t1->t1.field(Strings.VALID).value(true)))
+//                                .must(m2->m2.range(r1->r1.field(Strings.CD).lte(JsonData.of(cd))))
                         )
                 )
                 .trackTotalHits(tr->tr.enabled(true))
-                .aggregations("sum",a->a.sum(s1->s1.field("cd")))
-                .sort(s1->s1.field(f->f.field("cd").order(SortOrder.Desc)))
+                .aggregations("sum",a->a.sum(s1->s1.field(Strings.CD)))
+                .sort(s1->s1.field(f->f.field(Strings.CD).order(SortOrder.Desc)))
                 .size(100), Cash.class);
 
         if(result==null){
@@ -346,7 +345,7 @@ public class WalletTools {
         if(hitList.size()==0){
             cashListReturn.setCode(3);
             cashListReturn.setMsg("Get cashes failed.");
-            return null;
+            return cashListReturn;
         }
 
         List<Cash> cashList = new ArrayList<>();
@@ -368,8 +367,8 @@ public class WalletTools {
 
         if(adding<cd){
             cashListReturn.setCode(4);
-            cashListReturn.setMsg("Can't get enough cd from 100 cashes. Merge cashes with small cd first please.");
-            return null;
+            cashListReturn.setMsg("Can not get enough cd from 100 cashes. Merge cashes with small cd first please.");
+            return cashListReturn;
         }
 
         cashListReturn.setCashList(meetList);
@@ -396,13 +395,13 @@ public class WalletTools {
                     .size(100), Cash.class);
         } catch (IOException e) {
             cashListReturn.setCode(1);
-            cashListReturn.setMsg("Can't get cashes. Check ES.");
+            cashListReturn.setMsg("Can not get cashes. Check ES.");
             return cashListReturn;
         }
 
         if(result==null){
             cashListReturn.setCode(1);
-            cashListReturn.setMsg("Can't get cashes.Check ES.");
+            cashListReturn.setMsg("Can not get cashes.Check ES.");
             return cashListReturn;
         }
 

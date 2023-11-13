@@ -11,4 +11,7 @@ public class UpStrings {
     public static final String HOOK = "Hook";
     public static final String LISTENER = "Listener";
     public static final String PROVIDER = "Provider";
+    public static final String SYM_SIGN = "SymSign";
+    public static final String ASY_SIGN = "AsySign";
+    public static final String FID = "FID";
 }

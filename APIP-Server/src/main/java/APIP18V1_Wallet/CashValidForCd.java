@@ -1,7 +1,7 @@
 package APIP18V1_Wallet;
 
 import APIP0V1_OpenAPI.*;
-import apipClass.DataRequestBody;
+import apipClass.RequestBody;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
@@ -37,7 +37,7 @@ public class CashValidForCd extends HttpServlet {
 
         String addr = dataCheckResult.getAddr();
 
-        DataRequestBody requestBody = dataCheckResult.getDataRequestBody();
+        RequestBody requestBody = dataCheckResult.getDataRequestBody();
         replier.setNonce(requestBody.getNonce());
         //Check API
         if (!isThisApiRequest(requestBody)) {
@@ -47,7 +47,7 @@ public class CashValidForCd extends HttpServlet {
         }
 
         //Request
-        String index = IndicesNames.CASH;
+//        String index = IndicesNames.CASH;
         String addrRequested = requestBody.getFcdsl().getQuery().getTerms().getValues()[0];
 
         long cd = 0;
@@ -72,12 +72,14 @@ public class CashValidForCd extends HttpServlet {
         List<Cash> meetList = cashListReturn.getCashList();
 
         if(meetList==null){
-            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1020OtherError));
+            replier.setData(cashListReturn.getMsg());
             writer.write(replier.reply1012BadQuery(addr));
             return;
         }
         if(meetList.size()==0){
             response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1011DataNotFound));
+            replier.setData(cashListReturn.getMsg());
             writer.write(replier.reply1011DataNotFound(addr));
             return;
         }
@@ -90,14 +92,12 @@ public class CashValidForCd extends HttpServlet {
 
     }
 
-    private boolean isThisApiRequest(DataRequestBody requestBody) {
+    private boolean isThisApiRequest(RequestBody requestBody) {
         if(requestBody.getFcdsl()==null)
             return false;
         if(requestBody.getFcdsl().getQuery()==null)
             return false;
         if(requestBody.getFcdsl().getQuery().getTerms()==null)
-            return false;
-        if(!requestBody.getFcdsl().getQuery().getTerms().getFields()[0].equals("fid"))
             return false;
         if(requestBody.getFcdsl().getQuery().getTerms().getValues().length!=1)
             return false;
