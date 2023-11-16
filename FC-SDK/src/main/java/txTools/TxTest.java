@@ -1,11 +1,29 @@
 package txTools;
 
+import apipClass.ApipParamsForClient;
+import apipClient.ApipClient;
+import apipClient.WalletAPIs;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import constants.Constants;
+import cryptoTools.Hash;
+import fcTools.ParseTools;
+import fchClass.Cash;
+import fipaClass.Signature;
+import javaTools.BytesTools;
 import keyTools.KeyTools;
+import menu.Inputer;
 import org.bitcoinj.core.*;
 import org.bitcoinj.fch.FchMainNetwork;
 import org.bitcoinj.script.Script;
 import org.bitcoinj.script.ScriptBuilder;
+import walletTools.SendTo;
+import walletTools.WalletTools;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HexFormat;
 import java.util.List;
@@ -16,8 +34,77 @@ import static txTools.FchTool.createTransactionSign;
 
 public class TxTest {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
+        Transaction transaction = new Transaction(FchMainNetwork.MAINNETWORK);
+        String priKey = "L2bHRej6Fxxipvb4TiR5bu1rkT3tRp8yWEsUy4R1Zb8VMm2x7sd8";
+        String priKey32 = KeyTools.getPriKey32(priKey);
+        if(priKey32==null)return;
+        byte[]priKeyBytes = HexFormat.of().parseHex(priKey32);
+        ECKey ecKey = ECKey.fromPrivate(priKeyBytes);
+        String pubkey = ecKey.getPublicKeyAsHex();
+        String fid = KeyTools.pubKeyToFchAddr(pubkey);
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        System.out.println("Confirm or set your password...");
+        byte[] passwordBytes = Inputer.getPasswordBytes(br);
+        byte[] symKey = Hash.Sha256x2(passwordBytes);
+        byte[] sessionKey = new byte[0];
+        try {
+            ApipParamsForClient initApipParamsForClient = ApipParamsForClient.checkApipParams(br, passwordBytes.clone());
+            if(initApipParamsForClient ==null)return;
+            sessionKey = initApipParamsForClient.decryptSessionKey(Hash.Sha256x2(passwordBytes));
+            if(sessionKey ==null)return;
+            BytesTools.clearByteArray(passwordBytes);
+        }catch (Exception e){
+            e.printStackTrace();
+            System.out.println("Wrong password, try again.");
+        }
 
+        WalletAPIs walletAPIs = new WalletAPIs();
+        String urlHead = Constants.UrlHead_CID_CASH;
+
+        List<SendTo>sendToList = new ArrayList<>();
+        SendTo sendTo = new SendTo();
+        sendTo.setFid(fid);
+        sendTo.setAmount(0.1);
+        sendToList.add(sendTo);
+
+        String msg = "hi";
+
+        long fee = FchTool.calcFee(0, sendToList.size(), msg.length());
+
+        ApipClient apipClient = walletAPIs.cashValidForPayPost(urlHead, fid, 0.1+((double) fee /FchToSatoshi), null, sessionKey);
+
+        Object responseData = apipClient.getResponseBody().getData();
+        Type t = new TypeToken<ArrayList<Cash>>() {}.getType();
+        Gson gson = new Gson();
+        List<Cash> cashList = new Gson().fromJson(gson.toJson(responseData), t);
+
+        String txSigned = WalletTools.schnorrTxSign(cashList, sendToList, msg, priKeyBytes);
+        System.out.println(txSigned);
+    }
+
+    private static void schnorrMsgTest() throws IOException {
+        String priKey = "L2bHRej6Fxxipvb4TiR5bu1rkT3tRp8yWEsUy4R1Zb8VMm2x7sd8";
+        String priKey32 = KeyTools.getPriKey32(priKey);
+        if(priKey32==null)return;
+        byte[]priKeyBytes = HexFormat.of().parseHex(priKey32);
+        ECKey ecKey = ECKey.fromPrivate(priKeyBytes);
+        String pubkey = ecKey.getPublicKeyAsHex();
+        String fid = KeyTools.pubKeyToFchAddr(pubkey);
+        String msg = "hello";
+        System.out.println(msg);
+        String sign = WalletTools.schnorrMsgSign(msg,priKeyBytes);
+        System.out.println("sign:"+sign);
+
+        boolean verify = WalletTools.schnorrMsgVerify(msg,sign,fid);
+        System.out.println("verify '"+msg+"':"+verify);
+        verify = WalletTools.schnorrMsgVerify(msg+" ",sign,fid);
+        System.out.println("verify '"+msg+" "+"':"+verify);
+        Signature signature = new Signature(fid,msg,sign, Constants.Schnorr_No1_NrC7);
+        System.out.println(ParseTools.gsonString(signature));
+    }
+
+    public static void schnorrTxTest() {
         Transaction transaction = new Transaction(FchMainNetwork.MAINNETWORK);
         int inputIndex =0;
         String priKey = "L2bHRej6Fxxipvb4TiR5bu1rkT3tRp8yWEsUy4R1Zb8VMm2x7sd8";
@@ -58,13 +145,6 @@ public class TxTest {
         long fee=1000;
         String signed = createTransactionSign(inputs, outputs, opreturn, addr, fee);
         System.out.println(signed);
-
-//        SchnorrSignature sign = transaction.calculateSchnorrSignature(inputIndex, ecKey, script.getProgram(), value, sigHash, anyoneCanPay);
-//        System.out.println(HexFormat.of().formatHex(sign.getSignature()));
-//        transaction.calculateSignature(inputIndex,ecKey,redeemScript,sigHash,anyoneCanPay);
-
-
-
     }
 
     private static void testVarInt() {

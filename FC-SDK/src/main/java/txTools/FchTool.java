@@ -102,6 +102,16 @@ public class FchTool {
             totalOutput += output.getAmount();
             transaction.addOutput(Coin.valueOf(output.getAmount()), Address.fromBase58(FchMainNetwork.MAINNETWORK, output.getAddress()));
         }
+
+        if (opReturn != null && !"".equals(opReturn)) {
+            try {
+                Script opreturnScript = ScriptBuilder.createOpReturnScript(opReturn.getBytes(StandardCharsets.UTF_8));
+                transaction.addOutput(Coin.ZERO, opreturnScript);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
         for (TxInput input : inputs) {
             totalMoney += input.getAmount();
 
@@ -116,14 +126,6 @@ public class FchTool {
             throw new RuntimeException("input is not enough");
         }
 
-        if (opReturn != null && !"".equals(opReturn)) {
-            try {
-                Script opreturnScript = ScriptBuilder.createOpReturnScript(opReturn.getBytes(StandardCharsets.UTF_8));
-                transaction.addOutput(Coin.ZERO, opreturnScript);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
         if (returnAddr != null) {
             transaction.addOutput(Coin.valueOf(totalMoney - totalOutput - fee), Address.fromBase58(FchMainNetwork.MAINNETWORK, returnAddr));
         }

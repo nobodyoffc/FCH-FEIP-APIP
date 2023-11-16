@@ -45,13 +45,7 @@ public class StartTools {
         itemList.add("Sha256x2-file");
         
         itemList.add("Sign string with symKey sha256x2");
-        itemList.add("Sign with ECDSA");
-        itemList.add("Sign with Schnorr");
-        
-        itemList.add("Sign TX of FCH");
-        itemList.add("Verify ECDSA");
-        itemList.add("Verify Schnorr");
-        
+
         itemList.add("Encrypt with symKey");
         itemList.add("Encrypt with symKey to bundle");
         itemList.add("Encrypt with password");
@@ -88,30 +82,25 @@ public class StartTools {
                 case 7 -> sha256x2String(br);
                 case 8 -> sha256x2File(br);
                 case 9 -> symKeySign(br);
-                case 10 -> signWithEcdsa();
-                case 11 -> signWithSchnorr();
-                case 12 -> signFchTx();
-                case 13 -> verifyEcdsa();
-                case 14 -> verifySchnorr();
-                case 15 -> encryptWithSymKey(br);
-                case 16 -> encryptWithSymKeyBundle(br);
-                case 17 -> encryptWithPassword(br);
-                case 18 -> encryptWithPasswordBundle(br);
-                case 19 -> encryptAsy(br);
-                case 20 -> encryptAsyOneWayBundle(br);
-                case 21 -> encryptAsyTwoWayBundle(br);
-                case 22 -> encryptFileWithSymKey(br);
-                case 23 -> encryptFileAsy(br);
-                case 24 -> decryptWithSymKey(br);
-                case 25 -> decryptWithSymKeyBundle(br);
-                case 26 -> decryptWithPassword(br);
-                case 27 -> decryptWithPasswordBundle(br);
-                case 28 -> decryptAsy(br);
-                case 29 -> decryptAsyOneWayBundle(br);
-                case 30 -> decryptAsyTwoWayBundle(br);
-                case 31-> decryptFileSymKey(br);
-                case 32 -> decryptFileAsy(br);
-                case 33 -> {
+                case 10 -> encryptWithSymKey(br);
+                case 11 -> encryptWithSymKeyBundle(br);
+                case 12 -> encryptWithPassword(br);
+                case 13 -> encryptWithPasswordBundle(br);
+                case 14 -> encryptAsy(br);
+                case 15 -> encryptAsyOneWayBundle(br);
+                case 16 -> encryptAsyTwoWayBundle(br);
+                case 17 -> encryptFileWithSymKey(br);
+                case 18 -> encryptFileAsy(br);
+                case 19 -> decryptWithSymKey(br);
+                case 20 -> decryptWithSymKeyBundle(br);
+                case 21 -> decryptWithPassword(br);
+                case 22 -> decryptWithPasswordBundle(br);
+                case 23 -> decryptAsy(br);
+                case 24 -> decryptAsyOneWayBundle(br);
+                case 25 -> decryptAsyTwoWayBundle(br);
+                case 26-> decryptFileSymKey(br);
+                case 27 -> decryptFileAsy(br);
+                case 28 -> {
                     gainTimestamp();
                     Menu.anyKeyToContinue(br);
                 }
@@ -503,31 +492,6 @@ public class StartTools {
         System.out.println("encryptWithBtcAlgo is under developing:");
     }
 
-    private static void verifySchnorr() {
-        // TODO Auto-generated method stub
-        System.out.println("verifySchnorr is under developing:");
-    }
-
-    private static void verifyEcdsa() {
-        // TODO Auto-generated method stub
-        System.out.println("verifyEcdsa is under developing:");
-    }
-
-    private static void signFchTx() {
-        // TODO Auto-generated method stub
-        System.out.println("signFchTx is under developing:");
-    }
-
-    private static void signWithSchnorr() {
-        // TODO Auto-generated method stub
-        System.out.println("signWithSchnorr is under developing:");
-    }
-
-    private static void signWithEcdsa() {
-        // TODO Auto-generated method stub
-        System.out.println("signWithEcdsa is under developing:");
-    }
-
     public static void getRandom(BufferedReader br) throws IOException {
         // TODO Auto-generated method stub
 
@@ -637,17 +601,24 @@ public class StartTools {
         }
     }
 
-    private static void pubKeyToAddrs(BufferedReader br){
+    private static void pubKeyToAddrs(BufferedReader br) throws Exception {
         System.out.println("Input the public key, enter to exit:");
         String pubKey = null;
         try {
             pubKey = br.readLine();
         } catch (IOException e) {
             System.out.println("BufferedReader wrong.");
+            return;
         }
         if ("".equals(pubKey)) {
             return;
         }
+
+
+        pubKey = KeyTools.getPubKey33(pubKey);
+
+        KeyTools.showPubKeys(pubKey);
+
         Map<String, String> addrMap = KeyTools.pubKeyToAddresses(pubKey);
 
         System.out.println("----");
@@ -723,9 +694,9 @@ public class StartTools {
         }
     }
 
-    private static void sha256String(BufferedReader br) throws IOException {
+    private static void sha256String(BufferedReader br)  {
         System.out.println("Input the string to be hashed:");
-        String text = inputString(br);
+        String text = Inputer.inputStringMultiLine(br);
         String hash = Hash.Sha256(text);
         System.out.println("----");
         System.out.println("raw string:");
@@ -737,9 +708,9 @@ public class StartTools {
         Menu.anyKeyToContinue(br);
     }
 
-    private static void sha256x2String(BufferedReader br) throws IOException {
+    private static void sha256x2String(BufferedReader br)  {
         System.out.println("Input the string to be hashed:");
-        String text = inputString(br);
+        String text = Inputer.inputStringMultiLine(br);
         String hash = Hash.Sha256x2(text);
         System.out.println("----");
         System.out.println("raw string:");
@@ -762,7 +733,7 @@ public class StartTools {
 
             while(true) {
                 System.out.println("Input text to be signed, enter to input, 'q' to exit:");
-                String text = inputString(br);
+                String text = Inputer.inputStringMultiLine(br);
                 if("q".equals(text))return;
                 String sign = SHA.getSign(symKey,text);
                 System.out.println("----");
@@ -776,25 +747,4 @@ public class StartTools {
         }
     }
 
-    private static String inputString(BufferedReader br) throws IOException {
-        StringBuilder input = new StringBuilder();
-
-        String line;
-
-        while (true) {
-            line = br.readLine();
-            if("".equals(line)){
-                break;
-            }
-            input.append(line).append("\n");
-        }
-
-        // Access the complete input as a string
-        String text = input.toString();
-
-        if(text.endsWith("\n")) {
-            text = text.substring(0, input.length()-1);
-        }
-        return text;
-    }
 }

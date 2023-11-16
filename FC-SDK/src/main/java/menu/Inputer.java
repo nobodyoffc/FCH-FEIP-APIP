@@ -361,4 +361,58 @@ public class Inputer {
         }
         return passwordBytesNew;
     }
+
+//    public static String inputStringMultiLine(BufferedReader br) {
+//        StringBuilder input = new StringBuilder();
+//
+//        String line;
+//
+//        while (true) {
+//            try {
+//                line = br.readLine();
+//            } catch (IOException e) {
+//                System.out.println("BufferReader wrong.");
+//                return null;
+//            }
+//            if("".equals(line)){
+//                break;
+//            }
+//            input.append(line).append("\n");
+//        }
+//
+//        // Access the complete input as a string
+//        String text = input.toString();
+//
+//        if(text.endsWith("\n")) {
+//            text = text.substring(0, input.length()-1);
+//        }
+//        return text;
+//    }
+    public static String inputStringMultiLine(BufferedReader br) {
+        StringBuilder input = new StringBuilder();
+        String line;
+
+        while (true) {
+            try {
+                line = br.readLine();
+            } catch (IOException e) {
+                System.out.println("BufferReader wrong.");
+                return null;
+            }
+
+            // Check for a special delimiter or condition
+            if (line == null || line.trim().isEmpty()) {
+                break;
+            }
+
+            input.append(line).append("\n");
+        }
+
+        // Remove the last newline character if present
+        if (input.length() > 0 && input.charAt(input.length() - 1) == '\n') {
+            input.deleteCharAt(input.length() - 1);
+        }
+
+        return input.toString();
+    }
 }

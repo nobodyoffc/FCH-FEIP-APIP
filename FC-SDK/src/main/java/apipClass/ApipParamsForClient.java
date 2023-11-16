@@ -342,70 +342,11 @@ public class ApipParamsForClient {
     }
 
     public void inputBuyerPriKeyCipher(BufferedReader br,byte[] initSymKey){
-        byte[] priKey32 = new byte[0];
+//        byte[] priKey32 = new byte[0];
         while (true) {
-            System.out.println("""
-                    Input  the APIP buyer's private key.
-                    'b' for Base58 code.\s
-                    'c' for the cipher json.
-                    'h' for hex:""");
 
-            String input = Inputer.inputString(br);
-
-            switch (input){
-                case "b"->{
-                    do {
-                        System.out.println("Input Apip buyer's private key in Base58:");
-                        char[] priKeyBase58 = Inputer.inputPriKeyWif(br);
-                        priKey32 = KeyTools.getPriKey32(BytesTools.utf8CharArrayToByteArray(priKeyBase58));
-                        String buyer = KeyTools.priKeyToFid(priKey32);
-                        System.out.println(buyer);
-                        System.out.println("Is this your buyer FID? y/n:");
-                        input = Inputer.inputString(br);
-                    } while (!"y".equals(input));
-                }
-                case "c"->{
-                    do {
-                        System.out.println("Input the private key cipher json by  "+ Constants.ECC_AES_256_K1_P7+":");
-                        String cipher = Inputer.inputString(br);
-                        if (cipher == null || "".equals(cipher)) break;
-
-                        String ask = "Input the password to decrypt this priKey:";
-                        char[] userPassword = Inputer.inputPassword(br, ask);
-
-                        EccAes256K1P7 ecc = new EccAes256K1P7();
-                        byte[] userPasswordBytes = BytesTools.utf8CharArrayToByteArray(userPassword);
-
-                        EccAesDataByte eccAesDataByte;
-                        if (cipher.contains("SymKey"))
-                            eccAesDataByte = ecc.decrypt(cipher, Hash.Sha256x2(userPasswordBytes));
-                        else eccAesDataByte = ecc.decrypt(cipher, userPasswordBytes);
-
-                        BytesTools.clearCharArray(userPassword);
-
-                        if (eccAesDataByte.getError() != null) {
-                            System.out.println("Decrypt apipBuyerPriKeyCipher from input wrong." + eccAesDataByte.getError());
-                            System.out.println("Try again.");
-                            continue;
-                        }
-                        priKey32 = KeyTools.getPriKey32(eccAesDataByte.getMsg());
-                        System.out.println("Your main APIP buyer is: \n" + KeyTools.priKeyToFid(priKey32));
-                        System.out.println("Is it right? y/n");
-                        input = Inputer.inputString(br);
-                    } while (!"y".equals(input));
-                }
-                case "h"->{
-                    do {
-                        char[] priKeyHex = Inputer.input32BytesKey(br,"Input Apip buyer's private key in Hex:");
-                        if(priKeyHex==null)break;
-                        priKey32 = BytesTools.hexCharArrayToByteArray(priKeyHex);
-                        String buyer = KeyTools.priKeyToFid(priKey32);
-                        System.out.println(buyer);
-                        System.out.println("Is this your buyer FID? y/n:");
-                        input = Inputer.inputString(br);
-                    } while (!"y".equals(input));
-                }
-            }
+            byte[] priKey32 = inputCipherGetPriKey(br);
+            if(priKey32==null)return;
 
             apipBuyer = KeyTools.priKeyToFid(priKey32);
             System.out.println("Your main APIP buyer is: \n" + apipBuyer);
@@ -414,6 +355,78 @@ public class ApipParamsForClient {
             apipBuyerPriKeyCipher = buyerPriKeyCipher;
             return;
         }
+    }
+
+    @Nullable
+    public static byte[] inputCipherGetPriKey(BufferedReader br) {
+        System.out.println("""
+                Input  the private key.
+                'b' for Base58 code.\s
+                'c' for the cipher json.
+                'h' for hex.
+                other to exit:""");
+
+        String input = Inputer.inputString(br);
+
+        byte[] priKey32 = new byte[0];
+        switch (input){
+            case "b"->{
+                do {
+                    System.out.println("Input Apip buyer's private key in Base58:");
+                    char[] priKeyBase58 = Inputer.inputPriKeyWif(br);
+                    priKey32 = KeyTools.getPriKey32(BytesTools.utf8CharArrayToByteArray(priKeyBase58));
+                    String buyer = KeyTools.priKeyToFid(priKey32);
+                    System.out.println(buyer);
+                    System.out.println("Is this your buyer FID? y/n:");
+                    input = Inputer.inputString(br);
+                } while (!"y".equals(input));
+            }
+            case "c"->{
+                do {
+                    System.out.println("Input the private key cipher json by  "+ Constants.ECC_AES_256_K1_P7+":");
+                    String cipher = Inputer.inputString(br);
+                    if (cipher == null || "".equals(cipher)) break;
+
+                    String ask = "Input the password to decrypt this priKey:";
+                    char[] userPassword = Inputer.inputPassword(br, ask);
+
+                    EccAes256K1P7 ecc = new EccAes256K1P7();
+                    byte[] userPasswordBytes = BytesTools.utf8CharArrayToByteArray(userPassword);
+
+                    EccAesDataByte eccAesDataByte;
+                    if (cipher.contains("SymKey"))
+                        eccAesDataByte = ecc.decrypt(cipher, Hash.Sha256x2(userPasswordBytes));
+                    else eccAesDataByte = ecc.decrypt(cipher, userPasswordBytes);
+
+                    BytesTools.clearCharArray(userPassword);
+
+                    if (eccAesDataByte.getError() != null) {
+                        System.out.println("Decrypt apipBuyerPriKeyCipher from input wrong." + eccAesDataByte.getError());
+                        System.out.println("Try again.");
+                        continue;
+                    }
+                    priKey32 = KeyTools.getPriKey32(eccAesDataByte.getMsg());
+                    System.out.println("Your main APIP buyer is: \n" + KeyTools.priKeyToFid(priKey32));
+                    System.out.println("Is it right? y/n");
+                    input = Inputer.inputString(br);
+                } while (!"y".equals(input));
+            }
+            case "h"->{
+                do {
+                    char[] priKeyHex = Inputer.input32BytesKey(br,"Input Apip buyer's private key in Hex:");
+                    if(priKeyHex==null)break;
+                    priKey32 = BytesTools.hexCharArrayToByteArray(priKeyHex);
+                    String buyer = KeyTools.priKeyToFid(priKey32);
+                    System.out.println(buyer);
+                    System.out.println("Is this your buyer FID? y/n:");
+                    input = Inputer.inputString(br);
+                } while (!"y".equals(input));
+            }
+            default -> {
+                return null;
+            }
+        }
+        return priKey32;
     }
 
     @Nullable

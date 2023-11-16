@@ -1,0 +1,90 @@
+2023-10-30 08:22:17.819 [main] DEBUG redisTools.GetJedis - Create jedis pool.......
+2023-10-30 08:22:17.891 [main] DEBUG redisTools.GetJedis - Jedis pool created and tested.
+2023-10-30 08:23:34.478 [main] DEBUG redisTools.GetJedis - Create jedis pool.......
+2023-10-30 08:23:34.547 [main] DEBUG redisTools.GetJedis - Jedis pool created and tested.
+2023-10-30 08:24:39.015 [main] DEBUG org.bitcoin.Secp256k1Context - java.lang.UnsatisfiedLinkError: no secp256k1 in java.library.path: /Users/liuchangyong/Library/Java/Extensions:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java:.
+2023-10-30 08:26:03.103 [main] DEBUG redisTools.GetJedis - Create jedis pool.......
+2023-10-30 08:26:03.173 [main] DEBUG redisTools.GetJedis - Jedis pool created and tested.
+2023-10-30 08:45:16.516 [main] DEBUG redisTools.GetJedis - Create jedis pool.......
+2023-10-30 08:45:16.584 [main] DEBUG redisTools.GetJedis - Jedis pool created and tested.
+2023-10-30 08:45:54.975 [main] DEBUG org.bitcoin.Secp256k1Context - java.lang.UnsatisfiedLinkError: no secp256k1 in java.library.path: /Users/liuchangyong/Library/Java/Extensions:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java:.
+2023-10-30 08:49:20.836 [main] DEBUG redisTools.GetJedis - Create jedis pool.......
+2023-10-30 08:49:20.904 [main] DEBUG redisTools.GetJedis - Jedis pool created and tested.
+2023-10-30 08:51:37.007 [main] DEBUG redisTools.GetJedis - Create jedis pool.......
+2023-10-30 08:51:37.074 [main] DEBUG redisTools.GetJedis - Jedis pool created and tested.
+2023-10-30 08:52:09.558 [main] DEBUG org.bitcoin.Secp256k1Context - java.lang.UnsatisfiedLinkError: no secp256k1 in java.library.path: /Users/liuchangyong/Library/Java/Extensions:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java:.
+2023-10-30 09:13:16.918 [main] DEBUG redisTools.GetJedis - Create jedis pool.......
+2023-10-30 09:13:17.322 [main] DEBUG redisTools.GetJedis - Create jedisPool or jedis wrong. 
+redis.clients.jedis.exceptions.JedisConnectionException: Unexpected end of stream.
+	at redis.clients.jedis.util.RedisInputStream.ensureFill(RedisInputStream.java:205)
+	at redis.clients.jedis.util.RedisInputStream.readByte(RedisInputStream.java:46)
+	at redis.clients.jedis.Protocol.process(Protocol.java:126)
+	at redis.clients.jedis.Protocol.read(Protocol.java:192)
+	at redis.clients.jedis.Connection.readProtocolWithCheckingBroken(Connection.java:316)
+	at redis.clients.jedis.Connection.getOne(Connection.java:298)
+	at redis.clients.jedis.Connection.executeCommand(Connection.java:123)
+	at redis.clients.jedis.Jedis.set(Jedis.java:4887)
+	at redisTools.GetJedis.createJedisPool(GetJedis.java:44)
+	at startMake.StartMake.<clinit>(StartMake.java:47)
+2023-10-30 09:13:22.344 [main] DEBUG redisTools.GetJedis - Create jedis pool.......
+2023-10-30 09:13:22.780 [main] DEBUG redisTools.GetJedis - Create jedisPool or jedis wrong. 
+redis.clients.jedis.exceptions.JedisConnectionException: Unexpected end of stream.
+	at redis.clients.jedis.util.RedisInputStream.ensureFill(RedisInputStream.java:205)
+	at redis.clients.jedis.util.RedisInputStream.readByte(RedisInputStream.java:46)
+	at redis.clients.jedis.Protocol.process(Protocol.java:126)
+	at redis.clients.jedis.Protocol.read(Protocol.java:192)
+	at redis.clients.jedis.Connection.readProtocolWithCheckingBroken(Connection.java:316)
+	at redis.clients.jedis.Connection.getOne(Connection.java:298)
+	at redis.clients.jedis.Connection.executeCommand(Connection.java:123)
+	at redis.clients.jedis.Jedis.set(Jedis.java:4887)
+	at redisTools.GetJedis.createJedisPool(GetJedis.java:44)
+	at startMake.StartMake.<clinit>(StartMake.java:47)
+2023-10-30 09:13:35.944 [main] DEBUG redisTools.GetJedis - Create jedis pool.......
+2023-10-30 09:13:36.356 [main] DEBUG redisTools.GetJedis - Create jedisPool or jedis wrong. 
+redis.clients.jedis.exceptions.JedisConnectionException: Unexpected end of stream.
+	at redis.clients.jedis.util.RedisInputStream.ensureFill(RedisInputStream.java:205)
+	at redis.clients.jedis.util.RedisInputStream.readByte(RedisInputStream.java:46)
+	at redis.clients.jedis.Protocol.process(Protocol.java:126)
+	at redis.clients.jedis.Protocol.read(Protocol.java:192)
+	at redis.clients.jedis.Connection.readProtocolWithCheckingBroken(Connection.java:316)
+	at redis.clients.jedis.Connection.getOne(Connection.java:298)
+	at redis.clients.jedis.Connection.executeCommand(Connection.java:123)
+	at redis.clients.jedis.Jedis.set(Jedis.java:4887)
+	at redisTools.GetJedis.createJedisPool(GetJedis.java:44)
+	at startMake.StartMake.<clinit>(StartMake.java:47)
+2023-10-30 09:21:41.815 [main] DEBUG org.bitcoin.Secp256k1Context - java.lang.UnsatisfiedLinkError: no secp256k1 in java.library.path: /Users/liuchangyong/Library/Java/Extensions:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java:.
+2023-10-30 09:28:59.018 [main] DEBUG redisTools.GetJedis - Create jedis pool.......
+2023-10-30 09:28:59.506 [main] DEBUG redisTools.GetJedis - Create jedisPool or jedis wrong. 
+redis.clients.jedis.exceptions.JedisConnectionException: Unexpected end of stream.
+	at redis.clients.jedis.util.RedisInputStream.ensureFill(RedisInputStream.java:205)
+	at redis.clients.jedis.util.RedisInputStream.readByte(RedisInputStream.java:46)
+	at redis.clients.jedis.Protocol.process(Protocol.java:126)
+	at redis.clients.jedis.Protocol.read(Protocol.java:192)
+	at redis.clients.jedis.Connection.readProtocolWithCheckingBroken(Connection.java:316)
+	at redis.clients.jedis.Connection.getOne(Connection.java:298)
+	at redis.clients.jedis.Connection.executeCommand(Connection.java:123)
+	at redis.clients.jedis.Jedis.set(Jedis.java:4887)
+	at redisTools.GetJedis.createJedisPool(GetJedis.java:44)
+	at startMake.StartMake.<clinit>(StartMake.java:47)
+2023-10-30 10:31:04.121 [main] DEBUG redisTools.GetJedis - Create jedis pool.......
+2023-10-30 10:31:04.193 [main] DEBUG redisTools.GetJedis - Jedis pool created and tested.
+2023-10-30 13:18:30.473 [main] DEBUG redisTools.GetJedis - Create jedis pool.......
+2023-10-30 13:18:30.542 [main] DEBUG redisTools.GetJedis - Jedis pool created and tested.
+2023-10-30 13:19:23.612 [main] DEBUG org.bitcoin.Secp256k1Context - java.lang.UnsatisfiedLinkError: no secp256k1 in java.library.path: /Users/liuchangyong/Library/Java/Extensions:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java:.
+2023-10-30 14:13:37.983 [main] DEBUG redisTools.GetJedis - Create jedis pool.......
+2023-10-30 14:13:38.055 [main] DEBUG redisTools.GetJedis - Jedis pool created and tested.
+2023-10-30 14:13:48.919 [main] ERROR startMake.StartMake - Decrypt initSymKey error:Decrypt with password wrong: pad block corrupted
+2023-10-30 14:21:59.915 [main] DEBUG redisTools.GetJedis - Create jedis pool.......
+2023-10-30 14:21:59.983 [main] DEBUG redisTools.GetJedis - Jedis pool created and tested.
+2023-10-30 14:22:02.295 [main] ERROR startMake.StartMake - Decrypt initSymKey error:Decrypt with password wrong: pad block corrupted
+2023-10-30 14:25:10.268 [main] DEBUG redisTools.GetJedis - Create jedis pool.......
+2023-10-30 14:25:10.343 [main] DEBUG redisTools.GetJedis - Jedis pool created and tested.
+2023-10-30 14:25:52.949 [main] DEBUG org.bitcoin.Secp256k1Context - java.lang.UnsatisfiedLinkError: no secp256k1 in java.library.path: /Users/liuchangyong/Library/Java/Extensions:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java:.
+2023-10-30 14:30:43.864 [main] DEBUG redisTools.GetJedis - Create jedis pool.......
+2023-10-30 14:30:43.935 [main] DEBUG redisTools.GetJedis - Jedis pool created and tested.
+2023-10-30 14:44:00.947 [main] DEBUG redisTools.GetJedis - Create jedis pool.......
+2023-10-30 14:44:01.027 [main] DEBUG redisTools.GetJedis - Jedis pool created and tested.
+2023-10-30 14:59:06.759 [main] DEBUG redisTools.GetJedis - Create jedis pool.......
+2023-10-30 14:59:06.830 [main] DEBUG redisTools.GetJedis - Jedis pool created and tested.
+2023-10-30 14:59:13.095 [main] ERROR startMake.StartMake - Decrypt initSymKey error:Decrypt with password wrong: pad block corrupted
+2023-10-30 14:59:18.226 [main] ERROR startMake.StartMake - Decrypt initSymKey error:Decrypt with password wrong: pad block corrupted

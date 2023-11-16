@@ -45,7 +45,6 @@ public class ApipClient {
     private ResponseBody responseBody;
     private String responseBodyStr;
     private byte[] responseBodyBytes;
-    private Object responseData;
     private Signature signatureResponse;
     private HttpResponse httpResponse;
     private int code;
@@ -336,14 +335,6 @@ public class ApipClient {
 
     public void setResponseBody(ResponseBody responseBody) {
         this.responseBody = responseBody;
-    }
-
-    public Object getResponseData() {
-        return responseData;
-    }
-
-    public void setResponseData(Object responseData) {
-        this.responseData = responseData;
     }
 
     public Signature getSignatureRequest() {

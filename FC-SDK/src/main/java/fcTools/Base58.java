@@ -168,6 +168,15 @@ public class Base58 {
         return Base58.encode(addressBytes);
     }
 
+    public static String encodeChecked(byte[] payload) {
+
+            byte[] addressBytes = new byte[payload.length + 4];
+            System.arraycopy(payload, 0, addressBytes, 0, payload.length);
+            byte[] checksum = Sha256Hash.hashTwice(addressBytes, 0, payload.length);
+            System.arraycopy(checksum, 0, addressBytes, payload.length, 4);
+            return encode(addressBytes);
+    }
+
     /**
      * Decodes the given base58 string into the original data bytes.
      *

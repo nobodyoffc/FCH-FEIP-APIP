@@ -3,6 +3,7 @@ package apipClient;
 import apipClass.Fcdsl;
 import constants.ApiNames;
 import constants.Strings;
+import fcTools.ParseTools;
 
 import javax.annotation.Nullable;
 
@@ -39,6 +40,7 @@ public class WalletAPIs {
         apipClient.setSn("18");
         Fcdsl fcdsl = new Fcdsl();
         fcdsl.addNewQuery().addNewTerms().addNewFields(Strings.OWNER).addNewValues(fid);
+        amount = ParseTools.roundDouble8(amount);
         fcdsl.setOther(String.valueOf(amount));
         String urlTail = ApiNames.APIP18V1Path + ApiNames.CashValidForPayAPI;
 

@@ -11,11 +11,16 @@ import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
 import com.google.gson.Gson;
+import com.googlecode.jsonrpc4j.Base64;
 import com.googlecode.jsonrpc4j.JsonRpcHttpClient;
 import constants.Constants;
 import constants.IndicesNames;
 import constants.Strings;
+import cryptoTools.Hash;
 import fcTools.ParseTools;
+import fcTools.SchnorrSignature;
+import keyTools.KeyTools;
+import org.bitcoinj.core.ECKey;
 import txTools.FchTool;
 import fchClass.Cash;
 
@@ -23,10 +28,16 @@ import freecashRPC.FcRpcMethods;
 import freecashRPC.NewFcRpcClient;
 import javaTools.BytesTools;
 import redis.clients.jedis.Jedis;
+import txTools.TxInput;
+import txTools.TxOutput;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+
+import static constants.Constants.FchToSatoshi;
+import static txTools.FchTool.createTransactionSign;
 
 public class WalletTools {
     static final double Million = 100000000d;
@@ -547,4 +558,55 @@ public class WalletTools {
         boolQueryBuilder.filter(new Query.Builder().terms(tQuery).build());
     }
 
+    public static String schnorrTxSign(List<Cash> cashList, List<SendTo> sendToList,String msg,byte[]priKey){
+        String returnFid = KeyTools.priKeyToFid(priKey);
+        List<TxInput> inputList = cashToInputList(cashList,priKey);
+        List<TxOutput> outputList = sendToToTxOutputList(sendToList);
+        long fee = FchTool.calcFee(inputList.size(), outputList.size(), msg.getBytes().length);
+        return createTransactionSign(inputList, outputList, msg, returnFid, fee);
+    }
+
+    public static List<TxOutput> sendToToTxOutputList(List<SendTo> sendToList) {
+        List<TxOutput> outputList = new ArrayList<>();
+        for (SendTo sendTo : sendToList){
+            TxOutput txOutput = new TxOutput();
+            txOutput.setAddress(sendTo.getFid());
+            txOutput.setAmount((long) (sendTo.getAmount()*FchToSatoshi));
+            outputList.add(txOutput);
+        }
+        return outputList;
+    }
+
+    public static List<TxInput> cashToInputList(List<Cash> cashList, byte[] priKey) {
+        List<TxInput> inputList = new ArrayList<>();
+        ParseTools.gsonPrint(cashList);
+        for (Cash cash : cashList){
+            TxInput txInput = new TxInput();
+            txInput.setIndex(cash.getBirthIndex());
+            txInput.setAmount(cash.getValue());
+            txInput.setTxId(cash.getBirthTxId());
+            txInput.setPriKey32(priKey);
+            inputList.add(txInput);
+        }
+        return inputList;
+    }
+
+    public static String schnorrMsgSign(String msg, byte[]priKey){
+        ECKey ecKey = ECKey.fromPrivate(priKey);
+        BigInteger priKeyBigInteger = ecKey.getPrivKey();
+        byte[] pubKey = ecKey.getPubKey();
+        byte[] msgHash = Hash.Sha256x2(msg.getBytes());
+        byte[] sign = SchnorrSignature.schnorr_sign(msgHash, priKeyBigInteger);
+        byte[] pkSign = BytesTools.bytesMerger(pubKey,sign);
+        return Base64.encodeBytes(pkSign);
+    }
+
+    public static boolean schnorrMsgVerify(String msg, String pubSign, String fid) throws IOException {
+        byte[] msgHash = Hash.Sha256x2(msg.getBytes());
+        byte[] pubSignBytes = java.util.Base64.getDecoder().decode(pubSign);
+        byte[] pubKey = Arrays.copyOf(pubSignBytes,33);
+        if(!fid.equals(KeyTools.pubKeyToFchAddr(HexFormat.of().formatHex(pubKey))))return false;
+        byte[] sign = Arrays.copyOfRange(pubSignBytes,33,pubSignBytes.length);
+        return SchnorrSignature.schnorr_verify(msgHash,pubKey, sign);
+    }
 }

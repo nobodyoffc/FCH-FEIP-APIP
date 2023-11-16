@@ -55,4 +55,6 @@ public class Constants {
     public static final String ECC_AES_256_K1_P7 = "EccAes256K1P7@No1_NrC7";
     public static final String ALG_SIGN_TX_BY_CRYPTO_SIGN = "SignTxByCryptoSign@No1_NrC7";
     public static String EcdsaBtcMsg_No1_NrC7= "EcdsaBtcMsg@No1_NrC7";
+    public static String Schnorr_No1_NrC7= "SchnorrMsg@No1_NrC7";
+    public static String UrlHead_CID_CASH = "https://cid.cash/APIP";
 }

@@ -1,12 +1,16 @@
 package keyTools;
 
+import co.elastic.clients.elasticsearch._types.analysis.PredicateTokenFilter;
 import constants.Constants;
 import cryptoTools.SHA;
 import cryptoTools.Hash;
 import fcTools.ParseTools;
 import javaTools.BytesTools;
+import menu.Menu;
 import org.bitcoinj.core.Base58;
 import org.bitcoinj.core.ECKey;
+import org.bouncycastle.util.encoders.Hex;
+import org.jetbrains.annotations.NotNull;
 
 import java.math.BigInteger;
 import java.util.Arrays;
@@ -37,6 +41,22 @@ public class KeyTools {
         }catch (Exception ignore){
             return  false;
         }
+    }
+
+    public static String getPubKeyWifUncompressed(String pubKey33) {
+        String pubKey65 = KeyTools.recoverPK33ToPK65(pubKey33);
+        byte[] pubKeyBytes = HexFormat.of().parseHex(pubKey65);
+        return Base58.encodeChecked(0,pubKeyBytes);
+    }
+
+    public static String getPubKeyWifCompressedWithVer0(String pubKey33) {
+        byte[] pubKeyBytes = HexFormat.of().parseHex(pubKey33);
+        return Base58.encodeChecked(0,pubKeyBytes);
+    }
+
+    public static String getPubKeyWifCompressedWithoutVer(String pubKey33) {
+        byte[] pubKeyBytes = HexFormat.of().parseHex(pubKey33);
+        return fcTools.Base58.encodeChecked(pubKeyBytes);
     }
 
     public static Map<String, String> pubKeyToAddresses(String pubKey) {
@@ -806,6 +826,35 @@ public class KeyTools {
         byte[] priKey32 = getPriKey32(priKey);
         byte[] pubKey = priKeyToPubKey(priKey32);
         return pubKeyToFchAddr(pubKey);
+    }
+
+    public static void showPubKeys(String pubKey) {
+        Menu.printUnderline(4);
+        System.out.println("- Public key compressed in hex:\n"+ pubKey);
+        System.out.println("- Public key uncompressed in hex:\n"+ getPubKeyWifUncompressed(pubKey));
+
+        byte[] pubKeyBytes = HexFormat.of().parseHex(pubKey);
+        System.out.println("- Public key WIF compressed with version 0:\n"+ getPubKeyWifCompressedWithVer0(pubKey));
+        System.out.println("- Public key WIF compressed without version:\n"+ getPubKeyWifCompressedWithoutVer(pubKey));
+    }
+
+    @NotNull
+    public static String getPubKey33(String pubKey) throws Exception {
+        switch (pubKey.length()){
+            case 66 -> {
+                if(pubKey.startsWith("02")|| pubKey.startsWith("03"))return pubKey;
+            }
+            case 130 -> {
+                if(pubKey.startsWith("04")) return compressPk65To33(pubKey);
+            }
+            case 50 -> {
+                return HexFormat.of().formatHex(Base58.decodeChecked(pubKey));
+            }
+            case 51 -> {
+                return HexFormat.of().formatHex(Base58.decodeChecked(pubKey)).substring(2);
+            }
+        }
+        return null;
     }
 }
 

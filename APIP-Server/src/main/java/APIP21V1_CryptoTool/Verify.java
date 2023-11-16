@@ -8,7 +8,8 @@ import com.google.gson.Gson;
 import constants.ApiNames;
 import constants.ReplyInfo;
 import constants.Strings;
-import fcTools.ParseTools;
+import fipaClass.Signature;
+import keyTools.KeyTools;
 import org.bitcoinj.core.ECKey;
 
 import javax.servlet.ServletException;
@@ -48,36 +49,25 @@ public class Verify extends HttpServlet {
             writer.write(replier.reply1012BadQuery(addr));
             return;
         }
+        String rawSignJson = new Gson().toJson(dataCheckResult.getDataRequestBody().getFcdsl().getOther());
+//        Signature.SignShort signShort = Signature.parseSignature(rawSignJson);
+        Signature signature = Signature.parseSignature(rawSignJson);
 
-        SignShort signShort = new SignShort();
-        try {
-            Gson gson = new Gson();
-            String inputJson = gson.toJson(dataCheckResult.getDataRequestBody().getFcdsl().getOther());
-            if(inputJson.contains("signature")&&inputJson.contains("message")&&inputJson.contains("address")){
-                SignFull signFull;
-                signFull = gson.fromJson(inputJson,SignFull.class);
-                signShort.fid = signFull.address;
-                signShort.msg = signFull.message;
-                signShort.sign = signFull.signature;
-            }else if(inputJson.contains("----")){
-                signShort = parseOldSign(inputJson);
-            }else {
-                signShort = gson.fromJson(inputJson,SignShort.class);
-            }
-        }catch (Exception e){
+        if(signature==null){
             response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1020OtherError));
             Map<String,String> dataMap= new HashMap<>();
-            dataMap.put(Strings.ERROR,"Can not get parameters correctly from Json string.");
+            dataMap.put(Strings.ERROR,"Parse signature wrong.");
             replier.setData(dataMap);
             writer.write(replier.reply1020OtherError(addr));
             return;
         }
+
         boolean isGoodSign;
-        if(signShort.fid!=null&& signShort.msg!=null && signShort.sign!=null){
-            String sign = signShort.sign.replace("\\u003d", "=");
+        if(signature.getFid()!=null&& signature.getMsg()!=null && signature.getSign()!=null){
+            String sign = signature.getSign().replace("\\u003d", "=");
             try {
-                String signPubKey = ECKey.signedMessageToKey(signShort.msg, sign).getPublicKeyAsHex();
-                isGoodSign= signShort.fid.equals(keyTools.KeyTools.pubKeyToFchAddr(signPubKey));
+                String signPubKey = ECKey.signedMessageToKey(signature.getMsg(), sign).getPublicKeyAsHex();
+                isGoodSign= signature.getFid().equals(KeyTools.pubKeyToFchAddr(signPubKey));
             } catch (SignatureException e) {
                 isGoodSign = false;
             }
@@ -104,30 +94,4 @@ public class Verify extends HttpServlet {
         return true;
     }
 
-    private SignShort parseOldSign(String oldSign){
-        String[] elm = oldSign.split("----");
-        SignShort signShort = new SignShort();
-        signShort.msg = elm[0];
-        signShort.fid = elm[1];
-        signShort.sign = elm[2];
-
-        signShort.msg = signShort.msg.replaceAll("\"","");
-        signShort.sign = signShort.sign.replaceAll("\"","");
-        signShort.sign = signShort.sign.replaceAll("\\u003d","=");
-
-        ParseTools.gsonPrint(signShort);
-        return signShort;
-    }
-
-    private static class SignFull {
-        String address;
-        String message;
-        String signature;
-    }
-
-    private static class SignShort {
-        String fid;
-        String msg;
-        String sign;
-    }
 }

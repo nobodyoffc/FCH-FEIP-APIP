@@ -1,0 +1,56 @@
+2023-10-11 01:13:47.367 [main] INFO  startAPIP.StartAPIP - Start.
+2023-10-11 01:13:54.004 [main] DEBUG startAPIP.StartAPIP - Start order scanner...
+2023-10-11 01:13:54.005 [main] DEBUG startAPIP.StartAPIP - Order scanner is running.
+2023-10-11 01:13:54.005 [Thread-0] DEBUG order.OrderScanner - Order scanner begin
+2023-10-11 01:13:54.006 [Thread-0] DEBUG order.OrderScanner - Order scanner got the service. SID: 46c1df926598cf0b881f0f1ab2ac6340826a5f954dd690786459c36388d6c131
+2023-10-11 01:13:54.007 [Thread-0] DEBUG order.OrderScanner - SID: 46c1df926598cf0b881f0f1ab2ac6340826a5f954dd690786459c36388d6c131
+Service Name: ApipNo1
+Account: FUmo2eez6VK2sfGWjek9i9aK5y1mdHSnqv
+2023-10-11 01:14:01.795 [main] DEBUG startAPIP.StartAPIP - Clean mempool data in Redis...
+2023-10-11 01:14:01.800 [main] DEBUG mempool.MempoolScanner - Create FcRpcClient for class mempool.MempoolScanner
+2023-10-11 01:14:01.831 [main] DEBUG freecashRPC.NewFcRpcClient - Freecash RPC client is ready.
+2023-10-11 01:14:01.831 [main] DEBUG startAPIP.StartAPIP - Mempool scanner is running.
+2023-10-11 01:14:01.831 [Thread-2] DEBUG mempool.MempoolScanner - Scanning mempool.
+2023-10-11 01:14:08.791 [main] DEBUG startAPIP.StartAPIP - Webhook pusher is running.
+2023-10-11 01:15:42.589 [main] INFO  startAPIP.StartAPIP - Start.
+2023-10-11 01:15:45.479 [main] DEBUG startAPIP.StartAPIP - Start order scanner...
+2023-10-11 01:15:45.480 [main] DEBUG startAPIP.StartAPIP - Order scanner is running.
+2023-10-11 01:15:45.480 [Thread-0] DEBUG order.OrderScanner - Order scanner begin
+2023-10-11 01:15:45.480 [main] DEBUG startAPIP.StartAPIP - Clean mempool data in Redis...
+2023-10-11 01:15:45.482 [main] DEBUG mempool.MempoolScanner - Create FcRpcClient for class mempool.MempoolScanner
+2023-10-11 01:15:45.481 [Thread-0] DEBUG order.OrderScanner - Order scanner got the service. SID: 46c1df926598cf0b881f0f1ab2ac6340826a5f954dd690786459c36388d6c131
+2023-10-11 01:15:45.482 [Thread-0] DEBUG order.OrderScanner - SID: 46c1df926598cf0b881f0f1ab2ac6340826a5f954dd690786459c36388d6c131
+Service Name: ApipNo1
+Account: FUmo2eez6VK2sfGWjek9i9aK5y1mdHSnqv
+2023-10-11 01:15:45.499 [main] DEBUG freecashRPC.NewFcRpcClient - Freecash RPC client is ready.
+2023-10-11 01:15:45.499 [main] DEBUG startAPIP.StartAPIP - Mempool scanner is running.
+2023-10-11 01:15:45.499 [Thread-2] DEBUG mempool.MempoolScanner - Scanning mempool.
+2023-10-11 01:15:45.500 [main] DEBUG startAPIP.StartAPIP - Webhook pusher is running.
+2023-10-11 01:17:06.530 [main] INFO  startAPIP.StartAPIP - Start.
+2023-10-11 01:17:09.419 [main] DEBUG startAPIP.StartAPIP - Start order scanner...
+2023-10-11 01:17:09.420 [main] DEBUG startAPIP.StartAPIP - Order scanner is running.
+2023-10-11 01:17:09.420 [Thread-0] DEBUG order.OrderScanner - Order scanner begin
+2023-10-11 01:17:09.420 [main] DEBUG startAPIP.StartAPIP - Clean mempool data in Redis...
+2023-10-11 01:17:09.422 [main] DEBUG mempool.MempoolScanner - Create FcRpcClient for class mempool.MempoolScanner
+2023-10-11 01:17:09.422 [Thread-0] DEBUG order.OrderScanner - Order scanner got the service. SID: 46c1df926598cf0b881f0f1ab2ac6340826a5f954dd690786459c36388d6c131
+2023-10-11 01:17:09.422 [Thread-0] DEBUG order.OrderScanner - SID: 46c1df926598cf0b881f0f1ab2ac6340826a5f954dd690786459c36388d6c131
+Service Name: ApipNo1
+Account: FUmo2eez6VK2sfGWjek9i9aK5y1mdHSnqv
+2023-10-11 01:17:09.445 [main] DEBUG freecashRPC.NewFcRpcClient - Freecash RPC client is ready.
+2023-10-11 01:17:09.446 [main] DEBUG startAPIP.StartAPIP - Mempool scanner is running.
+2023-10-11 01:17:09.446 [Thread-2] DEBUG mempool.MempoolScanner - Scanning mempool.
+2023-10-11 01:17:09.446 [main] DEBUG startAPIP.StartAPIP - Webhook pusher is running.
+2023-10-11 01:18:06.332 [main] INFO  startAPIP.StartAPIP - Start.
+2023-10-11 01:18:10.047 [main] DEBUG startAPIP.StartAPIP - Start order scanner...
+2023-10-11 01:18:10.048 [main] DEBUG startAPIP.StartAPIP - Order scanner is running.
+2023-10-11 01:18:10.048 [Thread-0] DEBUG order.OrderScanner - Order scanner begin
+2023-10-11 01:18:10.048 [main] DEBUG startAPIP.StartAPIP - Clean mempool data in Redis...
+2023-10-11 01:18:10.050 [main] DEBUG mempool.MempoolScanner - Create FcRpcClient for class mempool.MempoolScanner
+2023-10-11 01:18:10.049 [Thread-0] DEBUG order.OrderScanner - Order scanner got the service. SID: 46c1df926598cf0b881f0f1ab2ac6340826a5f954dd690786459c36388d6c131
+2023-10-11 01:18:10.050 [Thread-0] DEBUG order.OrderScanner - SID: 46c1df926598cf0b881f0f1ab2ac6340826a5f954dd690786459c36388d6c131
+Service Name: ApipNo1
+Account: FUmo2eez6VK2sfGWjek9i9aK5y1mdHSnqv
+2023-10-11 01:18:10.067 [main] DEBUG freecashRPC.NewFcRpcClient - Freecash RPC client is ready.
+2023-10-11 01:18:10.067 [main] DEBUG startAPIP.StartAPIP - Mempool scanner is running.
+2023-10-11 01:18:10.067 [Thread-2] DEBUG mempool.MempoolScanner - Scanning mempool.
+2023-10-11 01:18:10.068 [main] DEBUG startAPIP.StartAPIP - Webhook pusher is running.

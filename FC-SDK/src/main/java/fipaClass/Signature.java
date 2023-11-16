@@ -3,8 +3,10 @@ package fipaClass;
 import com.google.gson.Gson;
 import constants.Constants;
 import constants.Strings;
+import fcTools.ParseTools;
 import keyTools.KeyTools;
 import org.bitcoinj.core.ECKey;
+import org.jetbrains.annotations.Nullable;
 
 import java.security.SignatureException;
 import java.util.HashMap;
@@ -25,8 +27,47 @@ public class Signature {
 
     private Type type;
 
+    public void makeSignature(){
+        if(fid==null && address!=null)fid=address;
+        if(msg==null && message!=null)msg=message;
+        if(sign==null && signature!=null)sign=signature;
+    }
+
+    @Nullable
+    public static Signature parseSignature(String rawSignJson) {
+        Signature signature;
+        try {
+            Gson gson = new Gson();
+            if(rawSignJson.contains("----")){
+                signature = parseOldSign(rawSignJson);
+            }else {
+                System.out.println(rawSignJson);
+                signature = gson.fromJson(rawSignJson,Signature.class);
+                signature.makeSignature();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+        return signature;
+    }
+
+    public static Signature parseOldSign(String oldSign){
+        String[] elm = oldSign.split("----");
+        Signature signature = new Signature();
+        signature.setMsg(elm[0].replaceAll("\"",""));
+        signature.setFid(elm[1]);
+        signature.setSign(elm[2]
+                .replaceAll("\"","")
+                .replaceAll("\\u003d","="));
+
+        return signature;
+    }
+
     public enum Type{
         SymSign,AsySign
+    }
+    public Signature() {
     }
 
     public Signature(String symSign) {
@@ -250,5 +291,65 @@ public class Signature {
 
     public void setSymKeyName(String symKeyName) {
         this.symKeyName = symKeyName;
+    }
+
+    private static class SignFull {
+        private String address;
+        private String message;
+        private String signature;
+
+        public String getAddress() {
+            return address;
+        }
+
+        public void setAddress(String address) {
+            this.address = address;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public void setMessage(String message) {
+            this.message = message;
+        }
+
+        public String getSignature() {
+            return signature;
+        }
+
+        public void setSignature(String signature) {
+            this.signature = signature;
+        }
+    }
+
+    public static class SignShort {
+        private String fid;
+        private String msg;
+        private String sign;
+
+        public String getFid() {
+            return fid;
+        }
+
+        public void setFid(String fid) {
+            this.fid = fid;
+        }
+
+        public String getMsg() {
+            return msg;
+        }
+
+        public void setMsg(String msg) {
+            this.msg = msg;
+        }
+
+        public String getSign() {
+            return sign;
+        }
+
+        public void setSign(String sign) {
+            this.sign = sign;
+        }
     }
 }
