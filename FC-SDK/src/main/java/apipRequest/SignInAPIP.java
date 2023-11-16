@@ -87,7 +87,6 @@ public class SignInAPIP {
         if (responseBody.getCode() != 0) {
             System.out.println(responseJson);
             signInReplyData = new SignInApipReplyData();
-            signInReplyData.setResponseBody(responseBody);
         } else {
             Object data = responseBody.getData();
             Type t = new TypeToken<SignInApipReplyData>() {

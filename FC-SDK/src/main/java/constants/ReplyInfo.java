@@ -37,7 +37,7 @@ public class ReplyInfo {
     public static final String Msg1012BadQuery = "Bad query. Check your request body referring related APIP document.";
     public static final int Code1013BadRequest = 1013;
     public static final String Msg1013BadRequest = "Bad request. Please check request body.";
-    public static final int Code1014ApiSuspended = 1014;
+    public static final int Code1014ApiSuspended = 1014;//The API is suspended
     public static final String Msg1014ApiSuspended  = "The API is suspended";
     public static final int Code1015FidMissed = 1015;
     public static final String Msg1015FidMissed  = "FID missed in request header.";
