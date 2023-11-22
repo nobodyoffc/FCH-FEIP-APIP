@@ -1,27 +1,12 @@
 package javaTools;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.*;
 
 public class JsonTools {
-
-    public static String sortJson(String json) {
-        Gson g = new Gson();
-        JsonParser p = new JsonParser();
-        JsonElement e = p.parse(json);
-        sort(e);
-        return g.toJson(e);
-    }
-
-    private static Comparator<String> getComparator() {
-        return (s1, s2) -> s1.compareTo(s2);
-    }
 
     private static void sort(JsonElement e) {
         if (e.isJsonNull() || e.isJsonPrimitive()) {
@@ -52,12 +37,44 @@ public class JsonTools {
             }
         }
     }
-
     public static <T,E> Type getMapType(Class<T> t, Class<E> e) {
         return new TypeToken<Map<T, E>>() {}.getType();
     }
-
     public static <T>Type getArrayListType(Class<T> t) {
         return new TypeToken<ArrayList<T>>() {}.getType();
     }
+
+    public static String getNiceString(Object ob) {
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.setPrettyPrinting();
+        Gson gson = gsonBuilder.create();
+        return gson.toJson(ob);
+    }
+
+    public static String getString(Object ob) {
+        return new Gson().toJson(ob);
+    }
+
+    public static void  gsonPrint(Object ob) {
+        System.out.println("***********\n" + ob.getClass().toString() + ": " + getNiceString(ob) + "\n***********");
+        return;
+    }
+
+    public static String strToJson(String rawStr) {
+
+        if (!rawStr.contains("{")) return null;
+
+        int begin = rawStr.indexOf("{");
+
+        String goodStr = rawStr.substring(begin);
+
+        goodStr.replaceAll("\r|\n|\t", "");
+
+        return goodStr;
+    }
+
+    private static Comparator<String> getComparator() {
+        return (s1, s2) -> s1.compareTo(s2);
+    }
+
 }

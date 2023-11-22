@@ -1,9 +1,9 @@
 import eccAes256K1P7.EccAes256K1P7;
 import eccAes256K1P7.EccAesData;
 import eccAes256K1P7.EccAesType;
-import fcTools.ParseTools;
 import fipaClass.Algorithm;
 import javaTools.BytesTools;
+import javaTools.JsonTools;
 
 import java.util.Arrays;
 import java.util.Base64;
@@ -38,7 +38,7 @@ public class SimpleTest {
         eccAesData.setPriKeyB(priKeyB);
         eccAesData.setPubKeyA(pubKeyA);
 
-        ParseTools.gsonPrint(eccAesData);
+        JsonTools.gsonPrint(eccAesData);
     }
 
     private static void charArrayAndByteArray() {

@@ -16,7 +16,7 @@ import com.google.gson.Gson;
 import com.googlecode.jsonrpc4j.JsonRpcHttpClient;
 import initial.Initiator;
 import javaTools.BytesTools;
-import fcTools.ParseTools;
+import javaTools.JsonTools;
 import redis.clients.jedis.Jedis;
 import apipTools.CashToInputsResult;
 
@@ -118,7 +118,7 @@ public class WalletTools {
         }
 
 
-        ParseTools.gsonPrint(outputs);
+        JsonTools.gsonPrint(outputs);
         System.out.println("spent cashes: "+inputs.size());
         System.out.println("total input: "+inputSum/Million);
         System.out.println("spent FCH:"+(inputSum-change-fee)/Million);
@@ -268,25 +268,25 @@ public class WalletTools {
         for(Hit<Cash> hit : hitList){
             Cash cash = hit.source();
             //TODO
-            ParseTools.gsonPrint(cash);
+            JsonTools.gsonPrint(cash);
             cashList.add(cash);
         }
 //TODO
-        ParseTools.gsonPrint(cashList);
+        JsonTools.gsonPrint(cashList);
 
         //checkUnconfirmed(addr,cashList);
 
         CashToInputsResult inputResult = cashListToInputs(cashList);
 
         //TODO
-        ParseTools.gsonPrint(inputResult);
+        JsonTools.gsonPrint(inputResult);
 
         List<Map<String, Object>> inputs = inputResult.getInputs();
 
         Map<String, Object> outputs = splitToOutputs(addr,outCount, inputResult);
 
         //TODO
-        ParseTools.gsonPrint(outputs);
+        JsonTools.gsonPrint(outputs);
 
         String unsignedRawTx = FcRpcMethods.createRawTx(fcClient, inputs, outputs);
 
@@ -322,7 +322,7 @@ public class WalletTools {
         long fee = calcFee(inputs, outputs, 0);
         outputs.put(addr,(valueSum-valueEach*(outCount-1)-fee)/Million);
 
-        ParseTools.gsonPrint(outputs);
+        JsonTools.gsonPrint(outputs);
 //        System.out.println("spent cashes: "+inputs.size());
 //        System.out.println("total input: "+inputSum/Million);
 //        System.out.println("spent FCH:"+(inputSum-change-fee)/Million);

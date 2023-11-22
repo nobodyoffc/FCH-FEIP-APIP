@@ -7,7 +7,7 @@ import javax.annotation.Nullable;
 
 public class BlockchainAPIs {
 
-    public ApipClient blockByIdsPost(String urlHead, String[] ids, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient blockByIdsPost(String urlHead, String[] ids, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("2");
         Fcdsl fcdsl = new Fcdsl();
@@ -20,7 +20,7 @@ public class BlockchainAPIs {
         if(!isGood)return null;
         return apipClient;
     }
-    public ApipClient blockSearchPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient blockSearchPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("2");
         apipClient.setRawFcdsl(fcdsl);
@@ -31,7 +31,7 @@ public class BlockchainAPIs {
         if(!isGood)return null;
         return apipClient;
     }
-    public ApipClient cashValidPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient cashValidPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("2");
         apipClient.setRawFcdsl(fcdsl);
@@ -42,7 +42,7 @@ public class BlockchainAPIs {
         if(!isGood)return null;
         return apipClient;
     }
-    public ApipClient cashByIdsPost(String urlHead, String[] ids, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient cashByIdsPost(String urlHead, String[] ids, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("2");
         Fcdsl fcdsl = new Fcdsl();
@@ -55,7 +55,7 @@ public class BlockchainAPIs {
         if(!isGood)return null;
         return apipClient;
     }
-    public ApipClient cashSearchPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient cashSearchPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("2");
         apipClient.setRawFcdsl(fcdsl);
@@ -67,7 +67,7 @@ public class BlockchainAPIs {
         return apipClient;
     }
 
-    public ApipClient fidByIdsPost(String urlHead, String[] ids, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient fidByIdsPost(String urlHead, String[] ids, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("2");
         Fcdsl fcdsl = new Fcdsl();
@@ -80,7 +80,7 @@ public class BlockchainAPIs {
         if(!isGood)return null;
         return apipClient;
     }
-    public ApipClient fidSearchPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient fidSearchPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("2");
         apipClient.setRawFcdsl(fcdsl);
@@ -91,7 +91,7 @@ public class BlockchainAPIs {
         if(!isGood)return null;
         return apipClient;
     }
-    public ApipClient opReturnByIdsPost(String urlHead, String[] ids, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient opReturnByIdsPost(String urlHead, String[] ids, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("2");
         Fcdsl fcdsl = new Fcdsl();
@@ -104,7 +104,7 @@ public class BlockchainAPIs {
         if(!isGood)return null;
         return apipClient;
     }
-    public ApipClient opReturnSearchPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient opReturnSearchPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("2");
         apipClient.setRawFcdsl(fcdsl);
@@ -115,7 +115,7 @@ public class BlockchainAPIs {
         if(!isGood)return null;
         return apipClient;
     }
-    public ApipClient p2shByIdsPost(String urlHead, String[] ids, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient p2shByIdsPost(String urlHead, String[] ids, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("2");
         Fcdsl fcdsl = new Fcdsl();
@@ -128,7 +128,7 @@ public class BlockchainAPIs {
         if(!isGood)return null;
         return apipClient;
     }
-    public ApipClient p2shSearchPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient p2shSearchPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("2");
         apipClient.setRawFcdsl(fcdsl);
@@ -139,7 +139,7 @@ public class BlockchainAPIs {
         if(!isGood)return null;
         return apipClient;
     }
-    public ApipClient txByIdsPost(String urlHead, String[] ids, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient txByIdsPost(String urlHead, String[] ids, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("2");
         Fcdsl fcdsl = new Fcdsl();
@@ -152,7 +152,7 @@ public class BlockchainAPIs {
         if(!isGood)return null;
         return apipClient;
     }
-    public ApipClient txSearchPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient txSearchPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("2");
 

@@ -9,7 +9,7 @@ import javax.annotation.Nullable;
 
 public class WalletAPIs {
 
-    public ApipClient broadcastTxPost(String urlHead, String txHex, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient broadcastTxPost(String urlHead, String txHex, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("18");
         Fcdsl fcdsl = new Fcdsl();
@@ -22,7 +22,7 @@ public class WalletAPIs {
         return apipClient;
     }
 
-    public ApipClient decodeRawTxPost(String urlHead, String rawTx, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient decodeRawTxPost(String urlHead, String rawTx, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("18");
         Fcdsl fcdsl = new Fcdsl();
@@ -35,7 +35,7 @@ public class WalletAPIs {
         return apipClient;
     }
 
-    public ApipClient cashValidForPayPost(String urlHead, String fid,double amount, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient cashValidForPayPost(String urlHead, String fid,double amount, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("18");
         Fcdsl fcdsl = new Fcdsl();
@@ -48,7 +48,7 @@ public class WalletAPIs {
         if(!isGood)return null;
         return apipClient;
     }
-    public ApipClient cashValidForCdPost(String urlHead, String fid,int cd, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient cashValidForCdPost(String urlHead, String fid,int cd, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("18");
         Fcdsl fcdsl = new Fcdsl();
@@ -60,7 +60,7 @@ public class WalletAPIs {
         if(!isGood)return null;
         return apipClient;
     }
-    public ApipClient unconfirmedPost(String urlHead, String[] ids, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient unconfirmedPost(String urlHead, String[] ids, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("18");
         Fcdsl fcdsl = new Fcdsl();

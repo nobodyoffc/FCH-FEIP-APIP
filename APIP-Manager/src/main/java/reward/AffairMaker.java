@@ -6,6 +6,7 @@ import fipaClass.Op;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import com.google.gson.Gson;
 import fcTools.ParseTools;
+import javaTools.JsonTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
@@ -104,7 +105,7 @@ public class AffairMaker {
         affairReward.setOp(Op.sign);
         affairReward.setData(dataSignTx);
 
-        return ParseTools.gsonString(affairReward);
+        return JsonTools.getNiceString(affairReward);
     }
 
     private void addQualifiedPendingToPay(HashMap<String, SendTo> sendToMap) {

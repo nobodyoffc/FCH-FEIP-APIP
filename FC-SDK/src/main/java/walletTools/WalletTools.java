@@ -17,8 +17,8 @@ import constants.Constants;
 import constants.IndicesNames;
 import constants.Strings;
 import cryptoTools.Hash;
-import fcTools.ParseTools;
 import fcTools.SchnorrSignature;
+import javaTools.JsonTools;
 import keyTools.KeyTools;
 import org.bitcoinj.core.ECKey;
 import txTools.FchTool;
@@ -98,7 +98,7 @@ public class WalletTools {
         }
 
 
-        ParseTools.gsonPrint(outputs);
+        JsonTools.gsonPrint(outputs);
         System.out.println("spent cashes: "+inputs.size());
         System.out.println("total input: "+inputSum/Million);
         System.out.println("spent FCH:"+(inputSum-change-fee)/Million);
@@ -558,14 +558,6 @@ public class WalletTools {
         boolQueryBuilder.filter(new Query.Builder().terms(tQuery).build());
     }
 
-    public static String schnorrTxSign(List<Cash> cashList, List<SendTo> sendToList,String msg,byte[]priKey){
-        String returnFid = KeyTools.priKeyToFid(priKey);
-        List<TxInput> inputList = cashToInputList(cashList,priKey);
-        List<TxOutput> outputList = sendToToTxOutputList(sendToList);
-        long fee = FchTool.calcFee(inputList.size(), outputList.size(), msg.getBytes().length);
-        return createTransactionSign(inputList, outputList, msg, returnFid, fee);
-    }
-
     public static List<TxOutput> sendToToTxOutputList(List<SendTo> sendToList) {
         List<TxOutput> outputList = new ArrayList<>();
         for (SendTo sendTo : sendToList){
@@ -579,7 +571,7 @@ public class WalletTools {
 
     public static List<TxInput> cashToInputList(List<Cash> cashList, byte[] priKey) {
         List<TxInput> inputList = new ArrayList<>();
-        ParseTools.gsonPrint(cashList);
+        JsonTools.gsonPrint(cashList);
         for (Cash cash : cashList){
             TxInput txInput = new TxInput();
             txInput.setIndex(cash.getBirthIndex());

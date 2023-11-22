@@ -78,6 +78,7 @@ public class CashValidForPay extends HttpServlet {
             response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1020OtherError));
             replier.setData(cashListReturn.getMsg());
             writer.write(replier.reply1020OtherError(addr));
+            return;
         }
 
         List<Cash> meetList = cashListReturn.getCashList();
@@ -85,7 +86,6 @@ public class CashValidForPay extends HttpServlet {
         replier.setGot(meetList.size());
         replier.setTotal(cashListReturn.getTotal());
         esRequest.writeSuccess(dataCheckResult.getSessionKey());
-
     }
 
     private boolean isThisApiRequest(RequestBody requestBody) {

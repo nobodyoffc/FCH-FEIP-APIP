@@ -1,16 +1,22 @@
 package txTools;
 
+import com.google.common.base.Preconditions;
+import fcTools.ParseTools;
+import fchClass.Cash;
+import fchClass.P2SH;
+import javaTools.BytesTools;
+import keyTools.KeyTools;
 import org.bitcoinj.core.*;
 import org.bitcoinj.crypto.SchnorrSignature;
 import org.bitcoinj.fch.FchMainNetwork;
 import org.bitcoinj.script.Script;
 import org.bitcoinj.script.ScriptBuilder;
-import org.bouncycastle.crypto.Digest;
-import org.bouncycastle.crypto.digests.SHA512Digest;
+import org.bitcoinj.script.ScriptOpCodes;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.math.ec.WNafL2RMultiplier;
-import org.bouncycastle.util.encoders.Base64;
+import walletTools.MultiSigData;
+import walletTools.SendTo;
 
+import javax.annotation.Nullable;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
@@ -18,6 +24,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -27,9 +34,9 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.Security;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import static org.bitcoinj.script.ScriptBuilder.createMultiSigInputScriptBytes;
 
 /**
  * 工具类
@@ -87,10 +94,11 @@ public class FchTool {
      * @param outputs
      * @param opReturn
      * @param returnAddr
-     * @param fee
      * @return
      */
-    public static String createTransactionSign(List<TxInput> inputs, List<TxOutput> outputs, String opReturn, String returnAddr, long fee) {
+    public static String createTransactionSign(List<TxInput> inputs, List<TxOutput> outputs, String opReturn, String returnAddr) {
+
+        long fee = FchTool.calcFee(inputs.size(), outputs.size()+1, opReturn.getBytes().length);
 
         Transaction transaction = new Transaction(FchMainNetwork.MAINNETWORK);
 
@@ -115,12 +123,13 @@ public class FchTool {
         for (TxInput input : inputs) {
             totalMoney += input.getAmount();
 
-            ECKey eckey = ECKey.fromPrivate(input.getPriKey32());//added
+            ECKey eckey = ECKey.fromPrivate(input.getPriKey32());
 
             ecKeys.add(eckey);
             UTXO utxo = new UTXO(Sha256Hash.wrap(input.getTxId()), input.getIndex(), Coin.valueOf(input.getAmount()), 0, false, ScriptBuilder.createP2PKHOutputScript(eckey));
             TransactionOutPoint outPoint = new TransactionOutPoint(FchMainNetwork.MAINNETWORK, utxo.getIndex(), utxo.getHash());
-            transaction.addSignedInput(outPoint, utxo.getScript(), eckey, Transaction.SigHash.ALL, true);
+            TransactionInput unsignedInput = new TransactionInput(new fcTools.FchMainNetwork(), transaction, new byte[0], outPoint);
+            transaction.addInput(unsignedInput);
         }
         if ((totalOutput + fee) > totalMoney) {
             throw new RuntimeException("input is not enough");
@@ -140,6 +149,302 @@ public class FchTool {
             transaction.getInput(i).setScriptSig(schnorr);
         }
 
+        byte[] signResult = transaction.bitcoinSerialize();
+        return Utils.HEX.encode(signResult);
+    }
+
+    public static String createTransactionSign(List<Cash> inputs, byte[] priKey, List<SendTo> outputs, String opReturn) {
+
+        String changeToFid=inputs.get(0).getOwner();
+
+        long fee;
+        if(opReturn!=null){
+            fee = FchTool.calcFee(inputs.size(), outputs.size(), opReturn.getBytes().length);
+        }else fee = FchTool.calcFee(inputs.size(), outputs.size(), 0);
+
+        Transaction transaction = new Transaction(fcTools.FchMainNetwork.MAINNETWORK);
+
+        long totalMoney = 0;
+        long totalOutput = 0;
+
+        ECKey eckey = ECKey.fromPrivate(priKey);
+
+        for (SendTo output : outputs) {
+            long value = ParseTools.fchToSatoshis(output.getAmount());
+            totalOutput += value;
+            transaction.addOutput(Coin.valueOf(value), Address.fromBase58(org.bitcoinj.fch.FchMainNetwork.MAINNETWORK, output.getFid()));
+        }
+
+        if (opReturn != null && !"".equals(opReturn)) {
+            try {
+                Script opreturnScript = ScriptBuilder.createOpReturnScript(opReturn.getBytes(StandardCharsets.UTF_8));
+                transaction.addOutput(Coin.ZERO, opreturnScript);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        for (Cash input : inputs) {
+            totalMoney += input.getValue();
+            TransactionOutPoint outPoint = new TransactionOutPoint(FchMainNetwork.MAINNETWORK, input.getBirthIndex(), Sha256Hash.wrap(input.getBirthTxId()));
+            TransactionInput unsignedInput = new TransactionInput(new fcTools.FchMainNetwork(), transaction, new byte[0], outPoint);
+            transaction.addInput(unsignedInput);
+        }
+
+        if ((totalOutput + fee) > totalMoney) {
+            throw new RuntimeException("input is not enough");
+        }
+
+        transaction.addOutput(Coin.valueOf(totalMoney - totalOutput - fee), Address.fromBase58(FchMainNetwork.MAINNETWORK, changeToFid));
+
+        for (int i = 0; i < inputs.size(); ++i) {
+            Cash input = inputs.get(i);
+            Script script = ScriptBuilder.createP2PKHOutputScript(eckey);
+            SchnorrSignature signature = transaction.calculateSchnorrSignature(i, eckey, script.getProgram(), Coin.valueOf(input.getValue()), Transaction.SigHash.ALL, false);
+            Script schnorr = ScriptBuilder.createSchnorrInputScript(signature, eckey);
+            transaction.getInput(i).setScriptSig(schnorr);
+        }
+
+        byte[] signResult = transaction.bitcoinSerialize();
+        return Utils.HEX.encode(signResult);
+    }
+
+    public static P2SH genMultiP2sh(List<byte[]> pubKeyList, int m)  {
+        List<ECKey> keys = new ArrayList<>();
+        for (byte[] bytes : pubKeyList) {
+            ECKey ecKey = ECKey.fromPublicOnly(bytes);
+            keys.add(ecKey);
+        }
+
+        Script multiSigScript = ScriptBuilder.createMultiSigOutputScript(m, keys);
+
+        byte[] redeemScriptBytes = multiSigScript.getProgram();
+
+        P2SH p2sh;
+        try {
+            p2sh = P2SH.parseP2shRedeemScript(HexFormat.of().formatHex(redeemScriptBytes));
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+        return p2sh;
+    }
+
+    public static byte[] createMultiSignRawTx(List<Cash> inputs, List<SendTo> outputs, String opReturn, P2SH p2SH) {
+
+        String changeToFid=inputs.get(0).getOwner();
+        if(!changeToFid.startsWith("3"))
+            throw new RuntimeException("It's not a multisig address.");;
+
+        long fee;
+        if(opReturn!=null){
+            fee = FchTool.calcFeeMultiSign(inputs.size(), outputs.size(), opReturn.getBytes().length,p2SH.getM(),p2SH.getN());
+        }else fee = FchTool.calcFeeMultiSign(inputs.size(), outputs.size(), 0,p2SH.getM(),p2SH.getN());
+
+        Transaction transaction = new Transaction(fcTools.FchMainNetwork.MAINNETWORK);
+
+        long totalMoney = 0;
+        long totalOutput = 0;
+
+        for (SendTo output : outputs) {
+            long value = ParseTools.fchToSatoshis(output.getAmount());
+            totalOutput += value;
+            transaction.addOutput(Coin.valueOf(value), Address.fromBase58(org.bitcoinj.fch.FchMainNetwork.MAINNETWORK, output.getFid()));
+        }
+
+        if (opReturn != null && !"".equals(opReturn)) {
+            try {
+                Script opreturnScript = ScriptBuilder.createOpReturnScript(opReturn.getBytes(StandardCharsets.UTF_8));
+                transaction.addOutput(Coin.ZERO, opreturnScript);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        for (Cash input : inputs) {
+            totalMoney += input.getValue();
+            TransactionOutPoint outPoint = new TransactionOutPoint(FchMainNetwork.MAINNETWORK, input.getBirthIndex(), Sha256Hash.wrap(input.getBirthTxId()));
+            TransactionInput unsignedInput = new TransactionInput(new fcTools.FchMainNetwork(), transaction, new byte[0], outPoint);
+            transaction.addInput(unsignedInput);
+        }
+
+        if ((totalOutput + fee) > totalMoney) {
+            throw new RuntimeException("input is not enough");
+        }
+
+        transaction.addOutput(Coin.valueOf(totalMoney - totalOutput - fee), Address.fromBase58(FchMainNetwork.MAINNETWORK, changeToFid));
+
+        return transaction.bitcoinSerialize();
+    }
+
+    public static String signSchnorrMultiSignTx(String multiSignDataJson, byte[] priKey) {
+        MultiSigData multiSignData = MultiSigData.fromJson(multiSignDataJson);
+        return signSchnorrMultiSignTx(multiSignData,priKey).toJson();
+    }
+
+        public static MultiSigData signSchnorrMultiSignTx(MultiSigData multiSignData, byte[] priKey){
+
+        byte[]rawTx = multiSignData.getRawTx();
+        byte[]redeemScript = HexFormat.of().parseHex(multiSignData.getP2SH().getRedeemScript());
+        List<Cash> cashList = multiSignData.getCashList();
+
+        Transaction transaction = new Transaction(FchMainNetwork.MAINNETWORK,rawTx);
+        List<TransactionInput> inputs = transaction.getInputs();
+
+        ECKey ecKey = ECKey.fromPrivate(priKey);
+        BigInteger priKeyBigInteger = ecKey.getPrivKey();
+        List<byte[]> sigList = new ArrayList<>();
+        for (int i = 0; i < inputs.size(); ++i) {
+            Script script = new Script(redeemScript);
+            Sha256Hash hash = transaction.hashForSignatureWitness(i,script, Coin.valueOf(cashList.get(i).getValue()), Transaction.SigHash.ALL, false);
+            byte[] sig = SchnorrSignature.schnorr_sign(hash.getBytes(),priKeyBigInteger);
+            sigList.add(sig);
+        }
+
+        String fid = KeyTools.priKeyToFid(priKey);
+        if(multiSignData.getFidSigMap()==null) {
+            Map<String, List<byte[]>> fidSigListMap = new HashMap<>();
+            multiSignData.setFidSigMap(fidSigListMap);
+        }
+        multiSignData.getFidSigMap().put(fid,sigList);
+        return multiSignData;
+    }
+
+    public static boolean rawTxSigVerify(byte[] rawTx,byte[] pubKey,byte[]sig,int inputIndex,long inputValue,byte[] redeemScript){
+        Transaction transaction = new Transaction(FchMainNetwork.MAINNETWORK,rawTx);
+        Script script = new Script(redeemScript);
+        Sha256Hash hash = transaction.hashForSignatureWitness(inputIndex,script, Coin.valueOf(inputValue), Transaction.SigHash.ALL, false);
+        return SchnorrSignature.schnorr_verify(hash.getBytes(), pubKey,sig);
+    }
+
+    public static String buildSchnorrMultiSignTx(byte[] rawTx, Map<String,List<byte[]>> sigListMap, P2SH p2sh){
+
+        if(sigListMap.size()>p2sh.getM())
+            sigListMap= dropRedundantSigs(sigListMap,p2sh.getM());
+
+        Transaction transaction = new Transaction(FchMainNetwork.MAINNETWORK,rawTx);
+
+        for(int i= 0;i<transaction.getInputs().size();i++) {
+            List<byte[]> sigListByTx = new ArrayList<>();
+            for (String fid :p2sh.getFids()) {
+                try {
+                    byte[] sig = sigListMap.get(fid).get(i);
+                    sigListByTx.add(sig);
+                }catch (Exception ignore){}
+            }
+
+            Script inputScript = createSchnorrMultiSigInputScriptBytes(sigListByTx,HexFormat.of().parseHex(p2sh.getRedeemScript())); // Include all required signatures
+
+            System.out.println(HexFormat.of().formatHex(inputScript.getProgram()));
+            TransactionInput input = transaction.getInput(i);
+            input.setScriptSig(inputScript);
+        }
+
+        byte[] signResult = transaction.bitcoinSerialize();
+        return Utils.HEX.encode(signResult);
+    }
+
+    private static Map<String, List<byte[]>> dropRedundantSigs(Map<String, List<byte[]>> sigListMap, int m) {
+        Map<String, List<byte[]>> newMap = new HashMap<>();
+        int i=0;
+        for(String key : sigListMap.keySet()){
+            newMap.put(key,sigListMap.get(key));
+            i++;
+            if(i==m)return newMap;
+        }
+        return newMap;
+    }
+
+    public static Script createSchnorrMultiSigInputScriptBytes(List<byte[]> signatures ,@Nullable byte[] multisigProgramBytes) {
+        Preconditions.checkArgument(signatures.size() <= 16);
+        ScriptBuilder builder = new ScriptBuilder();
+        builder.smallNum(0);
+        Iterator var3 = signatures.iterator();
+        byte[] sigHashAll = new byte[]{0x41};
+
+        while(var3.hasNext()) {
+            byte[] signature = (byte[])var3.next();
+            builder.data(BytesTools.bytesMerger(signature,sigHashAll));
+        }
+
+        if (multisigProgramBytes != null) {
+            builder.data(multisigProgramBytes);
+        }
+
+        return builder.build();
+    }
+
+    public static String createTimeLockedTransaction(List<Cash> inputs, byte[] priKey, List<SendTo> outputs,long lockUntil, String opReturn) {
+
+        String changeToFid=inputs.get(0).getOwner();
+
+        long fee;
+        if(opReturn!=null){
+            fee = FchTool.calcFee(inputs.size(), outputs.size(), opReturn.getBytes().length);
+        }else fee = FchTool.calcFee(inputs.size(), outputs.size(), 0);
+
+        Transaction transaction = new Transaction(fcTools.FchMainNetwork.MAINNETWORK);
+//        transaction.setLockTime(nLockTime);
+
+        long totalMoney = 0;
+        long totalOutput = 0;
+
+        ECKey eckey = ECKey.fromPrivate(priKey);
+
+        for (SendTo output : outputs) {
+            long value = ParseTools.fchToSatoshis(output.getAmount());
+            byte[] pubKeyHash = KeyTools.addrToHash160(output.getFid());
+            totalOutput += value;
+
+            ScriptBuilder builder = new ScriptBuilder();
+
+            builder.number(lockUntil)
+                    .op(ScriptOpCodes.OP_CHECKLOCKTIMEVERIFY)
+                    .op(ScriptOpCodes.OP_DROP);
+
+            builder.op(ScriptOpCodes.OP_DUP)
+                    .op(ScriptOpCodes.OP_HASH160)
+                    .data(pubKeyHash)
+                    .op(ScriptOpCodes.OP_EQUALVERIFY)
+                    .op(ScriptOpCodes.OP_CHECKSIG);
+
+            Script cltvScript = builder.build();
+
+            transaction.addOutput(Coin.valueOf(value), cltvScript);
+        }
+
+        if (opReturn != null && !"".equals(opReturn)) {
+            try {
+                Script opreturnScript = ScriptBuilder.createOpReturnScript(opReturn.getBytes(StandardCharsets.UTF_8));
+                transaction.addOutput(Coin.ZERO, opreturnScript);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        for (Cash input : inputs) {
+            totalMoney += input.getValue();
+
+            TransactionOutPoint outPoint = new TransactionOutPoint(FchMainNetwork.MAINNETWORK, input.getBirthIndex(), Sha256Hash.wrap(input.getBirthTxId()));
+            TransactionInput unsignedInput = new TransactionInput(new fcTools.FchMainNetwork(), transaction, new byte[0], outPoint);
+            transaction.addInput(unsignedInput);
+        }
+
+        if ((totalOutput + fee) > totalMoney) {
+            throw new RuntimeException("input is not enough");
+        }
+
+        transaction.addOutput(Coin.valueOf(totalMoney - totalOutput - fee), Address.fromBase58(FchMainNetwork.MAINNETWORK, changeToFid));
+
+
+        for (int i = 0; i < inputs.size(); ++i) {
+            Cash input = inputs.get(i);
+            Script script = ScriptBuilder.createP2PKHOutputScript(eckey);
+            SchnorrSignature signature = transaction.calculateSchnorrSignature(i, eckey, script.getProgram(), Coin.valueOf(input.getValue()), Transaction.SigHash.ALL, false);
+
+            Script schnorr = ScriptBuilder.createSchnorrInputScript(signature, eckey);
+            transaction.getInput(i).setScriptSig(schnorr);
+        }
 
         byte[] signResult = transaction.bitcoinSerialize();
         return Utils.HEX.encode(signResult);
@@ -147,18 +452,15 @@ public class FchTool {
 
     /**
      * 随机私钥
-     *
      * @param secret
      * @return
      */
     public static IdInfo createRandomIdInfo(String secret) {
-
         return IdInfo.genRandomIdInfo();
     }
 
     /**
      * 公钥转地址
-     *
      * @param pukey
      * @return
      */
@@ -245,53 +547,8 @@ public class FchTool {
             File f = new File(path);
             return Utils.HEX.encode(Sha256Hash.of(f).getBytes());
         } catch (Exception e) {
-
             throw new RuntimeException(e);
         }
-    }
-
-    public static long calcMinFee(int inputsize, int outputsize, String openreturn, String opreturnAddr, long fee) {
-
-        List<TxInput> txInputs = new ArrayList<>();
-        for (int i = 0; i < inputsize; ++i) {
-
-            TxInput input = new TxInput();
-            input.setPriKey32(Base58.decode("KxhPaZzFT1S48C4mmZsBiAvxyAEE1E5zcnFKD93Zc69ENpchjxra"));
-            input.setIndex(0);
-            input.setTxId("4a6bef758ae46c4610e5970e75d87effb8630eb3c8d2401008b78fc73f86d41e");
-            input.setAmount(20000000);
-            txInputs.add(input);
-        }
-        List<TxOutput> txOutputs = new ArrayList<>();
-        for (int i = 0; i < outputsize; ++i) {
-
-            TxOutput output = new TxOutput();
-            output.setAddress("FBmgfrbzRiJNTPnjgknRxqVU2CmKQFnKM4");
-            output.setAmount(1);
-            txOutputs.add(output);
-        }
-        String sig = createTransactionSign(txInputs, txOutputs, openreturn, opreturnAddr, 1000000);
-        byte[] sigBytes = Utils.HEX.decode(sig);
-        return sigBytes.length;
-    }
-
-    //**eceis
-
-
-    public static byte[] generateKey(String pubkey) {
-
-        IdInfo info = new IdInfo(Base58.decode("L1WkwqiJgkPoYdjrs7tcikRj5hjwFebiTUChvxwubuSohpAaDzjP"));
-        BigInteger pk = info.getECKey().getPrivKey();
-        ECKey pubECKey = ECKey.fromPublicOnly(Utils.HEX.decode(pubkey));
-        WNafL2RMultiplier mu = new WNafL2RMultiplier();
-        org.bouncycastle.math.ec.ECPoint newECPoint = mu.multiply(pubECKey.getPubKeyPoint(), pk);
-        byte[] xCood = newECPoint.getXCoord().getEncoded();
-        Digest digest = new SHA512Digest();
-        digest.update(xCood, 0, xCood.length);
-        byte[] r = new byte[digest.getDigestSize()];
-        digest.doFinal(r, 0);
-        System.out.println(Utils.HEX.encode(r));
-        return r;
     }
 
     public static byte[] aesCBCEncrypt(byte[] srcData, byte[] key, byte[] iv) throws NoSuchPaddingException, NoSuchAlgorithmException, BadPaddingException, IllegalBlockSizeException, InvalidAlgorithmParameterException, InvalidKeyException {
@@ -315,31 +572,6 @@ public class FchTool {
         return decbbdt;
     }
 
-
-    public static String encodeBase64Str(String str) {
-        try {
-            byte[] strBytes = Base64.encode(str.getBytes("utf-8"));
-            return new String(strBytes, "utf-8");
-        } catch (Exception e) {
-
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static String decodeBase64Str(String str) {
-        try {
-            byte[] strBytes = Base64.decode(str.getBytes("utf-8"));
-            return new String(strBytes, "utf-8");
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static void main(String[] args) {
-        byte[] r = generateKey("023e0098dbd6126b140a160073d3ab1f94bff109f144d211c4054759e2fe2e7f86");
-    }
-
-
     public static long calcFee(int inputNum, int outputNum, int opReturnBytesLen) {
         long priceInSatoshi =1;
         long length = 0 ;
@@ -347,6 +579,38 @@ public class FchTool {
             length = 10+ 141 * (long)inputNum + (long) 34 *(outputNum+1);
         }else{
             length= 10+ (long)141*inputNum + (long) 34 *(outputNum+1)+ (opReturnBytesLen+VarInt.sizeOf(opReturnBytesLen)+1+VarInt.sizeOf(opReturnBytesLen+VarInt.sizeOf(opReturnBytesLen)+1)+8);
+        }
+        return priceInSatoshi*length;
+    }
+
+    public static long calcFeeMultiSign(int inputNum, int outputNum, int opReturnBytesLen,int m, int n) {
+        long priceInSatoshi =1;
+
+        /*多签单个Input长度：
+            基础字节40（preTxId 32，preIndex 4，sequence 4），
+            可变脚本长度：？
+            脚本：
+                op_0    1
+                签名：m * (1+64+1)     // length + pubKeyLength + sigHash ALL
+                可变redeemScript 长度：？
+                redeem script：
+                    op_m    1
+                    pubKeys    n * 33
+                    op_n    1
+                    OP_CHECKMULTISIG    1
+         */
+
+        long redeemScriptLength = 1+(n* 33L)+1+1;
+        long redeemScriptVarInt = VarInt.sizeOf(redeemScriptLength);
+        long scriptLength = 1+ (m* 66L) + redeemScriptVarInt + redeemScriptLength;
+        long scriptVarInt = VarInt.sizeOf(scriptLength);
+        long inputLength = 40+scriptVarInt+scriptLength;
+
+        long length;
+        if(opReturnBytesLen==0) {
+            length = 10+ inputLength * inputNum + (long) 34 *(outputNum+1);
+        }else{
+            length= 10+ inputLength * inputNum + (long) 34 *(outputNum+1)+ (opReturnBytesLen+VarInt.sizeOf(opReturnBytesLen)+1+VarInt.sizeOf(opReturnBytesLen+VarInt.sizeOf(opReturnBytesLen)+1)+8);
         }
         return priceInSatoshi*length;
     }

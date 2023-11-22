@@ -6,8 +6,8 @@ import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
 import constants.IndicesNames;
-import fcTools.ParseTools;
 import esTools.EsTools;
+import javaTools.JsonTools;
 
 import java.io.IOException;
 import java.util.*;
@@ -39,7 +39,7 @@ public class PersonalRollbacker {
 
 		if(itemIdList==null||itemIdList.isEmpty())return false;
 		System.out.println("If rolling back is interrupted, reparse all effected ids of index 'box': ");
-		ParseTools.gsonPrint(itemIdList);
+		JsonTools.gsonPrint(itemIdList);
 		deleteEffectedItems(esClient, IndicesNames.BOX,itemIdList);
 		if(histIdList==null||histIdList.isEmpty())return false;
 		deleteRolledHists(esClient, IndicesNames.BOX_HISTORY,histIdList);

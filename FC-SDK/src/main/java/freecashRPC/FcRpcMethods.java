@@ -2,7 +2,7 @@ package freecashRPC;
 
 import com.google.gson.Gson;
 import com.googlecode.jsonrpc4j.JsonRpcHttpClient;
-import fcTools.ParseTools;
+import javaTools.JsonTools;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +38,7 @@ public class FcRpcMethods {
         } catch (Throwable e) {
             return e.getMessage();
         }
-        return ParseTools.gsonString(result);
+        return JsonTools.getNiceString(result);
     }
 
     public static String sendTx(JsonRpcHttpClient fcClient, String rawTx) {
@@ -46,7 +46,7 @@ public class FcRpcMethods {
         String result = null;
         try {
             result = fcClient.invoke("sendrawtransaction", new String[]{rawTx}, String.class);
-            return ParseTools.gsonString(result);
+            return JsonTools.getNiceString(result);
         } catch (Throwable e) {
             return e.getMessage();
         }
@@ -63,7 +63,7 @@ public class FcRpcMethods {
         Object[] params = new Object[]{rawUnsignedTx};
         Gson gson = new Gson();
         Object result = fcClient.invoke("signrawtransactionwithwallet", params, Object.class);
-        SignResult signResult = gson.fromJson(ParseTools.gsonString(result),SignResult.class);
+        SignResult signResult = gson.fromJson(JsonTools.getNiceString(result),SignResult.class);
         return signResult;
     }
 }

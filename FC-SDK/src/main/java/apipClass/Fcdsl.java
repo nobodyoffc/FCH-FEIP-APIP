@@ -1,6 +1,6 @@
 package apipClass;
 
-import fcTools.ParseTools;
+import javaTools.JsonTools;
 import menu.Inputer;
 import menu.Menu;
 import org.junit.Test;
@@ -312,7 +312,7 @@ public class Fcdsl{
         Fcdsl fcdsl = new Fcdsl();
         fcdsl.setIndex("cid");
         fcdsl.setSize("2");
-        ParseTools.gsonPrint(fcdsl);
+        JsonTools.gsonPrint(fcdsl);
     }
 
 

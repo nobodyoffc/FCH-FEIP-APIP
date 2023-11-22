@@ -117,4 +117,6 @@ public class Strings {
     public static final String PRE_KEY = "priKey";
     public static final String SYM_SIGN = "symSign";
     public static final String SYM_KEY_NAME = "symKeyName";
+    public static String spendCashMapKey = "spentCashMap";
+    public static String newCashMapKey = "newCashMap";
 }

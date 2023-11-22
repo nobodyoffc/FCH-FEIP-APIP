@@ -2,10 +2,10 @@ package test;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.*;
-import fcTools.ParseTools;
 import identity.CidHist;
 import esTools.EsTools;
 import esTools.NewEsClient;
+import javaTools.JsonTools;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -68,6 +68,6 @@ public class Test {
         ArrayList<String> signerList = new ArrayList<>();
         signerList.add("FEk41Kqjar45fLDriztUDTUkdki7mmcjWK");
         List<CidHist> reparseList = EsTools.getHistsForReparse(esClient, "cid_history","signer",signerList, CidHist.class);
-        ParseTools.gsonPrint(reparseList);
+        JsonTools.gsonPrint(reparseList);
     }
 }

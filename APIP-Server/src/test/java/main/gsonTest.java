@@ -3,7 +3,7 @@ package main;
 
 import apipClass.RequestBody;
 import com.google.gson.Gson;
-import fcTools.ParseTools;
+import javaTools.JsonTools;
 
 public class gsonTest {
     public static void main(String[] args) {
@@ -40,7 +40,7 @@ public class gsonTest {
         ///System.out.println(str);
         gson.fromJson(str, RequestBody.class);
 
-        ParseTools.gsonPrint(dataRequestBody);
+        JsonTools.gsonPrint(dataRequestBody);
 
 
     }

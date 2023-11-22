@@ -6,7 +6,7 @@ import com.google.gson.Gson;
 import constants.ApiNames;
 import constants.ReplyInfo;
 import constants.Strings;
-import fcTools.ParseTools;
+import javaTools.JsonTools;
 import org.bitcoinj.core.ECKey;
 
 import javax.servlet.ServletException;
@@ -114,7 +114,7 @@ public class Verify extends HttpServlet {
         signShort.sign = signShort.sign.replaceAll("\"","");
         signShort.sign = signShort.sign.replaceAll("\\u003d","=");
 
-        ParseTools.gsonPrint(signShort);
+        JsonTools.gsonPrint(signShort);
         return signShort;
     }
 

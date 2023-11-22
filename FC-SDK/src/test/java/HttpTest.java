@@ -1,9 +1,10 @@
+import apipClass.ResponseBody;
 import apipRequest.Reply;
 import com.google.gson.Gson;
 import cryptoTools.SHA;
-import fcTools.ParseTools;
 import fipaClass.LinkInfo;
 import javaTools.BytesTools;
+import javaTools.JsonTools;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.jetbrains.annotations.NotNull;
@@ -38,7 +39,7 @@ public class HttpTest {
 
         ResponseBody responseBody1= (ResponseBody)response.getBody();
 
-        ParseTools.gsonPrint(responseBody1);
+        JsonTools.gsonPrint(responseBody1);
         System.out.println(responseBody1.getMessage());
     }
 

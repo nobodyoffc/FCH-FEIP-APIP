@@ -7,7 +7,6 @@ import com.google.gson.JsonSyntaxException;
 import constants.Constants;
 import constants.UpStrings;
 import fcTools.FchMainNetwork;
-import fcTools.ParseTools;
 import fipaClass.Algorithm;
 import fipaClass.Signature;
 import org.apache.http.HttpResponse;
@@ -49,6 +48,27 @@ public class ApipClient {
     private HttpResponse httpResponse;
     private int code;
     private String message;
+
+    public int checkResponse(){
+        if(responseBody==null){
+            code = ClientCodeMessage.Code1ResponseIsNull;
+            message = ClientCodeMessage.Msg1ResponseIsNull;
+            return code;
+        }
+
+        if(responseBody.getCode()!=0){
+            code = responseBody.getCode();
+            message = responseBody.getMessage();
+            return code;
+        }
+
+        if(responseBody.getData()==null){
+            code = ClientCodeMessage.Code10ResponseDataIsNull;
+            message = ClientCodeMessage.Msg10ResponseDataIsNull;
+            return code;
+        }
+        return 0;
+    }
 
     public void makeRequestBody(){
         requestBody = new RequestBody();
@@ -165,7 +185,7 @@ public class ApipClient {
     private void makeHeaderAsySign(byte[] priKey) {
         if(priKey==null)return;
 
-        ECKey ecKey = ECKey.fromPrivate(priKey.clone());
+        ECKey ecKey = ECKey.fromPrivate(priKey);
 
         requestBodyStr = new String(requestBodyBytes,StandardCharsets.UTF_8);
         String sign = ecKey.signMessage(requestBodyStr);

@@ -5,6 +5,7 @@ import fcTools.ParseTools;
 import javaTools.BytesTools;
 import keyTools.KeyTools;
 import org.jetbrains.annotations.NotNull;
+import txTools.FchTool;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -57,6 +58,10 @@ public class Inputer {
             System.out.println("BufferedReader is wrong. Can't read.");
         }
         return input;
+    }
+    public static String inputString(BufferedReader br,String ask) {
+        System.out.println(ask);
+        return inputString(br);
     }
 
     public static Double inputGoodShare(BufferedReader br) {
@@ -192,6 +197,36 @@ public class Inputer {
         while(true) {
             String item =Inputer.inputString(br);
             if(item.equals(""))break;
+            if(len>0) {
+                if(item.length()!=len) {
+                    System.out.println("The length does not match.");
+                    continue;
+                }
+            }
+            itemList.add(item);
+            System.out.println("Input next item if you want or enter to end:");
+        }
+        if(itemList.isEmpty())return new String [0];
+
+        String[] items = itemList.toArray(new String[itemList.size()]);
+
+        return items;
+    }
+
+    public static String[] inputFidArray(BufferedReader br, String ask, int len) {
+        ArrayList<String> itemList = new ArrayList<String>();
+        System.out.println(ask);
+        while(true) {
+            String item =Inputer.inputString(br);
+            if(item.equals(""))break;
+            if(!KeyTools.isValidFchAddr(item)){
+                System.out.println("Invalid FID. Try again.");
+                continue;
+            }
+            if(item.startsWith("3")){
+                System.out.println("Multi-sign FID can not used to make new multi-sign FID. Try again.");
+                continue;
+            }
             if(len>0) {
                 if(item.length()!=len) {
                     System.out.println("The length does not match.");

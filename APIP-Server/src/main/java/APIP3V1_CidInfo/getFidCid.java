@@ -8,9 +8,9 @@ import co.elastic.clients.elasticsearch.core.GetResponse;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import apipClass.CidInfo;
-import fcTools.ParseTools;
 import feipClass.Cid;
 import initial.Initiator;
+import javaTools.JsonTools;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -42,7 +42,7 @@ public class getFidCid extends HttpServlet {
             List<Hit<Cid>> hitList = result.hits().hits();
             if(hitList==null || hitList.size()==0){
 
-                System.out.println("search: "+idRequested+"hit: "+ParseTools.gsonString(hitList));
+                System.out.println("search: "+idRequested+"hit: "+ JsonTools.getNiceString(hitList));
 
                 writer.write("Cid no found.");
                 return;
@@ -53,7 +53,7 @@ public class getFidCid extends HttpServlet {
 
             CidInfo cidInfo = mergeCidInfo(cid,fid);
 
-            writer.write(ParseTools.gsonString(cidInfo));
+            writer.write(JsonTools.getNiceString(cidInfo));
 
         }else if(idRequested.charAt(0) == 'F' || idRequested.charAt(0) == '3'){
             GetResponse<Address> fidResult = esClient.get(g -> g.index(IndicesNames.ADDRESS).id(idRequested), Address.class);
@@ -66,7 +66,7 @@ public class getFidCid extends HttpServlet {
                     return;
                 }
                 CidInfo cidInfo = CidInfo.mergeCidInfo(cid,fid);
-                writer.write(ParseTools.gsonString(cidInfo));
+                writer.write(JsonTools.getNiceString(cidInfo));
             }else {
                 writer.write("Fid no found.");
             }

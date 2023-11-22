@@ -9,8 +9,8 @@ import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
 import constants.IndicesNames;
-import fcTools.ParseTools;
 import esTools.EsTools;
+import javaTools.JsonTools;
 
 import java.io.IOException;
 import java.util.*;
@@ -39,7 +39,7 @@ public class IdentityRollbacker {
 		if(signerList==null || signerList.isEmpty())return error;
 		
 		System.out.println("If Rollbacking is interrupted, reparse all effected ids of index 'cid': ");
-		ParseTools.gsonPrint(signerList);
+		JsonTools.gsonPrint(signerList);
 		
 		deleteEffectedCids(esClient, signerList);
 		

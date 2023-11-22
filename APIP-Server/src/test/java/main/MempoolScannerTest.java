@@ -7,6 +7,7 @@ import fchClass.Cash;
 import javaTools.BytesTools;
 import fcTools.ParseTools;
 import fcTools.ParseTools.VarintResult;
+import javaTools.JsonTools;
 import org.junit.Test;
 import redis.clients.jedis.Jedis;
 import esTools.EsTools;
@@ -260,16 +261,16 @@ public class MempoolScannerTest extends Thread {
                 headers.put("Authorization", "Basic " + cred);
                 client = new JsonRpcHttpClient(new URL("http://" + "127.0.0.1" + ":" + 8332), headers);
                 this.client = client;
-                ParseTools.gsonPrint(client.invoke("getblockchaininfo",new Object[]{},Object.class));
+                JsonTools.gsonPrint(client.invoke("getblockchaininfo",new Object[]{},Object.class));
                 String[] ids = getTxIds();
-                ParseTools.gsonPrint(ids);
+                JsonTools.gsonPrint(ids);
                 if(ids.length>0)
-                    ParseTools.gsonPrint(getRawTx(ids[0]));
+                    JsonTools.gsonPrint(getRawTx(ids[0]));
                 String rawTx = "020000000106155b7150ba10949bdceea8a0f26cdd4641713ca8994165882e043202dcd10a000000006441baa4a2d1adb060599f6463fa004162aa5e821ae77e4624ee01c7448a400aa1480d03c9fc4e2e86134aff7d75edae83f1675aa07b218799e6fd3df55177581d764121030be1d7e633feb2338a74a860e76d893bac525f35a5813cb7b21e27ba1bc8312affffffff02404b4c00000000001976a91461c42abb6e3435e63bd88862f3746a3f8b86354288ac654a4c00000000001976a91461c42abb6e3435e63bd88862f3746a3f8b86354288ac00000000";
 
                 //System.out.println(client.invoke("decoderawtransaction",new Object[]{rawTx,true},Object.class));
                 Object result = client.invoke("decoderawtransaction", new Object[]{rawTx}, Object.class);
-                System.out.println(ParseTools.gsonString(result));
+                System.out.println(JsonTools.getNiceString(result));
 
                 try {
                     result = client.invoke("sendrawtransaction", new Object[]{rawTx}, Object.class);
@@ -278,7 +279,7 @@ public class MempoolScannerTest extends Thread {
                     String msg = e.getMessage();
                     System.out.println(msg);
                 }
-                ParseTools.gsonPrint(result);
+                JsonTools.gsonPrint(result);
 
             } catch (Exception e) {
                 e.printStackTrace();

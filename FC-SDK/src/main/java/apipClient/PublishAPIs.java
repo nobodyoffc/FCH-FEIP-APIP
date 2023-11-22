@@ -7,7 +7,7 @@ import javax.annotation.Nullable;
 
 public class PublishAPIs {
 
-    public ApipClient proofByIdsPost(String urlHead, String[] ids, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient proofByIdsPost(String urlHead, String[] ids, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("14");
         Fcdsl fcdsl = new Fcdsl();
@@ -19,7 +19,7 @@ public class PublishAPIs {
         if(!isGood)return null;
         return apipClient;
     }
-    public ApipClient proofSearchPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient proofSearchPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("14");
 
@@ -30,7 +30,7 @@ public class PublishAPIs {
         return apipClient;
     }
 
-    public ApipClient proofHistoryPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient proofHistoryPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("14");
 
@@ -41,7 +41,7 @@ public class PublishAPIs {
         return apipClient;
     }
 
-    public ApipClient statementByIdsPost(String urlHead, String[] ids, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient statementByIdsPost(String urlHead, String[] ids, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("15");
         Fcdsl fcdsl = new Fcdsl();
@@ -53,7 +53,7 @@ public class PublishAPIs {
         if(!isGood)return null;
         return apipClient;
     }
-    public ApipClient statementSearchPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient statementSearchPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("15");
 
@@ -63,7 +63,7 @@ public class PublishAPIs {
         if(!isGood)return null;
         return apipClient;
     }
-    public ApipClient nidSearchPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient nidSearchPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("19");
         apipClient.setRawFcdsl(fcdsl);

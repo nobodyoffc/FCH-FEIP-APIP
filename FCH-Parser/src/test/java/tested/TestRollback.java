@@ -15,7 +15,7 @@ import fchClass.Address;
 import fchClass.Cash;
 import fchClass.OpReturn;
 import javaTools.BytesTools;
-import fcTools.ParseTools;
+import javaTools.JsonTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import fileTools.OpReFileTools;
@@ -41,7 +41,7 @@ public class TestRollback {
 //        rollback(esClient,lastHeight);
 
         ArrayList<String> addrList = readEffectedAddresses(esClient, lastHeight);
-        ParseTools.gsonPrint(addrList);
+        JsonTools.gsonPrint(addrList);
 
         br.close();
     }
@@ -157,12 +157,12 @@ public class TestRollback {
         ArrayList<String> addrList = readAllAddrs(esClient,lastHeight);
         if (addrList == null) return;
         //TODO
-        ParseTools.gsonPrint(addrList);
+        JsonTools.gsonPrint(addrList);
 
         Map<String, Map<String, Long>> aggsMaps = aggsTxoByAddrs(esClient,lastHeight, addrList);
 
         System.out.println();
-        ParseTools.gsonPrint(aggsMaps);
+        JsonTools.gsonPrint(aggsMaps);
 
         bulkUpdateAddr(esClient,aggsMaps,lastHeight);
     }

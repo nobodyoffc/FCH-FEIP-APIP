@@ -14,13 +14,13 @@ import java.lang.reflect.Type;
 import java.util.HexFormat;
 
 public class OpenAPIs {
-    public ApipClient getService(String urlHead){
+    public static ApipClient getService(String urlHead){
         ApipClient apipClient = new ApipClient();
         apipClient.addNewApipUrl(urlHead, ApiNames.APIP0V1Path + ApiNames.GetServiceAPI);
         apipClient.get();
         return apipClient;
     }
-    public ApipClient signInPost(String urlHead, String via, byte[] priKey, String mode)  {
+    public static ApipClient signInPost(String urlHead, String via, byte[] priKey, String mode)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("0");
         String urlTail = ApiNames.APIP0V1Path + ApiNames.SignInAPI;
@@ -28,20 +28,17 @@ public class OpenAPIs {
 
         return apipClient;
     }
-    public ApipClient signInEccPost(String urlHead, @Nullable String via, byte[] priKey, @Nullable String mode)  {
+    public static ApipClient signInEccPost(String urlHead, @Nullable String via, byte[] priKey, @Nullable String mode)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("0");
         String urlTail = ApiNames.APIP0V1Path + ApiNames.SignInEccAPI;
         doSignIn(apipClient,urlHead, via, priKey, urlTail,mode);
 
-        SignInData signInData = makeSignInData(apipClient.getResponseBodyStr());
-
-        apipClient.getResponseBody().setData(signInData);
         return apipClient;
     }
 
     @Nullable
-    private ApipClient doSignIn(ApipClient apipClient, String urlHead, @Nullable String via, byte[] priKey, String urlTail, @Nullable String mode) {
+    private static ApipClient doSignIn(ApipClient apipClient, String urlHead, @Nullable String via, byte[] priKey, String urlTail, @Nullable String mode) {
 
         try {
             apipClient.asySignPost(urlHead, urlTail, via, null, priKey, mode);
@@ -53,29 +50,14 @@ public class OpenAPIs {
         return apipClient;
     }
 
-    public static SignInData makeSignInData(String responseJson) {
-        Gson gson = new Gson();
-        ResponseBody responseBody = gson.fromJson(responseJson, ResponseBody.class);
-        SignInData signInReplyData;
-        if (responseBody.getCode() != 0) {
-            System.out.println(responseJson);
-            signInReplyData = new SignInData();
-        } else {
-            Object data = responseBody.getData();
-            Type t = new TypeToken<SignInData>() {
-            }.getType();
-            signInReplyData = gson.fromJson(gson.toJson(data), t);
-        }
-        return signInReplyData;
-    }
-    public ApipClient totalsGet(String urlHead){
+    public static ApipClient totalsGet(String urlHead){
         ApipClient apipClient = new ApipClient();
         apipClient.addNewApipUrl(urlHead,ApiNames.FreeGetPath+ApiNames.GetTotalsAPI);
         apipClient.get();
         return apipClient;
     }
 
-    public ApipClient totalsPost(String urlHead,@Nullable String via, byte[] sessionKey)  {
+    public static ApipClient totalsPost(String urlHead,@Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("0");
         String urlTail = ApiNames.APIP0V1Path + ApiNames.TotalsAPI;
@@ -85,7 +67,7 @@ public class OpenAPIs {
         return apipClient;
     }
 
-    public ApipClient generalPost(String index, String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient generalPost(String index, String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("1");
         if(index==null){

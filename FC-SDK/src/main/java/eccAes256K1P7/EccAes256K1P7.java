@@ -47,7 +47,7 @@ public class EccAes256K1P7 {
         Security.addProvider(new BouncyCastleProvider());
     }
 
-    public static String encryptKey(byte[] keyBytes, byte[] initSymKey) {
+    public static String encryptKeyWithSymKey(byte[] keyBytes, byte[] initSymKey) {
         EccAes256K1P7 ecc = new EccAes256K1P7();
 
         EccAesDataByte eccAesDataByte = new EccAesDataByte();
@@ -57,6 +57,19 @@ public class EccAes256K1P7 {
         ecc.encrypt(eccAesDataByte);
         if(eccAesDataByte.getError()==null) return EccAesData.fromEccAesDataByte(eccAesDataByte).toJson();
         return "Error:"+eccAesDataByte.getError();
+    }
+
+    public static String encryptKeyWithPassword(byte[] keyBytes, char[] password) {
+        EccAes256K1P7 ecc = new EccAes256K1P7();
+        EccAesDataByte eccAesDataByte = new EccAesDataByte();
+        eccAesDataByte.setType(EccAesType.Password);
+        eccAesDataByte.setMsg(keyBytes);
+        eccAesDataByte.setPassword(BytesTools.utf8CharArrayToByteArray(password));
+        ecc.encrypt(eccAesDataByte);
+        if(eccAesDataByte.getError()!=null){
+            return "Error:"+eccAesDataByte.getError();
+        }
+        return EccAesData.fromEccAesDataByte(eccAesDataByte).toJson();
     }
 
     public static byte[] decryptKeyWithSymKey(String keyCipher, byte[] symKey) {

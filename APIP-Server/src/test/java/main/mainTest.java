@@ -9,7 +9,7 @@ import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
 import fchClass.Cash;
 import javaTools.BytesTools;
-import fcTools.ParseTools;
+import javaTools.JsonTools;
 import org.bitcoinj.core.ECKey;
 import org.junit.Test;
 import redis.clients.jedis.Jedis;
@@ -84,7 +84,7 @@ public class mainTest {
             hitSize = response.hits().hits().size();
             last = response.hits().hits().get(hitSize - 1).sort();
         }
-        ParseTools.gsonPrint(addrSet);
+        JsonTools.gsonPrint(addrSet);
         return new ArrayList<>(addrSet);
     }
 
@@ -93,7 +93,7 @@ public class mainTest {
         Sort sort = new Sort();
         sort.setField("id");
         sort.setOrder("asc");
-        ParseTools.gsonPrint(sort);
+        JsonTools.gsonPrint(sort);
 
         Sort sort1 = new Sort();
         sort1.setField("addr");
@@ -103,7 +103,7 @@ public class mainTest {
         sortL.add(sort);
         sortL.add(sort1);
 
-        ParseTools.gsonPrint(sortL);
+        JsonTools.gsonPrint(sortL);
     }
 
     @Test

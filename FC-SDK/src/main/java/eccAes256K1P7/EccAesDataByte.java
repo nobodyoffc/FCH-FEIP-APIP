@@ -1,7 +1,7 @@
 package eccAes256K1P7;
 
-import fcTools.ParseTools;
 import javaTools.BytesTools;
+import javaTools.JsonTools;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -63,7 +63,7 @@ public class EccAesDataByte {
 
     public String getJson(){
         EccAesData eccAesData = EccAesData.fromEccAesDataByte(this);
-        return ParseTools.gsonString(eccAesData);
+        return JsonTools.getNiceString(eccAesData);
     }
 
 //    public String makeIvAndCipherJson() {

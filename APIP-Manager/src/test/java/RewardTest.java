@@ -1,7 +1,7 @@
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import config.ConfigAPIP;
 import esTools.NewEsClient;
-import fcTools.ParseTools;
+import javaTools.JsonTools;
 import redis.clients.jedis.Jedis;
 import reward.*;
 
@@ -50,13 +50,13 @@ public class RewardTest {
 
     private static RewardInfo makeRewardInfo(long incomeT, RewardParams rewardParams, Jedis jedis) {
         RewardInfo rewardInfo = rewarder.makeRewardInfo(incomeT, rewardParams);
-        ParseTools.gsonPrint(rewardInfo);
+        JsonTools.gsonPrint(rewardInfo);
         return rewardInfo;
     }
 
     private static RewardParams getRewardParams(Jedis jedis) {
         RewardParams rewardParams = Rewarder.getRewardParams();
-        ParseTools.gsonPrint(rewardParams);
+        JsonTools.gsonPrint(rewardParams);
         return rewardParams;
     }
 

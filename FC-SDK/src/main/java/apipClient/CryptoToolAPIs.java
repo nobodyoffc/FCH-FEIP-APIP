@@ -18,7 +18,7 @@ import java.util.Map;
 
 public class CryptoToolAPIs {
 
-    public ApipClient addressesPost(String urlHead, String addrOrPubKey, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient addressesPost(String urlHead, String addrOrPubKey, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("21");
         Fcdsl fcdsl = new Fcdsl();
@@ -31,7 +31,7 @@ public class CryptoToolAPIs {
         return apipClient;
     }
 
-    public ApipClient encryptPost(String urlHead, String key,String message, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient encryptPost(String urlHead, String key,String message, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("21");
         Fcdsl fcdsl = new Fcdsl();
@@ -52,7 +52,7 @@ public class CryptoToolAPIs {
         return apipClient;
     }
 
-    public ApipClient verifyPost(String urlHead, String signature, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient verifyPost(String urlHead, String signature, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("21");
         Fcdsl fcdsl = new Fcdsl();
@@ -73,7 +73,7 @@ public class CryptoToolAPIs {
         return apipClient;
     }
 
-    public ApipClient sha256Post(String urlHead, String text, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient sha256Post(String urlHead, String text, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("21");
         Fcdsl fcdsl = new Fcdsl();
@@ -86,7 +86,7 @@ public class CryptoToolAPIs {
         return apipClient;
     }
 
-    public ApipClient sha256x2Post(String urlHead, String text, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient sha256x2Post(String urlHead, String text, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("21");
         Fcdsl fcdsl = new Fcdsl();
@@ -99,7 +99,7 @@ public class CryptoToolAPIs {
         return apipClient;
     }
 
-    public ApipClient sha256BytesPost(String urlHead, String hex, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient sha256BytesPost(String urlHead, String hex, @Nullable String via, byte[] sessionKey)  {
         if(!BytesTools.isHexString(hex)){
             System.out.println("Error: It's not a hex.");
             return null;
@@ -117,7 +117,7 @@ public class CryptoToolAPIs {
         return apipClient;
     }
 
-    public ApipClient sha256x2BytesPost(String urlHead, String hex, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient sha256x2BytesPost(String urlHead, String hex, @Nullable String via, byte[] sessionKey)  {
         if(!BytesTools.isHexString(hex)){
             System.out.println("Error: It's not a hex.");
             return null;
@@ -134,7 +134,7 @@ public class CryptoToolAPIs {
         return apipClient;
     }
 
-    public ApipClient offLineTxPost(String urlHead, String fromFid,List<SendTo>sendToList,String msg, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient offLineTxPost(String urlHead, String fromFid,List<SendTo>sendToList,String msg, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("21");
         Fcdsl fcdsl = new Fcdsl();
@@ -151,7 +151,7 @@ public class CryptoToolAPIs {
         return apipClient;
     }
 
-    public ApipClient offLineTxByCdPost(String urlHead, String fromFid,List<SendTo>sendToList,String msg,int cd, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient offLineTxByCdPost(String urlHead, String fromFid,List<SendTo>sendToList,String msg,int cd, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("21");
         Fcdsl fcdsl = new Fcdsl();

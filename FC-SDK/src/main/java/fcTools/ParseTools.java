@@ -1,22 +1,18 @@
 package fcTools;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 import cryptoTools.SHA;
 import io.netty.buffer.Unpooled;
 import javaTools.BytesTools;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.nio.file.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -122,18 +118,6 @@ public class ParseTools {
                         BytesTools.bytesMerger(txIdBytes, b4OutIndex)
                 ));
         return outId;
-    }
-
-    public static String gsonString(Object ob) {
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.setPrettyPrinting();
-        Gson gson = gsonBuilder.create();
-        return gson.toJson(ob);
-    }
-
-    public static void  gsonPrint(Object ob) {
-        System.out.println("***********\n" + ob.getClass().toString() + ": " + gsonString(ob) + "\n***********");
-        return;
     }
 
     public static void waitForChangeInDirectory(String directoryPathStr, AtomicBoolean running) {
@@ -287,17 +271,12 @@ public class ParseTools {
         }
     }
 
-    public static String strToJson(String rawStr) {
+    public static double fchToSatoshis(long satoshis){
+        return roundDouble8((double) satoshis /FchToSatoshi);
+    }
 
-        if (!rawStr.contains("{")) return null;
-
-        int begin = rawStr.indexOf("{");
-
-        String goodStr = rawStr.substring(begin);
-
-        goodStr.replaceAll("\r|\n|\t", "");
-
-        return goodStr;
+    public static long fchToSatoshis(double fch){
+        return (long)(fch*FchToSatoshi);
     }
 
     public static double roundDouble8(double raw){
@@ -357,7 +336,4 @@ public class ParseTools {
         return dateTime.format(formatter);
     }
 
-    public static String formatString(String str, int length) {
-        return String.format("%-" + length + "s", str);
-    }
 }

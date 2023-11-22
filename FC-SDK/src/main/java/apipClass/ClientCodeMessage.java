@@ -21,4 +21,6 @@ public class ClientCodeMessage {
     public static String Msg8BadResponseSign = "The sign in header is not correct to the response body.";
     public static int Code9BadQuery=9;
     public static String Msg9BadQuery = "Bad FCDSL query for this API.";
+    public static int Code10ResponseDataIsNull = 10;
+    public static String  Msg10ResponseDataIsNull= "The data object in response body is null.";
 }

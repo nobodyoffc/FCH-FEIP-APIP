@@ -12,6 +12,7 @@ import esTools.EsTools;
 import fcTools.ParseTools;
 import fchClass.Cash;
 import fchClass.OpReturn;
+import javaTools.JsonTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
@@ -271,7 +272,7 @@ private void waitNewOrder() {
 
         for (OpReturn opReturn : opReturnList) {
             try {
-                String goodOp = ParseTools.strToJson(opReturn.getOpReturn());
+                String goodOp = JsonTools.strToJson(opReturn.getOpReturn());
                 order.OrderOpReturn orderOpreturn = gson.fromJson(goodOp, OrderOpReturn.class);
 
                 if(orderOpreturn != null && orderOpreturn.getType().equals("APIP")

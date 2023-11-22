@@ -10,6 +10,7 @@ import esTools.EsTools;
 import fcTools.ParseTools;
 import fchClass.Address;
 import fileTools.JsonFileTools;
+import javaTools.JsonTools;
 import menu.Menu;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -205,22 +206,22 @@ public class RewardManager {
             return;
         }
         System.out.println("Unpaid rewards: ");
-        System.out.print(ParseTools.formatString("State",12));
-        System.out.print(ParseTools.formatString("Time",22));
-        System.out.print(ParseTools.formatString("Amount total",20));
-        System.out.print(ParseTools.formatString("Reward ID",66));
+        System.out.print(Menu.formatString("State",12));
+        System.out.print(Menu.formatString("Time",22));
+        System.out.print(Menu.formatString("Amount total",20));
+        System.out.print(Menu.formatString("Reward ID",66));
         System.out.println();
 
         for(RewardInfo rewardInfo : unpaidRewardList){
-            System.out.print(ParseTools.formatString(rewardInfo.getState().name(),12));
+            System.out.print(Menu.formatString(rewardInfo.getState().name(),12));
 
             String time = ParseTools.convertTimestampToDate(rewardInfo.getTime());
-            System.out.print(ParseTools.formatString(time,22));
+            System.out.print(Menu.formatString(time,22));
 
             String rewardT = String.valueOf((double) rewardInfo.getRewardT()/FchToSatoshi);
-            System.out.print(ParseTools.formatString(rewardT,20));
+            System.out.print(Menu.formatString(rewardT,20));
 
-            System.out.print(ParseTools.formatString(rewardInfo.getRewardId(),66));
+            System.out.print(Menu.formatString(rewardInfo.getRewardId(),66));
             System.out.println();
         }
         Menu.anyKeyToContinue(br);
@@ -254,7 +255,7 @@ public class RewardManager {
 
     private void showLastReward(ElasticsearchClient esClient, BufferedReader br) {
         RewardInfo reward = getLastRewardInfo(esClient);
-        System.out.println(ParseTools.gsonString(reward));
+        System.out.println(JsonTools.getNiceString(reward));
         Menu.anyKeyToContinue(br);
     }
 

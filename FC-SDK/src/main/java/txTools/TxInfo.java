@@ -1,11 +1,11 @@
-package parser;
+package txTools;
 
 import fchClass.Cash;
 import fchClass.Tx;
 
 import java.util.ArrayList;
 
-public class TxInMempool {
+public class TxInfo {
     private Tx tx;
     private ArrayList<Cash> inCashList;
     private ArrayList<Cash> outCashList;

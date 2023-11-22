@@ -4,15 +4,23 @@ import co.elastic.clients.elasticsearch._types.analysis.PredicateTokenFilter;
 import constants.Constants;
 import cryptoTools.SHA;
 import cryptoTools.Hash;
+import eccAes256K1P7.EccAes256K1P7;
+import eccAes256K1P7.EccAesDataByte;
+import fcTools.FchMainNetwork;
 import fcTools.ParseTools;
 import javaTools.BytesTools;
+import menu.Inputer;
 import menu.Menu;
+import org.bitcoinj.core.Address;
 import org.bitcoinj.core.Base58;
 import org.bitcoinj.core.ECKey;
 import org.bouncycastle.util.encoders.Hex;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.io.BufferedReader;
 import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HexFormat;
@@ -37,7 +45,7 @@ public class KeyTools {
             byte[] hash4 = new byte[4];
             System.arraycopy(hash, 0, hash4, 0, 4);
 
-            return addrNaked[0] == (byte) 0x23 && Arrays.equals(suffix, hash4);
+            return (addrNaked[0] == (byte) 0x23 ||addrNaked[0] == (byte) 0x05) && Arrays.equals(suffix, hash4);
         }catch (Exception ignore){
             return  false;
         }
@@ -497,7 +505,8 @@ public class KeyTools {
     }
 
     public static String scriptToMultiAddr(String script) {
-        byte[] b = SHA.Sha256(HexFormat.of().parseHex(script));
+        byte[] scriptBytes = HexFormat.of().parseHex(script);
+        byte[] b = SHA.Sha256(scriptBytes);
         byte[] h = SHA.Ripemd160(b);
         return KeyTools.hash160ToMultiAddr(h);
     }
@@ -855,6 +864,115 @@ public class KeyTools {
             }
         }
         return null;
+    }
+
+    @Nullable
+    public static byte[] inputCipherGetPriKey(BufferedReader br) {
+        System.out.println("""
+                Input  the private key.
+                'b' for Base58 code.
+                'c' for the cipher json.
+                'h' for hex.
+                'g' to generate a new one.
+                other to exit:""");
+
+        String input = Inputer.inputString(br);
+
+        byte[] priKey32 = new byte[0];
+        switch (input){
+            case "b"->{
+                do {
+                    System.out.println("Input the private key in Base58:");
+                    char[] priKeyBase58 = Inputer.inputPriKeyWif(br);
+                    priKey32 = getPriKey32(BytesTools.utf8CharArrayToByteArray(priKeyBase58));
+                    String buyer = priKeyToFid(priKey32);
+                    System.out.println(buyer);
+                    System.out.println("Is this your FID? y/n:");
+                    input = Inputer.inputString(br);
+                } while (!"y".equals(input));
+            }
+            case "c"->{
+                do {
+                    System.out.println("Input the private key cipher json by  "+ Constants.ECC_AES_256_K1_P7+":");
+                    String cipher = Inputer.inputString(br);
+                    if (cipher == null || "".equals(cipher)) break;
+
+                    String ask = "Input the password to decrypt this priKey:";
+                    char[] userPassword = Inputer.inputPassword(br, ask);
+
+                    EccAes256K1P7 ecc = new EccAes256K1P7();
+                    byte[] userPasswordBytes = BytesTools.utf8CharArrayToByteArray(userPassword);
+
+                    EccAesDataByte eccAesDataByte;
+                    if (cipher.contains("SymKey"))
+                        eccAesDataByte = ecc.decrypt(cipher, Hash.Sha256x2(userPasswordBytes));
+                    else eccAesDataByte = ecc.decrypt(cipher, userPasswordBytes);
+
+                    BytesTools.clearCharArray(userPassword);
+
+                    if (eccAesDataByte.getError() != null) {
+                        System.out.println("Decrypt priKey cipher from input wrong." + eccAesDataByte.getError());
+                        System.out.println("Try again.");
+                        continue;
+                    }
+                    priKey32 = getPriKey32(eccAesDataByte.getMsg());
+                    System.out.println("Your FID is: \n" + priKeyToFid(priKey32));
+                    System.out.println("Is it right? y/n");
+                    input = Inputer.inputString(br);
+                } while (!"y".equals(input));
+            }
+            case "h"->{
+                do {
+                    char[] priKeyHex = Inputer.input32BytesKey(br,"Input the private key in Hex:");
+                    if(priKeyHex==null)break;
+                    priKey32 = BytesTools.hexCharArrayToByteArray(priKeyHex);
+                    String buyer = priKeyToFid(priKey32);
+                    System.out.println(buyer);
+                    System.out.println("Is this your FID? y/n:");
+                    input = Inputer.inputString(br);
+                } while (!"y".equals(input));
+            }
+            case "g"-> {
+                ECKey ecKey = new ECKey(new SecureRandom());
+                String publicKeyAsHex = ecKey.getPublicKeyAsHex();
+                Address address = ecKey.toAddress(new FchMainNetwork());
+                System.out.println("New FID:"+address.toString());
+                System.out.println();
+                char[] password = Inputer.inputPassword(br, "Input a password to encrypt it:");
+
+                String cipher = EccAes256K1P7.encryptKeyWithPassword(ecKey.getPrivKeyBytes(), password);
+
+                password = Inputer.inputPassword(br, "Check the password:");
+                try{
+                    priKey32 = EccAes256K1P7.decryptKeyWithPassword(cipher, BytesTools.utf8CharArrayToByteArray(password));
+                    if(priKey32==null){
+                        System.out.println("Failed to generate new priKey.");
+                        break;
+                    }
+                    Address checkAddress = ECKey.fromPrivate(priKey32).toAddress(new FchMainNetwork());
+
+                    if(!address.toString().equals(checkAddress.toString())){
+                        System.out.println("Failed to generate new priKey.");
+                        break;
+                    }
+                    System.out.println("New priKey is ready:");
+                    Menu.printUnderline(10);
+                    System.out.println("FID:" + address);
+                    System.out.println("PubKey:" + publicKeyAsHex);
+                    System.out.println("PriKey:" + ecKey.getPrivateKeyAsWiF(new FchMainNetwork()));
+                    System.out.println("PriKeyCipher:"+cipher);
+                    Menu.printUnderline(10);
+                    System.out.println("* Save the priKey cipher and keep your password in mind." +
+                            "\nThey are both required to recover the priKey.");
+                }catch (Exception e){
+                    System.out.println("Failed to generate new priKey.");
+                }
+            }
+            default -> {
+                return null;
+            }
+        }
+        return priKey32;
     }
 }
 

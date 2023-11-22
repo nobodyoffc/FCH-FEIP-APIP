@@ -1,8 +1,8 @@
 package fileTools;
 
 import com.google.gson.Gson;
-import fcTools.ParseTools;
 import feipClass.Cid;
+import javaTools.JsonTools;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -27,7 +27,7 @@ public class JsonFileTools {
             try {
                 Cid cid1 = readObjectFromJsonFile(fis,Cid.class);
                 if(cid1!=null) {
-                    ParseTools.gsonPrint(cid1);
+                    JsonTools.gsonPrint(cid1);
                 }else return;
 
             } catch (Exception e) {

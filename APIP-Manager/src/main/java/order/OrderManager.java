@@ -71,7 +71,7 @@ public class OrderManager {
     }
 
     private void recreateIndexAndResetOrderHeight(BufferedReader br, ElasticsearchClient esClient, String order, String orderMappingJsonStr) {
-        Menu.askIfNotToDo("You will loss all orders info in the 'order' index of ES and Redis. Do you want to RECREATE?",br);
+        Menu.askIfToDo("You will loss all orders info in the 'order' index of ES and Redis. Do you want to RECREATE?",br);
         recreateApipIndex(br, esClient, ORDER, orderMappingJsonStr);
         resetLastOrderHeight(br);
     }
@@ -97,7 +97,7 @@ public class OrderManager {
 
     private void switchOrderScanner(OrderScanner orderScanner) {
         System.out.println("OrderScanner running is "+orderScanner.isRunning()+".");
-        Menu.askIfNotToDo("Switch it?",br);
+        Menu.askIfToDo("Switch it?",br);
         if(orderScanner.isRunning().get()){
             orderScanner.shutdown();
         }else{
@@ -144,10 +144,10 @@ public class OrderManager {
             int totalLength =FCH_LENGTH +2+DATE_TIME_LENGTH+2+FID_LENGTH+2+HEX256_LENGTH+2;
             System.out.println("Orders of "+fid+" : ");
             Menu.printUnderline(totalLength);
-            System.out.print(ParseTools.formatString("FCH",20));
-            System.out.print(ParseTools.formatString("Time",22));
-            System.out.print(ParseTools.formatString("Via",38));
-            System.out.print(ParseTools.formatString("TxId",66));
+            System.out.print(Menu.formatString("FCH",20));
+            System.out.print(Menu.formatString("Time",22));
+            System.out.print(Menu.formatString("Via",38));
+            System.out.print(Menu.formatString("TxId",66));
             System.out.println();
             Menu.printUnderline(totalLength);
 
@@ -158,10 +158,10 @@ public class OrderManager {
                 String time = ParseTools.convertTimestampToDate(order.getTime());
                 String txId = order.getTxId();
                 String via = order.getVia();
-                System.out.print(ParseTools.formatString(fch, FCH_LENGTH +2));
-                System.out.print(ParseTools.formatString(time, DATE_TIME_LENGTH+2));
-                System.out.print(ParseTools.formatString(via, FID_LENGTH+2));
-                System.out.print(ParseTools.formatString(txId, HEX256_LENGTH+2));
+                System.out.print(Menu.formatString(fch, FCH_LENGTH +2));
+                System.out.print(Menu.formatString(time, DATE_TIME_LENGTH+2));
+                System.out.print(Menu.formatString(via, FID_LENGTH+2));
+                System.out.print(Menu.formatString(txId, HEX256_LENGTH+2));
                 System.out.println();
             }
             Menu.printUnderline(totalLength);

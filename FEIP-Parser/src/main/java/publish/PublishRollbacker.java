@@ -6,8 +6,8 @@ import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
 import constants.IndicesNames;
-import fcTools.ParseTools;
 import esTools.EsTools;
+import javaTools.JsonTools;
 
 import java.io.IOException;
 import java.util.*;
@@ -47,7 +47,7 @@ public class PublishRollbacker {
 
 		if(itemIdList==null||itemIdList.isEmpty())return error;
 		System.out.println("If Rollbacking is interrupted, reparse all effected ids of index 'proof': ");
-		ParseTools.gsonPrint(itemIdList);
+		JsonTools.gsonPrint(itemIdList);
 		deleteEffectedItems(esClient, IndicesNames.PROOF, itemIdList);
 		if(histIdList==null||histIdList.isEmpty())return error;
 		deleteRolledHists(esClient, IndicesNames.PROOF_HISTORY,histIdList);

@@ -6,8 +6,8 @@ import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
 import constants.IndicesNames;
-import fcTools.ParseTools;
 import esTools.EsTools;
+import javaTools.JsonTools;
 
 import java.io.IOException;
 import java.util.*;
@@ -35,7 +35,7 @@ public class ConstructRollbacker {
 		
 		if(itemIdList==null||itemIdList.isEmpty())return error;
 		System.out.println("If rolling back is interrupted, reparse all effected ids of index 'protocol': ");
-		ParseTools.gsonPrint(itemIdList);
+		JsonTools.gsonPrint(itemIdList);
 		deleteEffectedItems(esClient, IndicesNames.PROTOCOL, itemIdList);
 		if(histIdList==null||histIdList.isEmpty())return error;
 		deleteRolledHists(esClient, IndicesNames.PROTOCOL_HISTORY,histIdList);
@@ -109,7 +109,7 @@ public class ConstructRollbacker {
 		
 		if(itemIdList==null||itemIdList.isEmpty())return error;
 		System.out.println("If rolling back is interrupted, reparse all effected ids of index 'service': ");
-		ParseTools.gsonPrint(itemIdList);
+		JsonTools.gsonPrint(itemIdList);
 		deleteEffectedItems(esClient, IndicesNames.SERVICE,itemIdList);
 		if(histIdList==null||histIdList.isEmpty())return error;
 		deleteRolledHists(esClient, IndicesNames.SERVICE_HISTORY,histIdList);
@@ -172,7 +172,7 @@ public class ConstructRollbacker {
 		
 		if(itemIdList==null||itemIdList.isEmpty())return error;
 		System.out.println("If rolling back is interrupted, reparse all effected ids of index 'app': ");
-		ParseTools.gsonPrint(itemIdList);
+		JsonTools.gsonPrint(itemIdList);
 		deleteEffectedItems(esClient, IndicesNames.APP,itemIdList);
 		if(histIdList==null||histIdList.isEmpty())return error;
 		deleteRolledHists(esClient, IndicesNames.APP_HISTORY,histIdList);
@@ -235,7 +235,7 @@ public class ConstructRollbacker {
 		
 		if(itemIdList==null||itemIdList.isEmpty())return error;
 		System.out.println("If rolling back is interrupted, reparse all effected ids of index 'code': ");
-		ParseTools.gsonPrint(itemIdList);
+		JsonTools.gsonPrint(itemIdList);
 		deleteEffectedItems(esClient, IndicesNames.CODE,itemIdList);
 		if(histIdList==null||histIdList.isEmpty())return error;
 		deleteRolledHists(esClient, IndicesNames.CODE_HISTORY,histIdList);

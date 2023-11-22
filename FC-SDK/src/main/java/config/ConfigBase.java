@@ -2,8 +2,8 @@ package config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import fcTools.ParseTools;
 import fileTools.JsonFileTools;
+import javaTools.JsonTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +55,7 @@ public class ConfigBase {
                 config(br);
                 t = JsonFileTools.readObjectFromJsonFile(configFilePath,configFileName,tClass);
             }else{
-                System.out.println("Config json: "+ ParseTools.gsonString(t));
+                System.out.println("Config json: "+ JsonTools.getNiceString(t));
             }
         } else {
             createConfigFile(configFilePath,configFileName);
@@ -76,7 +76,7 @@ public class ConfigBase {
                 System.out.println("Can't get parameters from config file. Config again...\n");
                 t = JsonFileTools.readObjectFromJsonFile(configFilePath,configFileName,tClass);
             }else{
-                System.out.println("Config json: "+ ParseTools.gsonString(t));
+                System.out.println("Config json: "+ JsonTools.getNiceString(t));
             }
         } else {
             createConfigFile(configFilePath,configFileName);

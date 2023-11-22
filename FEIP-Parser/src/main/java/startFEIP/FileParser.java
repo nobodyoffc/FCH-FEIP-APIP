@@ -16,6 +16,7 @@ import identity.IdentityParser;
 import identity.IdentityRollbacker;
 import identity.RepuHist;
 import feipClass.FcInfo;
+import javaTools.JsonTools;
 import opReturn.OpReFileTools;
 import fchClass.OpReturn;
 import opReturn.opReReadResult;
@@ -25,7 +26,6 @@ import organize.GroupHistory;
 import organize.OrganizationParser;
 import organize.OrganizationRollbacker;
 import organize.TeamHistory;
-import parser.Preparer;
 import personal.BoxHistory;
 import personal.PersonalParser;
 import personal.PersonalRollbacker;
@@ -59,7 +59,7 @@ public class FileParser {
 
 		if(opre.getOpReturn()==null)return null;
 
-		String protStr = ParseTools.strToJson(opre.getOpReturn());
+		String protStr = JsonTools.strToJson(opre.getOpReturn());
 
 		FcInfo feip = null;
 		try {

@@ -1,34 +1,35 @@
-package parser;
+package txTools;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import constants.Strings;
 import fchClass.Cash;
 import fchClass.Tx;
 import javaTools.BytesTools;
 import keyTools.KeyTools;
 import fcTools.ParseTools;
 import esTools.EsTools;
+import walletTools.MultiSigData;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static constants.IndicesNames.CASH;
 import static fcTools.ParseTools.parseVarint;
 
 public class RawTxParser {
-    static String spendCashMapKey = "spentCashMap";
-    static String newCashMapKey = "newCashMap";
 
-    public static TxInMempool parseMempoolTx(ElasticsearchClient esClient,String txHex, String txid) throws Exception {
+    public static TxInfo parseMempoolTx(ElasticsearchClient esClient, String txHex, String txid) throws Exception {
         Map<String, Map<String, Cash>> cashMapMap = parseUnconfirmedTxHex(txHex, txid);
-        ArrayList<Cash> inCashList = makeInCashMap(esClient, cashMapMap.get(spendCashMapKey),cashMapMap.get(newCashMapKey));
-        ArrayList<Cash> outCashList = new ArrayList<>(cashMapMap.get(newCashMapKey).values());
+        ArrayList<Cash> inCashList = makeInCashMap(esClient, cashMapMap.get(Strings.spendCashMapKey),cashMapMap.get(Strings.newCashMapKey));
+        ArrayList<Cash> outCashList = new ArrayList<>(cashMapMap.get(Strings.newCashMapKey).values());
 
         for(Cash cash:inCashList) cash.setSpendTxId(txid);
         for(Cash cash:outCashList) cash.setBirthTxId(txid);
 
         Tx tx = makeTx(txid,inCashList,outCashList);
-        TxInMempool txInMempool = new TxInMempool();
+        TxInfo txInMempool = new TxInfo();
         txInMempool.setTx(tx);
         txInMempool.setInCashList(inCashList);
         txInMempool.setOutCashList(outCashList);
@@ -56,9 +57,9 @@ public class RawTxParser {
 
     public static Map<String, Map<String, Cash>> parseUnconfirmedTxHex(String txHex, String txid) throws Exception {
         byte[] txBytes = BytesTools.hexToByteArray(txHex);
-        return parseUnconfirmedTxBytes(txBytes,txid);
+        return parseRawTxBytes(txBytes,txid);
     }
-    public static Map<String, Map<String, Cash>> parseUnconfirmedTxBytes(byte[] txBytes, String txid) throws Exception {
+    public static Map<String, Map<String, Cash>> parseRawTxBytes(byte[] txBytes, String txid) throws Exception {
 
         ByteArrayInputStream blockInputStream = new ByteArrayInputStream(txBytes);
 
@@ -75,10 +76,176 @@ public class RawTxParser {
         Map<String, Cash> newCashMap = parseOut(blockInputStream, txid);
 
         Map<String, Map<String,Cash>> cashMapMap = new HashMap<>();
-        cashMapMap.put(spendCashMapKey,spendCashMap);
-        cashMapMap.put(newCashMapKey,newCashMap);
+        cashMapMap.put(Strings.spendCashMapKey,spendCashMap);
+        cashMapMap.put(Strings.newCashMapKey,newCashMap);
         return cashMapMap;
     }
+
+    public static Map<String, Object> parseRawTxBytes(byte[] txBytes) throws Exception {
+
+        List<Cash> spentCashList = new ArrayList<>();
+        List<Cash> issuredCashList = new ArrayList<>();
+        String msg = null;
+
+        ByteArrayInputStream txInputStream = new ByteArrayInputStream(txBytes);
+
+        // Read tx version/读取交易的版本
+        byte[] b4Version = new byte[4];
+        txInputStream.read(b4Version);
+
+        // Read inputs /读输入
+        // ParseTxOutResult parseTxOutResult
+
+        // Get input count./获得输入数量
+        ParseTools.VarintResult varintParseResult;
+        varintParseResult = parseVarint(txInputStream);
+        long inputCount = varintParseResult.number;
+
+        // Read inputs /读输入
+        for (int j = 0; j < inputCount; j++) {
+            Cash spentCash = new Cash();
+            // Read preTXHash and preOutIndex./读取前交易哈希和输出索引。
+            byte[] b36PreTxIdAndIndex = new byte[32 + 4];
+            txInputStream.read(b36PreTxIdAndIndex);
+            String cashId =ParseTools.calcTxoIdFromBytes(b36PreTxIdAndIndex);
+            spentCash.setCashId(cashId);
+
+
+            // Read the length of script./读脚本长度。
+            varintParseResult = parseVarint(txInputStream);
+            long scriptCount = varintParseResult.number;
+
+            if(scriptCount!=0) {
+                // Get script./获取脚本。
+                byte[] bvScript = new byte[(int) scriptCount];
+                txInputStream.read(bvScript);
+
+                // Parse sigHash.
+                // 解析sigHash。
+                int sigLen = Byte.toUnsignedInt(bvScript[0]);// Length of signature;
+                // Skip signature/跳过签名。
+                byte sigHash = bvScript[sigLen];// 交易类型标志
+                switch (sigHash) {
+                    case 0x41:
+                        spentCash.setSigHash("ALL");
+                        break;
+                    case 0x42:
+                        spentCash.setSigHash("NONE");
+                        break;
+                    case 0x43:
+                        spentCash.setSigHash("SINGLE");
+                        break;
+                    case (byte) 0xc1:
+                        spentCash.setSigHash("ALLIANYONECANPAY");
+                        break;
+                    case (byte) 0xc2:
+                        spentCash.setSigHash("NONEIANYONECANPAY");
+                        break;
+                    case (byte) 0xc3:
+                        spentCash.setSigHash("SINGLEIANYONECANPAY");
+                        break;
+                    default:
+                        spentCash.setSigHash(null);
+                }
+            }
+            // Get sequence./获取sequence。
+            byte[] b4Sequence = new byte[4];
+            txInputStream.read(b4Sequence);
+            spentCash.setSequence(BytesTools.bytesToHexStringBE(b4Sequence));
+            spentCashList.add(spentCash);
+
+        }
+
+        // Parse Outputs./解析输出。
+        // Parse output count.
+        // 解析输出数量。
+        ParseTools.VarintResult varintParseResult1 = parseVarint(txInputStream);
+        long outputCount = varintParseResult1.number;
+
+        // Starting operators in output script.
+        // 输出脚本中的起始操作码。
+        final byte OP_DUP = (byte) 0x76;
+        final byte OP_HASH160 = (byte) 0xa9;
+        final byte OP_RETURN = (byte) 0x6a;
+        byte b1Script = 0x00; // For get the first byte of output script./接收脚本中的第一个字节。
+
+        for(int j = 0; j<outputCount;j++) {
+            // Start one output.
+            // 开始解析一个输出。
+            Cash newCash = new Cash();
+            newCash.setBirthIndex(j);
+
+            // Read the value of this output in satoshi.
+            // 读取该输出的金额，以聪为单位。
+            byte[] b8Value = new byte[8];
+            txInputStream.read(b8Value);
+            newCash.setValue(BytesTools.bytes8ToLong(b8Value, true));
+
+            // Parse the length of script.
+            // 解析脚本长度。
+            varintParseResult1 = parseVarint(txInputStream);
+            long scriptSize = varintParseResult1.number;
+            byte[] b2 = varintParseResult1.rawBytes;
+
+            byte[] bScript = new byte[(int) scriptSize];
+            txInputStream.read(bScript);
+
+            b1Script = bScript[0];
+
+            switch (b1Script) {
+                case OP_DUP -> {
+                    newCash.setType("P2PKH");
+                    newCash.setLockScript(BytesTools.bytesToHexStringBE(bScript));
+                    byte[] hash160Bytes = Arrays.copyOfRange(bScript, 3, 23);
+                    newCash.setOwner(KeyTools.hash160ToFchAddr(hash160Bytes));
+                }
+                case OP_RETURN -> {
+                    newCash.setType("OP_RETURN");
+                    msg = parseOpReturn(bScript);//new String(Arrays.copyOfRange(bScript, 2, bScript.length));
+                    newCash.setOwner("OpReturn");
+                    newCash.setValid(false);
+                }
+                case OP_HASH160 -> {
+                    newCash.setType("P2SH");
+                    newCash.setLockScript(BytesTools.bytesToHexStringBE(bScript));
+                    byte[] hash160Bytes1 = Arrays.copyOfRange(bScript, 2, 22);
+                    newCash.setOwner(KeyTools.hash160ToMultiAddr(hash160Bytes1));
+                }
+                default -> {
+                    newCash.setType("Unknown");
+                    newCash.setLockScript(BytesTools.bytesToHexStringBE(bScript));
+                    newCash.setOwner("Unknown");
+                }
+            }
+
+            // Add block and tx information to output./给输出添加区块和交易信息。
+            // Add information where it from/添加来源信息
+            newCash.setValid(true);
+
+            // Add this output to List.
+            // 添加输出到列表。
+            issuredCashList.add(newCash);
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put(Strings.spendCashMapKey,spentCashList);
+        result.put(Strings.newCashMapKey,issuredCashList);
+        result.put(Strings.OPRETURN,msg);
+        return result;
+    }
+
+    public static String parseOpReturn(byte[] bScript) throws IOException {
+        ByteArrayInputStream bis = new ByteArrayInputStream(bScript);
+        byte[] b1 = new byte[1];
+        bis.read(b1);
+        if(b1[0]!=0x6a)return null;
+
+        ParseTools.VarintResult result = parseVarint(bis);
+        byte[] msgBytes = new byte[(int) result.number];
+        bis.read(msgBytes);
+        return new String(msgBytes, StandardCharsets.UTF_8);
+    }
+
     private static Map<String, Cash> parseInput(ByteArrayInputStream rawTxInputStream,String txid) throws IOException {
 
         // Get input count./获得输入数量
@@ -266,5 +433,4 @@ public class RawTxParser {
         }
         return inCashList;
     }
-
 }

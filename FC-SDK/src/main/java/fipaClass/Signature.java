@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import constants.Constants;
 import constants.Strings;
 import fcTools.ParseTools;
+import javaTools.JsonTools;
 import keyTools.KeyTools;
 import org.bitcoinj.core.ECKey;
 import org.jetbrains.annotations.Nullable;
@@ -175,6 +176,9 @@ public class Signature {
     public String toJsonAsyShort(){
         Gson gson = new Gson();
         return gson.toJson(new ShortSign(fid,msg,sign,alg));
+    }
+    public String toJsonAsyShortNice(){
+        return JsonTools.getNiceString(new ShortSign(fid,msg,sign,alg));
     }
 
     public String toJsonAsyLong(){

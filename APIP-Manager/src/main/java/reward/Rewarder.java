@@ -16,6 +16,7 @@ import fchClass.OpReturn;
 import fchClass.TxHas;
 import feipClass.FcInfo;
 import fileTools.JsonFileTools;
+import javaTools.JsonTools;
 import menu.Inputer;
 import menu.Menu;
 import order.Order;
@@ -756,7 +757,7 @@ public class Rewarder {
 
     private void writeRewardParamsToRedis(RewardParams rewardParams) {
 
-        ParseTools.gsonPrint(rewardParams);
+        JsonTools.gsonPrint(rewardParams);
 
         try(Jedis jedis = StartAPIP.jedisPool.getResource()) {
             if(rewardParams.getOrderViaShare()!=null)jedis.hset(serviceName+"_"+ PARAMS_ON_CHAIN,ORDER_VIA_SHARE,rewardParams.getOrderViaShare());

@@ -2,7 +2,7 @@ package balance;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import constants.Strings;
-import fcTools.ParseTools;
+import javaTools.JsonTools;
 import menu.Menu;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,15 +80,15 @@ public class BalanceManager {
             Set<String> addrSet = jedis0Common.hkeys(StartAPIP.serviceName+"_"+Strings.FID_SESSION_NAME);
             for (String addr : addrSet) {
                 UserAPIP user = getUser(addr, jedis0Common, jedis1Session);
-                System.out.println(ParseTools.gsonString(user));
+                System.out.println(JsonTools.getNiceString(user));
             }
         } else {
             if (jedis0Common.hget(StartAPIP.serviceName+"_"+Strings.FID_SESSION_NAME, str) != null) {
                 UserAPIP user = getUser(str, jedis0Common, jedis1Session);
-                System.out.println(ParseTools.gsonString(user));
+                System.out.println(JsonTools.getNiceString(user));
             } else if (jedis1Session.hgetAll(str) != null) {
                 UserAPIP user = getUser(jedis1Session.hget(str, "addr"), jedis0Common, jedis1Session);
-                System.out.println(ParseTools.gsonString(user));
+                System.out.println(JsonTools.getNiceString(user));
             }
         }
         Menu.anyKeyToContinue(br);

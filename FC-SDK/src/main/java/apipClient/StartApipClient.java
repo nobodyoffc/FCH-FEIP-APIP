@@ -11,9 +11,9 @@ import constants.IndicesNames;
 import constants.Strings;
 import cryptoTools.Hash;
 import eccAes256K1P7.EccAes256K1P7;
-import fcTools.ParseTools;
 import javaTools.BytesTools;
 import javaTools.ImageTools;
+import javaTools.JsonTools;
 import keyTools.KeyTools;
 import menu.Inputer;
 import menu.Menu;
@@ -119,8 +119,7 @@ public class StartApipClient {
                 \tfcdsl.addNewExcept().addNewEquals().addNewFields("cd").addNewValues("1","2");
                 \tfcdsl.addNewSort("cd","desc").addSize(2).addNewAfter("56");
                 \tif(!fcdsl.checkFcdsl())return;
-                \tOpenAPIs openAPIs = new OpenAPIs();
-                \tApipClient apipClient =openAPIs.generalPost(IndicesNames.CASH,initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
+                \tApipClient apipClient =OpenAPIs.generalPost(IndicesNames.CASH,initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
                 \tGson gson = new GsonBuilder().setPrettyPrinting().create();
                 \tSystem.out.println("Request header:\\n"+ParseTools.gsonString(apipClient.getRequestHeaderMap()));
                 \tSystem.out.println("Request body:\\n"+gson.toJson(apipClient.getRequestBody()));
@@ -129,17 +128,16 @@ public class StartApipClient {
                 }""";
         System.out.println(code);
         System.out.println("Requesting ...");
-        OpenAPIs openAPIs = new OpenAPIs();
-        ApipClient apipClient =openAPIs.generalPost(IndicesNames.CASH,initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =OpenAPIs.generalPost(IndicesNames.CASH,initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         String responseBodyJson = gson.toJson(apipClient.getResponseBody());
         Menu.printUnderline(20);
-        System.out.println("Request header:\n"+ParseTools.gsonString(apipClient.getRequestHeaderMap()));
+        System.out.println("Request header:\n"+ JsonTools.getNiceString(apipClient.getRequestHeaderMap()));
         Menu.printUnderline(20);
         System.out.println("Request body:\n"+gson.toJson(apipClient.getRequestBody()));
         Menu.printUnderline(20);
-        System.out.println("Response header:\n"+ParseTools.gsonString(apipClient.getResponseHeaderMap()));
+        System.out.println("Response header:\n"+ JsonTools.getNiceString(apipClient.getResponseHeaderMap()));
         Menu.printUnderline(20);
         System.out.println("Response body:");
         Menu.printUnderline(20);
@@ -176,7 +174,7 @@ public class StartApipClient {
         System.out.println("Input the rawTx:");
         String rawTx = Inputer.inputString(br);
         System.out.println("Broadcasting...");
-        ApipClient apipClient = new FreeGetAPIs().broadcast(initApipParamsForClient.getUrlHead(),rawTx);
+        ApipClient apipClient = FreeGetAPIs.broadcast(initApipParamsForClient.getUrlHead(),rawTx);
         System.out.println(apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -184,9 +182,9 @@ public class StartApipClient {
     public static void getCashes(BufferedReader br) {
         String id = Inputer.inputGoodFid(br,"Input the FID:");
         System.out.println("Getting cashes...");
-        ApipClient apipClient = new FreeGetAPIs().getCashes(initApipParamsForClient.getUrlHead(),id);
+        ApipClient apipClient = FreeGetAPIs.getCashes(initApipParamsForClient.getUrlHead(),id,0);
         System.out.println(apipClient.getResponseBodyStr());
-        ParseTools.gsonPrint(ApipDataGetter.getCashList(apipClient.getResponseBody().getData()));
+        JsonTools.gsonPrint(ApipDataGetter.getCashList(apipClient.getResponseBody().getData()));
         Menu.anyKeyToContinue(br);
     }
     public static void getApps(BufferedReader br) {
@@ -194,7 +192,7 @@ public class StartApipClient {
         String id = Inputer.inputString(br);
         if("".equals(id))id=null;
         System.out.println("Getting APPs...");
-        ApipClient apipClient = new FreeGetAPIs().getApps(initApipParamsForClient.getUrlHead(),id);
+        ApipClient apipClient = FreeGetAPIs.getApps(initApipParamsForClient.getUrlHead(),id);
         System.out.println(apipClient.getResponseBodyStr());;
         Menu.anyKeyToContinue(br);
     }
@@ -203,25 +201,25 @@ public class StartApipClient {
         String id = Inputer.inputString(br);
         if("".equals(id))id=null;
         System.out.println("Getting services...");
-        ApipClient apipClient = new FreeGetAPIs().getServices(initApipParamsForClient.getUrlHead(),id);
+        ApipClient apipClient = FreeGetAPIs.getServices(initApipParamsForClient.getUrlHead(),id);
         System.out.println(apipClient.getResponseBodyStr());;
         Menu.anyKeyToContinue(br);
     }
     public static void getTotals(BufferedReader br) {
         System.out.println("Getting totals...");
-        ApipClient apipClient = new FreeGetAPIs().getTotals(initApipParamsForClient.getUrlHead());
+        ApipClient apipClient = FreeGetAPIs.getTotals(initApipParamsForClient.getUrlHead());
         System.out.println(apipClient.getResponseBodyStr());;
         Menu.anyKeyToContinue(br);
     }
     public static void getFreeService(BufferedReader br) {
         System.out.println("Getting the free service and the sessionKey...");
-        ApipClient apipClient = new FreeGetAPIs().getFreeService(initApipParamsForClient.getUrlHead());
+        ApipClient apipClient = FreeGetAPIs.getFreeService(initApipParamsForClient.getUrlHead());
         System.out.println(apipClient.getResponseBodyStr());;
         Menu.anyKeyToContinue(br);
     }
     public static void getService(BufferedReader br) {
         System.out.println("Getting the default service information...");
-        ApipClient apipClient = new OpenAPIs().getService(initApipParamsForClient.getUrlHead());
+        ApipClient apipClient = OpenAPIs.getService(initApipParamsForClient.getUrlHead());
         System.out.println(apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -271,27 +269,27 @@ public class StartApipClient {
 
         if(!fcdsl.checkFcdsl()){
             System.out.println("Fcdsl wrong:");
-            System.out.println(ParseTools.gsonString(fcdsl));
+            System.out.println(JsonTools.getNiceString(fcdsl));
             return;
         }
-        System.out.println(ParseTools.gsonString(fcdsl));
+        System.out.println(JsonTools.getNiceString(fcdsl));
         Menu.anyKeyToContinue(br);
         System.out.println("Requesting ...");
-        ApipClient apipClient =new OpenAPIs().generalPost(fcdsl.getIndex(),initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =OpenAPIs.generalPost(fcdsl.getIndex(),initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
         System.out.println(apipClient.getResponseBodyStr());;
         Menu.anyKeyToContinue(br);
     }
 
     public static void totalsGet(BufferedReader br) {
         System.out.println("Get request for totals...");
-        ApipClient apipClient = new OpenAPIs().totalsGet(initApipParamsForClient.getUrlHead());
+        ApipClient apipClient = OpenAPIs.totalsGet(initApipParamsForClient.getUrlHead());
         System.out.println(apipClient.getResponseBodyStr());;
         Menu.anyKeyToContinue(br);
     }
 
     public static void totalsPost(byte[] sessionKey, BufferedReader br) {
         System.out.println("Post request for totals...");
-        ApipClient apipClient =new OpenAPIs().totalsPost(initApipParamsForClient.getUrlHead(), initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =OpenAPIs.totalsPost(initApipParamsForClient.getUrlHead(), initApipParamsForClient.getVia(), sessionKey);
         System.out.println(apipClient.getResponseBodyStr());;
         Menu.anyKeyToContinue(br);
     }
@@ -300,11 +298,12 @@ public class StartApipClient {
         byte [] priKey = EccAes256K1P7.decryptKeyWithSymKey(initApipParamsForClient.getApipBuyerPriKeyCipher(), symKey.clone());
         if(priKey==null)return null;
         System.out.println("Sign in for EccAES256K1P7 encrypted sessionKey...");
-        ApipClient apipClient =new OpenAPIs().signInEccPost(initApipParamsForClient.getUrlHead(), initApipParamsForClient.getVia(),priKey.clone(),mode);
+        ApipClient apipClient =OpenAPIs.signInEccPost(initApipParamsForClient.getUrlHead(), initApipParamsForClient.getVia(),priKey.clone(),mode);
 
         System.out.println(apipClient.getResponseBodyStr());
 
-        SignInData signInData = (SignInData) apipClient.getResponseBody().getData();
+        Gson gson = new Gson();
+        SignInData signInData = gson.fromJson(gson.toJson(apipClient.getResponseBody().getData()),SignInData.class);
         String sessionKeyCipherFromApip = signInData.getSessionKeyCipher();
         byte[] newSessionKey = ApipTools.decryptSessionKeyWithPriKey(sessionKeyCipherFromApip, priKey.clone());
 
@@ -316,11 +315,14 @@ public class StartApipClient {
     public static byte[] signInPost(byte[] symKey, String mode) {
         byte [] priKey = EccAes256K1P7.decryptKeyWithSymKey(initApipParamsForClient.getApipBuyerPriKeyCipher(), symKey.clone());
         if(priKey==null)return null;
-        OpenAPIs sinIn = new OpenAPIs();
+
         System.out.println("Sign in...");
-        ApipClient apipClient = sinIn.signInPost(initApipParamsForClient.getUrlHead(), initApipParamsForClient.getVia(), priKey, mode);
-        System.out.println(ParseTools.gsonString(apipClient.getResponseBody()));
-        SignInData signInData = OpenAPIs.makeSignInData(apipClient.getResponseBodyStr());
+        ApipClient apipClient = OpenAPIs.signInPost(initApipParamsForClient.getUrlHead(), initApipParamsForClient.getVia(), priKey, mode);
+        System.out.println(JsonTools.getNiceString(apipClient.getResponseBody()));
+
+        Gson gson = new Gson();
+        SignInData signInData = gson.fromJson(gson.toJson(apipClient.getResponseBody().getData()),SignInData.class);
+
         byte[] newSessionKey = HexFormat.of().parseHex(signInData.getSessionKey());
 
         updateSession(symKey.clone(), signInData, newSessionKey);
@@ -371,7 +373,7 @@ public class StartApipClient {
     public static void blockByIds(byte[] sessionKey, BufferedReader br) {
         String[] ids = Inputer.inputStringArray(br,"Input blockIds:",0);
         System.out.println("Requesting blockByIds...");
-        ApipClient apipClient =new BlockchainAPIs().blockByIdsPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =BlockchainAPIs.blockByIdsPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
     }
 
@@ -379,14 +381,14 @@ public class StartApipClient {
         Fcdsl fcdsl = inputFcdsl(defaultSize, defaultSort, br);
         if (fcdsl == null) return;
         System.out.println("Requesting blockSearch...");
-        ApipClient apipClient =new BlockchainAPIs().blockSearchPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =BlockchainAPIs.blockSearchPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
     }
 
     public static void cashByIds(byte[] sessionKey, BufferedReader br) {
         String[] ids = Inputer.inputStringArray(br,"Input cashIds:",0);
         System.out.println("Requesting cashByIds...");
-        ApipClient apipClient =new BlockchainAPIs().cashByIdsPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =BlockchainAPIs.cashByIdsPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
     }
 
@@ -394,7 +396,7 @@ public class StartApipClient {
         Fcdsl fcdsl = inputFcdsl(defaultSize, defaultSort, br);
         if (fcdsl == null) return;
         System.out.println("Requesting cashValid...");
-        ApipClient apipClient =new BlockchainAPIs().cashValidPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =BlockchainAPIs.cashValidPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
     }
 
@@ -402,14 +404,14 @@ public class StartApipClient {
         Fcdsl fcdsl = inputFcdsl(defaultSize, defaultSort, br);
         if (fcdsl == null) return;
         System.out.println("Requesting cashSearch...");
-        ApipClient apipClient =new BlockchainAPIs().cashSearchPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =BlockchainAPIs.cashSearchPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
     }
 
     public static void fidByIds(byte[] sessionKey, BufferedReader br) {
         String[] ids = Inputer.inputStringArray(br,"Input FIDs:",0);
         System.out.println("Requesting fidByIds...");
-        ApipClient apipClient =new BlockchainAPIs().fidByIdsPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =BlockchainAPIs.fidByIdsPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
     }
 
@@ -417,14 +419,14 @@ public class StartApipClient {
         Fcdsl fcdsl = inputFcdsl(defaultSize, defaultSort, br);
         if (fcdsl == null) return;
         System.out.println("Requesting fidSearch...");
-        ApipClient apipClient =new BlockchainAPIs().fidSearchPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =BlockchainAPIs.fidSearchPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
     }
 
     public static void opReturnByIds(byte[] sessionKey, BufferedReader br) {
         String[] ids = Inputer.inputStringArray(br,"Input opReturnIds:",0);
         System.out.println("Requesting opReturnByIds...");
-        ApipClient apipClient =new BlockchainAPIs().opReturnByIdsPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =BlockchainAPIs.opReturnByIdsPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
     }
 
@@ -432,13 +434,13 @@ public class StartApipClient {
         Fcdsl fcdsl = inputFcdsl(defaultSize, defaultSort, br);
         if (fcdsl == null) return;
         System.out.println("Requesting opReturnSearch...");
-        ApipClient apipClient =new BlockchainAPIs().opReturnSearchPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =BlockchainAPIs.opReturnSearchPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
     }
     public static void p2shByIds(byte[] sessionKey, BufferedReader br) {
         String[] ids = Inputer.inputStringArray(br,"Input p2shIds:",0);
         System.out.println("Requesting p2shByIds...");
-        ApipClient apipClient =new BlockchainAPIs().p2shByIdsPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =BlockchainAPIs.p2shByIdsPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
     }
 
@@ -446,13 +448,13 @@ public class StartApipClient {
         Fcdsl fcdsl = inputFcdsl(defaultSize, defaultSort, br);
         if (fcdsl == null) return;
         System.out.println("Requesting p2shSearch...");
-        ApipClient apipClient =new BlockchainAPIs().p2shSearchPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =BlockchainAPIs.p2shSearchPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
     }
     public static void txByIds(byte[] sessionKey, BufferedReader br) {
         String[] ids = Inputer.inputStringArray(br,"Input txIds:",0);
         System.out.println("Requesting txByIds...");
-        ApipClient apipClient =new BlockchainAPIs().txByIdsPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =BlockchainAPIs.txByIdsPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
     }
 
@@ -460,7 +462,7 @@ public class StartApipClient {
         Fcdsl fcdsl = inputFcdsl(defaultSize, defaultSort, br);
         if (fcdsl == null) return;
         System.out.println("Requesting txSearch...");
-        ApipClient apipClient =new BlockchainAPIs().txSearchPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =BlockchainAPIs.txSearchPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
     }
 
@@ -472,10 +474,10 @@ public class StartApipClient {
 
         if(!fcdsl.checkFcdsl()){
             System.out.println("Fcdsl wrong:");
-            System.out.println(ParseTools.gsonString(fcdsl));
+            System.out.println(JsonTools.getNiceString(fcdsl));
             return null;
         }
-        System.out.println("fcdsl:\n"+ParseTools.gsonString(fcdsl));
+        System.out.println("fcdsl:\n"+ JsonTools.getNiceString(fcdsl));
 
         Menu.anyKeyToContinue(br);
         return fcdsl;
@@ -512,7 +514,7 @@ public class StartApipClient {
     public static void cidInfoByIds(byte[] sessionKey, BufferedReader br) {
         String[] ids = Inputer.inputStringArray(br,"Input FIDs:",0);
         System.out.println("Requesting cidInfoByIds...");
-        ApipClient apipClient =new IdentityAPIs().cidInfoByIdsPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =IdentityAPIs.cidInfoByIdsPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -520,7 +522,7 @@ public class StartApipClient {
         Fcdsl fcdsl = inputFcdsl(defaultSize, defaultSort, br);
         if (fcdsl == null) return;
         System.out.println("Requesting ...");
-        ApipClient apipClient =new IdentityAPIs().cidInfoSearchPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =IdentityAPIs.cidInfoSearchPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -529,7 +531,7 @@ public class StartApipClient {
         Fcdsl fcdsl = inputFcdsl(defaultSize, defaultSort, br);
         if (fcdsl == null) return;
         System.out.println("Requesting ...");
-        ApipClient apipClient =new IdentityAPIs().fidCidSeekPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =IdentityAPIs.fidCidSeekPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -538,14 +540,14 @@ public class StartApipClient {
         System.out.println("Input FID or CID:");
         String id = Inputer.inputString(br);
         System.out.println("Requesting ...");
-        ApipClient apipClient = new FreeGetAPIs().getFidCid(initApipParamsForClient.getUrlHead(),id);
+        ApipClient apipClient = FreeGetAPIs.getFidCid(initApipParamsForClient.getUrlHead(),id);
         System.out.println(apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
     public static void nobodyByIds(byte[] sessionKey, BufferedReader br) {
         String[] ids = Inputer.inputStringArray(br,"Input FIDs:",0);
         System.out.println("Requesting ...");
-        ApipClient apipClient =new IdentityAPIs().nobodyByIdsPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =IdentityAPIs.nobodyByIdsPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -553,7 +555,7 @@ public class StartApipClient {
         Fcdsl fcdsl = inputFcdsl(defaultSize, defaultSort, br);
         if (fcdsl == null) return;
         System.out.println("Requesting ...");
-        ApipClient apipClient =new IdentityAPIs().nobodySearchPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =IdentityAPIs.nobodySearchPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -562,7 +564,7 @@ public class StartApipClient {
         Fcdsl fcdsl = inputFcdsl(defaultSize, defaultSort, br);
         if (fcdsl == null) return;
         System.out.println("Requesting ...");
-        ApipClient apipClient =new IdentityAPIs().cidHistoryPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =IdentityAPIs.cidHistoryPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -570,7 +572,7 @@ public class StartApipClient {
         Fcdsl fcdsl = inputFcdsl(defaultSize, defaultSort, br);
         if (fcdsl == null) return;
         System.out.println("Requesting ...");
-        ApipClient apipClient =new IdentityAPIs().homepageHistoryPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =IdentityAPIs.homepageHistoryPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -578,7 +580,7 @@ public class StartApipClient {
         Fcdsl fcdsl = inputFcdsl(defaultSize, defaultSort, br);
         if (fcdsl == null) return;
         System.out.println("Requesting ...");
-        ApipClient apipClient =new IdentityAPIs().noticeFeeHistoryPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =IdentityAPIs.noticeFeeHistoryPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -587,7 +589,7 @@ public class StartApipClient {
         Fcdsl fcdsl = inputFcdsl(defaultSize, defaultSort, br);
         if (fcdsl == null) return;
         System.out.println("Requesting ...");
-        ApipClient apipClient =new IdentityAPIs().reputationHistoryPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =IdentityAPIs.reputationHistoryPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -595,7 +597,7 @@ public class StartApipClient {
     public static void avatars(byte[] sessionKey, BufferedReader br) {
         String[] ids = Inputer.inputStringArray(br,"Input FIDs:",0);
         System.out.println("Requesting ...");
-        ApipClient apipClient =new IdentityAPIs().avatarsPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =IdentityAPIs.avatarsPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -603,7 +605,7 @@ public class StartApipClient {
     public static void getAvatar(BufferedReader br) {
         String fid = Inputer.inputGoodFid(br,"Input FID:");
         System.out.println("Requesting ...");
-        ApipClient apipClient = new FreeGetAPIs().getAvatar(initApipParamsForClient.getUrlHead(),fid);
+        ApipClient apipClient = FreeGetAPIs.getAvatar(initApipParamsForClient.getUrlHead(),fid);
         byte[] imageBytes = apipClient.getResponseBodyBytes();
         ImageTools.displayPng(imageBytes);
         ImageTools.savePng(imageBytes,"test.png");
@@ -642,7 +644,7 @@ public class StartApipClient {
     public static void groupByIds(byte[] sessionKey, BufferedReader br) {
         String[] ids = Inputer.inputStringArray(br,"Input GIDs:",0);
         System.out.println("Requesting ...");
-        ApipClient apipClient =new OrganizeAPIs().groupByIdsPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =OrganizeAPIs.groupByIdsPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -650,7 +652,7 @@ public class StartApipClient {
         Fcdsl fcdsl = inputFcdsl(defaultSize, defaultSort, br);
         if (fcdsl == null) return;
         System.out.println("Requesting ...");
-        ApipClient apipClient =new OrganizeAPIs().groupSearchPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =OrganizeAPIs.groupSearchPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -658,14 +660,14 @@ public class StartApipClient {
     public static void groupMembers(byte[] sessionKey, BufferedReader br) {
         String[] ids = Inputer.inputStringArray(br,"Input GIDs:",0);
         System.out.println("Requesting ...");
-        ApipClient apipClient =new OrganizeAPIs().groupMembersPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =OrganizeAPIs.groupMembersPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
     public static void groupOpHistory(int defaultSize, String defaultSort, byte[] sessionKey, BufferedReader br) {
         Fcdsl fcdsl = inputFcdsl(defaultSize, defaultSort, br);
         if (fcdsl == null) return;
-        ApipClient apipClient =new OrganizeAPIs().groupOpHistoryPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =OrganizeAPIs.groupOpHistoryPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -674,13 +676,13 @@ public class StartApipClient {
         String id = Inputer.inputString(br);
         if("".equals(id))return;
         System.out.println("Requesting ...");
-        ApipClient apipClient =new OrganizeAPIs().myGroupsPost(initApipParamsForClient.getUrlHead(),id, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =OrganizeAPIs.myGroupsPost(initApipParamsForClient.getUrlHead(),id, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
     public static void teamByIds(byte[] sessionKey, BufferedReader br) {
         String[] ids = Inputer.inputStringArray(br,"Input TIDs:",0);
-        ApipClient apipClient =new OrganizeAPIs().teamByIdsPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =OrganizeAPIs.teamByIdsPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -688,7 +690,7 @@ public class StartApipClient {
         Fcdsl fcdsl = inputFcdsl(defaultSize, defaultSort, br);
         if (fcdsl == null) return;
         System.out.println("Requesting ...");
-        ApipClient apipClient =new OrganizeAPIs().teamSearchPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =OrganizeAPIs.teamSearchPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -696,14 +698,14 @@ public class StartApipClient {
     public static void teamMembers(byte[] sessionKey, BufferedReader br) {
         String[] ids = Inputer.inputStringArray(br,"Input TIDs:",0);
         System.out.println("Requesting ...");
-        ApipClient apipClient =new OrganizeAPIs().teamMembersPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =OrganizeAPIs.teamMembersPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
     public static void teamExMembers(byte[] sessionKey, BufferedReader br) {
         String[] ids = Inputer.inputStringArray(br,"Input TIDs:",0);
         System.out.println("Requesting ...");
-        ApipClient apipClient =new OrganizeAPIs().teamExMembersPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =OrganizeAPIs.teamExMembersPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -711,7 +713,7 @@ public class StartApipClient {
         Fcdsl fcdsl = inputFcdsl(defaultSize, defaultSort, br);
         if (fcdsl == null) return;
         System.out.println("Requesting ...");
-        ApipClient apipClient =new OrganizeAPIs().teamRateHistoryPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =OrganizeAPIs.teamRateHistoryPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -719,14 +721,14 @@ public class StartApipClient {
         Fcdsl fcdsl = inputFcdsl(defaultSize, defaultSort, br);
         if (fcdsl == null) return;
         System.out.println("Requesting ...");
-        ApipClient apipClient =new OrganizeAPIs().teamOpHistoryPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =OrganizeAPIs.teamOpHistoryPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
     public static void teamOtherPersons(byte[] sessionKey, BufferedReader br) {
         String[] ids = Inputer.inputStringArray(br,"Input TIDs:",0);
         System.out.println("Requesting ...");
-        ApipClient apipClient =new OrganizeAPIs().teamOtherPersonsPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =OrganizeAPIs.teamOtherPersonsPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -736,7 +738,7 @@ public class StartApipClient {
         String id = Inputer.inputString(br);
         if("".equals(id))return;
         System.out.println("Requesting ...");
-        ApipClient apipClient =new OrganizeAPIs().myTeamsPost(initApipParamsForClient.getUrlHead(),id, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =OrganizeAPIs.myTeamsPost(initApipParamsForClient.getUrlHead(),id, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -775,7 +777,7 @@ public class StartApipClient {
     public static void protocolByIds(byte[] sessionKey, BufferedReader br) {
         String[] ids = Inputer.inputStringArray(br,"Input PIDs:",0);
         System.out.println("Requesting ...");
-        ApipClient apipClient =new ConstructAPIs().protocolByIdsPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =ConstructAPIs.protocolByIdsPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -783,7 +785,7 @@ public class StartApipClient {
         Fcdsl fcdsl = inputFcdsl(defaultSize, defaultSort, br);
         if (fcdsl == null) return;
         System.out.println("Requesting ...");
-        ApipClient apipClient =new ConstructAPIs().protocolSearchPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =ConstructAPIs.protocolSearchPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -792,7 +794,7 @@ public class StartApipClient {
         Fcdsl fcdsl = inputFcdsl(defaultSize, defaultSort, br);
         if (fcdsl == null) return;
         System.out.println("Requesting ...");
-        ApipClient apipClient =new ConstructAPIs().protocolRateHistoryPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =ConstructAPIs.protocolRateHistoryPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -800,12 +802,12 @@ public class StartApipClient {
         Fcdsl fcdsl = inputFcdsl(defaultSize, defaultSort, br);
         if (fcdsl == null) return;
         System.out.println("Requesting ...");
-        ApipClient apipClient =new ConstructAPIs().protocolOpHistoryPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =ConstructAPIs.protocolOpHistoryPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     } public static void codeByIds(byte[] sessionKey, BufferedReader br) {
         String[] ids = Inputer.inputStringArray(br,"Input codeIds:",0);
-        ApipClient apipClient =new ConstructAPIs().codeByIdsPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =ConstructAPIs.codeByIdsPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -813,7 +815,7 @@ public class StartApipClient {
         Fcdsl fcdsl = inputFcdsl(defaultSize, defaultSort, br);
         if (fcdsl == null) return;
         System.out.println("Requesting ...");
-        ApipClient apipClient =new ConstructAPIs().codeSearchPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =ConstructAPIs.codeSearchPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -822,7 +824,7 @@ public class StartApipClient {
         Fcdsl fcdsl = inputFcdsl(defaultSize, defaultSort, br);
         if (fcdsl == null) return;
         System.out.println("Requesting ...");
-        ApipClient apipClient =new ConstructAPIs().codeRateHistoryPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =ConstructAPIs.codeRateHistoryPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -830,14 +832,14 @@ public class StartApipClient {
         Fcdsl fcdsl = inputFcdsl(defaultSize, defaultSort, br);
         if (fcdsl == null) return;
         System.out.println("Requesting ...");
-        ApipClient apipClient =new ConstructAPIs().codeOpHistoryPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =ConstructAPIs.codeOpHistoryPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
     public static void serviceByIds(byte[] sessionKey, BufferedReader br) {
         String[] ids = Inputer.inputStringArray(br,"Input SIDs:",0);
         System.out.println("Requesting ...");
-        ApipClient apipClient =new ConstructAPIs().serviceByIdsPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =ConstructAPIs.serviceByIdsPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -845,7 +847,7 @@ public class StartApipClient {
         Fcdsl fcdsl = inputFcdsl(defaultSize, defaultSort, br);
         if (fcdsl == null) return;
         System.out.println("Requesting ...");
-        ApipClient apipClient =new ConstructAPIs().serviceSearchPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =ConstructAPIs.serviceSearchPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -854,7 +856,7 @@ public class StartApipClient {
         Fcdsl fcdsl = inputFcdsl(defaultSize, defaultSort, br);
         if (fcdsl == null) return;
         System.out.println("Requesting ...");
-        ApipClient apipClient =new ConstructAPIs().serviceRateHistoryPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =ConstructAPIs.serviceRateHistoryPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -862,14 +864,14 @@ public class StartApipClient {
         Fcdsl fcdsl = inputFcdsl(defaultSize, defaultSort, br);
         if (fcdsl == null) return;
         System.out.println("Requesting ...");
-        ApipClient apipClient =new ConstructAPIs().serviceOpHistoryPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =ConstructAPIs.serviceOpHistoryPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
     public static void appByIds(byte[] sessionKey, BufferedReader br) {
         String[] ids = Inputer.inputStringArray(br,"Input AIDs:",0);
         System.out.println("Requesting ...");
-        ApipClient apipClient =new ConstructAPIs().appByIdsPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =ConstructAPIs.appByIdsPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -877,7 +879,7 @@ public class StartApipClient {
         Fcdsl fcdsl = inputFcdsl(defaultSize, defaultSort, br);
         if (fcdsl == null) return;
         System.out.println("Requesting ...");
-        ApipClient apipClient =new ConstructAPIs().appSearchPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =ConstructAPIs.appSearchPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -886,7 +888,7 @@ public class StartApipClient {
         Fcdsl fcdsl = inputFcdsl(defaultSize, defaultSort, br);
         if (fcdsl == null) return;
         System.out.println("Requesting ...");
-        ApipClient apipClient =new ConstructAPIs().appRateHistoryPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =ConstructAPIs.appRateHistoryPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -894,7 +896,7 @@ public class StartApipClient {
         Fcdsl fcdsl = inputFcdsl(defaultSize, defaultSort, br);
         if (fcdsl == null) return;
         System.out.println("Requesting ...");
-        ApipClient apipClient =new ConstructAPIs().appOpHistoryPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =ConstructAPIs.appOpHistoryPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -930,7 +932,7 @@ public class StartApipClient {
     public static void boxByIds(byte[] sessionKey, BufferedReader br) {
         String[] ids = Inputer.inputStringArray(br,"Input BIDs:",0);
         System.out.println("Requesting ...");
-        ApipClient apipClient =new PersonalAPIs().boxByIdsPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =PersonalAPIs.boxByIdsPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -938,7 +940,7 @@ public class StartApipClient {
         Fcdsl fcdsl = inputFcdsl(defaultSize, defaultSort, br);
         if (fcdsl == null) return;
         System.out.println("Requesting ...");
-        ApipClient apipClient =new PersonalAPIs().boxSearchPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =PersonalAPIs.boxSearchPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -947,7 +949,7 @@ public class StartApipClient {
         Fcdsl fcdsl = inputFcdsl(defaultSize, defaultSort, br);
         if (fcdsl == null) return;
         System.out.println("Requesting ...");
-        ApipClient apipClient =new PersonalAPIs().boxHistoryPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =PersonalAPIs.boxHistoryPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -955,7 +957,7 @@ public class StartApipClient {
     public static void contactByIds(byte[] sessionKey, BufferedReader br) {
         String[] ids = Inputer.inputStringArray(br,"Input contactIds:",0);
         System.out.println("Requesting ...");
-        ApipClient apipClient =new PersonalAPIs().contactByIdsPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =PersonalAPIs.contactByIdsPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -963,7 +965,7 @@ public class StartApipClient {
         Fcdsl fcdsl = inputFcdsl(defaultSize, defaultSort, br);
         if (fcdsl == null) return;
         System.out.println("Requesting ...");
-        ApipClient apipClient =new PersonalAPIs().contactsPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =PersonalAPIs.contactsPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -971,14 +973,14 @@ public class StartApipClient {
         Fcdsl fcdsl = inputFcdsl(defaultSize, defaultSort, br);
         if (fcdsl == null) return;
         System.out.println("Requesting ...");
-        ApipClient apipClient =new PersonalAPIs().contactsDeletedPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =PersonalAPIs.contactsDeletedPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
     public static void secretByIds(byte[] sessionKey, BufferedReader br) {
         String[] ids = Inputer.inputStringArray(br,"Input secretIds:",0);
         System.out.println("Requesting ...");
-        ApipClient apipClient =new PersonalAPIs().secretByIdsPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =PersonalAPIs.secretByIdsPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -986,7 +988,7 @@ public class StartApipClient {
         Fcdsl fcdsl = inputFcdsl(defaultSize, defaultSort, br);
         if (fcdsl == null) return;
         System.out.println("Requesting ...");
-        ApipClient apipClient =new PersonalAPIs().secretsPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =PersonalAPIs.secretsPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -994,7 +996,7 @@ public class StartApipClient {
         Fcdsl fcdsl = inputFcdsl(defaultSize, defaultSort, br);
         if (fcdsl == null) return;
         System.out.println("Requesting ...");
-        ApipClient apipClient =new PersonalAPIs().secretsDeletedPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =PersonalAPIs.secretsDeletedPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -1002,7 +1004,7 @@ public class StartApipClient {
     public static void mailByIds(byte[] sessionKey, BufferedReader br) {
         String[] ids = Inputer.inputStringArray(br,"Input mailIds:",0);
         System.out.println("Requesting ...");
-        ApipClient apipClient =new PersonalAPIs().mailByIdsPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =PersonalAPIs.mailByIdsPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -1010,7 +1012,7 @@ public class StartApipClient {
         Fcdsl fcdsl = inputFcdsl(defaultSize, defaultSort, br);
         if (fcdsl == null) return;
         System.out.println("Requesting ...");
-        ApipClient apipClient =new PersonalAPIs().mailsPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =PersonalAPIs.mailsPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -1018,7 +1020,7 @@ public class StartApipClient {
         Fcdsl fcdsl = inputFcdsl(defaultSize, defaultSort, br);
         if (fcdsl == null) return;
         System.out.println("Requesting ...");
-        ApipClient apipClient =new PersonalAPIs().mailsDeletedPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =PersonalAPIs.mailsDeletedPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -1027,7 +1029,7 @@ public class StartApipClient {
         Fcdsl fcdsl = inputFcdsl(defaultSize, defaultSort, br);
         if (fcdsl == null) return;
         System.out.println("Requesting ...");
-        ApipClient apipClient =new PersonalAPIs().mailThreadPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =PersonalAPIs.mailThreadPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -1056,7 +1058,7 @@ public class StartApipClient {
     public static void proofByIds(byte[] sessionKey, BufferedReader br) {
         String[] ids = Inputer.inputStringArray(br,"Input proofIds:",0);
         System.out.println("Requesting ...");
-        ApipClient apipClient =new PublishAPIs().proofByIdsPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =PublishAPIs.proofByIdsPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -1064,7 +1066,7 @@ public class StartApipClient {
         Fcdsl fcdsl = inputFcdsl(defaultSize, defaultSort, br);
         if (fcdsl == null) return;
         System.out.println("Requesting ...");
-        ApipClient apipClient =new PublishAPIs().proofSearchPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =PublishAPIs.proofSearchPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -1073,14 +1075,14 @@ public class StartApipClient {
         Fcdsl fcdsl = inputFcdsl(defaultSize, defaultSort, br);
         if (fcdsl == null) return;
         System.out.println("Requesting ...");
-        ApipClient apipClient =new PublishAPIs().proofHistoryPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =PublishAPIs.proofHistoryPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
     public static void statementByIds(byte[] sessionKey, BufferedReader br) {
         String[] ids = Inputer.inputStringArray(br,"Input statementIds:",0);
         System.out.println("Requesting ...");
-        ApipClient apipClient =new PublishAPIs().statementByIdsPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =PublishAPIs.statementByIdsPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -1088,7 +1090,7 @@ public class StartApipClient {
         Fcdsl fcdsl = inputFcdsl(defaultSize, defaultSort, br);
         if (fcdsl == null) return;
         System.out.println("Requesting ...");
-        ApipClient apipClient =new PublishAPIs().statementSearchPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =PublishAPIs.statementSearchPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -1096,7 +1098,7 @@ public class StartApipClient {
         Fcdsl fcdsl = inputFcdsl(defaultSize, defaultSort, br);
         if (fcdsl == null) return;
         System.out.println("Requesting ...");
-        ApipClient apipClient =new PublishAPIs().nidSearchPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =PublishAPIs.nidSearchPost(initApipParamsForClient.getUrlHead(),fcdsl, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -1131,7 +1133,7 @@ public class StartApipClient {
             }
         }
         System.out.println("Requesting ...");
-        ApipClient apipClient =new WalletAPIs().broadcastTxPost(initApipParamsForClient.getUrlHead(),txHex, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =WalletAPIs.broadcastTxPost(initApipParamsForClient.getUrlHead(),txHex, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -1145,7 +1147,7 @@ public class StartApipClient {
             System.out.println("It's not a hex. Try again.");
         }
         System.out.println("Requesting ...");
-        ApipClient apipClient =new WalletAPIs().decodeRawTxPost(initApipParamsForClient.getUrlHead(),txHex, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =WalletAPIs.decodeRawTxPost(initApipParamsForClient.getUrlHead(),txHex, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -1162,7 +1164,7 @@ public class StartApipClient {
         Double amount = Inputer.inputDouble(br, "Input the amount:");
         if(amount==null)return;
         System.out.println("Requesting ...");
-        ApipClient apipClient =new WalletAPIs().cashValidForPayPost(initApipParamsForClient.getUrlHead(),fid,amount, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =WalletAPIs.cashValidForPayPost(initApipParamsForClient.getUrlHead(),fid,amount, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -1178,13 +1180,13 @@ public class StartApipClient {
         }
         int cd = Inputer.inputInteger(br, "Input the required CD:",0);
         System.out.println("Requesting ...");
-        ApipClient apipClient =new WalletAPIs().cashValidForCdPost(initApipParamsForClient.getUrlHead(),fid,cd, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =WalletAPIs.cashValidForCdPost(initApipParamsForClient.getUrlHead(),fid,cd, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
     public static void unconfirmed(byte[] sessionKey, BufferedReader br) {
         String[] ids = Inputer.inputStringArray(br,"Input FIDs:",0);
-        ApipClient apipClient =new WalletAPIs().unconfirmedPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =WalletAPIs.unconfirmedPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -1219,7 +1221,7 @@ public class StartApipClient {
         String addrOrKey = Inputer.inputString(br);
         if("".equals(addrOrKey))return;
         System.out.println("Requesting ...");
-        ApipClient apipClient =new CryptoToolAPIs().addressesPost(initApipParamsForClient.getUrlHead(),addrOrKey, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =CryptoToolAPIs.addressesPost(initApipParamsForClient.getUrlHead(),addrOrKey, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -1233,7 +1235,7 @@ public class StartApipClient {
         String key = Inputer.inputString(br);
         if("".equals(key))return;
 
-        ApipClient apipClient =new CryptoToolAPIs().encryptPost(initApipParamsForClient.getUrlHead(),key,msg, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =CryptoToolAPIs.encryptPost(initApipParamsForClient.getUrlHead(),key,msg, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -1243,7 +1245,7 @@ public class StartApipClient {
         String signature = Inputer.inputString(br);
         if("".equals(signature))return;
         System.out.println("Requesting ...");
-        ApipClient apipClient =new CryptoToolAPIs().verifyPost(initApipParamsForClient.getUrlHead(),signature, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =CryptoToolAPIs.verifyPost(initApipParamsForClient.getUrlHead(),signature, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -1252,7 +1254,7 @@ public class StartApipClient {
         String text = Inputer.inputString(br);
         if("".equals(text))return;
         System.out.println("Requesting ...");
-        ApipClient apipClient =new CryptoToolAPIs().sha256Post(initApipParamsForClient.getUrlHead(),text, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =CryptoToolAPIs.sha256Post(initApipParamsForClient.getUrlHead(),text, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -1261,7 +1263,7 @@ public class StartApipClient {
         String text = Inputer.inputString(br);
         if("".equals(text))return;
         System.out.println("Requesting ...");
-        ApipClient apipClient =new CryptoToolAPIs().sha256x2Post(initApipParamsForClient.getUrlHead(),text, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =CryptoToolAPIs.sha256x2Post(initApipParamsForClient.getUrlHead(),text, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -1271,7 +1273,7 @@ public class StartApipClient {
         String text = Inputer.inputString(br);
         if("".equals(text))return;
         System.out.println("Requesting ...");
-        ApipClient apipClient =new CryptoToolAPIs().sha256BytesPost(initApipParamsForClient.getUrlHead(),text, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =CryptoToolAPIs.sha256BytesPost(initApipParamsForClient.getUrlHead(),text, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -1281,7 +1283,7 @@ public class StartApipClient {
         String text = Inputer.inputString(br);
         if("".equals(text))return;
         System.out.println("Requesting ...");
-        ApipClient apipClient =new CryptoToolAPIs().sha256x2BytesPost(initApipParamsForClient.getUrlHead(),text, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =CryptoToolAPIs.sha256x2BytesPost(initApipParamsForClient.getUrlHead(),text, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -1296,7 +1298,7 @@ public class StartApipClient {
         String msg = Inputer.inputString(br);
         if("".equals(msg))msg=null;
         System.out.println("Requesting ...");
-        ApipClient apipClient =new CryptoToolAPIs().offLineTxPost(initApipParamsForClient.getUrlHead(),fid,sendToList,msg, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =CryptoToolAPIs.offLineTxPost(initApipParamsForClient.getUrlHead(),fid,sendToList,msg, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -1313,7 +1315,7 @@ public class StartApipClient {
         String msg = Inputer.inputString(br);
         if("".equals(msg))msg=null;
         System.out.println("Requesting ...");
-        ApipClient apipClient =new CryptoToolAPIs().offLineTxByCdPost(initApipParamsForClient.getUrlHead(),fid,sendToList,msg,cd, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =CryptoToolAPIs.offLineTxByCdPost(initApipParamsForClient.getUrlHead(),fid,sendToList,msg,cd, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
         Menu.anyKeyToContinue(br);
     }
@@ -1369,7 +1371,7 @@ public class StartApipClient {
             System.out.println("Encrypt buyer's priKey with new password wrong.");
             return passwordBytesOld;
         }
-        String sessionKeyCipherNew = EccAes256K1P7.encryptKey(sessionKey, symKeyNew.clone());
+        String sessionKeyCipherNew = EccAes256K1P7.encryptKeyWithSymKey(sessionKey, symKeyNew.clone());
         if(sessionKeyCipherNew.contains("Error")){
             System.out.println("Get sessionKey wrong:"+sessionKeyCipherNew);
         }
@@ -1393,12 +1395,12 @@ public class StartApipClient {
         String via = initApipParamsForClient.getVia();
 
         System.out.println("Requesting ...");
-        ApipClient apipClient = new ConstructAPIs().serviceByIdsPost(urlHead, ids, via, sessionKey);
+        ApipClient apipClient = ConstructAPIs.serviceByIdsPost(urlHead, ids, via, sessionKey);
         System.out.println(apipClient.getResponseBodyStr());
 
         Menu.printUnderline(20);
         System.out.println("User Params:");
-        System.out.println(ParseTools.gsonString(initApipParamsForClient));
+        System.out.println(JsonTools.getNiceString(initApipParamsForClient));
         Menu.printUnderline(20);
         Menu.anyKeyToContinue(br);
     }

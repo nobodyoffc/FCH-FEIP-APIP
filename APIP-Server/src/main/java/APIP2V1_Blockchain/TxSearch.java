@@ -7,11 +7,11 @@ import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
 import esTools.EsTools;
-import fcTools.ParseTools;
 import fchClass.Tx;
 import fchClass.TxHas;
 import apipClass.TxInfo;
 import initial.Initiator;
+import javaTools.JsonTools;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -52,7 +52,7 @@ public class TxSearch extends HttpServlet {
         //Request
         DataRequestHandler esRequest = new DataRequestHandler(dataCheckResult.getAddr(),requestBody,response,replier);
 
-        String fcdslQuery = ParseTools.gsonString(requestBody.getFcdsl().getQuery());
+        String fcdslQuery = JsonTools.getNiceString(requestBody.getFcdsl().getQuery());
 
         List<Tx> txList = null;
         List<TxHas> txHasList = null;

@@ -7,8 +7,8 @@ import com.googlecode.jsonrpc4j.JsonRpcHttpClient;
 import config.ConfigAPIP;
 import constants.Strings;
 import esTools.NewEsClient;
-import fcTools.ParseTools;
 import freecashRPC.NewFcRpcClient;
+import javaTools.JsonTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
@@ -101,7 +101,7 @@ public class Initiator extends HttpServlet {
 
                 if(service ==null )log.error("Reading service from redis failed.");
 
-                log.debug("Service: "+ ParseTools.gsonString(service));
+                log.debug("Service: "+ JsonTools.getNiceString(service));
 
                 params = service.getParams();
 

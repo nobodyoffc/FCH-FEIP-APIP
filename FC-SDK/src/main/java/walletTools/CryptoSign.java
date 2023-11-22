@@ -1,9 +1,9 @@
 package walletTools;
 
 import constants.Constants;
-import fcTools.*;
 import fchClass.Cash;
 import com.google.gson.Gson;
+import javaTools.JsonTools;
 
 import java.util.List;
 
@@ -96,7 +96,7 @@ public class CryptoSign {
 
     public static DataForOffLineTx parseDataForOffLineTxFromOther(Object other) {
         Gson gson = new Gson();
-        ParseTools.gsonPrint(other);
+        JsonTools.gsonPrint(other);
         return gson.fromJson(gson.toJson(other), DataForOffLineTx.class);
     }
 }

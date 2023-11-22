@@ -1,16 +1,23 @@
 package menu;
 
 import fcTools.ParseTools;
+import org.checkerframework.checker.units.qual.A;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.*;
 
 import static constants.Strings.ANY_KEY;
 
 public class Menu {
-    private Map<Integer, String> itemMap = new HashMap<>();
+    private final Map<Integer, String> itemMap = new HashMap<>();
     private int itemNum = 0;
+
+    public Menu add(String item){
+        itemMap.put(itemMap.size()+1,item);
+        return this;
+    }
 
     public static void anyKeyToContinue(BufferedReader br) {
         System.out.println(ANY_KEY);
@@ -19,7 +26,7 @@ public class Menu {
         } catch (IOException ignored) {}
     }
 
-    public static boolean askIfNotToDo(String x, BufferedReader br)  {
+    public static boolean askIfToDo(String x, BufferedReader br)  {
         System.out.println(x+" 'y' to do it. Other key to quit:");
 
         String input = Inputer.inputString(br);
@@ -51,6 +58,10 @@ public class Menu {
             return false;
         }
         return true;
+    }
+
+    public static String formatString(String str, int length) {
+        return String.format("%-" + length + "s", str);
     }
 
     public void add(ArrayList<String> itemList) {

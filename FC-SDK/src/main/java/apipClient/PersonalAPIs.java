@@ -6,7 +6,7 @@ import constants.ApiNames;
 import javax.annotation.Nullable;
 
 public class PersonalAPIs {
-    public ApipClient boxByIdsPost(String urlHead, String[] ids, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient boxByIdsPost(String urlHead, String[] ids, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("10");
         Fcdsl fcdsl = new Fcdsl();
@@ -18,7 +18,7 @@ public class PersonalAPIs {
         if(!isGood)return null;
         return apipClient;
     }
-    public ApipClient boxSearchPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient boxSearchPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("10");
 
@@ -29,7 +29,7 @@ public class PersonalAPIs {
         return apipClient;
     }
 
-    public ApipClient boxHistoryPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient boxHistoryPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("10");
 
@@ -39,7 +39,7 @@ public class PersonalAPIs {
         if(!isGood)return null;
         return apipClient;
     }
-    public ApipClient contactByIdsPost(String urlHead, String[] ids, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient contactByIdsPost(String urlHead, String[] ids, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("11");
         Fcdsl fcdsl = new Fcdsl();
@@ -51,7 +51,7 @@ public class PersonalAPIs {
         if(!isGood)return null;
         return apipClient;
     }
-    public ApipClient contactsPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient contactsPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("11");
 
@@ -61,7 +61,7 @@ public class PersonalAPIs {
         if(!isGood)return null;
         return apipClient;
     }
-    public ApipClient contactsDeletedPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient contactsDeletedPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("11");
 
@@ -71,7 +71,7 @@ public class PersonalAPIs {
         if(!isGood)return null;
         return apipClient;
     }
-    public ApipClient secretByIdsPost(String urlHead, String[] ids, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient secretByIdsPost(String urlHead, String[] ids, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("12");
         Fcdsl fcdsl = new Fcdsl();
@@ -83,7 +83,7 @@ public class PersonalAPIs {
         if(!isGood)return null;
         return apipClient;
     }
-    public ApipClient secretsPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient secretsPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("12");
 
@@ -93,7 +93,7 @@ public class PersonalAPIs {
         if(!isGood)return null;
         return apipClient;
     }
-    public ApipClient secretsDeletedPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient secretsDeletedPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("12");
 
@@ -103,7 +103,7 @@ public class PersonalAPIs {
         if(!isGood)return null;
         return apipClient;
     }
-    public ApipClient mailByIdsPost(String urlHead, String[] ids, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient mailByIdsPost(String urlHead, String[] ids, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("13");
         Fcdsl fcdsl = new Fcdsl();
@@ -115,7 +115,7 @@ public class PersonalAPIs {
         if(!isGood)return null;
         return apipClient;
     }
-    public ApipClient mailsPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient mailsPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("13");
 
@@ -125,7 +125,7 @@ public class PersonalAPIs {
         if(!isGood)return null;
         return apipClient;
     }
-    public ApipClient mailsDeletedPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient mailsDeletedPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("13");
 
@@ -135,7 +135,7 @@ public class PersonalAPIs {
         if(!isGood)return null;
         return apipClient;
     }
-    public ApipClient mailThreadPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient mailThreadPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("13");
 

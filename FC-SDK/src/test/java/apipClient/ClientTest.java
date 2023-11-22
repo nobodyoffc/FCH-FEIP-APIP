@@ -1,7 +1,6 @@
 package apipClient;
 
-import apipClass.ResponseBody;
-import fcTools.ParseTools;
+import javaTools.JsonTools;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -17,7 +16,7 @@ public class ClientTest {
     private static void totalsGet() {
         String urlHead="https://cid.cash/APIP";
         ApipClient body = new OpenAPIs().totalsGet(urlHead);
-        ParseTools.gsonPrint(body.getResponseBody());
+        JsonTools.gsonPrint(body.getResponseBody());
     }
 
     private static void totalsPost() throws IOException {
@@ -25,7 +24,7 @@ public class ClientTest {
         byte[] sessionKey = HexFormat.of().parseHex(sessionSample.sessionKey);
         String urlHead = "https://cid.cash/APIP";
         ApipClient body = new OpenAPIs().totalsPost(urlHead, null, sessionKey);
-        ParseTools.gsonPrint(body.getResponseBody());
+        JsonTools.gsonPrint(body.getResponseBody());
 
     }
 

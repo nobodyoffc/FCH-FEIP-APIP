@@ -9,7 +9,7 @@ import javax.annotation.Nullable;
 
 public class IdentityAPIs {
 
-    public ApipClient cidInfoByIdsPost(String urlHead, String[] ids, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient cidInfoByIdsPost(String urlHead, String[] ids, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("3");
         Fcdsl fcdsl = new Fcdsl();
@@ -22,7 +22,7 @@ public class IdentityAPIs {
         if(!isGood)return null;
         return apipClient;
     }
-    public ApipClient cidInfoSearchPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient cidInfoSearchPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("3");
         apipClient.setRawFcdsl(fcdsl);
@@ -34,7 +34,7 @@ public class IdentityAPIs {
         return apipClient;
     }
 
-    public ApipClient cidHistoryPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient cidHistoryPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("3");
 
@@ -46,7 +46,7 @@ public class IdentityAPIs {
         return apipClient;
     }
 
-    public ApipClient homepageHistoryPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient homepageHistoryPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("3");
         apipClient.setRawFcdsl(fcdsl);
@@ -58,7 +58,7 @@ public class IdentityAPIs {
         return apipClient;
     }
 
-    public ApipClient noticeFeeHistoryPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient noticeFeeHistoryPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("3");
         apipClient.setRawFcdsl(fcdsl);
@@ -70,7 +70,7 @@ public class IdentityAPIs {
         return apipClient;
     }
 
-    public ApipClient reputationHistoryPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient reputationHistoryPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("3");
         apipClient.setRawFcdsl(fcdsl);
@@ -82,7 +82,7 @@ public class IdentityAPIs {
         return apipClient;
     }
 
-    public ApipClient fidCidSeekPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient fidCidSeekPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
 
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("3");
@@ -108,7 +108,7 @@ public class IdentityAPIs {
         return apipClient;
     }
 
-    public ApipClient fidCidGet(String urlHead,String id){
+    public static ApipClient fidCidGet(String urlHead,String id){
         ApipClient apipClient = new ApipClient();
 
         if(!id.contains("_")){
@@ -124,7 +124,7 @@ public class IdentityAPIs {
         return apipClient;
     }
 
-    public ApipClient nobodyByIdsPost(String urlHead, String[] ids, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient nobodyByIdsPost(String urlHead, String[] ids, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("3");
         Fcdsl fcdsl = new Fcdsl();
@@ -137,7 +137,7 @@ public class IdentityAPIs {
         if(!isGood)return null;
         return apipClient;
     }
-    public ApipClient nobodySearchPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient nobodySearchPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("3");
         apipClient.setRawFcdsl(fcdsl);
@@ -149,7 +149,7 @@ public class IdentityAPIs {
         return apipClient;
     }
 
-    public ApipClient avatarsPost(String urlHead, String[] ids, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient avatarsPost(String urlHead, String[] ids, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("17");
         Fcdsl fcdsl = new Fcdsl();

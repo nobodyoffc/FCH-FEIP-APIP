@@ -8,7 +8,7 @@ import javax.annotation.Nullable;
 public class OrganizeAPIs {
 
 
-    public ApipClient groupByIdsPost(String urlHead, String[] ids, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient groupByIdsPost(String urlHead, String[] ids, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("8");
         Fcdsl fcdsl = new Fcdsl();
@@ -21,7 +21,7 @@ public class OrganizeAPIs {
         if(!isGood)return null;
         return apipClient;
     }
-    public ApipClient groupSearchPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient groupSearchPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("8");
 
@@ -33,7 +33,7 @@ public class OrganizeAPIs {
         return apipClient;
     }
 
-    public ApipClient groupOpHistoryPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient groupOpHistoryPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("8");
 
@@ -44,7 +44,7 @@ public class OrganizeAPIs {
         return apipClient;
     }
 
-    public ApipClient groupMembersPost(String urlHead, String[] ids, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient groupMembersPost(String urlHead, String[] ids, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("8");
         Fcdsl fcdsl = new Fcdsl();
@@ -57,7 +57,7 @@ public class OrganizeAPIs {
         return apipClient;
     }
 
-    public ApipClient myGroupsPost(String urlHead, String fid, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient myGroupsPost(String urlHead, String fid, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("8");
         Fcdsl fcdsl = new Fcdsl();
@@ -72,7 +72,7 @@ public class OrganizeAPIs {
     }
 
 
-    public ApipClient teamByIdsPost(String urlHead, String[] ids, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient teamByIdsPost(String urlHead, String[] ids, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("9");
         Fcdsl fcdsl = new Fcdsl();
@@ -84,7 +84,7 @@ public class OrganizeAPIs {
         if(!isGood)return null;
         return apipClient;
     }
-    public ApipClient teamSearchPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient teamSearchPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("9");
 
@@ -95,7 +95,7 @@ public class OrganizeAPIs {
         return apipClient;
     }
 
-    public ApipClient teamOpHistoryPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient teamOpHistoryPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("9");
 
@@ -106,7 +106,7 @@ public class OrganizeAPIs {
         return apipClient;
     }
 
-    public ApipClient teamRateHistoryPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient teamRateHistoryPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("9");
 
@@ -117,7 +117,7 @@ public class OrganizeAPIs {
         return apipClient;
     }
 
-    public ApipClient teamMembersPost(String urlHead, String[] ids, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient teamMembersPost(String urlHead, String[] ids, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("9");
         Fcdsl fcdsl = new Fcdsl();
@@ -130,7 +130,7 @@ public class OrganizeAPIs {
         return apipClient;
     }
 
-    public ApipClient teamExMembersPost(String urlHead, String[] ids, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient teamExMembersPost(String urlHead, String[] ids, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("9");
         Fcdsl fcdsl = new Fcdsl();
@@ -143,7 +143,7 @@ public class OrganizeAPIs {
         return apipClient;
     }
 
-    public ApipClient teamOtherPersonsPost(String urlHead, String[] ids, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient teamOtherPersonsPost(String urlHead, String[] ids, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("9");
         Fcdsl fcdsl = new Fcdsl();
@@ -156,7 +156,7 @@ public class OrganizeAPIs {
         return apipClient;
     }
 
-    public ApipClient myTeamsPost(String urlHead, String fid, @Nullable String via, byte[] sessionKey)  {
+    public static ApipClient myTeamsPost(String urlHead, String fid, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("9");
         Fcdsl fcdsl = new Fcdsl();

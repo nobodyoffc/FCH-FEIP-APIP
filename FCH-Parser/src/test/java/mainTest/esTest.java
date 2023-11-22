@@ -7,9 +7,8 @@ import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
 import esTools.NewEsClient;
 import fchClass.Address;
-import fcTools.ParseTools;
 
-import startFCH.IndicesFCH;
+import javaTools.JsonTools;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -59,6 +58,6 @@ class EsTest {
             }
         }
 
-        ParseTools.gsonPrint(addrAllList);
+        JsonTools.gsonPrint(addrAllList);
     }
 }

@@ -7,10 +7,10 @@ import com.google.gson.reflect.TypeToken;
 import com.googlecode.jsonrpc4j.JsonRpcHttpClient;
 import fchClass.Cash;
 import fchClass.Tx;
-import fcTools.ParseTools;
+import javaTools.JsonTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import parser.TxInMempool;
+import txTools.TxInfo;
 import redis.clients.jedis.Jedis;
 import config.ConfigAPIP;
 
@@ -26,7 +26,7 @@ import static constants.Strings.CONFIG;
 import static constants.Strings.CONFIG_FILE_PATH;
 import static freecashRPC.FcRpcMethods.getRawTx;
 import static freecashRPC.FcRpcMethods.getTxIds;
-import static parser.RawTxParser.parseMempoolTx;
+import static txTools.RawTxParser.parseMempoolTx;
 
 public class MempoolScanner implements Runnable {
     private volatile AtomicBoolean running = new AtomicBoolean(true);
@@ -98,7 +98,7 @@ public class MempoolScanner implements Runnable {
                             e.printStackTrace();
                             log.error("Get raw tx of " + txid + " wrong.");
                         }
-                        TxInMempool txInMempoolMap = null;
+                        TxInfo txInMempoolMap = null;
                         try {
                             txInMempoolMap = parseMempoolTx(esClient,rawTxHex, txid);
                         } catch (Exception e) {
@@ -118,7 +118,7 @@ public class MempoolScanner implements Runnable {
         }
     }
 
-    private void addMempoolTxToRedis(TxInMempool txInMempoolMap) {
+    private void addMempoolTxToRedis(TxInfo txInMempoolMap) {
         Tx tx = txInMempoolMap.getTx();
         List<Cash> inList = txInMempoolMap.getInCashList();
         List<Cash> outList = txInMempoolMap.getOutCashList();
@@ -132,23 +132,23 @@ public class MempoolScanner implements Runnable {
     }
 
     private void addTxToRedis(Tx tx) {
-        jedis.hset("tx",tx.getTxId(),ParseTools.gsonString(tx));
+        jedis.hset("tx",tx.getTxId(), JsonTools.getNiceString(tx));
     }
 
     private void addSpendCashesToRedis(List<Cash> inList) {
         for(Cash cash:inList){
             if(jedis.hget("spendCashes",cash.getCashId())==null) {
-                jedis.hset("spendCashes", cash.getCashId(), ParseTools.gsonString(cash));
+                jedis.hset("spendCashes", cash.getCashId(), JsonTools.getNiceString(cash));
             }
             else{
-                log.debug("Double spend : "+ ParseTools.gsonString(cash));
+                log.debug("Double spend : "+ JsonTools.getNiceString(cash));
             }
         }
     }
 
     private void addNewCashesToRedis(List<Cash> outList) {
         for(Cash cash:outList){
-            jedis.hset("newCashes",cash.getCashId(),ParseTools.gsonString(cash));
+            jedis.hset("newCashes",cash.getCashId(), JsonTools.getNiceString(cash));
         }
     }
 
@@ -213,9 +213,9 @@ public class MempoolScanner implements Runnable {
 
             jedis.hset(fid, spendValueKey, String.valueOf(spendValue));
             jedis.hset(fid, spendCountKey, String.valueOf(spendCount));
-            jedis.hset(fid,spendCashesKey,ParseTools.gsonString(newSpendCashes));
+            jedis.hset(fid,spendCashesKey, JsonTools.getNiceString(newSpendCashes));
             jedis.hset(fid, netKey, String.valueOf(net));
-            jedis.hset(fid, txValueMapKey, ParseTools.gsonString(txValueMap));
+            jedis.hset(fid, txValueMapKey, JsonTools.getNiceString(txValueMap));
         }
 
         for (Cash cash : outList) {
@@ -260,9 +260,9 @@ public class MempoolScanner implements Runnable {
 
             jedis.hset(fid, incomeValueKey, String.valueOf(incomeValue));
             jedis.hset(fid, incomeCountKey, String.valueOf(incomeCount));
-            jedis.hset(fid,incomeCashesKey,ParseTools.gsonString(newIncomeCashes));
+            jedis.hset(fid,incomeCashesKey, JsonTools.getNiceString(newIncomeCashes));
             jedis.hset(fid, netKey, String.valueOf(net));
-            jedis.hset(fid, txValueMapKey, ParseTools.gsonString(txValueMap));
+            jedis.hset(fid, txValueMapKey, JsonTools.getNiceString(txValueMap));
         }
 
     }

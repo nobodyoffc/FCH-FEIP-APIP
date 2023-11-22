@@ -13,10 +13,10 @@ import constants.OpNames;
 import feipClass.Service;
 import feipClass.ServiceData;
 import fcTools.ParseTools;
+import javaTools.JsonTools;
 import keyTools.KeyTools;
 import menu.Inputer;
 import menu.Menu;
-import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
@@ -93,7 +93,7 @@ public class ServiceManager {
 			}
 			Gson gson = new Gson();
 			ApipService service1 = gson.fromJson(jedis.get(StartAPIP.serviceName + "_" + SERVICE), ApipService.class);
-			ParseTools.gsonPrint(service1);
+			JsonTools.gsonPrint(service1);
 		}
 	}
 
@@ -114,7 +114,7 @@ public class ServiceManager {
 	}
 
 	private void reloadServiceFromRedis(ElasticsearchClient esClient, BufferedReader br) throws IOException {
-		if (Menu.askIfNotToDo("Reload the service from ES? ", br)) return;
+		if (Menu.askIfToDo("Reload the service from ES? ", br)) return;
 		try(Jedis jedis = StartAPIP.jedisPool.getResource()) {
 			String serviceStr = jedis.get(StartAPIP.serviceName + "_" + SERVICE);
 			if (serviceStr == null) {
@@ -232,7 +232,7 @@ public class ServiceManager {
 	}
 
 	public void publish(BufferedReader br) throws IOException {
-		if (Menu.askIfNotToDo("Get the OpReturn text to publish a new service?", br)) return;
+		if (Menu.askIfToDo("Get the OpReturn text to publish a new service?", br)) return;
 
 		Feip5 feip5 = new Feip5();
 
@@ -372,7 +372,7 @@ public class ServiceManager {
 
 	private void update(ElasticsearchClient esClient, BufferedReader br) throws IOException {
 
-		if (Menu.askIfNotToDo("Get the OpReturn text to update your service? ", br)) return;
+		if (Menu.askIfToDo("Get the OpReturn text to update your service? ", br)) return;
 
 		String sid = StartAPIP.service.getSid();
 
@@ -701,7 +701,7 @@ public class ServiceManager {
 	}
 
 	private void stop(ElasticsearchClient esClient,BufferedReader br) throws IOException {
-		if (Menu.askIfNotToDo("Get the OpReturn text to stop the service? ", br)) return;
+		if (Menu.askIfToDo("Get the OpReturn text to stop the service? ", br)) return;
 
 		System.out.println("Input the SID of your service:");
 		String sid = br.readLine();
@@ -730,7 +730,7 @@ public class ServiceManager {
 	}
 
 	private void recover(ElasticsearchClient esClient,BufferedReader br) throws ElasticsearchException, IOException {
-		if (Menu.askIfNotToDo("Get the OpReturn text to recover the service? ", br)) return;
+		if (Menu.askIfToDo("Get the OpReturn text to recover the service? ", br)) return;
 
 		System.out.println("Input the SID of your service:");
 		String sid = br.readLine();
@@ -759,7 +759,7 @@ public class ServiceManager {
 	}
 
 	private void close(ElasticsearchClient esClient,BufferedReader br) throws ElasticsearchException, IOException {
-		if (Menu.askIfNotToDo("Get the OpReturn text to CLOSE the service?!", br)) return;
+		if (Menu.askIfToDo("Get the OpReturn text to CLOSE the service?!", br)) return;
 
 		System.out.println("Input the SID of your service:");
 		String sid = br.readLine();

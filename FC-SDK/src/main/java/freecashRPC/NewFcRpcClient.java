@@ -2,13 +2,12 @@ package freecashRPC;
 
 import com.googlecode.jsonrpc4j.Base64;
 import com.googlecode.jsonrpc4j.JsonRpcHttpClient;
-import fcTools.ParseTools;
+import javaTools.JsonTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
@@ -43,7 +42,7 @@ public class NewFcRpcClient {
             log.error("MalformedURLException when creating Freecash RPC client.",e);
         }
         try {
-            ParseTools.gsonPrint(client.invoke("getblockchaininfo",new Object[]{},Object.class));
+            JsonTools.gsonPrint(client.invoke("getblockchaininfo",new Object[]{},Object.class));
         } catch (Throwable e) {
             log.error("Create Freecash RPC client error.",e);
             return null;

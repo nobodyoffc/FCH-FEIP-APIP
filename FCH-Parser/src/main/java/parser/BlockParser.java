@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import static txTools.RawTxParser.parseOpReturn;
+
 public class BlockParser {
 	public ReadyBlock parseBlock(byte[] blockBytes, BlockMark blockMark) throws IOException {
 		
@@ -259,7 +261,7 @@ public class BlockParser {
 				break;
 			case OP_RETURN:
 				out.setType("OP_RETURN");
-				opReturnStr = new String(Arrays.copyOfRange(bScript, 2, bScript.length));
+				opReturnStr = parseOpReturn(bScript);
 				out.setOwner("OpReturn");
 
 				out.setValid(false);

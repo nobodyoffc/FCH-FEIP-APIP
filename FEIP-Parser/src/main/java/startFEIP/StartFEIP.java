@@ -7,7 +7,7 @@ import co.elastic.clients.json.JsonData;
 import com.google.gson.Gson;
 import config.ConfigFEIP;
 import constants.IndicesNames;
-import fcTools.ParseTools;
+import javaTools.JsonTools;
 import menu.Menu;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -160,7 +160,7 @@ public class StartFEIP {
 		ParseMark parseMark = result.hits().hits().get(0).source();
 
 		if (parseMark == null) throw new AssertionError();
-		ParseTools.gsonPrint(parseMark);
+		JsonTools.gsonPrint(parseMark);
 		
 		FileParser fileParser = new FileParser();
 		

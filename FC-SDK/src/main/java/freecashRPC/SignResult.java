@@ -1,6 +1,6 @@
 package freecashRPC;
 
-import fcTools.ParseTools;
+import javaTools.JsonTools;
 
 public class SignResult {
     private String hex;
@@ -23,6 +23,6 @@ public class SignResult {
     }
     @Override
     public String toString(){
-        return ParseTools.gsonString(this);
+        return JsonTools.getNiceString(this);
     }
 }
