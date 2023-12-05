@@ -1,20 +1,17 @@
 package keyTools;
 
-import co.elastic.clients.elasticsearch._types.analysis.PredicateTokenFilter;
 import constants.Constants;
 import cryptoTools.SHA;
 import cryptoTools.Hash;
 import eccAes256K1P7.EccAes256K1P7;
 import eccAes256K1P7.EccAesDataByte;
 import fcTools.FchMainNetwork;
-import fcTools.ParseTools;
 import javaTools.BytesTools;
-import menu.Inputer;
-import menu.Menu;
+import appUtils.Inputer;
+import appUtils.Shower;
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.Base58;
 import org.bitcoinj.core.ECKey;
-import org.bouncycastle.util.encoders.Hex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -116,6 +113,11 @@ public class KeyTools {
         map.put(Constants.DOGE_ADDR, dogeAddr);
 
         return map;
+    }
+
+    public static Map<String, String> pubKeyToAddresses(byte[] pubKey) {
+        String pubKeyStr = HexFormat.of().formatHex(pubKey);
+        return pubKeyToAddresses(pubKeyStr);
     }
 
     public static String parsePkFromUnlockScript(String hexScript) {
@@ -838,7 +840,7 @@ public class KeyTools {
     }
 
     public static void showPubKeys(String pubKey) {
-        Menu.printUnderline(4);
+        Shower.printUnderline(4);
         System.out.println("- Public key compressed in hex:\n"+ pubKey);
         System.out.println("- Public key uncompressed in hex:\n"+ getPubKeyWifUncompressed(pubKey));
 
@@ -956,12 +958,12 @@ public class KeyTools {
                         break;
                     }
                     System.out.println("New priKey is ready:");
-                    Menu.printUnderline(10);
+                    Shower.printUnderline(10);
                     System.out.println("FID:" + address);
                     System.out.println("PubKey:" + publicKeyAsHex);
                     System.out.println("PriKey:" + ecKey.getPrivateKeyAsWiF(new FchMainNetwork()));
                     System.out.println("PriKeyCipher:"+cipher);
-                    Menu.printUnderline(10);
+                    Shower.printUnderline(10);
                     System.out.println("* Save the priKey cipher and keep your password in mind." +
                             "\nThey are both required to recover the priKey.");
                 }catch (Exception e){
@@ -973,6 +975,26 @@ public class KeyTools {
             }
         }
         return priKey32;
+    }
+
+    public static ECKey genNewFid(BufferedReader br) {
+        ECKey ecKey = new ECKey();
+        byte[] priKey32 = ecKey.getPrivKeyBytes();
+        System.out.println("New FID generated:");
+        Shower.printUnderline(60);
+        System.out.println(ecKey.toAddress(FchMainNetwork.MAINNETWORK).toBase58());
+        System.out.println("PriKey WIF:"+ecKey.getPrivateKeyAsWiF(FchMainNetwork.MAINNETWORK));
+        System.out.println("PriKey hex:"+HexFormat.of().formatHex(priKey32));
+        Shower.printUnderline(60);
+        System.out.println("* Warning: To copy and paste priKey is dangerous with an online device!\n");
+        char[] password = Inputer.inputPassword(br,"Input a password to encrypt your new private key:");
+        String userCipher = EccAes256K1P7.encryptKeyWithPassword(priKey32,password);
+        System.out.println("Here is the cipher of your new private key:");
+        Shower.printUnderline(60);
+        System.out.println(userCipher);
+        Shower.printUnderline(60);
+        System.out.println("* Warning: Keep the cipher text and the password. Without any of them, you lose the control of the FID.");
+        return ecKey;
     }
 }
 

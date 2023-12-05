@@ -1,11 +1,9 @@
-package menu;
+package appUtils;
 
 import fcTools.ParseTools;
-import org.checkerframework.checker.units.qual.A;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.*;
 
 import static constants.Strings.ANY_KEY;
@@ -34,13 +32,6 @@ public class Menu {
         return !"y".equals(input);
     }
 
-    public static void printUnderline(int num) {
-        for(int i=0; i<num; i++) {
-            System.out.print("_");
-        }
-        System.out.println();
-    }
-
     public static boolean isFullShareMap(Map<String, String> map) {
         long sum = 0;
         for(String key: map.keySet()){
@@ -58,10 +49,6 @@ public class Menu {
             return false;
         }
         return true;
-    }
-
-    public static String formatString(String str, int length) {
-        return String.format("%-" + length + "s", str);
     }
 
     public void add(ArrayList<String> itemList) {
@@ -115,6 +102,5 @@ public class Menu {
         }
         return choice;
     }
-
 
 }

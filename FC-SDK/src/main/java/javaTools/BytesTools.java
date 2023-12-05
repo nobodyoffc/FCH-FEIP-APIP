@@ -415,6 +415,21 @@ public class BytesTools {
         }
         return true;
     }
+
+    public static int bytes2ToIntBE(byte[] byteArray) {
+        return ((byteArray[0] & 0xFF) << 8) | (byteArray[1] & 0xFF);
+    }
+
+    public static int bytes2ToIntLE(byte[] byteArray) {
+        return ((byteArray[1] & 0xFF) << 8) | (byteArray[0] & 0xFF);
+    }
+
+    public static byte[] addByteArray(byte[] original, byte[] add) {
+        byte[] total = new byte[original.length+add.length];  // For AES-256
+        System.arraycopy(original, 0, total, 0, original.length);
+        System.arraycopy(add, 0, total, original.length, add.length);
+        return total;
+    }
 }
 
 

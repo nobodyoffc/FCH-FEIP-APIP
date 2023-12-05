@@ -15,10 +15,9 @@ import fchClass.CashMark;
 import fchClass.OpReturn;
 import fchClass.TxHas;
 import feipClass.FcInfo;
-import fileTools.JsonFileTools;
 import javaTools.JsonTools;
-import menu.Inputer;
-import menu.Menu;
+import appUtils.Inputer;
+import appUtils.Menu;
 import order.Order;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -698,7 +697,7 @@ public class Rewarder {
         }
         log.debug("Backup rewardInfo into ES success. BestHeight.");
 
-        JsonFileTools.writeObjectToJsonFile(rewardInfo,REWARD_HISTORY_FILE,true);
+        JsonTools.writeObjectToJsonFile(rewardInfo,REWARD_HISTORY_FILE,true);
 
         log.debug("Backup rewardInfo into "+REWARD_HISTORY_FILE+" success. BestHeight {}.",rewardInfo.getBestHeight());
         return true;

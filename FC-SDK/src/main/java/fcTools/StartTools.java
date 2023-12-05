@@ -10,8 +10,8 @@ import eccAes256K1P7.EccAesType;
 import fileTools.FileTools;
 import javaTools.BytesTools;
 import keyTools.KeyTools;
-import menu.Inputer;
-import menu.Menu;
+import appUtils.Inputer;
+import appUtils.Menu;
 import org.bitcoinj.core.ECKey;
 import org.bitcoinj.params.MainNetParams;
 

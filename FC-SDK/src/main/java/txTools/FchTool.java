@@ -1,6 +1,7 @@
 package txTools;
 
 import com.google.common.base.Preconditions;
+import constants.Constants;
 import fcTools.ParseTools;
 import fchClass.Cash;
 import fchClass.P2SH;
@@ -24,7 +25,6 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -134,9 +134,9 @@ public class FchTool {
         if ((totalOutput + fee) > totalMoney) {
             throw new RuntimeException("input is not enough");
         }
-
-        if (returnAddr != null) {
-            transaction.addOutput(Coin.valueOf(totalMoney - totalOutput - fee), Address.fromBase58(FchMainNetwork.MAINNETWORK, returnAddr));
+        long change = totalMoney - totalOutput - fee;
+        if (returnAddr != null && change > Constants.DustInSatoshi) {
+            transaction.addOutput(Coin.valueOf(change), Address.fromBase58(FchMainNetwork.MAINNETWORK, returnAddr));
         }
 
 
@@ -170,7 +170,7 @@ public class FchTool {
         ECKey eckey = ECKey.fromPrivate(priKey);
 
         for (SendTo output : outputs) {
-            long value = ParseTools.fchToSatoshis(output.getAmount());
+            long value = ParseTools.fchToSatoshi(output.getAmount());
             totalOutput += value;
             transaction.addOutput(Coin.valueOf(value), Address.fromBase58(org.bitcoinj.fch.FchMainNetwork.MAINNETWORK, output.getFid()));
         }
@@ -194,8 +194,10 @@ public class FchTool {
         if ((totalOutput + fee) > totalMoney) {
             throw new RuntimeException("input is not enough");
         }
-
-        transaction.addOutput(Coin.valueOf(totalMoney - totalOutput - fee), Address.fromBase58(FchMainNetwork.MAINNETWORK, changeToFid));
+        long change = totalMoney - totalOutput - fee;
+        if(change > Constants.DustInSatoshi) {
+            transaction.addOutput(Coin.valueOf(change), Address.fromBase58(FchMainNetwork.MAINNETWORK, changeToFid));
+        }
 
         for (int i = 0; i < inputs.size(); ++i) {
             Cash input = inputs.get(i);
@@ -247,7 +249,7 @@ public class FchTool {
         long totalOutput = 0;
 
         for (SendTo output : outputs) {
-            long value = ParseTools.fchToSatoshis(output.getAmount());
+            long value = ParseTools.fchToSatoshi(output.getAmount());
             totalOutput += value;
             transaction.addOutput(Coin.valueOf(value), Address.fromBase58(org.bitcoinj.fch.FchMainNetwork.MAINNETWORK, output.getFid()));
         }
@@ -271,8 +273,10 @@ public class FchTool {
         if ((totalOutput + fee) > totalMoney) {
             throw new RuntimeException("input is not enough");
         }
-
-        transaction.addOutput(Coin.valueOf(totalMoney - totalOutput - fee), Address.fromBase58(FchMainNetwork.MAINNETWORK, changeToFid));
+        long change = totalMoney - totalOutput - fee;
+        if(change > Constants.DustInSatoshi) {
+            transaction.addOutput(Coin.valueOf(change), Address.fromBase58(FchMainNetwork.MAINNETWORK, changeToFid));
+        }
 
         return transaction.bitcoinSerialize();
     }
@@ -392,7 +396,7 @@ public class FchTool {
         ECKey eckey = ECKey.fromPrivate(priKey);
 
         for (SendTo output : outputs) {
-            long value = ParseTools.fchToSatoshis(output.getAmount());
+            long value = ParseTools.fchToSatoshi(output.getAmount());
             byte[] pubKeyHash = KeyTools.addrToHash160(output.getFid());
             totalOutput += value;
 
@@ -434,8 +438,10 @@ public class FchTool {
             throw new RuntimeException("input is not enough");
         }
 
-        transaction.addOutput(Coin.valueOf(totalMoney - totalOutput - fee), Address.fromBase58(FchMainNetwork.MAINNETWORK, changeToFid));
-
+        long change = totalMoney - totalOutput - fee;
+        if(change > Constants.DustInSatoshi) {
+            transaction.addOutput(Coin.valueOf(change), Address.fromBase58(FchMainNetwork.MAINNETWORK, changeToFid));
+        }
 
         for (int i = 0; i < inputs.size(); ++i) {
             Cash input = inputs.get(i);

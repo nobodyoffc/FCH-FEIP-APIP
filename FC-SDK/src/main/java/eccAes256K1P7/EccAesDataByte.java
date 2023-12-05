@@ -22,6 +22,7 @@ public class EccAesDataByte {
     private byte[] priKeyB;
     private byte[] iv;
     private byte[] sum;
+    private boolean badSum;
     private byte[] cipher;
     private String error;
 
@@ -57,6 +58,7 @@ public class EccAesDataByte {
             eccAesDataByte.setSum(HexFormat.of().parseHex(eccAesData.getSum()));
         if(eccAesData.getError()!=null)
             eccAesDataByte.setError(eccAesData.getError());
+        eccAesDataByte.setBadSum(eccAesData.isBadSum());
 
         return eccAesDataByte;
     }
@@ -221,4 +223,11 @@ public class EccAesDataByte {
         this.priKeyB = priKeyB;
     }
 
+    public boolean isBadSum() {
+        return badSum;
+    }
+
+    public void setBadSum(boolean badSum) {
+        this.badSum = badSum;
+    }
 }

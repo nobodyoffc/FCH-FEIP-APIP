@@ -24,6 +24,8 @@ public class Constants {
     public static final String BCH_ADDR = "bchAddr";
     public static final String DOGE_ADDR = "dogeAddr";
     public static final String TRX_ADDR = "trxAddr";
+
+    public static final String[] VALID_ADDRS = new String[]{Strings.FID,BTC_ADDR,ETH_ADDR,LTC_ADDR,DOGE_ADDR,TRX_ADDR};
     public static final String REWARD_HTML_FILE = "index.html";
     public static final String REWARD_HISTORY_FILE = "rewardHistory.json";
     public static final int FCH_LENGTH = 17;
@@ -47,6 +49,9 @@ public class Constants {
     public static final String APIP = "APIP";
     public static final String V1 = "V1";
     public static final String APIP_PARAMS_JSON = "ApipParams.json";;
+    public static final String MAKER_SN = "2";
+    public static final String FEIP = "FEIP";
+    public static final double Dust = 0.00001;
     public static int RedisDb4Webhook = 4;
     public static int RedisDb3Mempool=3;
     public static int RedisDb0Common=0;
@@ -57,4 +62,5 @@ public class Constants {
     public static String EcdsaBtcMsg_No1_NrC7= "EcdsaBtcMsg@No1_NrC7";
     public static String Schnorr_No1_NrC7= "SchnorrMsg@No1_NrC7";
     public static String UrlHead_CID_CASH = "https://cid.cash/APIP";
+    public static long DustInSatoshi=1000;
 }

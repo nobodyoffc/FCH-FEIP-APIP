@@ -42,11 +42,11 @@ public class CashValidLive extends HttpServlet {
         RequestBody requestBody = dataCheckResult.getDataRequestBody();
         replier.setNonce(requestBody.getNonce());
         //Check API
-        if(!isThisApiRequest(requestBody)){
-            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
-            writer.write(replier.reply1012BadQuery(addr));
-            return;
-        }
+//        if(!isThisApiRequest(requestBody)){
+//            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
+//            writer.write(replier.reply1012BadQuery(addr));
+//            return;
+//        }
 
         //Set default sort.
         ArrayList<Sort> sort = Sort.makeSortList("cd",true,"value",true,"cashId",true);
@@ -81,13 +81,13 @@ public class CashValidLive extends HttpServlet {
 
     }
 
-    private boolean isThisApiRequest(RequestBody requestBody) {
-        if(requestBody.getFcdsl()==null)
-            return false;
-        if(requestBody.getFcdsl().getQuery()==null)
-            return false;
-        if(!requestBody.getFcdsl().getQuery().getTerms().getFields()[0].equals("fid"))
-            return false;
-        return true;
-    }
+//    private boolean isThisApiRequest(RequestBody requestBody) {
+//        if(requestBody.getFcdsl()==null)
+//            return false;
+//        if(requestBody.getFcdsl().getQuery()==null)
+//            return false;
+//        if(!requestBody.getFcdsl().getQuery().getTerms().getFields()[0].equals("owner"))
+//            return false;
+//        return true;
+//    }
 }

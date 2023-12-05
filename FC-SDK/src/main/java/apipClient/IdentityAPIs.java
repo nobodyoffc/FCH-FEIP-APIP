@@ -1,11 +1,17 @@
 package apipClient;
 
+import apipClass.ApipParamsForClient;
+import apipClass.CidInfo;
 import apipClass.ClientCodeMessage;
 import apipClass.Fcdsl;
 import constants.ApiNames;
+import fchClass.Address;
+import javaTools.JsonTools;
 import keyTools.KeyTools;
 
 import javax.annotation.Nullable;
+import java.util.List;
+import java.util.Map;
 
 public class IdentityAPIs {
 
@@ -161,5 +167,47 @@ public class IdentityAPIs {
         boolean isGood = apipClient.post(urlHead,urlTail, fcdsl, via, sessionKey);
         if(!isGood)return null;
         return apipClient;
+    }
+
+    public static String getPubKey(String fid, ApipParamsForClient apipParams, byte[] symKey) {
+        ApipClient apipClient = BlockchainAPIs.fidByIdsPost(apipParams.getUrlHead(),new String[]{fid},apipParams.getVia(),symKey);
+        if(apipClient==null ||apipClient.checkResponse()!=0){
+            if(apipClient.getMessage()!=null) System.out.println(apipClient.getMessage());
+            return null;
+        }
+        Map<String, Address> addrMap = ApipDataGetter.getAddressMap(apipClient.getResponseBody().getData());
+        Address address = addrMap.get(fid);
+        if(address==null){
+            System.out.println("The pubKey is not shown on-chain.");
+            return null;
+        }
+        String pubKey = address.getPubKey();
+        if(pubKey ==null){
+            System.out.println("This address "+fid+" has no pubKey on-chain.");
+            return null;
+        }
+        if(!KeyTools.isValidPubKey(pubKey)){
+            System.out.println("Invalid pubKey:"+ pubKey);
+            return null;
+        }
+        return pubKey;
+    }
+
+    public static CidInfo getCidInfo(String fid, ApipParamsForClient apipParams, byte[] symKey) {
+        ApipClient apipClient = IdentityAPIs.cidInfoByIdsPost(apipParams.getUrlHead(),new String[]{fid},apipParams.getVia(),symKey);
+        assert apipClient != null;
+        if(apipClient.checkResponse()!=0){
+            if(apipClient.getMessage()!=null) System.out.println(apipClient.getMessage());
+            if(apipClient.getResponseBody()!=null&& apipClient.getResponseBody().getData()!=null)
+                System.out.println(JsonTools.getString(apipClient.getResponseBody().getData()));
+            return null;
+        }
+        Map<String,CidInfo> addrMap = ApipDataGetter.getCidInfoMap(apipClient.getResponseBody().getData());
+        CidInfo cid = addrMap.get(fid);
+        if(cid ==null){
+            System.out.println("The pubKey is not shown on-chain.");
+            return null;
+        }
+        return cid;
     }
 }

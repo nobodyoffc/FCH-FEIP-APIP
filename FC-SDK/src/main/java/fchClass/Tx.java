@@ -5,7 +5,7 @@ public class Tx {
 	//from block;
 	private String txId;		//txid,hash of tx
 	private int version;		//version
-	private long lockTime;	//locktime
+	private long lockTime;	//lockTime
 	private long blockTime;		//blockTime
 	private String blockId;		//block ID, hash of block head
 	private int txIndex;		//the index of this tx in the block

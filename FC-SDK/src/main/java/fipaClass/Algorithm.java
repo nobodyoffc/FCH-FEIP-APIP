@@ -7,13 +7,11 @@ public enum Algorithm {
     EcdsaBtcMsg_No1_NrC7("EcdsaBtcMsg@No1_NrC7"),
     SignTxByCryptoSign_No1_NrC7("SignTxByCryptoSign@No1_NrC7");
 
-    private final String str;
+//    private final String name;
 
-    Algorithm(String name) {
-        this.str = name;
-    }
+    Algorithm(String name) {}
 
-    public String getStr() {
-        return str;
+    public String getName() {
+        return this.name();
     }
 }

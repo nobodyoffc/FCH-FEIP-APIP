@@ -80,9 +80,9 @@ public class NewCashByFids extends HttpServlet {
                     String subscription = getWebhookFromRedis(webhookRequestBody.getUserName());
                     dataMap.put(Strings.OP, Strings.CHECK);
                     if (subscription == null) {
-                        dataMap.put(Strings.FOUND, Strings.FALSE);
+                        dataMap.put(Strings.FOUND, Values.FALSE);
                     } else {
-                        dataMap.put(Strings.FOUND, Strings.TRUE);
+                        dataMap.put(Strings.FOUND, Values.TRUE);
                         dataMap.put(Strings.SUBSCRIBE, subscription);
                     }
                     replier.setData(dataMap);

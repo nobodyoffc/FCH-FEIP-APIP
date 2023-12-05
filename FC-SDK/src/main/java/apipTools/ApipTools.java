@@ -1,11 +1,18 @@
 package apipTools;
 
+import FeipClient.IdentityFEIPs;
+import apipClass.ApipParamsForClient;
+import apipClass.CidInfo;
+import apipClient.IdentityAPIs;
+import appUtils.Inputer;
 import cryptoTools.SHA;
 import eccAes256K1P7.EccAes256K1P7;
 import eccAes256K1P7.EccAesDataByte;
 import javaTools.BytesTools;
+import keyTools.KeyTools;
 import redis.clients.jedis.Jedis;
 
+import java.io.BufferedReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HexFormat;
@@ -69,5 +76,32 @@ public class ApipTools {
         }
         String sessionKeyHex = new String(eccAesDataBytes.getMsg(), StandardCharsets.UTF_8);
         return HexFormat.of().parseHex(sessionKeyHex);
+    }
+
+    public static void checkMaster(String priKeyCipher, byte[] initSymKey, ApipParamsForClient initApipParams, BufferedReader br) {
+        byte[] priKey = EccAes256K1P7.decryptKey(priKeyCipher,initSymKey);
+        if(priKey==null){
+            throw new RuntimeException("Failed to decrypt priKey.");
+        }
+        String fid = KeyTools.priKeyToFid(priKey);
+        byte[] sessionKey = initApipParams.decryptSessionKey(initSymKey.clone());
+        CidInfo cid = IdentityAPIs.getCidInfo(fid,initApipParams,sessionKey);
+        if(cid!=null) {
+            if(cid.getMaster()!=null)return;
+            if(Inputer.askIfYes(br,"Assign a master for "+fid+"? y/n:")) {
+                while(true) {
+                    String master = Inputer.inputString(br, "Input the master FID or pubKey:");
+                    if(KeyTools.isValidPubKey(master) || KeyTools.isValidFchAddr(master)) {
+                        String result = IdentityFEIPs.setMasterOnChain(priKeyCipher, master, initApipParams, sessionKey,initSymKey);
+                        if(result==null) System.out.println("Failed to set master.");;
+                        if (BytesTools.isHexString(result)) System.out.println("Master was set at txId: " + result);
+                        else System.out.println(result);
+                        break;
+                    }
+                }
+            }
+        }else {
+            System.out.println("Failed to get CID information of "+fid+".");
+        }
     }
 }

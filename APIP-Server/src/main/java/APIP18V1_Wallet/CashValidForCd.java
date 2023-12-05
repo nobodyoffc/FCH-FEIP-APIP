@@ -69,6 +69,7 @@ public class CashValidForCd extends HttpServlet {
         DataRequestHandler esRequest = new DataRequestHandler(dataCheckResult.getAddr(),requestBody,response,replier);
 
         CashListReturn cashListReturn = WalletTools.getCashForCd(addrRequested, cd,Initiator.esClient);
+
         List<Cash> meetList = cashListReturn.getCashList();
 
         if(meetList==null){

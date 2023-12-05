@@ -2,10 +2,7 @@ package APIP2V1_Blockchain;
 
 import APIP0V1_OpenAPI.*;
 import apipClass.*;
-import constants.ApiNames;
-import constants.IndicesNames;
-import constants.ReplyInfo;
-import constants.Strings;
+import constants.*;
 import fchClass.Cash;
 
 import javax.servlet.ServletException;
@@ -49,7 +46,7 @@ public class CashValid extends HttpServlet {
         ArrayList<Sort> sort = Sort.makeSortList("cd",true,"value",false,"cashId",true);
 
         //Add condition
-        Fcdsl fcdsl = Fcdsl.addExceptTermsToFcdsl(requestBody, Strings.VALID,Strings.FALSE);
+        Fcdsl fcdsl = Fcdsl.addExceptTermsToFcdsl(requestBody, FieldNames.VALID, Values.FALSE);
         requestBody.setFcdsl(fcdsl);
 
         //Request

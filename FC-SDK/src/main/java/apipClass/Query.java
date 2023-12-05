@@ -1,7 +1,7 @@
 package apipClass;
 
-import menu.Inputer;
-import menu.Menu;
+import appUtils.Inputer;
+import appUtils.Menu;
 
 import java.io.BufferedReader;
 import java.util.Arrays;

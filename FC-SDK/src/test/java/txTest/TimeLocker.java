@@ -36,7 +36,7 @@ public class TimeLocker {
         ECKey eckey = ECKey.fromPrivate(priKey);
 
         for (SendTo output : outputs) {
-            long value = ParseTools.fchToSatoshis(output.getAmount());
+            long value = ParseTools.fchToSatoshi(output.getAmount());
             byte[] pubKeyHash = KeyTools.addrToHash160(output.getFid());
             totalOutput += value;
 

@@ -40,7 +40,7 @@ public class Terms {
         return values;
     }
 
-    public void setValues(String[] values) {
+    public void setValues(String... values) {
         this.values = values;
     }
 }

@@ -8,7 +8,7 @@ import com.google.gson.Gson;
 import config.ConfigFEIP;
 import constants.IndicesNames;
 import javaTools.JsonTools;
-import menu.Menu;
+import appUtils.Menu;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import esTools.NewEsClient;

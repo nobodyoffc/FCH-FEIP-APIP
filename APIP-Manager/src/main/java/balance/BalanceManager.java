@@ -3,7 +3,7 @@ package balance;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import constants.Strings;
 import javaTools.JsonTools;
-import menu.Menu;
+import appUtils.Menu;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;

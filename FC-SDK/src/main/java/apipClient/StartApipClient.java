@@ -15,8 +15,9 @@ import javaTools.BytesTools;
 import javaTools.ImageTools;
 import javaTools.JsonTools;
 import keyTools.KeyTools;
-import menu.Inputer;
-import menu.Menu;
+import appUtils.Inputer;
+import appUtils.Menu;
+import appUtils.Shower;
 import org.jetbrains.annotations.Nullable;
 import walletTools.SendTo;
 
@@ -38,9 +39,9 @@ public class StartApipClient {
         byte[] sessionKey;
         byte[] symKey;
         while(true) {
-            Menu.printUnderline(20);
+            Shower.printUnderline(20);
             System.out.println("\nWelcome to the Freeverse with APIP Client.");
-            Menu.printUnderline(20);
+            Shower.printUnderline(20);
             System.out.println("Confirm or set your password...");
             byte[] passwordBytes = Inputer.getPasswordBytes(br);
             symKey = Hash.Sha256x2(passwordBytes);
@@ -109,7 +110,7 @@ public class StartApipClient {
         fcdsl.addNewSort("cd","desc").addSize(2).addNewAfter("56");
         if(!fcdsl.checkFcdsl())return;
         System.out.println("Java code:");
-        Menu.printUnderline(20);
+        Shower.printUnderline(20);
         String code = """
                 public static void showExample(byte[] sessionKey, BufferedReader br) {
                 \tFcdsl fcdsl = new Fcdsl();
@@ -132,17 +133,17 @@ public class StartApipClient {
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         String responseBodyJson = gson.toJson(apipClient.getResponseBody());
-        Menu.printUnderline(20);
+        Shower.printUnderline(20);
         System.out.println("Request header:\n"+ JsonTools.getNiceString(apipClient.getRequestHeaderMap()));
-        Menu.printUnderline(20);
+        Shower.printUnderline(20);
         System.out.println("Request body:\n"+gson.toJson(apipClient.getRequestBody()));
-        Menu.printUnderline(20);
+        Shower.printUnderline(20);
         System.out.println("Response header:\n"+ JsonTools.getNiceString(apipClient.getResponseHeaderMap()));
-        Menu.printUnderline(20);
+        Shower.printUnderline(20);
         System.out.println("Response body:");
-        Menu.printUnderline(20);
+        Shower.printUnderline(20);
         System.out.println(responseBodyJson);
-        Menu.printUnderline(20);
+        Shower.printUnderline(20);
 
         Menu.anyKeyToContinue(br);
     }
@@ -295,7 +296,7 @@ public class StartApipClient {
     }
 
     public static byte[] signInEccPost(byte[] symKey, String mode) {
-        byte [] priKey = EccAes256K1P7.decryptKeyWithSymKey(initApipParamsForClient.getApipBuyerPriKeyCipher(), symKey.clone());
+        byte [] priKey = EccAes256K1P7.decryptKey(initApipParamsForClient.getApipBuyerPriKeyCipher(), symKey.clone());
         if(priKey==null)return null;
         System.out.println("Sign in for EccAES256K1P7 encrypted sessionKey...");
         ApipClient apipClient =OpenAPIs.signInEccPost(initApipParamsForClient.getUrlHead(), initApipParamsForClient.getVia(),priKey.clone(),mode);
@@ -313,7 +314,7 @@ public class StartApipClient {
     }
 
     public static byte[] signInPost(byte[] symKey, String mode) {
-        byte [] priKey = EccAes256K1P7.decryptKeyWithSymKey(initApipParamsForClient.getApipBuyerPriKeyCipher(), symKey.clone());
+        byte [] priKey = EccAes256K1P7.decryptKey(initApipParamsForClient.getApipBuyerPriKeyCipher(), symKey.clone());
         if(priKey==null)return null;
 
         System.out.println("Sign in...");
@@ -1363,7 +1364,7 @@ public class StartApipClient {
         byte[] symKeyOld = Hash.Sha256x2(passwordBytesOld);
 
         byte[] sessionKey = initApipParamsForClient.decryptSessionKey(symKeyOld.clone());
-        byte [] priKey = EccAes256K1P7.decryptKeyWithSymKey(initApipParamsForClient.getApipBuyerPriKeyCipher(), symKeyOld.clone());
+        byte [] priKey = EccAes256K1P7.decryptKey(initApipParamsForClient.getApipBuyerPriKeyCipher(), symKeyOld.clone());
 
         byte[] symKeyNew= Hash.Sha256x2(passwordBytesNew);
         String buyerPriKeyCipherNew = ApipParamsForClient.encrypt32BytesKeyWithSymKeyBytes(priKey, symKeyNew.clone());
@@ -1388,7 +1389,7 @@ public class StartApipClient {
     }
 
     public static void checkApip(byte[] sessionKey, BufferedReader br) {
-        Menu.printUnderline(20);
+        Shower.printUnderline(20);
         System.out.println("Apip Service:");
         String urlHead = initApipParamsForClient.getUrlHead();
         String[] ids = new String[]{initApipParamsForClient.getSid()};
@@ -1398,10 +1399,10 @@ public class StartApipClient {
         ApipClient apipClient = ConstructAPIs.serviceByIdsPost(urlHead, ids, via, sessionKey);
         System.out.println(apipClient.getResponseBodyStr());
 
-        Menu.printUnderline(20);
+        Shower.printUnderline(20);
         System.out.println("User Params:");
         System.out.println(JsonTools.getNiceString(initApipParamsForClient));
-        Menu.printUnderline(20);
+        Shower.printUnderline(20);
         Menu.anyKeyToContinue(br);
     }
 

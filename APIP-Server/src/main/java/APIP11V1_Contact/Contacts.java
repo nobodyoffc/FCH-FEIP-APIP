@@ -2,10 +2,7 @@ package APIP11V1_Contact;
 
 import APIP0V1_OpenAPI.*;
 import apipClass.*;
-import constants.ApiNames;
-import constants.IndicesNames;
-import constants.ReplyInfo;
-import constants.Strings;
+import constants.*;
 import feipClass.Contact;
 
 import javax.servlet.ServletException;
@@ -51,7 +48,7 @@ public class Contacts extends HttpServlet {
         ArrayList<Sort> sort = Sort.makeSortList("birthHeight",false,"contactId",true,null,null);
 
         //Add condition
-        Fcdsl fcdsl = Fcdsl.addExceptTermsToFcdsl(requestBody, Strings.ACTIVE,Strings.FALSE);
+        Fcdsl fcdsl = Fcdsl.addExceptTermsToFcdsl(requestBody, Strings.ACTIVE, Values.FALSE);
         requestBody.setFcdsl(fcdsl);
 
         //Request

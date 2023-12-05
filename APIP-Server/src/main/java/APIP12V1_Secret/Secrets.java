@@ -2,10 +2,7 @@ package APIP12V1_Secret;
 
 import APIP0V1_OpenAPI.*;
 import apipClass.*;
-import constants.ApiNames;
-import constants.IndicesNames;
-import constants.ReplyInfo;
-import constants.Strings;
+import constants.*;
 import feipClass.Secret;
 
 import javax.servlet.ServletException;
@@ -45,7 +42,7 @@ public class Secrets extends HttpServlet {
         ArrayList<Sort> sort = Sort.makeSortList("birthHeight",false,"secretId",true,null,null);
 
         //Add condition
-        Fcdsl fcdsl = Fcdsl.addExceptTermsToFcdsl(requestBody, Strings.ACTIVE,Strings.FALSE);
+        Fcdsl fcdsl = Fcdsl.addExceptTermsToFcdsl(requestBody, Strings.ACTIVE, Values.FALSE);
         requestBody.setFcdsl(fcdsl);
 
         //Request

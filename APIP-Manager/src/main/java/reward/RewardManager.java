@@ -9,9 +9,9 @@ import co.elastic.clients.elasticsearch.core.search.Hit;
 import esTools.EsTools;
 import fcTools.ParseTools;
 import fchClass.Address;
-import fileTools.JsonFileTools;
 import javaTools.JsonTools;
-import menu.Menu;
+import appUtils.Menu;
+import appUtils.Shower;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
@@ -78,7 +78,7 @@ public class RewardManager {
         ArrayList<RewardInfo> rewardInfoList = getRewardInfoList(esClient);
         if(rewardInfoList==null)return;
         for(RewardInfo rewardInfo:rewardInfoList){
-            JsonFileTools.writeObjectToJsonFile(rewardInfo,REWARD_HISTORY_FILE,true);
+            JsonTools.writeObjectToJsonFile(rewardInfo,REWARD_HISTORY_FILE,true);
         }
         log.debug(rewardInfoList.size() +"reward records saved to "+REWARD_HISTORY_FILE+ ".");
         Menu.anyKeyToContinue(br);
@@ -206,22 +206,22 @@ public class RewardManager {
             return;
         }
         System.out.println("Unpaid rewards: ");
-        System.out.print(Menu.formatString("State",12));
-        System.out.print(Menu.formatString("Time",22));
-        System.out.print(Menu.formatString("Amount total",20));
-        System.out.print(Menu.formatString("Reward ID",66));
+        System.out.print(Shower.formatString("State",12));
+        System.out.print(Shower.formatString("Time",22));
+        System.out.print(Shower.formatString("Amount total",20));
+        System.out.print(Shower.formatString("Reward ID",66));
         System.out.println();
 
         for(RewardInfo rewardInfo : unpaidRewardList){
-            System.out.print(Menu.formatString(rewardInfo.getState().name(),12));
+            System.out.print(Shower.formatString(rewardInfo.getState().name(),12));
 
             String time = ParseTools.convertTimestampToDate(rewardInfo.getTime());
-            System.out.print(Menu.formatString(time,22));
+            System.out.print(Shower.formatString(time,22));
 
             String rewardT = String.valueOf((double) rewardInfo.getRewardT()/FchToSatoshi);
-            System.out.print(Menu.formatString(rewardT,20));
+            System.out.print(Shower.formatString(rewardT,20));
 
-            System.out.print(Menu.formatString(rewardInfo.getRewardId(),66));
+            System.out.print(Shower.formatString(rewardInfo.getRewardId(),66));
             System.out.println();
         }
         Menu.anyKeyToContinue(br);

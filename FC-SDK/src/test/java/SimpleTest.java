@@ -4,15 +4,36 @@ import eccAes256K1P7.EccAesType;
 import fipaClass.Algorithm;
 import javaTools.BytesTools;
 import javaTools.JsonTools;
+import appUtils.Shower;
 
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.HexFormat;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.*;
 
 public class SimpleTest {
     public static void main(String[] args) {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String title = "text";
+        String[] fields = new String[]{"name","age","money"};
+        int[] widths = new int[]{4,8,33};
+        List<List<Object>> valueListList = new ArrayList<>();
+        List<Object>oneLine = new ArrayList<>();
+        oneLine.add("name1");
+        oneLine.add(20);
+        oneLine.add(12.834030940322);
+        valueListList.add(oneLine);
+        List<Object>oneLine1 = new ArrayList<>();
+        oneLine1.add("name2");
+        oneLine1.add(100);
+        oneLine1.add(3439248212.8340309);
+        valueListList.add(oneLine1);
+
+        Shower.showDataTable(title,fields,widths,valueListList);
+    }
+
+    private static void enumTest() {
         System.out.println(Algorithm.EcdsaBtcMsg_No1_NrC7.ordinal());
-        System.out.println(Algorithm.EcdsaBtcMsg_No1_NrC7.getStr());
+        System.out.println(Algorithm.EcdsaBtcMsg_No1_NrC7.getName());
         System.out.println(Algorithm.ECC256k1_AES256CBC.ordinal());
     }
 

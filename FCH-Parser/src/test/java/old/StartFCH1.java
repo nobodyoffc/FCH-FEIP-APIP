@@ -5,7 +5,7 @@ import constants.Constants;
 import esTools.EsTools;
 import fchClass.Block;
 import config.ConfigFCH;
-import menu.Menu;
+import appUtils.Menu;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import fileTools.OpReFileTools;

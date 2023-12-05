@@ -73,7 +73,6 @@ public class Strings {
     public static final String FIELDS = "fields";
     public static final String SESSION_NAME = "sessionName";
     public static final String VIA = "via";
-    public static final String OWNER = "owner";
     public static final String TYPE = "type";
     public static final String CLOSED = "closed";
     public static final String ACTIVE = "active";
@@ -89,8 +88,6 @@ public class Strings {
     public static final String CASH_ID = "cashId";
     public static final String BIRTH_HEIGHT = "birthHeight";
     public static final String ORDER = "order";
-    public static final String TRUE = "true";
-    public static final String FALSE = "false";
     public static final String NONCE = "nonce";
     public static final String RENEW = "renew";
     public static final String SUBSCRIBE = "subscribe";
@@ -99,24 +96,15 @@ public class Strings {
     public static final String ERROR = "error";
     public static final String PARAMS = "params";
     public static final String UNSIGNED_TX_FOR_CS = "unsignedTxForCs";
-    public static final String VALID = "valid";
-    public static final String CD = "cd";
-    public static final String VALUE = "value";
-    public static final String SUM = "sum";
-    public static final String SPEND_CASHES = "spendCashes";
-    public static final String NEW_CASHES = "newCashes";
     public static final String REFRESH = "refresh";
-    public static final String BUY = "buy";
     public static final String IGNORE = "ignore";
     public static final String INIT_SYM_KEY_CIPHER = "initSymKeyCipher";
-    public static final String ARB = "arb";
     public static final String API = "api";
     public static final String USER_ID = "userId";
     public static final String CHECK = "check";
     public static final String FOUND = "found";
     public static final String PRE_KEY = "priKey";
-    public static final String SYM_SIGN = "symSign";
-    public static final String SYM_KEY_NAME = "symKeyName";
+    public static final String SWAP = "swap";
     public static String spendCashMapKey = "spentCashMap";
     public static String newCashMapKey = "newCashMap";
 }

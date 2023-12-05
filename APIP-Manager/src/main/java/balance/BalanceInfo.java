@@ -8,7 +8,6 @@ import co.elastic.clients.json.JsonData;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import constants.Strings;
-import menu.Menu;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;

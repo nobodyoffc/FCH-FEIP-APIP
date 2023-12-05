@@ -9,6 +9,7 @@ import constants.UpStrings;
 import fcTools.FchMainNetwork;
 import fipaClass.Algorithm;
 import fipaClass.Signature;
+import javaTools.JsonTools;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -49,6 +50,19 @@ public class ApipClient {
     private int code;
     private String message;
 
+    public boolean checkResponse(String taskName){
+        if(checkResponse()!=0){
+            System.out.println("Failed to "+taskName);
+            if(responseBody==null) {
+                System.out.println("ResponseBody is null.");
+                System.out.println(message);
+            }else {
+                System.out.println(responseBody.getCode()+":"+responseBody.getMessage());
+                if(responseBody.getData()!= null) System.out.println(JsonTools.getString(responseBody.getData()));
+            }
+            return false;
+        }else return true;
+    }
     public int checkResponse(){
         if(responseBody==null){
             code = ClientCodeMessage.Code1ResponseIsNull;

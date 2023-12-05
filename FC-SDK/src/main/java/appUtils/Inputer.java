@@ -1,11 +1,13 @@
-package menu;
+package appUtils;
 
+import eccAes256K1P7.EccAes256K1P7;
 import fcTools.Base58;
 import fcTools.ParseTools;
 import javaTools.BytesTools;
 import keyTools.KeyTools;
+import org.bitcoinj.core.ECKey;
 import org.jetbrains.annotations.NotNull;
-import txTools.FchTool;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,23 +17,19 @@ import java.util.HashMap;
 import java.util.Map;
 import java.io.Console;
 
+import static FeipClient.IdentityFEIPs.setMasterOnChain;
+
+
 public class Inputer {
 
-    public static byte[] inputPassword() {
-        char[] passwordChars = inputPasswordChars();
-        if (passwordChars == null) return null;
-        byte[] passwordBytes = BytesTools.utf8CharArrayToByteArray(passwordChars);
-        Arrays.fill(passwordChars, (char) 0);
-        return passwordBytes;
-    }
-
-    private static char[] inputPasswordChars() {
+    private static char[] inputPassword(String ask) {
+        System.out.println(ask);
         Console console = System.console();
         if (console == null) {
             System.out.println("Couldn't get Console instance. Maybe you're running this from within an IDE, which doesn't support Console.");
             return null;
         }
-        return console.readPassword("Enter your password: ");
+        return console.readPassword(ask);
     }
 
     public static char[] inputPassword(BufferedReader br, String ask)  {
@@ -449,5 +447,76 @@ public class Inputer {
         }
 
         return input.toString();
+    }
+
+    public static boolean askIfYes(BufferedReader br, String ask) {
+        System.out.println(ask);
+        String input;
+        try {
+            input = br.readLine();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return "y".equals(input);
+    }
+
+    @Nullable
+    public static ECKey inputPriKey(BufferedReader br) {
+        byte[] priKey32;
+        String input = inputString(br, "Generate a new private key? y/n");
+        if("y".equals(input)){
+            return KeyTools.genNewFid(br);
+        }else {
+            priKey32=KeyTools.inputCipherGetPriKey(br);
+            if(priKey32!=null) return ECKey.fromPrivate(priKey32);
+        }
+        return null;
+    }
+
+    public static String inputPriKeyCipher(BufferedReader br, byte[] initSymKey) {
+        ECKey ecKey = inputPriKey(br);
+        if(ecKey==null)return null;
+        byte[] priKeyBytes = ecKey.getPrivKeyBytes();
+        return EccAes256K1P7.encryptKeyWithSymKey(priKeyBytes,initSymKey);
+    }
+
+    public static String[] promptAndSet(BufferedReader reader, String fieldName, String[] currentValue) throws IOException {
+        String ask = "Enter " + fieldName + " (Press Enter to skip): ";
+        String[] newValue = inputStringArray(reader,ask,0);
+        return newValue.length==0 ? currentValue : newValue;
+    }
+
+    public static String promptAndSet(BufferedReader reader, String fieldName, String currentValue) throws IOException {
+        System.out.print("Enter " + fieldName + " (Press Enter to skip): ");
+        String newValue = reader.readLine();
+        return newValue.isEmpty() ? currentValue : newValue;
+    }
+
+    public static long promptForLong(BufferedReader reader, String fieldName, long currentValue) throws IOException {
+        System.out.print("Enter " + fieldName + " (Press Enter to skip): ");
+        String newValue = reader.readLine();
+        return newValue.isEmpty() ? currentValue : Long.parseLong(newValue);
+    }
+
+    public static String[] promptAndUpdate(BufferedReader reader, String fieldName, String[] currentValue) throws IOException {
+        System.out.println(fieldName + " current value: " + Arrays.toString(currentValue));
+        System.out.print("Do you want to update it? (y/n): ");
+
+        if ("y".equalsIgnoreCase(reader.readLine())) {
+            String ask = "Enter new values for " + fieldName + ": ";
+            return inputStringArray(reader,ask,0);
+        }
+        return currentValue;
+    }
+
+    public static String promptAndUpdate(BufferedReader reader, String fieldName, String currentValue) throws IOException {
+        System.out.println(fieldName + " current value: " + currentValue);
+        System.out.print("Do you want to update it? (y/n): ");
+
+        if ("y".equalsIgnoreCase(reader.readLine())) {
+            String ask = "Enter new values for " + fieldName + ": ";
+            return inputString(reader,ask);
+        }
+        return currentValue;
     }
 }

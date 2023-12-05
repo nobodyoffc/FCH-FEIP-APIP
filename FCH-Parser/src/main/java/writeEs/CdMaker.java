@@ -11,12 +11,13 @@ import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.UpdateByQueryResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
+import constants.FieldNames;
 import constants.Strings;
 import esTools.NewEsClient;
 import fcTools.ParseTools;
 import fchClass.Address;
 import fchClass.Block;
-import menu.Inputer;
+import appUtils.Inputer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import fcTools.WeightMethod;
@@ -65,7 +66,7 @@ public class CdMaker {
 				.timeout(Time.of(t->t.time("1800s")))
 				.index(CASH)
 				.query(q -> q.bool(b -> b
-						.filter(f -> f.term(t -> t.field(Strings.VALID).value(true)))))
+						.filter(f -> f.term(t -> t.field(FieldNames.VALID).value(true)))))
 				.script(s -> s.inline(i1 -> i1.source(
 								"ctx._source.cd = (long)(((long)((params.bestBlockTime - ctx._source.birthTime)/86400)*ctx._source.value)/100000000)")
 						.params("bestBlockTime", JsonData.of(bestBlockTime)))));
@@ -157,9 +158,9 @@ public class CdMaker {
 		SearchResponse<Address> response = esClient.search(
 				s -> s.index(CASH).size(0).query(q -> q.term(t -> t.field("valid").value(true)))
 						.aggregations("filterByAddr",
-								a -> a.filter(f -> f.terms(t -> t.field(Strings.OWNER).terms(t1 -> t1.value(fieldValueList))))
+								a -> a.filter(f -> f.terms(t -> t.field(FieldNames.OWNER).terms(t1 -> t1.value(fieldValueList))))
 										.aggregations("termByAddr",
-												a1 -> a1.terms(t3 -> t3.field(Strings.OWNER).size(addrOldList.size()))
+												a1 -> a1.terms(t3 -> t3.field(FieldNames.OWNER).size(addrOldList.size()))
 														.aggregations("cdSum", a2 -> a2.sum(su -> su.field("cd"))))),
 				Address.class);
 

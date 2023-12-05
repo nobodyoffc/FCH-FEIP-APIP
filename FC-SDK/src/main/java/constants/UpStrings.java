@@ -14,4 +14,8 @@ public class UpStrings {
     public static final String SYM_SIGN = "SymSign";
     public static final String ASY_SIGN = "AsySign";
     public static final String FID = "FID";
+    public static final String USDT = "Usdt";
+    public static final String MASTER = "Master";
+    public static final String SWAP = "Swap";
+    public static final String ADDR = "Addr";
 }

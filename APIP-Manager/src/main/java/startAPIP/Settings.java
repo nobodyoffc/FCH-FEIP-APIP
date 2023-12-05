@@ -3,7 +3,7 @@ package startAPIP;
 import config.ConfigAPIP;
 import constants.ApiNames;
 import constants.Strings;
-import menu.Menu;
+import appUtils.Menu;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
@@ -16,8 +16,8 @@ import java.util.HashMap;
 import java.util.HexFormat;
 import java.util.Map;
 
-import static constants.Strings.FALSE;
-import static constants.Strings.TRUE;
+import static constants.Values.FALSE;
+import static constants.Values.TRUE;
 import static constants.Strings.*;
 
 public class Settings {

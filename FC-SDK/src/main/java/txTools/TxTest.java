@@ -12,8 +12,8 @@ import fipaClass.Signature;
 import javaTools.BytesTools;
 import javaTools.JsonTools;
 import keyTools.KeyTools;
-import menu.Inputer;
-import menu.Menu;
+import appUtils.Inputer;
+import appUtils.Shower;
 import org.bitcoinj.core.*;
 import org.bitcoinj.fch.FchMainNetwork;
 import org.bitcoinj.script.Script;
@@ -120,7 +120,7 @@ public class TxTest {
         byte[] rawTx = createMultiSignRawTx(cashList, sendToList, msg, p2sh);
 
         System.out.println(HexFormat.of().formatHex(rawTx));
-        Menu.printUnderline(10);
+        Shower.printUnderline(10);
         //Sign raw tx
         byte[] redeemScript = HexFormat.of().parseHex(p2sh.getRedeemScript());
         MultiSigData multiSignData = new MultiSigData(rawTx,p2sh,cashList);
@@ -146,7 +146,7 @@ public class TxTest {
                 System.out.println("    " + HexFormat.of().formatHex(sig));
             }
         }
-        Menu.printUnderline(10);
+        Shower.printUnderline(10);
         //build signed tx
         String signedTx = buildSchnorrMultiSignTx(rawTx, sigAll,p2sh);
 

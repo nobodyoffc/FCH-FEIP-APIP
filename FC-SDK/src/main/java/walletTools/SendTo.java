@@ -1,6 +1,6 @@
 package walletTools;
 
-import menu.Inputer;
+import appUtils.Inputer;
 
 import java.io.BufferedReader;
 import java.util.ArrayList;

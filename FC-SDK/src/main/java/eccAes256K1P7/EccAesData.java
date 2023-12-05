@@ -26,6 +26,7 @@ public class EccAesData {
     private char[] priKeyB ;
     private String iv;
     private String sum;
+    private boolean badSum;
     private String error;
 
     public EccAesData() {
@@ -155,6 +156,7 @@ public class EccAesData {
         this.pubKeyA = eccAesData.getPubKeyA();
         this.pubKeyB = eccAesData.getPubKeyB();
         this.sum = eccAesData.getSum();
+        this.badSum = eccAesData.isBadSum();
         this.error = eccAesData.getError();
     }
 
@@ -192,6 +194,7 @@ public class EccAesData {
             eccAesData.setSum(HexFormat.of().formatHex(eccAesDataByte.getSum()));
         if(eccAesDataByte.getError()!=null)
             eccAesData.setError(eccAesDataByte.getError());
+        eccAesData.setBadSum(eccAesDataByte.isBadSum());
 
         return eccAesData;
     }
@@ -337,5 +340,13 @@ public class EccAesData {
 
     public void setError(String error) {
         this.error = error;
+    }
+
+    public boolean isBadSum() {
+        return badSum;
+    }
+
+    public void setBadSum(boolean badSum) {
+        this.badSum = badSum;
     }
 }

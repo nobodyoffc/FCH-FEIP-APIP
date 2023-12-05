@@ -8,6 +8,7 @@ import config.ConfigAPIP;
 import constants.Constants;
 import constants.IndicesNames;
 import constants.Strings;
+import constants.Values;
 import esTools.EsTools;
 import fcTools.ParseTools;
 import fchClass.Cash;
@@ -285,7 +286,7 @@ private void waitNewOrder() {
                 if (orderOpreturn != null
                         && orderOpreturn.getType().equals("APIP")
                         && orderOpreturn.getSn().equals("0")
-                        && orderOpreturn.getData().getOp().equals(Strings.BUY)
+                        && orderOpreturn.getData().getOp().equals(Values.BUY)
                         && orderOpreturn.getData().getSid().equals(this.service.getSid())
                 ) {
                     orderInfo.setVia(orderOpreturn.getData().getVia());

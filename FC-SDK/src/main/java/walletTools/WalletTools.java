@@ -13,9 +13,7 @@ import co.elastic.clients.json.JsonData;
 import com.google.gson.Gson;
 import com.googlecode.jsonrpc4j.Base64;
 import com.googlecode.jsonrpc4j.JsonRpcHttpClient;
-import constants.Constants;
-import constants.IndicesNames;
-import constants.Strings;
+import constants.*;
 import cryptoTools.Hash;
 import fcTools.SchnorrSignature;
 import javaTools.JsonTools;
@@ -176,7 +174,7 @@ public class WalletTools {
         Gson gson = new Gson();
         try(Jedis jedis3Mempool = new Jedis()) {
             jedis3Mempool.select(Constants.RedisDb3Mempool);
-            String spendCashIdStr = jedis3Mempool.hget(addr, Strings.SPEND_CASHES);
+            String spendCashIdStr = jedis3Mempool.hget(addr, FieldNames.SPEND_CASHES);
             if (spendCashIdStr != null) {
                 String[] spendCashIdList = gson.fromJson(spendCashIdStr, String[].class);
                 Iterator<Cash> iter = meetList.iterator();
@@ -189,11 +187,11 @@ public class WalletTools {
                 }
             }
 
-            String newCashIdStr = jedis3Mempool.hget(addr, Strings.NEW_CASHES);
+            String newCashIdStr = jedis3Mempool.hget(addr, FieldNames.NEW_CASHES);
             if (newCashIdStr != null) {
                 String[] newCashIdList = gson.fromJson(newCashIdStr, String[].class);
                 for (String id : newCashIdList) {
-                    Cash cash = gson.fromJson(jedis3Mempool.hget(Strings.NEW_CASHES, id), Cash.class);
+                    Cash cash = gson.fromJson(jedis3Mempool.hget(FieldNames.NEW_CASHES, id), Cash.class);
                     if (cash != null) meetList.add(cash);
                 }
             }
@@ -280,7 +278,7 @@ public class WalletTools {
 
         cashListReturn = getCdFromOneCash(addrRequested, cd, esClient);
 
-        if(cashListReturn.getCashList().isEmpty()){
+        if(cashListReturn.getCashList()==null || cashListReturn.getCashList().isEmpty()){
             cashListReturn.setCode(code);
             cashListReturn.setMsg(msg);
         }
@@ -292,13 +290,13 @@ public class WalletTools {
         CashListReturn cashListReturn = new CashListReturn();
         SearchResponse<Cash> result = esClient.search(s -> s.index(index)
                 .query(q ->q.bool(b->b
-                                .must(m->m.term(t -> t.field(Strings.OWNER).value(addrRequested)))
-                                .must(m1->m1.term(t1->t1.field(Strings.VALID).value(true)))
-                                .must(m2->m2.range(r1->r1.field(Strings.CD).gte(JsonData.of(cd))))
+                                .must(m->m.term(t -> t.field(FieldNames.OWNER).value(addrRequested)))
+                                .must(m1->m1.term(t1->t1.field(FieldNames.VALID).value(true)))
+                                .must(m2->m2.range(r1->r1.field(FieldNames.CD).gte(JsonData.of(cd))))
                         )
                 )
                 .trackTotalHits(tr->tr.enabled(true))
-                .sort(s1->s1.field(f->f.field(Strings.CD).order(SortOrder.Asc)))
+                .sort(s1->s1.field(f->f.field(FieldNames.CD).order(SortOrder.Asc)))
                 .size(1), Cash.class);
 
         List<Cash> cashList = new ArrayList<>();
@@ -314,7 +312,7 @@ public class WalletTools {
 
         checkUnconfirmed(addrRequested,cashList);
 
-        assert result.hits().total() != null;
+        if(result.hits().total() == null)return cashListReturn;
         cashListReturn.setTotal(result.hits().total().value());
         cashListReturn.setCashList(cashList);
         return cashListReturn;
@@ -325,14 +323,14 @@ public class WalletTools {
 
         SearchResponse<Cash> result = esClient.search(s -> s.index(index)
                 .query(q ->q.bool(b->b
-                                .must(m->m.term(t -> t.field(Strings.OWNER).value(addrRequested)))
-                                .must(m1->m1.term(t1->t1.field(Strings.VALID).value(true)))
+                                .must(m->m.term(t -> t.field(FieldNames.OWNER).value(addrRequested)))
+                                .must(m1->m1.term(t1->t1.field(FieldNames.VALID).value(true)))
 //                                .must(m2->m2.range(r1->r1.field(Strings.CD).lte(JsonData.of(cd))))
                         )
                 )
                 .trackTotalHits(tr->tr.enabled(true))
-                .aggregations("sum",a->a.sum(s1->s1.field(Strings.CD)))
-                .sort(s1->s1.field(f->f.field(Strings.CD).order(SortOrder.Desc)))
+                .aggregations("sum",a->a.sum(s1->s1.field(FieldNames.CD)))
+                .sort(s1->s1.field(f->f.field(FieldNames.CD).order(SortOrder.Desc)))
                 .size(100), Cash.class);
 
         if(result==null){
@@ -396,13 +394,13 @@ public class WalletTools {
         try {
             result = esClient.search(s -> s.index(index)
                     .query(q ->q.bool(b->b
-                                    .must(m->m.term(t -> t.field(Strings.OWNER).value(addrRequested)))
-                                    .must(m1->m1.term(t1->t1.field(Strings.VALID).value(true)))
+                                    .must(m->m.term(t -> t.field(FieldNames.OWNER).value(addrRequested)))
+                                    .must(m1->m1.term(t1->t1.field(FieldNames.VALID).value(true)))
                             )
                     )
                     .trackTotalHits(tr->tr.enabled(true))
-                    .aggregations(Strings.SUM,a->a.sum(s1->s1.field(Strings.VALUE)))
-                    .sort(s1->s1.field(f->f.field(Strings.CD).order(SortOrder.Asc)))
+                    .aggregations(FieldNames.SUM, a->a.sum(s1->s1.field(FieldNames.VALUE)))
+                    .sort(s1->s1.field(f->f.field(FieldNames.CD).order(SortOrder.Asc)))
                     .size(100), Cash.class);
         } catch (IOException e) {
             cashListReturn.setCode(1);
@@ -419,7 +417,7 @@ public class WalletTools {
         assert result.hits().total() != null;
         cashListReturn.setTotal(result.hits().total().value());
 
-        long sum = (long)result.aggregations().get(Strings.SUM).sum().value();
+        long sum = (long)result.aggregations().get(FieldNames.SUM).sum().value();
 
         if(sum<value){
             cashListReturn.setCode(2);
@@ -470,14 +468,14 @@ public class WalletTools {
             SearchRequest.Builder searchBuilder = new SearchRequest.Builder();
             searchBuilder.index(index);
             searchBuilder.trackTotalHits(tr->tr.enabled(true));
-            searchBuilder.aggregations(Strings.SUM,a->a.sum(s1->s1.field(Strings.VALUE)));
-            searchBuilder.sort(s1->s1.field(f->f.field(Strings.CD).order(SortOrder.Asc)));
+            searchBuilder.aggregations(FieldNames.SUM, a->a.sum(s1->s1.field(FieldNames.VALUE)));
+            searchBuilder.sort(s1->s1.field(f->f.field(FieldNames.CD).order(SortOrder.Asc)));
             searchBuilder.size(100);
 
             BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
 
-            boolQueryBuilder.must(m->m.term(t -> t.field(Strings.OWNER).value(addrRequested)));
-            boolQueryBuilder.must(m1->m1.term(t1->t1.field(Strings.VALID).value(true)));
+            boolQueryBuilder.must(m->m.term(t -> t.field(FieldNames.OWNER).value(addrRequested)));
+            boolQueryBuilder.must(m1->m1.term(t1->t1.field(FieldNames.VALID).value(true)));
 
             searchBuilder.query(q->q.bool(boolQueryBuilder.build()));
 
@@ -498,7 +496,7 @@ public class WalletTools {
         assert result.hits().total() != null;
         long total = result.hits().total().value();
 
-        long sum = (long)result.aggregations().get(Strings.SUM).sum().value();
+        long sum = (long)result.aggregations().get(FieldNames.SUM).sum().value();
 
         if(sum<value){
             cashListReturn.setCode(2);

@@ -6,6 +6,7 @@ import constants.ApiNames;
 import constants.ReplyInfo;
 import initial.Initiator;
 import constants.Strings;
+import keyTools.KeyTools;
 import redis.clients.jedis.Jedis;
 
 import javax.imageio.ImageIO;
@@ -43,7 +44,7 @@ public class GetAvatar extends HttpServlet {
             return;
         }
         fidRequested = request.getParameter("fid");
-        if (!(fidRequested.charAt(0) == 'F' || fidRequested.charAt(0) == '3')) {
+        if (!KeyTools.isValidFchAddr(fidRequested)) {
             response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code2003IllegalFid));
             writer.write(replier.reply2003IllegalFid());
             return;

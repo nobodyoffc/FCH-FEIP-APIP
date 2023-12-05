@@ -6,7 +6,7 @@ import co.elastic.clients.elasticsearch.indices.CreateIndexResponse;
 import co.elastic.clients.elasticsearch.indices.DeleteIndexResponse;
 import co.elastic.clients.transport.endpoints.BooleanResponse;
 import constants.IndicesNames;
-import menu.Menu;
+import appUtils.Menu;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;

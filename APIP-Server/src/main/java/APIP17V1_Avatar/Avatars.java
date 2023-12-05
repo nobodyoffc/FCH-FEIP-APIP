@@ -47,9 +47,9 @@ public class Avatars extends HttpServlet {
         replier.setNonce(requestBody.getNonce());
 
         //Check API
-        String[] addrsRow = checkBody(requestBody);
+        String[] addrsRaw = checkBody(requestBody);
         ArrayList<String> addrList = new ArrayList<>();
-        for(String fid : addrsRow){
+        for(String fid : addrsRaw){
             if(KeyTools.isValidFchAddr(fid)){
                 addrList.add(fid);
             }
@@ -106,12 +106,6 @@ public class Avatars extends HttpServlet {
         String addrs[] = fcdsl.getIds();
 
         if(addrs.length>20)return null;
-        for(String addr:addrs){
-            if(addr.length()!=34)return null;
-            String first = addr.substring(0, 1);
-            if(!(first.equals("F")||first.equals("3")))return null;
-        }
-
         return addrs;
     }
 }

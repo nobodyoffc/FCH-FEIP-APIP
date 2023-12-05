@@ -10,6 +10,16 @@ public class FcInfo {
 	private String did;
 	private Object data;
 
+	public FcInfo() {
+	}
+
+	public FcInfo(String type, String sn, String ver, String name) {
+		this.type = type;
+		this.sn = sn;
+		this.ver = ver;
+		this.name = name;
+	}
+
 	public String getDid() {
 		return did;
 	}

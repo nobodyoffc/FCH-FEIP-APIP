@@ -7,10 +7,7 @@ import apipTools.ApipTools;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.SortOrder;
 import com.google.gson.Gson;
-import constants.ApiNames;
-import constants.Constants;
-import constants.IndicesNames;
-import constants.Strings;
+import constants.*;
 import esTools.EsTools;
 import fcTools.ParseTools;
 import fchClass.Cash;
@@ -177,7 +174,7 @@ public class Pusher implements Runnable{
         Map<String,Object> dataMap = new HashMap<>();
         dataMap.put(BALANCE,balance);
         dataMap.put(BEST_HEIGHT,bestHeight);
-        dataMap.put(NEW_CASHES,newCashList);
+        dataMap.put(FieldNames.NEW_CASHES,newCashList);
 
         String dataStr = gson.toJson(dataMap);
         byte[] dataBytes = dataStr.getBytes(StandardCharsets.UTF_8);
@@ -204,7 +201,7 @@ public class Pusher implements Runnable{
         DataOfNewCashListByIds data = gson.fromJson(gson.toJson(webhookInfo.getData()),DataOfNewCashListByIds.class);
         String[] fids = data.getFids();
         try {
-            return EsTools.getListByTermsSinceHeight(esClient,IndicesNames.CASH,Strings.OWNER,fids,sinceHeight,Strings.CASH_ID,SortOrder.Asc,Cash.class);
+            return EsTools.getListByTermsSinceHeight(esClient,IndicesNames.CASH, FieldNames.OWNER,fids,sinceHeight,Strings.CASH_ID,SortOrder.Asc,Cash.class);
         } catch (IOException e) {
             log.error("Get new cash list for "+ApiNames.NewCashByFidsAPI+" from ES wrong.",e);
             return null;

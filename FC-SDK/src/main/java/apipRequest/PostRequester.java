@@ -3,9 +3,7 @@ package apipRequest;
 import apipClass.*;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import constants.ApiNames;
-import constants.Strings;
-import constants.UpStrings;
+import constants.*;
 import cryptoTools.SHA;
 import fipaClass.LinkInfo;
 import feipClass.Service;
@@ -228,7 +226,7 @@ public class PostRequester {
 
         Query query = new Query();
         Terms terms = new Terms();
-        String[] termsFields = new String[]{Strings.OWNER};
+        String[] termsFields = new String[]{FieldNames.OWNER};
         String[] termsValues = new String[]{owner};
         terms.setFields(termsFields);
         terms.setValues(termsValues);
@@ -249,7 +247,7 @@ public class PostRequester {
             Except except = new Except();
             Terms terms2 = new Terms();
             String[] terms2Fields = new String[]{Strings.ACTIVE};
-            String[] terms2Values = new String[]{Strings.FALSE};
+            String[] terms2Values = new String[]{Values.FALSE};
             terms2.setFields(terms2Fields);
             terms2.setValues(terms2Values);
             except.setTerms(terms2);
@@ -258,7 +256,7 @@ public class PostRequester {
             Except except = new Except();
             Terms terms2 = new Terms();
             String[] terms2Fields = new String[]{Strings.CLOSED};
-            String[] terms2Values = new String[]{Strings.TRUE};
+            String[] terms2Values = new String[]{Values.TRUE};
             terms2.setFields(terms2Fields);
             terms2.setValues(terms2Values);
             except.setTerms(terms2);

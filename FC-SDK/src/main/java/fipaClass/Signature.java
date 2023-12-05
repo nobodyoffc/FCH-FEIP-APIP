@@ -2,8 +2,7 @@ package fipaClass;
 
 import com.google.gson.Gson;
 import constants.Constants;
-import constants.Strings;
-import fcTools.ParseTools;
+import constants.FieldNames;
 import javaTools.JsonTools;
 import keyTools.KeyTools;
 import org.bitcoinj.core.ECKey;
@@ -167,8 +166,8 @@ public class Signature {
         if(symKeyName==null)return sign;
         else {
             Map<String,String> dataMap = new HashMap<>();
-            dataMap.put(Strings.SYM_SIGN,sign);
-            dataMap.put(Strings.SYM_KEY_NAME,symKeyName);
+            dataMap.put(FieldNames.SYM_SIGN,sign);
+            dataMap.put(FieldNames.SYM_KEY_NAME,symKeyName);
             return gson.toJson(dataMap);
         }
     }

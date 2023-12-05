@@ -15,12 +15,21 @@
     <module>FEIP-Parser</module>
     <module>APIP-Manager</module>
     <module>APIP-Server</module>
-      <module>Maker-manager</module>
+      <module>SwapFchUsdt</module>
+      <module>VipWallet</module>
   </modules>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
+
+  <repositories>
+    <!-- Other repositories if any -->
+    <repository>
+      <id>jitpack.io</id>
+      <url>https://jitpack.io</url>
+    </repository>
+  </repositories>
 
   <dependencies>
     <dependency>
@@ -73,9 +82,10 @@
     </dependency>
 
     <dependency>
-      <groupId>org.bitcoinj</groupId>
-      <artifactId>bitcoinj-core</artifactId>
-      <version>0.16.1</version>
+      <groupId>com.github.nobodyoffc</groupId>
+      <artifactId>freecashj</artifactId>
+      <version>v0.16</version>
+
       <exclusions>
         <exclusion>
           <groupId>org.bouncycastle</groupId>

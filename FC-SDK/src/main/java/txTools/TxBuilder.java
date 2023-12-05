@@ -1,20 +1,26 @@
 package txTools;
 
+import apipClass.ApipParamsForClient;
+import apipClient.ApipClient;
+import apipClient.ApipDataGetter;
+import apipClient.WalletAPIs;
 import com.google.common.base.Preconditions;
 import fcTools.FchMainNetwork;
 import fcTools.ParseTools;
 import fchClass.Cash;
+import javaTools.JsonTools;
 import keyTools.KeyTools;
 import org.bitcoinj.core.*;
 import org.bitcoinj.crypto.SchnorrSignature;
-import org.bitcoinj.crypto.TransactionSignature;
 import org.bitcoinj.script.*;
 import walletTools.SendTo;
 
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.HexFormat;
 import java.util.List;
+
+import static constants.Constants.FchToSatoshi;
+import static txTools.FchTool.createTransactionSign;
 
 public class TxBuilder {
 
@@ -39,7 +45,7 @@ public class TxBuilder {
 
         for (SendTo output : outputs) {
             totalOutput += output.getAmount();
-            transaction.addOutput(Coin.valueOf(ParseTools.fchToSatoshis(output.getAmount())), Address.fromBase58(org.bitcoinj.fch.FchMainNetwork.MAINNETWORK, output.getFid()));
+            transaction.addOutput(Coin.valueOf(ParseTools.fchToSatoshi(output.getAmount())), Address.fromBase58(org.bitcoinj.fch.FchMainNetwork.MAINNETWORK, output.getFid()));
         }
 
         if (opReturn != null && !"".equals(opReturn)) {
@@ -96,5 +102,44 @@ public class TxBuilder {
         builder.op(136);
         builder.op(172);
         return builder.build();
+    }
+
+    public static String sendTxForMsgByAPIP(ApipParamsForClient apipParams, byte[] symKey, byte[] priKey, List<SendTo> sendToList, String msg) {
+
+        byte[] sessionKey = apipParams.decryptSessionKey(symKey.clone());
+
+        String sender = KeyTools.priKeyToFid(priKey);
+
+        double sum = 0;
+        int sendToSize = 0;
+        if(sendToList!=null && !sendToList.isEmpty()) {
+            sendToSize = sendToList.size();
+            for (SendTo sendTo : sendToList) sum += sendTo.getAmount();
+        }
+
+        long fee = FchTool.calcFee(0, sendToSize, msg.length());
+
+        String urlHead=apipParams.getUrlHead();
+        System.out.println("Getting cashes from "+urlHead+" ...");
+        ApipClient apipClient = WalletAPIs.cashValidForPayPost(urlHead, sender, sum+((double) fee /FchToSatoshi), apipParams.getVia(), sessionKey);
+        if(apipClient.checkResponse()!=0){
+            System.out.println("Failed to get cashes."+apipClient.getMessage()+apipClient.getResponseBody().getData());
+            JsonTools.gsonPrint(apipClient);
+            return apipClient.getMessage();
+        }
+
+        List<Cash> cashList = ApipDataGetter.getCashList(apipClient.getResponseBody().getData());
+
+        String txSigned = FchTool.createTransactionSign(cashList, priKey, sendToList, msg);
+
+        System.out.println("Broadcast with "+urlHead+" ...");
+        apipClient = WalletAPIs.broadcastTxPost(urlHead,txSigned, apipParams.getVia(), sessionKey);
+        if(apipClient.checkResponse()!=0){
+            System.out.println(apipClient.getCode()+": "+apipClient.getMessage());
+            if(apipClient.getResponseBody().getData()!=null) System.out.println(apipClient.getResponseBody().getData());
+            return apipClient.getMessage();
+        }
+
+        return (String)apipClient.getResponseBody().getData();
     }
 }

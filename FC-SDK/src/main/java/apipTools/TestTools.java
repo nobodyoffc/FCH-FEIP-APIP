@@ -5,8 +5,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import constants.ApiNames;
 import cryptoTools.SHA;
-import menu.Inputer;
-import menu.Menu;
+import appUtils.Inputer;
+import appUtils.Menu;
 
 import java.io.BufferedReader;
 import java.io.IOException;

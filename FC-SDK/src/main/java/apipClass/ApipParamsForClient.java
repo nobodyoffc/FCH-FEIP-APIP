@@ -10,12 +10,11 @@ import eccAes256K1P7.EccAesData;
 import eccAes256K1P7.EccAesDataByte;
 import eccAes256K1P7.EccAesType;
 import feipClass.Service;
-import fileTools.JsonFileTools;
 import javaTools.BytesTools;
 import javaTools.JsonTools;
 import keyTools.KeyTools;
-import menu.Inputer;
-import menu.Menu;
+import appUtils.Inputer;
+import appUtils.Menu;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,10 +41,10 @@ public class ApipParamsForClient {
 
     @Nullable
     public SignInData requestApipSessionKey(byte[] priKey, String mode) {
-        OpenAPIs openAPIs = new OpenAPIs();
+
         System.out.println("SignIn APIP (sid)"+sid+" ...");
-        ApipClient apipClient = openAPIs.signInEccPost(this.getUrlHead(), this.getVia(), priKey.clone(), mode);
-        if(apipClient==null){
+        ApipClient apipClient = OpenAPIs.signInEccPost(this.getUrlHead(), this.getVia(), priKey.clone(), mode);
+        if(apipClient.checkResponse()!=0){
             System.out.println("Get sessionKey cipher from APIP server failed.");
             return null;
         }
@@ -163,10 +162,10 @@ public class ApipParamsForClient {
             sid = service.getSid();
         }
 
+        String ask = "The via FID is :"+via+"\nInput the new one. Enter to skip:";
+        input = Inputer.inputGoodFid(br,ask);
+        if(input!=null && !"".equals(input))via=input;
 
-        System.out.println("The via FID:\n"+via+"\nInput the new one. Enter to skip:");
-        input = Inputer.inputString(br);
-        if(!"".equals(input))via=input;
 
         while(true) {
             System.out.println("The buyerPriKeyCipher:\n" + apipBuyerPriKeyCipher + ".\nChange it? y/n:");
@@ -236,7 +235,7 @@ public class ApipParamsForClient {
         return sessionKeyCipher;
     }
     public static void writeApipParamsToFile(ApipParamsForClient apipParamsForClient, String fileName) {
-        JsonFileTools.writeObjectToJsonFile(apipParamsForClient, fileName,false);
+        JsonTools.writeObjectToJsonFile(apipParamsForClient, fileName,false);
     }
 
     public static ApipParamsForClient readApipParamsFromFile() {
@@ -251,7 +250,7 @@ public class ApipParamsForClient {
                 }
             }
             FileInputStream fis = new FileInputStream(file);
-            apipParamsForClient = JsonFileTools.readObjectFromJsonFile(fis,ApipParamsForClient.class);
+            apipParamsForClient = JsonTools.readObjectFromJsonFile(fis,ApipParamsForClient.class);
             if(apipParamsForClient!=null)return apipParamsForClient;
         } catch (IOException e) {
             e.printStackTrace();
@@ -336,23 +335,36 @@ public class ApipParamsForClient {
         String input =Inputer.inputString(br);
         if(input.endsWith("/"))input=input.substring(0,input.length()-1);
         if("".equals(input)){
-            urlHead = "https://cid.cash/APIP";
-        }
-        urlHead=input;
+            this.urlHead = "https://cid.cash/APIP";
+        }else this.urlHead=input;
+    }
+
+    public void inputVia(BufferedReader br) {
+        String ask="Input the via FID when requesting the APIP service. Enter to set as 'FJYN3D7x4yiLF692WUAe7Vfo2nQpYDNrC7':";
+        String input =Inputer.inputGoodFid(br,ask);
+        if("".equals(input)){
+            this.via = "FJYN3D7x4yiLF692WUAe7Vfo2nQpYDNrC7";
+        }else this.via=input;
     }
 
     public void inputBuyerPriKeyCipher(BufferedReader br,byte[] initSymKey){
-//        byte[] priKey32 = new byte[0];
-        while (true) {
+        byte[] priKey32;
 
-            byte[] priKey32 = KeyTools.inputCipherGetPriKey(br);
+        while (true) {
+            String input = Inputer.inputString(br, "Generate a new private key? y/n");
+            if("y".equals(input)){
+                priKey32= KeyTools.genNewFid(br).getPrivKeyBytes();
+            }else priKey32 = KeyTools.inputCipherGetPriKey(br);
+
             if(priKey32==null)return;
 
             apipBuyer = KeyTools.priKeyToFid(priKey32);
             System.out.println("Your main APIP buyer is: \n" + apipBuyer);
+
             String buyerPriKeyCipher = encrypt32BytesKeyWithSymKeyBytes(priKey32, initSymKey.clone());
             if (buyerPriKeyCipher == null) continue;
             apipBuyerPriKeyCipher = buyerPriKeyCipher;
+            BytesTools.clearByteArray(priKey32);
             return;
         }
     }

@@ -6,11 +6,13 @@ import co.elastic.clients.elasticsearch.core.search.Hit;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import constants.Strings;
+import constants.Values;
 import fcTools.ParseTools;
 import feipClass.Service;
 import keyTools.KeyTools;
-import menu.Inputer;
-import menu.Menu;
+import appUtils.Inputer;
+import appUtils.Menu;
+import appUtils.Shower;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
@@ -143,13 +145,13 @@ public class OrderManager {
         if(result!=null && result.hits().hits().size()>0){
             int totalLength =FCH_LENGTH +2+DATE_TIME_LENGTH+2+FID_LENGTH+2+HEX256_LENGTH+2;
             System.out.println("Orders of "+fid+" : ");
-            Menu.printUnderline(totalLength);
-            System.out.print(Menu.formatString("FCH",20));
-            System.out.print(Menu.formatString("Time",22));
-            System.out.print(Menu.formatString("Via",38));
-            System.out.print(Menu.formatString("TxId",66));
+            Shower.printUnderline(totalLength);
+            System.out.print(Shower.formatString("FCH",20));
+            System.out.print(Shower.formatString("Time",22));
+            System.out.print(Shower.formatString("Via",38));
+            System.out.print(Shower.formatString("TxId",66));
             System.out.println();
-            Menu.printUnderline(totalLength);
+            Shower.printUnderline(totalLength);
 
             for(Hit<Order> hit: result.hits().hits()){
                 Order order = hit.source();
@@ -158,13 +160,13 @@ public class OrderManager {
                 String time = ParseTools.convertTimestampToDate(order.getTime());
                 String txId = order.getTxId();
                 String via = order.getVia();
-                System.out.print(Menu.formatString(fch, FCH_LENGTH +2));
-                System.out.print(Menu.formatString(time, DATE_TIME_LENGTH+2));
-                System.out.print(Menu.formatString(via, FID_LENGTH+2));
-                System.out.print(Menu.formatString(txId, HEX256_LENGTH+2));
+                System.out.print(Shower.formatString(fch, FCH_LENGTH +2));
+                System.out.print(Shower.formatString(time, DATE_TIME_LENGTH+2));
+                System.out.print(Shower.formatString(via, FID_LENGTH+2));
+                System.out.print(Shower.formatString(txId, HEX256_LENGTH+2));
                 System.out.println();
             }
-            Menu.printUnderline(totalLength);
+            Shower.printUnderline(totalLength);
         }else{
             System.out.println("No orders found.");
         }
@@ -183,10 +185,10 @@ public class OrderManager {
                 return;
             }
             if ("y".equals(input)) {
-                if (TRUE.equals(isCheckOrderOpReturn)) {
-                    jedis.hset(CONFIG, Strings.CHECK_ORDER_OPRETURN, FALSE);
-                } else if (FALSE.equals(isCheckOrderOpReturn)) {
-                    jedis.hset(CONFIG, Strings.CHECK_ORDER_OPRETURN, TRUE);
+                if (Values.TRUE.equals(isCheckOrderOpReturn)) {
+                    jedis.hset(CONFIG, Strings.CHECK_ORDER_OPRETURN, Values.FALSE);
+                } else if (Values.FALSE.equals(isCheckOrderOpReturn)) {
+                    jedis.hset(CONFIG, Strings.CHECK_ORDER_OPRETURN, Values.TRUE);
                 } else {
                     System.out.println("Invalid input.");
                 }

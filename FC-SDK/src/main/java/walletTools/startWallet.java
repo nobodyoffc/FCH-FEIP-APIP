@@ -7,6 +7,7 @@ import constants.Constants;
 import constants.Strings;
 import cryptoTools.Hash;
 import eccAes256K1P7.EccAes256K1P7;
+import fcTools.ParseTools;
 import fchClass.Address;
 import fchClass.Cash;
 import fchClass.P2SH;
@@ -14,8 +15,9 @@ import fipaClass.Signature;
 import javaTools.BytesTools;
 import javaTools.JsonTools;
 import keyTools.KeyTools;
-import menu.Inputer;
-import menu.Menu;
+import appUtils.Inputer;
+import appUtils.Menu;
+import appUtils.Shower;
 import org.bitcoinj.core.ECKey;
 import txTools.FchTool;
 import txTools.RawTxParser;
@@ -23,9 +25,11 @@ import txTools.RawTxParser;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.security.Key;
 import java.security.SignatureException;
 import java.util.*;
 
+import static apipClient.StartApipClient.encrypt;
 import static apipClient.StartApipClient.setting;
 import static constants.Constants.FchToSatoshi;
 import static constants.Strings.newCashMapKey;
@@ -36,14 +40,16 @@ import static txTools.FchTool.createTransactionSign;
 public class startWallet {
 
     static ApipParamsForClient initApipParamsForClient;
+    private static String via = "FJYN3D7x4yiLF692WUAe7Vfo2nQpYDNrC7";
+
     public static void main(String[] args) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         byte[] sessionKey;
         byte[] symKey;
         while (true) {
-            Menu.printUnderline(20);
+            Shower.printUnderline(20);
             System.out.println("\nWelcome to the Freecash Wallet Tools with APIP Client.");
-            Menu.printUnderline(20);
+            Shower.printUnderline(20);
             System.out.println("Confirm or set your password...");
             byte[] passwordBytes = Inputer.getPasswordBytes(br);
             symKey = Hash.Sha256x2(passwordBytes);
@@ -58,6 +64,8 @@ public class startWallet {
                 e.printStackTrace();
                 System.out.println("Wrong password, try again.");
             }
+
+
         }
 
         Menu menu = new Menu();
@@ -68,9 +76,9 @@ public class startWallet {
         menuItemList.add("VerifyMsgEcdsa");
         menuItemList.add("SignMsgSchnorr");
         menuItemList.add("VerifyMsgSchnorr");
-        menuItemList.add("PriKeySwap");
-        menuItemList.add("PubKeySwap");
-        menuItemList.add("AddressSwap");
+        menuItemList.add("PriKeyConvert");
+        menuItemList.add("PubKeyConvert");
+        menuItemList.add("AddressConvert");
         menuItemList.add("MultiSign");
         menuItemList.add("Settings");
 
@@ -81,14 +89,14 @@ public class startWallet {
             menu.show();
             int choice = menu.choose(br);
             switch (choice) {
-                case 1 -> sendTxSchnorr(symKey, br);
+                case 1 -> sendTx(symKey, br);
                 case 2 -> signMsgEcdsa(symKey,br);
                 case 3 -> verifyMsgEcdsa(br);
                 case 4 -> signMsgSchnorr(symKey, br);
                 case 5 -> verifyMsgSchnorr(br);
-                case 6 -> priKeySwap(symKey, br);
-                case 7 -> pubKeySwap(br);
-                case 8 -> addressSwap(br);
+                case 6 -> priKeyConvert(symKey, br);
+                case 7 -> pubKeyConvert(br);
+                case 8 -> addressConvert(br);
                 case 9 -> multiSign(sessionKey,symKey,br);
                 case 12 -> setting(sessionKey, symKey, br);
                 case 0 -> {
@@ -149,18 +157,12 @@ public class startWallet {
                         && multiSignData.getRawTx().length>0){
                     rawTx = multiSignData.getRawTx();
                 }
-                //TODO
-                JsonTools.gsonPrint(multiSignData.getFidSigMap());
 
                 fidSigListMap.putAll(multiSignData.getFidSigMap());
 
             }catch (Exception ignored){}
         }
         if(rawTx==null||p2sh==null)return;
-
-        JsonTools.gsonPrint(HexFormat.of().formatHex(rawTx));
-        JsonTools.gsonPrint(fidSigListMap);
-        JsonTools.gsonPrint(p2sh);
 
         String signedTx = FchTool.buildSchnorrMultiSignTx(rawTx, fidSigListMap, p2sh);
         System.out.println(signedTx);
@@ -174,7 +176,7 @@ public class startWallet {
             System.out.println("Sign with Apip Buyer? y/n:");
             String input = Inputer.inputString(br);
             if ("y".equals(input))
-                priKey = EccAes256K1P7.decryptKeyWithSymKey(initApipParamsForClient.getApipBuyerPriKeyCipher(), symKey);
+                priKey = EccAes256K1P7.decryptKey(initApipParamsForClient.getApipBuyerPriKeyCipher(), symKey);
             else {
                 try {
                     priKey = KeyTools.inputCipherGetPriKey(br);
@@ -191,16 +193,18 @@ public class startWallet {
 
             System.out.println("Input the unsigned data json string: ");
             String multiSignDataJson = Inputer.inputStringMultiLine(br);
+
             showRawTxInfo(multiSignDataJson,br);
+
             System.out.println("Multisig data signed by " + KeyTools.priKeyToFid(priKey)+":");
-            Menu.printUnderline(60);
+            Shower.printUnderline(60);
             System.out.println(FchTool.signSchnorrMultiSignTx(multiSignDataJson, priKey));
             BytesTools.clearByteArray(priKey);
-            Menu.printUnderline(60);
+            Shower.printUnderline(60);
             Menu.anyKeyToContinue(br);
 
             input = Inputer.inputString(br,"Sign with another priKey?y/n");
-            if(!"y".endsWith(input)){
+            if(!"y".equals(input)){
                 BytesTools.clearByteArray(priKey);
                 return;
             }
@@ -226,38 +230,42 @@ public class startWallet {
         for(Cash cash:multiSigData.getCashList())spendCashMap.put(cash.getCashId(),cash);
 
         System.out.println("You are spending:");
-        Menu.printUnderline(120);
-        System.out.print(Menu.formatString("cashId",68));
-        System.out.print(Menu.formatString("owner",38));
-        System.out.println(Menu.formatString("fch",20));
-        Menu.printUnderline(120);
+        Shower.printUnderline(60);
+        System.out.print(Shower.formatString("cashId",68));
+        System.out.print(Shower.formatString("owner",38));
+        System.out.println(Shower.formatString("fch",20));
+        Shower.printUnderline(60);
         for(Cash cash:spendCashList){
             Cash niceCash = spendCashMap.get(cash.getCashId());
             if(niceCash==null) {
                 System.out.println("Warning： The cash " + cash.getCashId() + "in the rawTx is unfounded.");
                 return;
             }
-            System.out.print(Menu.formatString(niceCash.getCashId(),68));
-            System.out.print(Menu.formatString(niceCash.getOwner(),38));
-            System.out.println(Menu.formatString(String.valueOf(niceCash.getValue()/FchToSatoshi),20));
+            System.out.print(Shower.formatString(niceCash.getCashId(),68));
+            System.out.print(Shower.formatString(niceCash.getOwner(),38));
+            System.out.println(Shower.formatString(String.valueOf(ParseTools.satoshiToFch(niceCash.getValue())),20));
         }
-        Menu.printUnderline(120);
+        Shower.printUnderline(60);
         Menu.anyKeyToContinue(br);
         System.out.println("You are paying:");
-        Menu.printUnderline(120);
-        System.out.print(Menu.formatString("FID",38));
-        System.out.println(Menu.formatString("fch",20));
-        Menu.printUnderline(120);
+        Shower.printUnderline(60);
+        System.out.print(Shower.formatString("FID",38));
+        System.out.println(Shower.formatString("fch",20));
+        Shower.printUnderline(60);
         for(Cash cash:issuredCashList){
-            System.out.print(Menu.formatString(cash.getOwner(),38));
-            System.out.println(Menu.formatString(String.valueOf(cash.getValue()/FchToSatoshi),20));
+            System.out.print(Shower.formatString(cash.getOwner(),38));
+            System.out.println(Shower.formatString(String.valueOf(ParseTools.satoshiToFch(cash.getValue())),20));
         }
+        Shower.printUnderline(60);
+        Shower.printUnderline(60);
         Menu.anyKeyToContinue(br);
+        Shower.printUnderline(60);
 
         if(msg!=null) {
-            System.out.println("The message in OP_RETURN is: \n" + msg);
-            Menu.printUnderline(120);
-            Menu.printUnderline(120);
+            System.out.println("The message in OP_RETURN is: " );
+            Shower.printUnderline(60);
+            System.out.println(msg);
+            Shower.printUnderline(60);
             Menu.anyKeyToContinue(br);
         }
     }
@@ -303,21 +311,19 @@ public class startWallet {
 
         List<Cash> cashList = ApipDataGetter.getCashList(apipClient.getResponseBody().getData());
 
-        JsonTools.gsonPrint(cashList);
-
         byte[] rawTx = FchTool.createMultiSignRawTx(cashList, sendToList, msg, p2sh);
 
         MultiSigData multiSignData = new MultiSigData(rawTx,p2sh,cashList);
 
         System.out.println("Multisig data unsigned:");
-        Menu.printUnderline(10);
+        Shower.printUnderline(10);
         System.out.println(multiSignData.toJson());
-        Menu.printUnderline(10);
+        Shower.printUnderline(10);
 
         System.out.println("Next step: sign it separately with the priKeys of: ");
-        Menu.printUnderline(10);
+        Shower.printUnderline(10);
         for(String fid1:p2sh.getFids()) System.out.println(fid1);
-        Menu.printUnderline(10);
+        Shower.printUnderline(10);
         Menu.anyKeyToContinue(br);
     }
 
@@ -347,15 +353,15 @@ public class startWallet {
 
         String mFid = p2SH.getFid();
 
-        Menu.printUnderline(10);
+        Shower.printUnderline(10);
         System.out.println("The multisig information is: \n"+JsonTools.getNiceString(p2SH));
         System.out.println("It's generated from :");
         for(String fid:fids){
             System.out.println(fid);
         }
-        Menu.printUnderline(10);
+        Shower.printUnderline(10);
         System.out.println("Your multisig FID: \n"+p2SH.getFid());
-        Menu.printUnderline(10);
+        Shower.printUnderline(10);
         Menu.anyKeyToContinue(br);
     }
 
@@ -377,10 +383,10 @@ public class startWallet {
             System.out.println(fid + " is not found.");
             return;
         }
-        Menu.printUnderline(10);
+        Shower.printUnderline(10);
         System.out.println("Multisig:");
         System.out.println(JsonTools.getNiceString(p2sh));
-        Menu.printUnderline(10);
+        Shower.printUnderline(10);
         System.out.println("The members:");
 
         apipClient = IdentityAPIs.cidInfoByIdsPost(initApipParamsForClient.getUrlHead(), p2sh.getFids(), initApipParamsForClient.getVia(), sessionKey);
@@ -390,25 +396,25 @@ public class startWallet {
         }
         Map<String, CidInfo> cidInfoMap = ApipDataGetter.getCidInfoMap(apipClient.getResponseBody().getData());
         System.out.println(JsonTools.getNiceString(cidInfoMap));
-        Menu.printUnderline(10);
+        Shower.printUnderline(10);
         Menu.anyKeyToContinue(br);
     }
 
-    private static void pubKeySwap(BufferedReader br) throws Exception {
+    private static void pubKeyConvert(BufferedReader br) throws Exception {
         System.out.println("Input the public key:");
         String input = Inputer.inputString(br);
         String pubKey33 = KeyTools.getPubKey33(input);
-        Menu.printUnderline(10);
+        Shower.printUnderline(10);
         System.out.println("* PubKey 33 bytes compressed hex:\n"+pubKey33);
         System.out.println("* PubKey 65 bytes uncompressed hex:\n"+KeyTools.recoverPK33ToPK65(pubKey33));
         System.out.println("* PubKey WIF uncompressed:\n"+KeyTools.getPubKeyWifUncompressed(pubKey33));
         System.out.println("* PubKey WIF compressed with ver 0:\n"+ KeyTools.getPubKeyWifCompressedWithVer0(pubKey33));
         System.out.println("* PubKey WIF compressed without ver:\n"+KeyTools.getPubKeyWifCompressedWithoutVer(pubKey33));
-        Menu.printUnderline(10);
+        Shower.printUnderline(10);
         Menu.anyKeyToContinue(br);
     }
 
-    private static void addressSwap(BufferedReader br) throws Exception {
+    private static void addressConvert(BufferedReader br) throws Exception {
         System.out.println("Input the address or public key:");
         String input = Inputer.inputString(br);
 
@@ -422,12 +428,12 @@ public class startWallet {
             pubKey = KeyTools.getPubKey33(input);
             addrMap = KeyTools.pubKeyToAddresses(pubKey);
         }
-        Menu.printUnderline(10);
+        Shower.printUnderline(10);
         System.out.println(JsonTools.getNiceString(addrMap));
-        Menu.printUnderline(10);
+        Shower.printUnderline(10);
         Menu.anyKeyToContinue(br);
     }
-    private static void priKeySwap(byte[] symKey, BufferedReader br) {
+    private static void priKeyConvert(byte[] symKey, BufferedReader br) {
         byte[] priKey;
         System.out.println("By a new FID? 'y' to confirm, others to use the local priKey:");
         String input = Inputer.inputString(br);
@@ -436,9 +442,11 @@ public class startWallet {
             if(priKey==null)return;
         }else priKey = initApipParamsForClient.decryptApipBuyerPriKey(initApipParamsForClient.getApipBuyerPriKeyCipher(),symKey);
 
-        String sender = KeyTools.priKeyToFid(priKey);
-        Menu.printUnderline(10);
-        System.out.println("The sender is :"+ sender);
+        if(priKey==null)return;
+        String fid = KeyTools.priKeyToFid(priKey);
+        Shower.printUnderline(10);
+        System.out.println("* FID:"+ fid);
+        System.out.println("* PubKey:"+ HexFormat.of().formatHex(KeyTools.priKeyToPubKey(priKey)));
 
         System.out.println("* PriKey 32 bytes:");
         String priKey32 = HexFormat.of().formatHex(priKey);
@@ -447,27 +455,44 @@ public class startWallet {
         System.out.println(KeyTools.priKey32To37(priKey32));
         System.out.println("* PriKey WIF compressed:");
         System.out.println(KeyTools.priKey32To38(priKey32));
-        Menu.printUnderline(10);
+        Shower.printUnderline(10);
         Menu.anyKeyToContinue(br);
     }
 
-    private static void sendTxSchnorr(byte[] symKey, BufferedReader br) {
-        byte[] priKey;
-        System.out.println("By a new FID? 'y' to confirm, others to use the local priKey:");
+    private static void sendTx(byte[] symKey, BufferedReader br) {
+        byte[] priKey = initApipParamsForClient.decryptApipBuyerPriKey(initApipParamsForClient.getApipBuyerPriKeyCipher(),symKey);
+        String fid = KeyTools.priKeyToFid(priKey);
+
+        System.out.println("A priKey is needed. 'g' to generate a new one. 'i' to input a priKey, others to use the local priKey of:"+fid);
         String input = Inputer.inputString(br);
-        if("y".equals(input)) {
+        if("i".equals(input)) {
             priKey = KeyTools.inputCipherGetPriKey(br);
             if(priKey==null)return;
-        }else priKey = initApipParamsForClient.decryptApipBuyerPriKey(initApipParamsForClient.getApipBuyerPriKeyCipher(),symKey);
+        }else if("g".equals(input)){
+            priKey = KeyTools.genNewFid(br).getPrivKeyBytes();
+        }
 
         String sender = KeyTools.priKeyToFid(priKey);
         System.out.println("The sender is :"+ sender);
+        byte[] sessionKey = initApipParamsForClient.decryptSessionKey(symKey);
+        ApipClient apipClient;
 
+        apipClient = BlockchainAPIs.fidByIdsPost(initApipParamsForClient.getUrlHead(),new String[]{sender}, initApipParamsForClient.getVia(),sessionKey);
+        if(!apipClient.checkResponse("get fid from APIP")){
+            System.out.println("The fid is no found in the APIP.");
+        }else {
+            Map<String, Address> fidMap = ApipDataGetter.getAddressMap(apipClient.getResponseBody().getData());
+            Address addr = fidMap.get(sender);
+            if(addr==null){
+                System.out.println("The fid is no found in the APIP.");
+                return;
+            }
+            else JsonTools.gsonPrint(addr);
+        }
         List<SendTo> sendToList = SendTo.inputSendToList(br);
         double sum = 0;
         for(SendTo sendTo : sendToList) sum += sendTo.getAmount();
 
-        WalletAPIs walletAPIs = new WalletAPIs();
         String urlHead = Constants.UrlHead_CID_CASH;
 
         System.out.println("Input the opreturn message. Enter to ignore:");
@@ -475,21 +500,26 @@ public class startWallet {
 
         long fee = FchTool.calcFee(0, sendToList.size(), msg.length());
 
-        byte[] sessionKey = initApipParamsForClient.decryptSessionKey(symKey);
 
         System.out.println("Getting cashes from "+urlHead+" ...");
-        ApipClient apipClient = walletAPIs.cashValidForPayPost(urlHead, sender, sum+((double) fee /FchToSatoshi), null, sessionKey);
+
+        apipClient = WalletAPIs.cashValidForPayPost(urlHead, sender, sum+((double) fee /FchToSatoshi), initApipParamsForClient.getVia(), sessionKey);
+        if(apipClient==null||apipClient.checkResponse()!=0){
+            System.out.println("Failed to get cashes."+apipClient.getMessage()+apipClient.getResponseBody().getData());
+            return;
+        }
+
         List<Cash> cashList = ApipDataGetter.getCashList(apipClient.getResponseBody().getData());
 
         String txSigned = createTransactionSign(cashList, priKey, sendToList, msg);
 
         System.out.println("Signed tx:");
-        Menu.printUnderline(10);
+        Shower.printUnderline(10);
         System.out.println(txSigned);
-        Menu.printUnderline(10);
+        Shower.printUnderline(10);
 
         System.out.println("Broadcast with "+urlHead+" ...");
-        apipClient = walletAPIs.broadcastTxPost(urlHead,txSigned, initApipParamsForClient.getVia(), sessionKey);
+        apipClient = WalletAPIs.broadcastTxPost(urlHead,txSigned, initApipParamsForClient.getVia(), sessionKey);
         if(apipClient.checkResponse()!=0){
             System.out.println(apipClient.getCode()+": "+apipClient.getMessage());
             if(apipClient.getResponseBody().getData()!=null) System.out.println(apipClient.getResponseBody().getData());
@@ -497,9 +527,9 @@ public class startWallet {
         }
 
         System.out.println("Sent Tx:");
-        Menu.printUnderline(10);
+        Shower.printUnderline(10);
         System.out.println((String)apipClient.getResponseBody().getData());
-        Menu.printUnderline(10);
+        Shower.printUnderline(10);
         Menu.anyKeyToContinue(br);
     }
 
@@ -524,9 +554,9 @@ public class startWallet {
         String sign = ecKey.signMessage(msg);
         Signature signature = new Signature(signer,msg,sign,Constants.EcdsaBtcMsg_No1_NrC7);
         System.out.println("Signature:");
-        Menu.printUnderline(10);
+        Shower.printUnderline(10);
         System.out.println(signature.toJsonAsyShortNice());
-        Menu.printUnderline(10);
+        Shower.printUnderline(10);
         Menu.anyKeyToContinue(br);
     }
     private static void verifyMsgEcdsa(BufferedReader br) {
@@ -544,9 +574,9 @@ public class startWallet {
         try {
             signPubKey = ECKey.signedMessageToKey(signature.getMsg(), signature.getSign()).getPublicKeyAsHex();
             System.out.println("Check result:");
-            Menu.printUnderline(10);
+            Shower.printUnderline(10);
             System.out.println(signature.getFid().equals(keyTools.KeyTools.pubKeyToFchAddr(signPubKey)));
-            Menu.printUnderline(10);
+            Shower.printUnderline(10);
             Menu.anyKeyToContinue(br);
         } catch (SignatureException e) {
             System.out.println("Check signature wrong."+e.getMessage());
@@ -575,9 +605,9 @@ public class startWallet {
         Signature signature = new Signature(signer,msg,sign,Constants.EcdsaBtcMsg_No1_NrC7);
 
         System.out.println("Signature:");
-        Menu.printUnderline(10);
+        Shower.printUnderline(10);
         System.out.println(signature.toJsonAsyShortNice());
-        Menu.printUnderline(10);
+        Shower.printUnderline(10);
         Menu.anyKeyToContinue(br);
     }
 
@@ -594,9 +624,9 @@ public class startWallet {
         try {
 
             System.out.println("Result:");
-            Menu.printUnderline(10);
+            Shower.printUnderline(10);
             System.out.println(WalletTools.schnorrMsgVerify(signature.getMsg(), signature.getSign(), signature.getFid()));
-            Menu.printUnderline(10);
+            Shower.printUnderline(10);
             Menu.anyKeyToContinue(br);
         } catch (IOException e) {
             System.out.println("Checking signature wrong." + e.getMessage());

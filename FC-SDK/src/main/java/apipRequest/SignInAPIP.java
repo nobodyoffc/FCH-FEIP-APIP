@@ -15,7 +15,6 @@ import keyTools.KeyTools;
 import org.bitcoinj.core.ECKey;
 
 import java.lang.reflect.Type;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HexFormat;
 
@@ -55,13 +54,8 @@ public class SignInAPIP {
 
         byte[] sessionKey = ApipTools.decryptSessionKeyWithPriKey(sessionKeyCipher, priKey32Bytes);
         System.out.println("SessinKey: "+HexFormat.of().formatHex(sessionKey));
-        String sessionName = makeSessionName(sessionKey);
+        String sessionName = ApipTools.getSessionName(sessionKey);
         System.out.println("SessinName:"+sessionName);
-    }
-
-    private static String makeSessionName(byte[] sessionKey) {
-        byte[] sessionNameBytes = Arrays.copyOf(sessionKey,6);
-        return HexFormat.of().formatHex(sessionNameBytes);
     }
 
     public static SignInApipReplyData signIn(String urlHead, String via, byte[]priKey, String mode){

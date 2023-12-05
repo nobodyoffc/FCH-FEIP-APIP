@@ -2,7 +2,7 @@ package eccTest;
 
 import eccAes256K1P7.EccAes256K1P7;
 import javaTools.BytesTools;
-import menu.Inputer;
+import appUtils.Inputer;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

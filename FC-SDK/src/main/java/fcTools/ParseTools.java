@@ -2,8 +2,8 @@ package fcTools;
 
 import com.google.gson.Gson;
 import cryptoTools.SHA;
-import io.netty.buffer.Unpooled;
 import javaTools.BytesTools;
+import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -49,18 +49,18 @@ public class ParseTools {
             byte[] f = new byte[2];
             blockInputStream.read(f);
             bl.add(f);
-            number = Unpooled.wrappedBuffer(f).readUnsignedShortLE();
+            number = BytesTools.bytes2ToIntLE(f);//Unpooled.wrappedBuffer(f).readUnsignedShortLE();
 
         } else if (size == 254) {
             byte[] f = new byte[4];
             blockInputStream.read(f);
             bl.add(f);
-            number = Unpooled.wrappedBuffer(f).readUnsignedIntLE();
+            number = BytesTools.bytes2ToIntLE(f);
         } else {
             byte[] f = new byte[8];
             blockInputStream.read(f);
             bl.add(f);
-            number = Unpooled.wrappedBuffer(f).readLongLE();
+            number = BytesTools.bytes2ToIntLE(f);
             System.exit(0);
         }
         //For return./将要返回的值。
@@ -75,20 +75,6 @@ public class ParseTools {
 
     public static long cdd(long value, long birthTime, long spentTime) {
         return Math.floorDiv(value * Math.floorDiv((spentTime - birthTime), (60 * 60 * 24)), 100000000);
-    }
-
-    public static String hashTxo(String tHash, int index, boolean isRawOrder) {
-
-        String verseTHash = BytesTools.bytesToHexStringBE(BytesTools.invertArray(BytesTools.hexToByteArray(tHash)));
-
-        byte[] txHashBytes = BytesTools.invertArray(BytesTools.hexToByteArray(isRawOrder ? verseTHash : tHash));
-        byte[] fromIndexBytes = new byte[4];
-        fromIndexBytes = BytesTools.invertArray(BytesTools.intToByteArray(index));
-        String oHash = BytesTools.bytesToHexStringLE(
-                SHA.Sha256x2(
-                        BytesTools.bytesMerger(txHashBytes, fromIndexBytes)
-                ));
-        return oHash;
     }
 
     public static <T> ArrayList<T> deepListCopy(ArrayList<T> origList, Class<T> class1) {
@@ -155,41 +141,6 @@ public class ParseTools {
             System.err.println("Waiting for directory interrupted: " + e.getMessage());
         }
     }
-//
-//    public static void waitForChangeInDirectory(String directoryPathStr, AtomicBoolean running) {
-//        try {
-//            Path directory = Paths.get(directoryPathStr);
-//
-//            try (WatchService watchService = FileSystems.getDefault().newWatchService()) {
-//                directory.register(watchService, StandardWatchEventKinds.ENTRY_CREATE,
-//                        StandardWatchEventKinds.ENTRY_DELETE,
-//                        StandardWatchEventKinds.ENTRY_MODIFY);
-//
-//                while (running.get()) {
-//                    WatchKey key = watchService.take();
-//                    for (WatchEvent<?> event : key.pollEvents()) {
-//                        WatchEvent.Kind<?> kind = event.kind();
-//
-//                        if (kind != StandardWatchEventKinds.OVERFLOW) {
-//                            WatchEvent<Path> ev = (WatchEvent<Path>) event;
-//                        }
-//                    }
-//
-//                    boolean valid = key.reset();
-//                    if (!valid) {
-//                        //TODO
-//                        System.out.println(directoryPathStr+" changed.");
-//                        break;
-//                    }
-//                }
-//            }
-//        } catch (IOException e) {
-//            System.err.println("Error while watching directory: " + e.getMessage());
-//        } catch (InterruptedException e) {
-//            Thread.currentThread().interrupt();
-//            System.err.println("Waiting for directory interrupted: " + e.getMessage());
-//        }
-//    }
 
     public static void waitForNewItemInFile(String filePathStr) {
         try {
@@ -271,11 +222,18 @@ public class ParseTools {
         }
     }
 
-    public static double fchToSatoshis(long satoshis){
+    public static double satoshiToFch(long satoshis){
         return roundDouble8((double) satoshis /FchToSatoshi);
     }
 
-    public static long fchToSatoshis(double fch){
+    public static double weiToDouble(long longValue){
+        return roundDouble16((double) longValue /(FchToSatoshi*FchToSatoshi));
+    }
+    public static long doubleToWei(double wei){
+        return (long)(wei*FchToSatoshi*FchToSatoshi);
+    }
+
+    public static long fchToSatoshi(double fch){
         return (long)(fch*FchToSatoshi);
     }
 
@@ -285,12 +243,32 @@ public class ParseTools {
         return (double) i/FchToSatoshi;
     }
 
+    public static double roundDouble16(double raw){
+        long i = 0;
+        i = (long) (raw*FchToSatoshi*FchToSatoshi);
+        return (double) i/(FchToSatoshi*FchToSatoshi);
+    }
+
     public static double roundDouble4(double raw){
         long i = 0;
         i = (long) (raw*10000);
         double j = (double) i / 10000;
-        System.out.println(raw + " is rounded to "+ j);
+//        System.out.println(raw + " is rounded to "+ j);
         return j;
+    }
+
+    public static double roundDouble2(double raw){
+        long i = 0;
+        i = (long) (raw*100);
+        double j = (double) i / 100;
+//        System.out.println(raw + " is rounded to "+ j);
+        return j;
+    }
+
+    @Test
+    public void test(){
+        roundDouble2(1.343);
+        return;
     }
 
     public static boolean isGoodShare(String consumeViaShare) {

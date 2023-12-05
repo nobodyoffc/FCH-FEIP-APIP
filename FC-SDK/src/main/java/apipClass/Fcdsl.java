@@ -1,8 +1,8 @@
 package apipClass;
 
 import javaTools.JsonTools;
-import menu.Inputer;
-import menu.Menu;
+import appUtils.Inputer;
+import appUtils.Menu;
 import org.junit.Test;
 
 import java.io.BufferedReader;

@@ -261,7 +261,7 @@ public class BlockParser {
 				break;
 			case OP_RETURN:
 				out.setType("OP_RETURN");
-				opReturnStr = parseOpReturn(bScript);
+				opReturnStr = parseOpReturn(bScript);//new String(Arrays.copyOfRange(bScript, 2, bScript.length));
 				out.setOwner("OpReturn");
 
 				out.setValid(false);
