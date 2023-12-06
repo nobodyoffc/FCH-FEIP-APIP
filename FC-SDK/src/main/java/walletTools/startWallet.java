@@ -25,11 +25,9 @@ import txTools.RawTxParser;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.security.Key;
 import java.security.SignatureException;
 import java.util.*;
 
-import static apipClient.StartApipClient.encrypt;
 import static apipClient.StartApipClient.setting;
 import static constants.Constants.FchToSatoshi;
 import static constants.Strings.newCashMapKey;
@@ -137,34 +135,8 @@ public class startWallet {
     private static void buildSignedTx(BufferedReader br) {
         String[] signedData = Inputer.inputStringArray(br,"Input the signed data. Enter to end:",0);
 
-        Map<String,List<byte[]>> fidSigListMap= new HashMap<>();
-        byte[] rawTx=null;
-        P2SH p2sh=null;
-
-        for(String dataJson:signedData){
-            try {
-                System.out.println(dataJson);
-
-                MultiSigData multiSignData = MultiSigData.fromJson(dataJson);
-
-                if(p2sh == null
-                        && multiSignData.getP2SH()!=null){
-                    p2sh = multiSignData.getP2SH();
-                }
-
-                if(rawTx == null
-                        && multiSignData.getRawTx()!=null
-                        && multiSignData.getRawTx().length>0){
-                    rawTx = multiSignData.getRawTx();
-                }
-
-                fidSigListMap.putAll(multiSignData.getFidSigMap());
-
-            }catch (Exception ignored){}
-        }
-        if(rawTx==null||p2sh==null)return;
-
-        String signedTx = FchTool.buildSchnorrMultiSignTx(rawTx, fidSigListMap, p2sh);
+        String signedTx = FchTool.buildSignedTx(signedData);
+        if (signedTx == null) return;
         System.out.println(signedTx);
         Menu.anyKeyToContinue(br);
     }
@@ -211,7 +183,7 @@ public class startWallet {
         }
     }
 
-    private static void showRawTxInfo(String multiSignDataJson, BufferedReader br) {
+    public static void showRawTxInfo(String multiSignDataJson, BufferedReader br) {
         MultiSigData multiSigData = MultiSigData.fromJson(multiSignDataJson);
 
         byte[] rawTx = multiSigData.getRawTx();
@@ -304,10 +276,7 @@ public class startWallet {
         double feeDouble = fee/FchToSatoshi;
         apipClient = WalletAPIs.cashValidForPayPost(initApipParamsForClient.getUrlHead(), fid, sum+feeDouble, initApipParamsForClient.getVia(), sessionKey);
 
-        if(apipClient==null || apipClient.checkResponse()!=0){
-            System.out.println(JsonTools.getNiceString(apipClient.getResponseBody()));
-            return;
-        }
+        if(apipClient.isBadResponse("get cash list"))return;
 
         List<Cash> cashList = ApipDataGetter.getCashList(apipClient.getResponseBody().getData());
 
@@ -336,10 +305,7 @@ public class startWallet {
         int m = Inputer.inputInteger(br,"How many signatures is required? ",16);
 
         ApipClient apipClient = BlockchainAPIs.fidByIdsPost(initApipParamsForClient.getUrlHead(), fids, initApipParamsForClient.getVia(), sessionKey);
-        if(apipClient==null || apipClient.checkResponse()!=0){
-            System.out.println(JsonTools.getNiceString(apipClient.getResponseBody()));
-            return;
-        }
+        if(apipClient.isBadResponse("fidByIds"))return;
 
         Map<String, Address> fidMap = ApipDataGetter.getAddressMap(apipClient.getResponseBody().getData());
 
@@ -373,12 +339,10 @@ public class startWallet {
         }
         System.out.println("Requesting APIP from "+ initApipParamsForClient.getUrlHead());
         ApipClient apipClient = BlockchainAPIs.p2shByIdsPost(initApipParamsForClient.getUrlHead(), new String[]{fid}, initApipParamsForClient.getVia(), sessionKey);
-        if(apipClient==null || apipClient.checkResponse()!=0){
-            System.out.println(JsonTools.getNiceString(apipClient.getResponseBody()));
-            return;
-        }
+        if(apipClient.isBadResponse("get multiSign FID info"))return;;
         Map<String, P2SH> p2shMap = ApipDataGetter.getP2SHMap(apipClient.getResponseBody().getData());
         P2SH p2sh = p2shMap.get(fid);
+
         if(p2sh==null){
             System.out.println(fid + " is not found.");
             return;
@@ -478,7 +442,7 @@ public class startWallet {
         ApipClient apipClient;
 
         apipClient = BlockchainAPIs.fidByIdsPost(initApipParamsForClient.getUrlHead(),new String[]{sender}, initApipParamsForClient.getVia(),sessionKey);
-        if(!apipClient.checkResponse("get fid from APIP")){
+        if(apipClient.isBadResponse("get fid from APIP")){
             System.out.println("The fid is no found in the APIP.");
         }else {
             Map<String, Address> fidMap = ApipDataGetter.getAddressMap(apipClient.getResponseBody().getData());

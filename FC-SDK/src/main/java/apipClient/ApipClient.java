@@ -50,7 +50,7 @@ public class ApipClient {
     private int code;
     private String message;
 
-    public boolean checkResponse(String taskName){
+    public boolean isBadResponse(String taskName){
         if(checkResponse()!=0){
             System.out.println("Failed to "+taskName);
             if(responseBody==null) {
@@ -60,8 +60,8 @@ public class ApipClient {
                 System.out.println(responseBody.getCode()+":"+responseBody.getMessage());
                 if(responseBody.getData()!= null) System.out.println(JsonTools.getString(responseBody.getData()));
             }
-            return false;
-        }else return true;
+            return true;
+        }else return false;
     }
     public int checkResponse(){
         if(responseBody==null){

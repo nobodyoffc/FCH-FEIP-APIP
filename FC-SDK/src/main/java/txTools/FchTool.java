@@ -620,4 +620,36 @@ public class FchTool {
         }
         return priceInSatoshi*length;
     }
+
+    @org.jetbrains.annotations.Nullable
+    public static String buildSignedTx(String[] signedData) {
+        Map<String,List<byte[]>> fidSigListMap= new HashMap<>();
+        byte[] rawTx=null;
+        P2SH p2sh=null;
+
+        for(String dataJson: signedData){
+            try {
+                System.out.println(dataJson);
+
+                MultiSigData multiSignData = MultiSigData.fromJson(dataJson);
+
+                if(p2sh == null
+                        && multiSignData.getP2SH()!=null){
+                    p2sh = multiSignData.getP2SH();
+                }
+
+                if(rawTx == null
+                        && multiSignData.getRawTx()!=null
+                        && multiSignData.getRawTx().length>0){
+                    rawTx = multiSignData.getRawTx();
+                }
+
+                fidSigListMap.putAll(multiSignData.getFidSigMap());
+
+            }catch (Exception ignored){}
+        }
+        if(rawTx==null||p2sh==null) return null;
+
+        return buildSchnorrMultiSignTx(rawTx, fidSigListMap, p2sh);
+    }
 }
