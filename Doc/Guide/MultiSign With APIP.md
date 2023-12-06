@@ -71,7 +71,7 @@ ApipParamsForClient apipParamsForClient = ApipParamsForClient.checkApipParams(br
 ## 构造多签地址
 1. 输入地址，获取公钥
 ```java
-        ApipClient apipClient = BlockchainAPIs.fidByIdsPost(initApipParamsForClient.getUrlHead(), fids, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient = BlockchainAPIs.fidByIdsPost(apipParamsForClient.getUrlHead(), fids, apipParamsForClient.getVia(), sessionKey);
         if(apipClient.isBadResponse("fidByIds"))return;
         Map<String, Address> fidPubKeyMap = ApipDataGetter.getAddressMap(apipClient.getResponseBody().getData());
 ```
@@ -85,7 +85,7 @@ ApipParamsForClient apipParamsForClient = ApipParamsForClient.checkApipParams(br
 
 ## 获取多签地址信息
 ```java
-        ApipClient apipClient = BlockchainAPIs.p2shByIdsPost(initApipParamsForClient.getUrlHead(), new String[]{fid}, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient = BlockchainAPIs.p2shByIdsPost(apipParamsForClient.getUrlHead(), new String[]{fid}, apipParamsForClient.getVia(), sessionKey);
         if(apipClient.isBadResponse("get multiSign FID info"))return;;
         Map<String, P2SH> p2shMap = ApipDataGetter.getP2SHMap(apipClient.getResponseBody().getData());
         P2SH p2sh = p2shMap.get(fid);
@@ -132,6 +132,7 @@ public class SendTo {
 5. 向APIP请求输入
 ```java
         double feeDouble = fee/FchToSatoshi;//FchToSatoshi=100000000
+        int msgLen = msg.getBytes().length;
         apipClient = WalletAPIs.cashValidForPayPost(urlHead, mFid, sum+feeDouble, via, sessionKey);
         // urlHead和via（渠道商）来自Apip参数，sum为总输出金额，mFid为多签地址，sessionKey从访问APIP所需）
         if(apipClient.isBadResponse("get cash list"))return;
@@ -160,7 +161,8 @@ String partSignedDataJson = FchTool.signSchnorrMultiSignTx(multiSignDataJson, pr
 
 ### 组合交易
    获得超过m个人独立签名后，即可组合交易。
-   * 注意：组合时一定要按照组建多签时的公钥顺序提供签名。可缺不可乱。顺序不同，多签地址不同！
+   * 注意
+      组合时一定要按照组建多签时的公钥顺序提供签名。可缺不可乱。顺序不同，多签地址不同！
 ```java
     String[] partSignedDataJsons = new String[]{partSignedDataJson1,partSignedDataJsons2,...}
     String signedTx = FchTool.buildSignedTx(partSignedDataJsons);
