@@ -15,8 +15,6 @@
     <module>FEIP-Parser</module>
     <module>APIP-Manager</module>
     <module>APIP-Server</module>
-      <module>SwapFchUsdt</module>
-      <module>VipWallet</module>
   </modules>
 
   <properties>

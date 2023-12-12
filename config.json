@@ -1,8 +1,8 @@
 {
-  "avatarBasePath": "/Users/liuchangyong/Desktop/IdeaProjects/FCH-FEIP-APIP/avatar/elements",
+  "avatarElementsPath": "/Users/liuchangyong/Desktop/IdeaProjects/FCH-FEIP-APIP/avatar/elements",
   "avatarPngPath": "/Users/liuchangyong/Desktop/IdeaProjects/FCH-FEIP-APIP/avatar/png",
-  "serviceName": "APIP",
-  "windowTime": 50000000000,
+  "serviceName": "ApipNo1",
+  "windowTime": 600000000000000,
   "checkOrderOpReturn": true,
   "forbidFreeGet": false,
   "scanMempool": true,

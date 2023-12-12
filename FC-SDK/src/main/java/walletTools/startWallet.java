@@ -467,12 +467,8 @@ public class startWallet {
 
         System.out.println("Getting cashes from "+urlHead+" ...");
 
-        apipClient = WalletAPIs.cashValidForPayPost(urlHead, sender, sum+((double) fee /FchToSatoshi), initApipParamsForClient.getVia(), sessionKey);
-        if(apipClient==null||apipClient.checkResponse()!=0){
-            System.out.println("Failed to get cashes."+apipClient.getMessage()+apipClient.getResponseBody().getData());
-            return;
-        }
-
+        apipClient = WalletAPIs.cashValidForPayPost(urlHead, sender, sum+fee, initApipParamsForClient.getVia(), sessionKey);
+        if(apipClient.isBadResponse("get cash list"))return;
         List<Cash> cashList = ApipDataGetter.getCashList(apipClient.getResponseBody().getData());
 
         String txSigned = createTransactionSign(cashList, priKey, sendToList, msg);

@@ -100,7 +100,8 @@ public class FchTool {
 
         long fee = FchTool.calcFee(inputs.size(), outputs.size()+1, opReturn.getBytes().length);
 
-        Transaction transaction = new Transaction(FchMainNetwork.MAINNETWORK);
+        FchMainNetwork mainnetwork = FchMainNetwork.MAINNETWORK;
+        Transaction transaction = new Transaction(mainnetwork);
 
         long totalMoney = 0;
         long totalOutput = 0;
@@ -108,7 +109,7 @@ public class FchTool {
         List<ECKey> ecKeys = new ArrayList<>();
         for (TxOutput output : outputs) {
             totalOutput += output.getAmount();
-            transaction.addOutput(Coin.valueOf(output.getAmount()), Address.fromBase58(FchMainNetwork.MAINNETWORK, output.getAddress()));
+            transaction.addOutput(Coin.valueOf(output.getAmount()), Address.fromBase58(mainnetwork, output.getAddress()));
         }
 
         if (opReturn != null && !"".equals(opReturn)) {
@@ -127,7 +128,7 @@ public class FchTool {
 
             ecKeys.add(eckey);
             UTXO utxo = new UTXO(Sha256Hash.wrap(input.getTxId()), input.getIndex(), Coin.valueOf(input.getAmount()), 0, false, ScriptBuilder.createP2PKHOutputScript(eckey));
-            TransactionOutPoint outPoint = new TransactionOutPoint(FchMainNetwork.MAINNETWORK, utxo.getIndex(), utxo.getHash());
+            TransactionOutPoint outPoint = new TransactionOutPoint(mainnetwork, utxo.getIndex(), utxo.getHash());
             TransactionInput unsignedInput = new TransactionInput(new fcTools.FchMainNetwork(), transaction, new byte[0], outPoint);
             transaction.addInput(unsignedInput);
         }
@@ -135,10 +136,11 @@ public class FchTool {
             throw new RuntimeException("input is not enough");
         }
         long change = totalMoney - totalOutput - fee;
-        if (returnAddr != null && change > Constants.DustInSatoshi) {
-            transaction.addOutput(Coin.valueOf(change), Address.fromBase58(FchMainNetwork.MAINNETWORK, returnAddr));
-        }
 
+        if (change > Constants.DustInSatoshi) {
+            if(returnAddr==null)returnAddr= ECKey.fromPrivate(inputs.get(0).getPriKey32()).toAddress(mainnetwork).toBase58();
+            transaction.addOutput(Coin.valueOf(change), Address.fromBase58(mainnetwork, returnAddr));
+        }
 
         for (int i = 0; i < inputs.size(); ++i) {
             TxInput input = inputs.get(i);
