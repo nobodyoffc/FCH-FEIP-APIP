@@ -98,7 +98,10 @@ public class FchTool {
      */
     public static String createTransactionSign(List<TxInput> inputs, List<TxOutput> outputs, String opReturn, String returnAddr) {
 
-        long fee = FchTool.calcFee(inputs.size(), outputs.size()+1, opReturn.getBytes().length);
+        long fee;
+        if(opReturn!=null){
+            fee = FchTool.calcFee(inputs.size(), outputs.size(), opReturn.getBytes().length);
+        }else fee = FchTool.calcFee(inputs.size(), outputs.size(), 0);
 
         FchMainNetwork mainnetwork = FchMainNetwork.MAINNETWORK;
         Transaction transaction = new Transaction(mainnetwork);
