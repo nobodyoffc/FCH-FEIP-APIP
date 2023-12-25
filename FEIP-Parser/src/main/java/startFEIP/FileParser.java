@@ -229,9 +229,7 @@ public class FileParser {
 				case SERVICE -> {
 					System.out.println("Service @"+opre.getHeight()+"."+opre.getTxId());
 					ServiceHistory serviceHist = constructParser.makeService(opre, feip);
-					//TODO
-					JsonTools.gsonPrint(opre);
-					JsonTools.gsonPrint(serviceHist);
+					
 
 					if (serviceHist == null) break;
 					isValid = constructParser.parseService(esClient, serviceHist);

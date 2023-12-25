@@ -18,6 +18,13 @@ public class FreeGetAPIs {
         return apipClient;
     }
 
+    public static ApipClient getBestBlock(String urlHead){
+        ApipClient apipClient = new ApipClient();
+        apipClient.addNewApipUrl(urlHead, ApiNames.FreeGetPath + ApiNames.GetBestBlockAPI);
+
+        apipClient.get();
+        return apipClient;
+    }
     public static ApipClient getServices(String urlHead, String id){
         ApipClient apipClient = new ApipClient();
         if(id==null)apipClient.addNewApipUrl(urlHead, ApiNames.FreeGetPath + ApiNames.GetServicesAPI);

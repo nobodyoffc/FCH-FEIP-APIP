@@ -21,6 +21,7 @@ public class Terms {
         this.values=values;
         return this;
     }
+
     public Terms appendValues(String value) {
         String[] newValues = Arrays.copyOf(this.values, this.values.length + 1);
         newValues[this.values.length] = value;

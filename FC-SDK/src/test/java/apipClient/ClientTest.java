@@ -1,17 +1,20 @@
 package apipClient;
 
+import apipClass.Fcdsl;
+import apipClass.TxInfo;
 import javaTools.JsonTools;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.HexFormat;
+import java.util.List;
 
 public class ClientTest {
     public static void main(String[] args) throws IOException {
 
-        totalsGet();
-        totalsPost();
     }
+
+
 
     private static void totalsGet() {
         String urlHead="https://cid.cash/APIP";

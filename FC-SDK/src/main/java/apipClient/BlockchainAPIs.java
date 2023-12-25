@@ -2,6 +2,7 @@ package apipClient;
 
 import apipClass.Fcdsl;
 import constants.ApiNames;
+import constants.Strings;
 
 import javax.annotation.Nullable;
 
@@ -20,6 +21,22 @@ public class BlockchainAPIs {
         if(!isGood)return null;
         return apipClient;
     }
+
+    public static ApipClient blockByHeightsPost(String urlHead, String[] heights, @Nullable String via, byte[] sessionKey)  {
+        ApipClient apipClient = new ApipClient();
+        apipClient.setSn("2");
+        Fcdsl fcdsl = new Fcdsl();
+        fcdsl.addNewQuery().addNewTerms().appendFields(Strings.HEIGHT).addNewValues(heights);
+
+        apipClient.setRawFcdsl(fcdsl);
+
+        String urlTail = ApiNames.APIP2V1Path + ApiNames.BlockSearchAPI;
+
+        boolean isGood = apipClient.post(urlHead,urlTail, fcdsl, via, sessionKey);
+        if(!isGood)return null;
+        return apipClient;
+    }
+
     public static ApipClient blockSearchPost(String urlHead, Fcdsl fcdsl, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("2");

@@ -156,20 +156,28 @@ public class StartApipClient {
             int choice = menu.choose(br);
 
             switch (choice){
-                case 1 -> broadcast(br);
-                case 2 -> getApps(br);
-                case 3 -> getServices(br);
-                case 4 -> getAvatar(br);
-                case 5 -> getCashes(br);
-                case 6 -> getFidCid(br);
-                case 7 -> getFreeService(br);
-                case 8 -> getService(br);
-                case 9-> getTotals(br);
+                case 1 -> getBestBlock(br);
+                case 2 -> broadcast(br);
+                case 3 -> getApps(br);
+                case 4 -> getServices(br);
+                case 5 -> getAvatar(br);
+                case 6 -> getCashes(br);
+                case 7 -> getFidCid(br);
+                case 8 -> getFreeService(br);
+                case 9 -> getService(br);
+                case 10-> getTotals(br);
                 case 0 -> {
                     return;
                 }
             }
         }
+    }
+
+    public static void getBestBlock(BufferedReader br) {
+        System.out.println("Getting bestBlock...");
+        ApipClient apipClient = FreeGetAPIs.getBestBlock(initApipParamsForClient.getUrlHead());
+        System.out.println(apipClient.getResponseBodyStr());;
+        Menu.anyKeyToContinue(br);
     }
     public static void broadcast(BufferedReader br) {
         System.out.println("Input the rawTx:");
@@ -197,6 +205,7 @@ public class StartApipClient {
         System.out.println(apipClient.getResponseBodyStr());;
         Menu.anyKeyToContinue(br);
     }
+
     public static void getServices(BufferedReader br) {
         System.out.println("Input the sid or enter to ignore:");
         String id = Inputer.inputString(br);
@@ -353,17 +362,18 @@ public class StartApipClient {
             switch (choice){
                 case 1 -> blockByIds(sessionKey,br);
                 case 2 -> blockSearch(DEFAULT_SIZE,"height:desc->blockId:asc",sessionKey,br);
-                case 3 -> cashByIds(sessionKey,br);
-                case 4 -> cashSearch(DEFAULT_SIZE,"valid:desc->birthHeight:desc->cashId:asc",sessionKey,br);
-                case 5 -> cashValid(DEFAULT_SIZE,"cd:asc->value:desc->cashId:asc",sessionKey,br);
-                case 6 -> fidByIds(sessionKey,br);
-                case 7 -> fidSearch(DEFAULT_SIZE,"lastHeight:desc->fid:asc",sessionKey,br);
-                case 8 -> opReturnByIds(sessionKey,br);
-                case 9 -> opReturnSearch(DEFAULT_SIZE,"height:desc->txIndex:desc->txId:asc",sessionKey,br);
-                case 10-> p2shByIds(sessionKey,br);
-                case 11-> p2shSearch(DEFAULT_SIZE,"birthHeight:desc->fid:asc",sessionKey,br);
-                case 12-> txByIds(sessionKey,br);
-                case 13-> txSearch(DEFAULT_SIZE,"height:desc->txId:asc",sessionKey,br);
+                case 3 -> blockByHeights(sessionKey,br);
+                case 4 -> cashByIds(sessionKey,br);
+                case 5 -> cashSearch(DEFAULT_SIZE,"valid:desc->birthHeight:desc->cashId:asc",sessionKey,br);
+                case 6 -> cashValid(DEFAULT_SIZE,"cd:asc->value:desc->cashId:asc",sessionKey,br);
+                case 7 -> fidByIds(sessionKey,br);
+                case 8 -> fidSearch(DEFAULT_SIZE,"lastHeight:desc->fid:asc",sessionKey,br);
+                case 9 -> opReturnByIds(sessionKey,br);
+                case 10 -> opReturnSearch(DEFAULT_SIZE,"height:desc->txIndex:desc->txId:asc",sessionKey,br);
+                case 11-> p2shByIds(sessionKey,br);
+                case 12-> p2shSearch(DEFAULT_SIZE,"birthHeight:desc->fid:asc",sessionKey,br);
+                case 13-> txByIds(sessionKey,br);
+                case 14-> txSearch(DEFAULT_SIZE,"height:desc->txId:asc",sessionKey,br);
                 case 0 -> {
                     return;
                 }
@@ -375,6 +385,13 @@ public class StartApipClient {
         String[] ids = Inputer.inputStringArray(br,"Input blockIds:",0);
         System.out.println("Requesting blockByIds...");
         ApipClient apipClient =BlockchainAPIs.blockByIdsPost(initApipParamsForClient.getUrlHead(),ids, initApipParamsForClient.getVia(), sessionKey);
+        System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
+    }
+
+    public static void blockByHeights(byte[] sessionKey, BufferedReader br) {
+        String[] heights = Inputer.inputStringArray(br,"Input blockHeights:",0);
+        System.out.println("Requesting blockByHeights...");
+        ApipClient apipClient = BlockchainAPIs.blockByHeightsPost(initApipParamsForClient.getUrlHead(),heights, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
     }
 

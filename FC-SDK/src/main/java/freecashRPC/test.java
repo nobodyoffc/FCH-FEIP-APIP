@@ -8,7 +8,7 @@ public class test {
 //        NewFcRpcClient newFcRpcClient = new NewFcRpcClient("127.0.0.1",8332,"liu");
 //        JsonRpcHttpClient fcClient = newFcRpcClient.getClient();
 
-        NewFcRpcClient newFcRpcClient = new NewFcRpcClient("127.0.0.1",8332,"user","password");
+        NewFcRpcClient newFcRpcClient = new NewFcRpcClient("127.0.0.1",8332,"username","password");
         newFcRpcClient.getClientSilent();
     }
 }
