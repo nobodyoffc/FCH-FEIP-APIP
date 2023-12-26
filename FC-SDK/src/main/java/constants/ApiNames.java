@@ -43,8 +43,8 @@ public class ApiNames {
     public static final String GeneralAPI = "general";
     public static final String TotalsAPI = "totals";
     public static final String BlockByIdsAPI = "blockByIds";
-    public static final String BlockByHeightsAPI = "blockByHeights";
     public static final String BlockSearchAPI = "blockSearch";
+    public static final String BlockByHeightsAPI = "blockByHeights";
     public static final String CashByIdsAPI = "cashByIds";
     public static final String GetCashesAPI = "getCashes";
     public static final String CashSearchAPI = "cashSearch";
@@ -151,8 +151,6 @@ public class ApiNames {
     public static final String GetFreeKeyAPI="getFreeKey";
 
 
-
-
     static {
 
         OpenAPIs = new String[]{
@@ -160,7 +158,7 @@ public class ApiNames {
         };
 
         BlockchainAPIs = new String[]{
-                BlockByIdsAPI, BlockSearchAPI,BlockByHeightsAPI,
+                BlockByIdsAPI, BlockSearchAPI, BlockByHeightsAPI,
                 CashByIdsAPI, CashSearchAPI,CashValidAPI,
                 FidByIdsAPI,FidSearchAPI,
                 OpReturnByIdsAPI,OpReturnSearchAPI,
@@ -220,7 +218,7 @@ public class ApiNames {
                 BroadcastAPI,GetAppsAPI,GetServicesAPI,GetAvatarAPI,GetCashesAPI,
                 GetFidCidAPI,GetFreeServiceAPI,GetServicesAPI,GetTotalsAPI
         };
-
+        freeApiList.add(ApiNames.GetBestBlockAPI);
         freeApiList.add(ApiNames.GetFreeServiceAPI);
         freeApiList.add(ApiNames.GetAvatarAPI);
         freeApiList.add(ApiNames.GetTotalsAPI);

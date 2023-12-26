@@ -32,6 +32,7 @@ import static constants.Strings.PUBLIC;
 
 public class RequestChecker {
 
+    public static final String NO_SUCH_API = "No such API. Check the API name in request url.";
     private final PrintWriter writer;
     private final HttpServletResponse response;
     private final HttpServletRequest request;
@@ -51,7 +52,7 @@ public class RequestChecker {
         this.response = response;
         this.writer = response.getWriter();
         this.url = request.getRequestURL().toString();
-        this.apiName = ApipTools.getApiNameFromUrl(url);
+        this.apiName = ApipTools.getApiNameFromUrl(request.getRequestURL().toString());
         this.replier.setData(null);
         this.gson = new Gson();
     }
@@ -224,7 +225,8 @@ public class RequestChecker {
         if("".equals(apiName)){
             response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1020OtherError));
             Map<String,String> dataMap= new HashMap<>();
-            dataMap.put(Strings.ERROR,"No such API. Check the API name in request url.");
+            dataMap.put(Strings.ERROR, NO_SUCH_API);
+
             replier.setData(dataMap);
             writer.write(replier.reply1020OtherError());
             return null;

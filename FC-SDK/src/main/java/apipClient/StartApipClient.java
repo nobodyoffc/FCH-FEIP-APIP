@@ -391,6 +391,7 @@ public class StartApipClient {
     public static void blockByHeights(byte[] sessionKey, BufferedReader br) {
         String[] heights = Inputer.inputStringArray(br,"Input blockHeights:",0);
         System.out.println("Requesting blockByHeights...");
+
         ApipClient apipClient = BlockchainAPIs.blockByHeightsPost(initApipParamsForClient.getUrlHead(),heights, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
     }

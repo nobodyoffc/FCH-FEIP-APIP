@@ -26,11 +26,9 @@ public class BlockchainAPIs {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("2");
         Fcdsl fcdsl = new Fcdsl();
-        fcdsl.addNewQuery().addNewTerms().appendFields(Strings.HEIGHT).addNewValues(heights);
-
+        fcdsl.addNewQuery().addNewTerms().addNewFields(Strings.HEIGHT).addNewValues(heights);
         apipClient.setRawFcdsl(fcdsl);
-
-        String urlTail = ApiNames.APIP2V1Path + ApiNames.BlockSearchAPI;
+        String urlTail = ApiNames.APIP2V1Path + ApiNames.BlockByHeightsAPI;
 
         boolean isGood = apipClient.post(urlHead,urlTail, fcdsl, via, sessionKey);
         if(!isGood)return null;

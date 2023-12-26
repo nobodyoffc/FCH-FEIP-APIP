@@ -6,6 +6,7 @@ import APIP0V1_OpenAPI.Replier;
 import APIP0V1_OpenAPI.RequestChecker;
 import apipClass.BlockInfo;
 import apipClass.RequestBody;
+import apipClass.Sort;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
@@ -47,12 +48,16 @@ public class BlockByHeights extends HttpServlet {
 
         //Check API
 
+        //Set default sort.
+        ArrayList<Sort> sort = Sort.makeSortList("height",false,"blockId",true,null,null);
+
         //Request
+        String index = IndicesNames.BLOCK_HAS;
 
         DataRequestHandler esRequest = new DataRequestHandler(dataCheckResult.getAddr(),requestBody,response,replier);
         List<BlockHas> blockHasList;
         try {
-            blockHasList = esRequest.doRequest(IndicesNames.BLOCK_HAS,null, BlockHas.class);
+            blockHasList = esRequest.doRequest(index,sort, BlockHas.class);
             if(blockHasList==null||blockHasList.size()==0){
                 return;
             }
@@ -84,14 +89,13 @@ public class BlockByHeights extends HttpServlet {
 
         Map<String,BlockInfo> meetMap = new HashMap<>();
         for(BlockInfo blockInfo :meetList){
-            meetMap.put(blockInfo.getId(),blockInfo);
+            meetMap.put(String.valueOf(blockInfo.getHeight()),blockInfo);
         }
 
         //response
 
         replier.setData(meetMap);
         replier.setGot(meetMap.size());
-        replier.setTotal(meetMap.size());
         esRequest.writeSuccess(dataCheckResult.getSessionKey());
     }
 }
