@@ -9,6 +9,7 @@ import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
 import com.google.gson.Gson;
+import config.RewardParams;
 import esTools.EsTools;
 import fcTools.ParseTools;
 import fchClass.CashMark;
@@ -712,7 +713,7 @@ public class Rewarder {
         Params params = StartAPIP.service.getParams();
         Double share;
         if(params!=null&&params.getConsumeViaShare()==null){
-            System.out.println("Set consumeViaShare");
+            System.out.println("Set consumeViaShare(0~1)");
             share = Inputer.inputGoodShare(br);
             String consumeViaShare;
             if (share != null) {
@@ -722,7 +723,7 @@ public class Rewarder {
         }
 
         if(params!=null&&params.getOrderViaShare()==null) {
-            System.out.println("Set orderViaShare");
+            System.out.println("Set orderViaShare(0~1)");
             share = Inputer.inputGoodShare(br);
             String orderViaShare;
             if (share != null) {

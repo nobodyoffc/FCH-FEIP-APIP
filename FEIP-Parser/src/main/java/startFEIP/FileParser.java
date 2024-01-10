@@ -177,6 +177,7 @@ public class FileParser {
 					isValid = cidParser.parseCidInfo(esClient, identityHist);
 					if (isValid)
 						esClient.index(i -> i.index(IndicesNames.CID_HISTORY).id(identityHist.getTxId()).document(identityHist));
+					System.out.println(isValid);
 				}
 				case NOBODY -> {
 					System.out.println("Nobody @"+opre.getHeight()+"."+opre.getTxId());
@@ -185,6 +186,7 @@ public class FileParser {
 					isValid = cidParser.parseCidInfo(esClient, identityHist4);
 					if (isValid)
 						esClient.index(i -> i.index(IndicesNames.CID_HISTORY).id(identityHist4.getTxId()).document(identityHist4));
+					System.out.println(isValid);
 				}
 				case MASTER -> {
 					System.out.println("Master @"+opre.getHeight()+"."+opre.getTxId());
@@ -193,6 +195,7 @@ public class FileParser {
 					isValid = cidParser.parseCidInfo(esClient, identityHist1);
 					if (isValid)
 						esClient.index(i -> i.index(IndicesNames.CID_HISTORY).id(identityHist1.getTxId()).document(identityHist1));
+					System.out.println(isValid);
 				}
 				case HOMEPAGE -> {
 					System.out.println("Homepage @"+opre.getHeight()+"."+opre.getTxId());
@@ -201,6 +204,7 @@ public class FileParser {
 					isValid = cidParser.parseCidInfo(esClient, identityHist2);
 					if (isValid)
 						esClient.index(i -> i.index(IndicesNames.CID_HISTORY).id(identityHist2.getTxId()).document(identityHist2));
+					System.out.println(isValid);
 				}
 				case NOTICE_FEE -> {
 					System.out.println("Notice fee @"+opre.getHeight()+"."+opre.getTxId());
@@ -209,6 +213,7 @@ public class FileParser {
 					isValid = cidParser.parseCidInfo(esClient, identityHist3);
 					if (isValid)
 						esClient.index(i -> i.index(IndicesNames.CID_HISTORY).id(identityHist3.getTxId()).document(identityHist3));
+					System.out.println(isValid);
 				}
 				case REPUTATION -> {
 					System.out.println("Reputation @"+opre.getHeight()+"."+opre.getTxId());
@@ -217,6 +222,7 @@ public class FileParser {
 					isValid = cidParser.parseReputation(esClient, repuHist);
 					if (isValid)
 						esClient.index(i -> i.index(IndicesNames.REPUTATION_HISTORY).id(repuHist.getTxId()).document(repuHist));
+					System.out.println(isValid);
 				}
 				case PROTOCOL -> {
 					System.out.println("Protocol @"+opre.getHeight()+"."+opre.getTxId());
@@ -225,16 +231,16 @@ public class FileParser {
 					isValid = constructParser.parseProtocol(esClient, freeProtocolHist);
 					if (isValid)
 						esClient.index(i -> i.index(IndicesNames.PROTOCOL_HISTORY).id(freeProtocolHist.getTxId()).document(freeProtocolHist));
+					System.out.println(isValid);
 				}
 				case SERVICE -> {
 					System.out.println("Service @"+opre.getHeight()+"."+opre.getTxId());
 					ServiceHistory serviceHist = constructParser.makeService(opre, feip);
-					
-
 					if (serviceHist == null) break;
 					isValid = constructParser.parseService(esClient, serviceHist);
 					if (isValid)
 						esClient.index(i -> i.index(IndicesNames.SERVICE_HISTORY).id(serviceHist.getTxId()).document(serviceHist));
+					System.out.println(isValid);
 				}
 				case APP -> {
 					System.out.println("APP @"+opre.getHeight()+"."+opre.getTxId());
@@ -243,6 +249,7 @@ public class FileParser {
 					isValid = constructParser.parseApp(esClient, appHist);
 					if (isValid)
 						esClient.index(i -> i.index(IndicesNames.APP_HISTORY).id(appHist.getTxId()).document(appHist));
+					System.out.println(isValid);
 				}
 				case CODE -> {
 					System.out.println("Code @"+opre.getHeight()+"."+opre.getTxId());
@@ -251,26 +258,32 @@ public class FileParser {
 					isValid = constructParser.parseCode(esClient, codeHist);
 					if (isValid)
 						esClient.index(i -> i.index(IndicesNames.CODE_HISTORY).id(codeHist.getTxId()).document(codeHist));
+					System.out.println(isValid);
 				}
 				case NID -> {
 					System.out.println("Nid @"+opre.getHeight()+"."+opre.getTxId());
 					isValid = publishParser.parseNid(esClient, opre, feip);
+					System.out.println(isValid);
 				}
 				case CONTACT -> {
 					System.out.println("Contact @"+opre.getHeight()+"."+opre.getTxId());
 					isValid = personalParser.parseContact(esClient, opre, feip);
+					System.out.println(isValid);
 				}
 				case MAIL -> {
 					System.out.println("Mail @"+opre.getHeight()+"."+opre.getTxId());
 					isValid = personalParser.parseMail(esClient, opre, feip);
+					System.out.println(isValid);
 				}
 				case SAFE -> {
 					System.out.println("Safe @"+opre.getHeight()+"."+opre.getTxId());
 					isValid = personalParser.parseSecret(esClient, opre, feip);
+					System.out.println(isValid);
 				}
 				case STATEMENT -> {
 					System.out.println("Statement @"+opre.getHeight()+"."+opre.getTxId());
 					isValid = publishParser.parseStatement(esClient, opre, feip);
+					System.out.println(isValid);
 				}
 				case GROUP -> {
 					System.out.println("Group @"+opre.getHeight()+"."+opre.getTxId());
@@ -279,6 +292,7 @@ public class FileParser {
 					isValid = organizationParser.parseGroup(esClient, groupHist);
 					if (isValid)
 						esClient.index(i -> i.index(IndicesNames.GROUP_HISTORY).id(groupHist.getTxId()).document(groupHist));
+					System.out.println(isValid);
 				}
 				case TEAM -> {
 					System.out.println("Team @"+opre.getHeight()+"."+opre.getTxId());
@@ -287,6 +301,7 @@ public class FileParser {
 					isValid = organizationParser.parseTeam(esClient, teamHist);
 					if (isValid)
 						esClient.index(i -> i.index(IndicesNames.TEAM_HISTORY).id(teamHist.getTxId()).document(teamHist));
+					System.out.println(isValid);
 				}
 				case BOX -> {
 					System.out.println("Box @"+opre.getHeight()+"."+opre.getTxId());
@@ -295,6 +310,7 @@ public class FileParser {
 					isValid = personalParser.parseBox(esClient, boxHist);
 					if (isValid)
 						esClient.index(i -> i.index(IndicesNames.BOX_HISTORY).id(boxHist.getTxId()).document(boxHist));
+					System.out.println(isValid);
 				}
 				case PROOF -> {
 					System.out.println("Proof @"+opre.getHeight()+"."+opre.getTxId());
@@ -303,6 +319,7 @@ public class FileParser {
 					isValid = publishParser.parseProof(esClient, proofHist);
 					if (isValid)
 						esClient.index(i -> i.index(IndicesNames.PROOF_HISTORY).id(proofHist.getTxId()).document(proofHist));
+					System.out.println(isValid);
 				}
 				default -> {
 				}

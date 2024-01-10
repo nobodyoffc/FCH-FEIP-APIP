@@ -10,7 +10,7 @@
   "listenPath": "/Users/liuchangyong/fc_data/blocks/",
   "rpcIp": "127.0.0.1",
   "rpcPort": 8332,
-  "rpcUser": "user",
+  "rpcUser": "username",
   "rpcPassword": "password",
   "esIp": "127.0.0.1",
   "esPort": 9200,

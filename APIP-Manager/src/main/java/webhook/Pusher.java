@@ -42,7 +42,13 @@ public class Pusher implements Runnable{
     public void run() {
 
         try(Jedis jedis = new Jedis()) {
-            long bestHeight = Long.parseLong(jedis.get(BEST_HEIGHT));
+
+            long bestHeight;
+            try {
+                bestHeight = Long.parseLong(jedis.get(BEST_HEIGHT));
+            }catch (Exception e){
+                bestHeight=0;
+            }
             sinceHeight=bestHeight;
             List<WebhookRequestBody> webhookInfoList;
             webhookInfoList = getWebhookInfoListFromEs(esClient);

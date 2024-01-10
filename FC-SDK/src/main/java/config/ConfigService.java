@@ -94,7 +94,7 @@ public class ConfigService extends ConfigFEIP {
         setCheckOrderOpReturn(br);
         setForbidFreeGet(br);
         setScanMempool(br);
-        setConfigFilePath(br);
+//        setConfigFilePath(br);
         setEsIp(br);
         setEsPort(br);
         setEsUsername(br);

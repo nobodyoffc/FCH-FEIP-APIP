@@ -25,6 +25,19 @@ public class FreeGetAPIs {
         apipClient.get();
         return apipClient;
     }
+
+    public static ApipClient getPrices(String urlHead){
+        ApipClient apipClient = new ApipClient();
+        apipClient.addNewApipUrl(urlHead, ApiNames.FreeGetPath + ApiNames.GetPricesAPI);
+        apipClient.get();
+        return apipClient;
+    }
+    public static ApipClient getService(String urlHead){
+        ApipClient apipClient = new ApipClient();
+        apipClient.addNewApipUrl(urlHead, ApiNames.APIP0V1Path + ApiNames.GetServiceAPI);
+        apipClient.get();
+        return apipClient;
+    }
     public static ApipClient getServices(String urlHead, String id){
         ApipClient apipClient = new ApipClient();
         if(id==null)apipClient.addNewApipUrl(urlHead, ApiNames.FreeGetPath + ApiNames.GetServicesAPI);
@@ -44,7 +57,7 @@ public class FreeGetAPIs {
         ApipClient apipClient = new ApipClient();
         String urlTail = ApiNames.FreeGetPath + ApiNames.GetCashesAPI;
         if(id!=null)urlTail =urlTail+"?fid="+id;
-        if(amount!=0)urlTail = urlTail+"?amount="+id;
+        if(amount!=0)urlTail = urlTail+"?amount="+amount;
         apipClient.addNewApipUrl(urlHead, urlTail);
         apipClient.get();
         return apipClient;

@@ -24,7 +24,7 @@ public class ConfigBase {
     protected String blockFilePath;
     protected String configFileName = "config.json";
     protected String configFilePath = System.getProperty(UserDir);
-    private String opReturnFilePath;
+    private String opReturnFilePath= System.getProperty(UserDir)+"opreturn";
 
     public void config(BufferedReader br) throws IOException {
         printConfigJson();
@@ -34,9 +34,8 @@ public class ConfigBase {
         setEsUsername(br);
         setSymKey();
         setBlockFilePath(br);
-        setOpReturnFilePath(br);
-        setConfigFilePath(br);
-
+//        setOpReturnFilePath(br);
+//        setConfigFilePath(br);
         writeConfigToFile();
     }
 

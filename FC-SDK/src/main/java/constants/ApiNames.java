@@ -134,6 +134,7 @@ public class ApiNames {
     public static final String CashValidForCdAPI = "cashValidForCd";
     public static final String CashValidForPayAPI = "cashValidForPay";
     public static final String GetTotalsAPI = "getTotals";
+    public static final String GetPricesAPI = "getPrices";
     public static final String NidSearchAPI = "nidSearch";
     public static final String EncryptAPI = "encrypt";
     public static final String Sha256API = "sha256";
@@ -216,12 +217,14 @@ public class ApiNames {
         FreeGetAPIs = new String[]{
                 GetBestBlockAPI,
                 BroadcastAPI,GetAppsAPI,GetServicesAPI,GetAvatarAPI,GetCashesAPI,
-                GetFidCidAPI,GetFreeServiceAPI,GetServicesAPI,GetTotalsAPI
+                GetFidCidAPI,GetFreeServiceAPI,GetServicesAPI,GetTotalsAPI,
+                GetPricesAPI
         };
         freeApiList.add(ApiNames.GetBestBlockAPI);
         freeApiList.add(ApiNames.GetFreeServiceAPI);
         freeApiList.add(ApiNames.GetAvatarAPI);
         freeApiList.add(ApiNames.GetTotalsAPI);
+        freeApiList.add(ApiNames.GetPricesAPI);
         freeApiList.add(ApiNames.GetAppsAPI);
         freeApiList.add(ApiNames.GetCashesAPI);
         freeApiList.add(ApiNames.GetFidCidAPI);

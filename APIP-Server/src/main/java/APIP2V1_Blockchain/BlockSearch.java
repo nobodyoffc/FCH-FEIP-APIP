@@ -49,13 +49,13 @@ public class BlockSearch extends HttpServlet {
         ArrayList<Sort> sort = Sort.makeSortList("height",false,"blockId",true,null,null);
 
         //Request
-        String index = IndicesNames.BLOCK_HAS;
+        String index = IndicesNames.BLOCK;
 
         DataRequestHandler esRequest = new DataRequestHandler(dataCheckResult.getAddr(),requestBody,response,replier);
-        List<BlockHas> blockHasList;
+        List<Block> blockList;
         try {
-            blockHasList = esRequest.doRequest(index,sort, BlockHas.class);
-            if(blockHasList==null||blockHasList.size()==0){
+            blockList = esRequest.doRequest(index,sort, Block.class);
+            if(blockList==null||blockList.size()==0){
                 return;
             }
         } catch (Exception e) {
@@ -66,14 +66,14 @@ public class BlockSearch extends HttpServlet {
         }
 
         List<String> idList = new ArrayList<>();
-        for(BlockHas blockHas : blockHasList){
-            idList.add(blockHas.getBlockId());
+        for(Block block : blockList){
+            idList.add(block.getBlockId());
         }
 
-        List<Block> blockList = null;
+        List<BlockHas> blockHasList = null;
         try {
-            blockList = EsTools.getMultiByIdList(Initiator.esClient, IndicesNames.BLOCK, idList, Block.class).getResultList();
-            if(blockList==null||blockList.size()==0){
+            blockHasList = EsTools.getMultiByIdList(Initiator.esClient, IndicesNames.BLOCK_HAS, idList, BlockHas.class).getResultList();
+            if(blockHasList==null||blockHasList.size()==0){
                 return;
             }
         } catch (Exception e) {

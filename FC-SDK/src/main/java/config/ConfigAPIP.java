@@ -21,15 +21,16 @@ public class ConfigAPIP extends ConfigService {
 
         setAvatarPath(br);
         setBlockFilePath(br);
-        setOpReturnFilePath(br);
-        setListenPath(br);
-        setTomcatBasePath(br);
+//        setOpReturnFilePath(br);
+//        setListenPath(br);
+//        setTomcatBasePath(br);
+        this.listenPath=this.blockFilePath;
 
         setWindowTime(br);
-        setCheckOrderOpReturn(br);
-        setForbidFreeGet(br);
-        setScanMempool(br);
-        setConfigFilePath(br);
+//        setCheckOrderOpReturn(br);
+//        setForbidFreeGet(br);
+//        setScanMempool(br);
+//        setConfigFilePath(br);
         setEsIp(br);
         setEsPort(br);
         setEsUsername(br);

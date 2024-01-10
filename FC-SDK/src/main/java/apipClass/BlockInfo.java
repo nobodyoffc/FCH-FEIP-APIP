@@ -154,7 +154,11 @@ public class BlockInfo {
 
     // Method to merge lists of Block and BlockHas into a list of BlockInfo
     public static List<BlockInfo> mergeBlockAndBlockHas(List<Block> blockList, List<BlockHas> blockHasList) {
-        Map<String, BlockInfo> blockInfoMap = new HashMap<>();
+        ArrayList<BlockInfo> blockInfoList = new ArrayList<>();
+        Map<String,BlockHas> blockHasMap = new HashMap<>();
+
+        for (BlockHas blockHas : blockHasList)
+            blockHasMap.put(blockHas.getBlockId(),blockHas);
 
         for (Block block : blockList) {
             BlockInfo blockInfo = new BlockInfo();
@@ -173,17 +177,11 @@ public class BlockInfo {
             blockInfo.setCdd(block.getCdd());
             blockInfo.setId(block.getBlockId());
 
-            blockInfoMap.put(block.getBlockId(), blockInfo);
-        }
+            blockInfo.setTxList(blockHasMap.get(block.getBlockId()).getTxMarks());
 
-        for (BlockHas blockHas : blockHasList) {
-            BlockInfo blockInfo = blockInfoMap.get(blockHas.getBlockId());
-            if (blockInfo != null) {
-                blockInfo.setTxList(blockHas.getTxMarks());
-            }
+            blockInfoList.add(blockInfo);
         }
-
-        return new ArrayList<>(blockInfoMap.values());
+        return blockInfoList;
     }
 }
 

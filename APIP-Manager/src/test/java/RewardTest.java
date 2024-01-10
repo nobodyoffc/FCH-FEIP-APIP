@@ -1,5 +1,6 @@
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import config.ConfigAPIP;
+import config.RewardParams;
 import esTools.NewEsClient;
 import javaTools.JsonTools;
 import redis.clients.jedis.Jedis;

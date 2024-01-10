@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import reward.RewardManager;
-import reward.RewardParams;
+import config.RewardParams;
 import reward.Rewarder;
 import service.ApipService;
 import service.Params;
@@ -217,7 +217,7 @@ public class StartAPIP {
 	private static void checkRewardParams() {
 		RewardParams rewardParams = Rewarder.getRewardParams();
 		if (rewardParams == null) {
-			System.out.println("Reward params aren't set yet.");
+			System.out.println("Reward parameters aren't set yet.");
 			new Rewarder(esClient).setRewardParameters( br);
 			Menu.anyKeyToContinue(br);
 		}

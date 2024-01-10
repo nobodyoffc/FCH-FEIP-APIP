@@ -7,6 +7,7 @@ import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import com.google.gson.Gson;
 import fchClass.OpReturn;
 import esTools.EsTools;
+import javaTools.JsonTools;
 import startFEIP.StartFEIP;
 
 import java.io.IOException;
@@ -190,9 +191,8 @@ public class ConstructParser {
 				serviceHist.setParams(serviceRaw.getParams());
 			}
 			break;	
-		case "stop":
+		case "stop", "recover":
 			if(serviceRaw.getSid()==null)return null;
-			
 			serviceHist.setSid(serviceRaw.getSid());
 			serviceHist.setTxId(opre.getTxId());
 			serviceHist.setHeight(opre.getHeight());
@@ -200,17 +200,7 @@ public class ConstructParser {
 			serviceHist.setTime(opre.getTime());
 			serviceHist.setSigner(opre.getSigner());
 			break;
-		case "recover":
-			if(serviceRaw.getSid()==null)return null;
-			
-			serviceHist.setSid(serviceRaw.getSid());
-			serviceHist.setTxId(opre.getTxId());
-			serviceHist.setHeight(opre.getHeight());
-			serviceHist.setIndex(opre.getTxIndex());
-			serviceHist.setTime(opre.getTime());
-			serviceHist.setSigner(opre.getSigner());
-			break;
-		case "close":
+			case "close":
 			if(serviceRaw.getSid()==null)return null;
 			serviceHist.setSid(serviceRaw.getSid());
 			if(serviceHist.getCloseStatement()!=null)serviceHist.setCloseStatement(null);
@@ -761,7 +751,7 @@ public class ConstructParser {
 				break;
 			}
 			
-			if(! service.getOwner().equals(serviceHist.getSigner())) {
+			if(! (service.getOwner().equals(serviceHist.getSigner()))) {
 				isValid = false;
 				break;
 			}
@@ -783,7 +773,6 @@ public class ConstructParser {
 
 			esClient.index(i->i.index(IndicesNames.SERVICE).id(serviceHist.getSid()).document(service4));
 			isValid = true;
-
 			break;
 			
 		case "close":	

@@ -65,9 +65,8 @@ public class BroadcastRawTx extends HttpServlet {
             return;
         }
 
-
         if(result.startsWith("\""))result=result.substring(1);
-        if(result.endsWith("\""))result=result.substring(0,result.length()-2);
+        if(result.endsWith("\""))result=result.substring(0,result.length()-1);
 
         if(!BytesTools.isHexString(result)){
             response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1020OtherError));
