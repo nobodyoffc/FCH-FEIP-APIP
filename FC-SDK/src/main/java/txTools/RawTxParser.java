@@ -237,25 +237,28 @@ public class RawTxParser {
 
     public static String parseOpReturn(byte[] bScript) throws IOException {
         ByteArrayInputStream bis = new ByteArrayInputStream(bScript);
-        byte[] b1 = new byte[1];
-        bis.read(b1);
-        if(b1[0]!=0x6a)return null;
+        byte[] op_return = new byte[1];
+        byte[] opcode = new byte[1];
+        byte[] dataLen1 = new byte[1];
+        byte[] dataLen2 = new byte[2];
+        byte[] msgBytes =null;
 
-        byte[] msgBytes = new byte[0];
-        bis.read(b1);
-        if(b1[0] < 76){
-            msgBytes = new byte[b1[0]];
+        bis.read(op_return);
+        if(op_return[0]!=0x6a)return null;
+
+        bis.read(opcode);
+        if(opcode[0] < 76){
+            msgBytes = new byte[opcode[0]];
         }
-        if(b1[0]==76){
-            bis.read(b1);
-            msgBytes = new byte[(b1[0]& 0xFF)];//new byte[bScript.length-3];
+        if(opcode[0]==76){
+            bis.read(dataLen1);
+            msgBytes = new byte[(dataLen1[0]& 0xFF)];//new byte[bScript.length-3];
         }
-        if(b1[0] == 77){
-            byte[]b2 = new byte[2];
-            bis.read(b2);
-            msgBytes = new byte[BytesTools.bytes2ToIntLE(b2)];//new byte[bScript.length-4];
+        if(opcode[0] == 77){
+            bis.read(dataLen2);
+            msgBytes = new byte[BytesTools.bytes2ToIntLE(dataLen2)];//new byte[bScript.length-4];
         }
-        if(b1[0] > 77){
+        if(opcode[0] > 77){
             msgBytes = new byte[bScript.length-2];
         }
 
@@ -267,23 +270,31 @@ public class RawTxParser {
     @Test
     public void parseOpTest(){
 
-        String op = "6a026869";;
-        String op76 = "6a4cc5464549507c357c317c4920616d20777869645f696730786f696a72743477323532407765636861742d2d2d2d46504c3434594a52775064643269707a6946767171367932747734566e56767041762d2d2d2d494c7066324672574339634253716b726e463839544473783052785565757161566145626c6f31537a575343513578316a47596a41716b77536871517839386b6b574d724572543542756f524c546d45665767667245733d7c4920636f6e6669726d656420746869732073746174656d656e74";
-        String op77 = "6a4db8017b2275726c223a22687474703a2f2f6c6f63616c686f73743a383038302f415049502f746f6f6c732f766572696679222c2274696d65223a313637373637333832313236372c226e6f6e6365223a3839322c22666364736c223a7b226f74686572223a7b2261646472657373223a2246456b34314b716a61723435664c4472697a74554454556b646b69376d6d636a574b222c226d657373616765223a227b5c2275726c5c223a5c2268747470733a2f2f6369642e636173682f415049502f61706970302f76312f7369676e496e5c222c5c227075624b65795c223a5c223033306265316437653633336665623233333861373461383630653736643839336261633532356633356135383133636237623231653237626131626338333132615c222c5c226e6f6e63655c223a3132332c5c2274696d655c223a313637373537313534313839357d222c227369676e6174757265223a22494c65326a4f675765465272594233586f646e30334334516535417974396f69786a67483379574237496a45576452626f4b4f51414545423332567361747875574c4b674161535a616f657964457471493743696a65455c7530303364227d7d7d";
+        String data2 = "6a026869";;
+        String data76 = "6a4cc5464549507c357c317c4920616d20777869645f696730786f696a72743477323532407765636861742d2d2d2d46504c3434594a52775064643269707a6946767171367932747734566e56767041762d2d2d2d494c7066324672574339634253716b726e463839544473783052785565757161566145626c6f31537a575343513578316a47596a41716b77536871517839386b6b574d724572543542756f524c546d45665767667245733d7c4920636f6e6669726d656420746869732073746174656d656e74";
+        String data77 = "6a4c4d7b22706179466f72223a2262396430653061306537666337363234633665366137613164663833666534653234396333323436333330326336323234633833336534346334643765386339227d";
+        String data440 = "6a4db8017b2275726c223a22687474703a2f2f6c6f63616c686f73743a383038302f415049502f746f6f6c732f766572696679222c2274696d65223a313637373637333832313236372c226e6f6e6365223a3839322c22666364736c223a7b226f74686572223a7b2261646472657373223a2246456b34314b716a61723435664c4472697a74554454556b646b69376d6d636a574b222c226d657373616765223a227b5c2275726c5c223a5c2268747470733a2f2f6369642e636173682f415049502f61706970302f76312f7369676e496e5c222c5c227075624b65795c223a5c223033306265316437653633336665623233333861373461383630653736643839336261633532356633356135383133636237623231653237626131626338333132615c222c5c226e6f6e63655c223a3132332c5c2274696d655c223a313637373537313534313839357d222c227369676e6174757265223a22494c65326a4f675765465272594233586f646e30334334516535417974396f69786a67483379574237496a45576452626f4b4f51414545423332567361747875574c4b674161535a616f657964457471493743696a65455c7530303364227d7d7d";
 
         try {
-            System.out.println("<76:"+parseOpReturn(HexFormat.of().parseHex(op)));
-            System.out.println("=76:"+parseOpReturn(HexFormat.of().parseHex(op76)));
-            System.out.println(">76:"+parseOpReturn(HexFormat.of().parseHex(op77)));
+            System.out.println("<76:"+parseOpReturn(HexFormat.of().parseHex(data2)));
+            System.out.println("=76:"+parseOpReturn(HexFormat.of().parseHex(data76)));
+            System.out.println("=77:"+parseOpReturn(HexFormat.of().parseHex(data77)));
+            System.out.println(">77:"+parseOpReturn(HexFormat.of().parseHex(data440)));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
         System.out.println(new String(HexFormat.of().parseHex("7b7d"),StandardCharsets.UTF_8));
         byte[] len1 = HexFormat.of().parseHex("5801");
-
+        String str = "{\"payFor\":\"b9d0e0a0e7fc7624c6e6a7a1df83fe4e249c32463302c6224c833e44c4d7e8c9\"}";
         System.out.println(BytesTools.bytes2ToIntBE(len1));
         System.out.println(BytesTools.bytes2ToIntLE(len1));
+        System.out.println("4c="+(int)0x4c);
+        System.out.println("ct="+(int)0xc5);
+
+        System.out.println(str);
+        System.out.println(str.length());
+        System.out.println(HexFormat.of().formatHex(str.getBytes()));
     }
 
     private static Map<String, Cash> parseInput(ByteArrayInputStream rawTxInputStream,String txid) throws IOException {

@@ -26,7 +26,7 @@ public class BlockInfo {
     private long cdd;
 
     // BlockHas properties
-    private String id;
+    private String blockId;
     private ArrayList<TxMark> txList;
 
     // Getters and setters for all properties
@@ -136,12 +136,12 @@ public class BlockInfo {
         this.cdd = cdd;
     }
 
-    public String getId() {
-        return id;
+    public String getBlockId() {
+        return blockId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setBlockId(String blockId) {
+        this.blockId = blockId;
     }
 
     public ArrayList<TxMark> getTxList() {
@@ -175,7 +175,7 @@ public class BlockInfo {
             blockInfo.setOutValueT(block.getOutValueT());
             blockInfo.setFee(block.getFee());
             blockInfo.setCdd(block.getCdd());
-            blockInfo.setId(block.getBlockId());
+            blockInfo.setBlockId(block.getBlockId());
 
             blockInfo.setTxList(blockHasMap.get(block.getBlockId()).getTxMarks());
 

@@ -2,7 +2,7 @@
 
 ## 简介
 1. 功能：基于APIP数据，实现无协商多签应用。
-2. 适用：目前用于Freecash（FCH），理论上也适用于BTC、BCH、XEC、BSV、Doge.DogeTxMaker、LTC等中本聪经典框架，需要在FCH链上存在签名交易记录。
+2. 适用：目前用于Freecash（FCH），理论上也适用于BTC、BCH、XEC、BSV、Doge、LTC等中本聪经典框架，需要在FCH链上存储签名交易信息。
 3. 特点：
    * 任意构造多签地址：通过APIP获取地址和公钥信息，可无需协商构建16个公钥以内的多签地址。
    * 公开多签结构：一次支付交易后，其构成公钥、必需签名数量和赎回脚本可通过APIP公开获取。
@@ -30,7 +30,7 @@ F9pcRpps3T2iHuNGzU3k5b2kWKMRukZP1U
 ```
 
 ## Java 实现概况
-1. 项目模块：位于[FCH-FEIP-APIP项目的FC-SDK模块](https://github.com/nobodyoffc/FCH-FEIP-APIP/tree/master/FC-SDK)。该模块成熟后，考虑提取未独立项目。
+1. 项目模块：位于[FCH-FEIP-APIP项目的FC-SDK模块](https://github.com/nobodyoffc/FCH-FEIP-APIP/tree/master/FC-SDK)。该模块成熟后，考虑提取为独立项目。
 2. 依赖：FCH-FEIP-APIP项目的pom.xml和FC-SDK模块的pom.xml。
 3. 核心类：[FchTool](https://github.com/nobodyoffc/FCH-FEIP-APIP/blob/master/FC-SDK/src/main/java/txTools/FchTool.java)
 4. 测试应用：[StartWallet.multiSign(sessionKey,symKey,br)](https://github.com/nobodyoffc/FCH-FEIP-APIP/blob/master/FC-SDK/src/main/java/walletTools/startWallet.java#L110)

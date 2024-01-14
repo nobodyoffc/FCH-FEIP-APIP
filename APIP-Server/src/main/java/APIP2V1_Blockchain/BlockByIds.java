@@ -86,7 +86,7 @@ public class BlockByIds extends HttpServlet {
 
         Map<String,BlockInfo> meetMap = new HashMap<>();
         for(BlockInfo blockInfo :meetList){
-            meetMap.put(blockInfo.getId(),blockInfo);
+            meetMap.put(blockInfo.getBlockId(),blockInfo);
         }
 
         //response

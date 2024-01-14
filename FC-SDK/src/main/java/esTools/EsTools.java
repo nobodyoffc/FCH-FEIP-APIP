@@ -27,8 +27,8 @@ import static constants.IndicesNames.BLOCK;
 
 public class EsTools {
 
-    public static final int READ_MAX = 5000;
-    public static final int WRITE_MAX = 3000;
+    public static final int READ_MAX = 3000;
+    public static final int WRITE_MAX = 2000;
     final static Logger log = LoggerFactory.getLogger(EsTools.class);
 
     public static <T> T getBestOne(ElasticsearchClient esClient, String index, String orderField, SortOrder sortOrder, Class<T> clazz) throws IOException {

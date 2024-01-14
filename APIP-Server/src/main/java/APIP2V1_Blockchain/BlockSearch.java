@@ -64,30 +64,30 @@ public class BlockSearch extends HttpServlet {
             writer.write(replier.reply1012BadQuery(addr));
             return;
         }
-
-        List<String> idList = new ArrayList<>();
-        for(Block block : blockList){
-            idList.add(block.getBlockId());
-        }
-
-        List<BlockHas> blockHasList = null;
-        try {
-            blockHasList = EsTools.getMultiByIdList(Initiator.esClient, IndicesNames.BLOCK_HAS, idList, BlockHas.class).getResultList();
-            if(blockHasList==null||blockHasList.size()==0){
-                return;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
-            writer.write(replier.reply1012BadQuery(addr));
-        }
-
-        List<BlockInfo> meetList = BlockInfo.mergeBlockAndBlockHas(blockList, blockHasList);
+//
+//        List<String> idList = new ArrayList<>();
+//        for(Block block : blockList){
+//            idList.add(block.getBlockId());
+//        }
+//
+//        List<BlockHas> blockHasList = null;
+//        try {
+//            blockHasList = EsTools.getMultiByIdList(Initiator.esClient, IndicesNames.BLOCK_HAS, idList, BlockHas.class).getResultList();
+//            if(blockHasList==null||blockHasList.size()==0){
+//                return;
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
+//            writer.write(replier.reply1012BadQuery(addr));
+//        }
+//
+//        List<BlockInfo> meetList = BlockInfo.mergeBlockAndBlockHas(blockList, blockHasList);
 
         //response
 
-        replier.setData(meetList);
-        replier.setGot(meetList.size());
+        replier.setData(blockList);
+        replier.setGot(blockList.size());
         esRequest.writeSuccess(dataCheckResult.getSessionKey());
     }
 }
