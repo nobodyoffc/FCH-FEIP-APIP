@@ -784,7 +784,7 @@ public class KeyTools {
         return priKey26;
     }
 
-    private static byte[] priKey32To38Compressed(byte[] bytes32) {
+    public static byte[] priKey32To38Compressed(byte[] bytes32) {
         byte[] bytes34 = new byte[34];
         bytes34[0]= (byte) 0x80;
         System.arraycopy(bytes32, 0, bytes34, 1, 32);

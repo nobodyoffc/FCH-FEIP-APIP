@@ -318,6 +318,25 @@ public class EccAes256K1P7 {
         return eccAesData.getMsg();
     }
 
+    public byte[] decryptForBytes(String eccAesDataJson, char[] key){
+        Gson gson = new Gson();
+        EccAesData eccAesData = gson.fromJson(eccAesDataJson,EccAesData.class);
+
+        switch (eccAesData.getType()){
+            case AsyOneWay -> eccAesData.setPriKeyB(key);
+            case AsyTwoWay -> eccAesData.setPriKeyB(key);
+            case SymKey -> eccAesData.setSymKey(key);
+            case Password -> eccAesData.setPassword(key);
+            default -> eccAesData.setError("Wrong EccAesType type"+eccAesData.getType());
+        }
+        EccAesDataByte eccAesDataByte = EccAesDataByte.fromEccAesData(eccAesData);
+        if(eccAesDataByte.getError() !=null){
+            return null;
+        }
+        decrypt(eccAesDataByte);
+        return eccAesDataByte.getMsg();
+    }
+
     public EccAesDataByte decrypt(String eccAesDataJson,byte[] key){
         Gson gson = new Gson();
         EccAesData eccAesData = gson.fromJson(eccAesDataJson,EccAesData.class);
