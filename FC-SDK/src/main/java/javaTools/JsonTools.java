@@ -41,6 +41,14 @@ public class JsonTools {
             }
         }
     }
+    public static Map<String, String> getStringStringMap(String json) {
+        Gson gson = new Gson();
+        // Define the type of the map
+        Type mapType = new TypeToken<Map<String, String>>() {}.getType();
+        // Parse the JSON string back into a map
+        Map<String, String> map = gson.fromJson(json, mapType);
+        return map;
+    }
     public static <T,E> Type getMapType(Class<T> t, Class<E> e) {
         return new TypeToken<Map<T, E>>() {}.getType();
     }
@@ -235,5 +243,44 @@ public class JsonTools {
         String cleanedString = removeEscapes(input);
         System.out.println("Original: " + input);
         System.out.println("Cleaned:  " + cleanedString);
+    }
+    public static  <T> void writeObjectListToJsonFile(List<T> objList, String fileName, boolean append) {
+        Gson gson = new Gson();
+        try (Writer writer = new FileWriter(fileName,append)) {
+            objList.forEach(t -> gson.toJson(t, writer));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public static <T> List<T> readJsonObjectListFromFile(String fileName, Class<T> clazz) {
+        List<T> objects = new ArrayList<>();
+        Gson gson = new Gson();
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
+            StringBuilder jsonBuilder = new StringBuilder();
+            int braceCount = 0;
+            int ch;
+
+            while ((ch = reader.read()) != -1) {
+                char c = (char) ch;
+                jsonBuilder.append(c);
+
+                if (c == '{') {
+                    braceCount++;
+                } else if (c == '}') {
+                    braceCount--;
+
+                    if (braceCount == 0) {
+                        T obj = gson.fromJson(jsonBuilder.toString(), clazz);
+                        objects.add(obj);
+                        jsonBuilder = new StringBuilder();
+                    }
+                }
+            }
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+        return objects;
     }
 }

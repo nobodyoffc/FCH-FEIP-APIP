@@ -92,8 +92,9 @@ public class StartAPIP {
 
 				if(!jedis.exists(serviceName+"_"+Strings.N_PRICE)) Settings.setNPrices(br);
 
-				indicesAPIP = new IndicesAPIP(esClient, jedis,br);
+				indicesAPIP = new IndicesAPIP(esClient,br);
 				indicesAPIP.checkApipIndices();
+				indicesAPIP.checkSwapIndices();
 			};
 
 			if(orderScanner==null) startOrderScan(configAPIP, esClient);

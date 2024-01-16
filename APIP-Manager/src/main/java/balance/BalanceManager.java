@@ -42,6 +42,7 @@ public class BalanceManager {
         menuItemList.add("Find user balance");
         menuItemList.add("Backup user balance to ES");
         menuItemList.add("Recover user balance from ES");
+        menuItemList.add("Recover user balance from File");
         menuItemList.add("Recreate balance index");
 
         menu.add(menuItemList);
@@ -53,7 +54,8 @@ public class BalanceManager {
                 case 1 -> findUsers(br);
                 case 2 -> BalanceInfo.backupUserBalanceToEs(esClient);
                 case 3 -> BalanceInfo.recoverUserBalanceFromEs(esClient);
-                case 4 -> recreateApipIndex(br, esClient,  BALANCE, balanceMappingJsonStr);
+                case 4 -> BalanceInfo.recoverUserBalanceFromFile();
+                case 5 -> recreateApipIndex(br, esClient,  BALANCE, balanceMappingJsonStr);
                 case 0 -> {
                     return;
                 }
@@ -67,7 +69,7 @@ public class BalanceManager {
         try {
             str = br.readLine();
         } catch (IOException e) {
-            System.out.println("br.readLine() wrong.");
+            log.debug("br.readLine() wrong.");
             return;
         }
 

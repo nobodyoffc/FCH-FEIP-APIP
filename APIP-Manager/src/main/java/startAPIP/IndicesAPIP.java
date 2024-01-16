@@ -9,7 +9,6 @@ import constants.IndicesNames;
 import appUtils.Menu;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import redis.clients.jedis.Jedis;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -18,29 +17,32 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
-import static constants.Strings.ORDER;
-import static constants.IndicesNames.WEBHOOK;
+import static constants.IndicesNames.*;
 import static constants.Strings.BALANCE;
 import static constants.Strings.REWARD;
 import static startAPIP.StartAPIP.getNameOfService;
 
 public class IndicesAPIP {
     private static final Logger log = LoggerFactory.getLogger(IndicesAPIP.class);
-    private final Jedis jedis;
     private final ElasticsearchClient esClient;
     private final BufferedReader br;
     public static  final  String  orderMappingJsonStr = "{\"mappings\":{\"properties\":{\"amount\":{\"type\":\"long\"},\"orderId\":{\"type\":\"keyword\"},\"fromFid\":{\"type\":\"wildcard\"},\"height\":{\"type\":\"long\"},\"time\":{\"type\":\"long\"},\"toFid\":{\"type\":\"wildcard\"},\"txId\":{\"type\":\"keyword\"},\"txIndex\":{\"type\":\"long\"},\"txid\":{\"type\":\"keyword\"},\"via\":{\"type\":\"wildcard\"}}}}";
     public static  final  String  balanceMappingJsonStr = "{\"mappings\":{\"properties\":{\"user\":{\"type\":\"text\"},\"consumeVia\":{\"type\":\"text\"},\"orderVia\":{\"type\":\"text\"},\"bestHeight\":{\"type\":\"keyword\"}}}}";
     public static final String  rewardMappingJsonStr = "{\"mappings\":{\"properties\":{\"rewardId\":{\"type\":\"keyword\"},\"rewardT\":{\"type\":\"long\"},\"time\":{\"type\":\"long\"},\"txId\":{\"type\":\"keyword\"},\"state\":{\"type\":\"keyword\"},\"bestHeight\":{\"type\":\"keyword\"},\"builderList\":{\"type\":\"nested\",\"properties\":{\"fid\":{\"type\":\"keyword\"},\"share\":{\"type\":\"float\"},\"amount\":{\"type\":\"long\"},\"fixed\":{\"type\":\"long\"}}},\"orderViaList\":{\"type\":\"nested\",\"properties\":{\"fid\":{\"type\":\"keyword\"},\"share\":{\"type\":\"float\"},\"amount\":{\"type\":\"long\"},\"fixed\":{\"type\":\"long\"}}},\"consumeViaList\":{\"type\":\"nested\",\"properties\":{\"fid\":{\"type\":\"keyword\"},\"share\":{\"type\":\"float\"},\"amount\":{\"type\":\"long\"},\"fixed\":{\"type\":\"long\"}}},\"costList\":{\"type\":\"nested\",\"properties\":{\"fid\":{\"type\":\"keyword\"},\"share\":{\"type\":\"float\"},\"amount\":{\"type\":\"long\"},\"fixed\":{\"type\":\"long\"}}}}}}";
     public static final String  webhookMappingJsonStr = "{\"mappings\":{\"properties\":{\"hookId\":{\"type\":\"keyword\"},\"owner\":{\"type\":\"wildcard\"},\"endpoint\":{\"type\":\"text\"},\"data\":{\"type\":\"object\"},\"method\":{\"type\":\"wildcard\"},\"op\":{\"type\":\"keyword\"}}}}";
-    public IndicesAPIP(ElasticsearchClient esClient, Jedis jedis, BufferedReader br){
+
+    public static final String  swapStateJsonStr = "{\"mappings\":{\"properties\":{\"sid\":{\"type\":\"keyword\"},\"gSum\":{\"type\":\"double\"},\"mSum\":{\"type\":\"double\"},\"gBestBlockId\":{\"type\":\"keyword\"},\"gBestHeight\":{\"type\":\"long\"},\"mBestBlockId\":{\"type\":\"keyword\"},\"mBestHeight\":{\"type\":\"long\"},\"lastTime\":{\"type\":\"long\"},\"lastSn\":{\"type\":\"long\"},\"lastId\":{\"type\":\"keyword\"},\"gPendingSum\":{\"type\":\"double\"},\"mPendingSum\":{\"type\":\"double\"}}}}";
+    public static final String  swapPendingMappingJsonStr = "{\"mappings\":{\"properties\":{\"id\":{\"type\":\"keyword\"},\"sid\":{\"type\":\"keyword\"},\"sn\":{\"type\":\"long\"},\"act\":{\"type\":\"keyword\"},\"g\":{\"type\":\"object\",\"properties\":{\"txId\":{\"type\":\"keyword\"},\"refundTxId\":{\"type\":\"keyword\"},\"withdrawTxId\":{\"type\":\"keyword\"},\"refundAmt\":{\"type\":\"double\"},\"addr\":{\"type\":\"keyword\"},\"amt\":{\"type\":\"double\"},\"sum\":{\"type\":\"double\"},\"blockTime\":{\"type\":\"long\"},\"blockHeight\":{\"type\":\"long\"},\"blockIndex\":{\"type\":\"long\"},\"txFee\":{\"type\":\"long\"}}},\"m\":{\"type\":\"object\",\"properties\":{\"txId\":{\"type\":\"keyword\"},\"refundTxId\":{\"type\":\"keyword\"},\"withdrawTxId\":{\"type\":\"keyword\"},\"refundAmt\":{\"type\":\"double\"},\"addr\":{\"type\":\"keyword\"},\"amt\":{\"type\":\"double\"},\"sum\":{\"type\":\"double\"},\"blockTime\":{\"type\":\"long\"},\"blockHeight\":{\"type\":\"long\"},\"blockIndex\":{\"type\":\"long\"},\"txFee\":{\"type\":\"long\"}}},\"sendTime\":{\"type\":\"long\"},\"getTime\":{\"type\":\"long\"},\"state\":{\"type\":\"keyword\"},\"tooSmall\":{\"type\":\"boolean\"}}}}";
+    public static final String  swapLpMappingJsonStr = "{\"mappings\":{\"properties\":{\"sid\":{\"type\":\"keyword\"},\"gLpRawMap\":{\"type\":\"object\",\"properties\":{\"key\":{\"type\":\"keyword\"},\"value\":{\"type\":\"double\"}}},\"gLpNetMap\":{\"type\":\"object\",\"properties\":{\"key\":{\"type\":\"keyword\"},\"value\":{\"type\":\"double\"}}},\"gLpShareMap\":{\"type\":\"object\",\"properties\":{\"key\":{\"type\":\"keyword\"},\"value\":{\"type\":\"double\"}}},\"mLpRawMap\":{\"type\":\"object\",\"properties\":{\"key\":{\"type\":\"keyword\"},\"value\":{\"type\":\"double\"}}},\"mLpNetMap\":{\"type\":\"object\",\"properties\":{\"key\":{\"type\":\"keyword\"},\"value\":{\"type\":\"double\"}}},\"mLpShareMap\":{\"type\":\"object\",\"properties\":{\"key\":{\"type\":\"keyword\"},\"value\":{\"type\":\"double\"}}},\"gLpRawSum\":{\"type\":\"double\"},\"mLpRawSum\":{\"type\":\"double\"},\"gServiceFee\":{\"type\":\"double\"},\"mServiceFee\":{\"type\":\"double\"}}}}";
+    public static final String  swapFinishedMappingJsonStr = "{\"mappings\":{\"properties\":{\"id\":{\"type\":\"keyword\"},\"sid\":{\"type\":\"keyword\"},\"sn\":{\"type\":\"long\"},\"act\":{\"type\":\"keyword\"},\"g\":{\"type\":\"object\",\"properties\":{\"txId\":{\"type\":\"keyword\"},\"refundTxId\":{\"type\":\"keyword\"},\"withdrawTxId\":{\"type\":\"keyword\"},\"refundAmt\":{\"type\":\"double\"},\"addr\":{\"type\":\"keyword\"},\"amt\":{\"type\":\"double\"},\"sum\":{\"type\":\"double\"},\"blockTime\":{\"type\":\"long\"},\"blockHeight\":{\"type\":\"long\"},\"blockIndex\":{\"type\":\"long\"},\"txFee\":{\"type\":\"long\"}}},\"m\":{\"type\":\"object\",\"properties\":{\"txId\":{\"type\":\"keyword\"},\"refundTxId\":{\"type\":\"keyword\"},\"withdrawTxId\":{\"type\":\"keyword\"},\"refundAmt\":{\"type\":\"double\"},\"addr\":{\"type\":\"keyword\"},\"amt\":{\"type\":\"double\"},\"sum\":{\"type\":\"double\"},\"blockTime\":{\"type\":\"long\"},\"blockHeight\":{\"type\":\"long\"},\"blockIndex\":{\"type\":\"long\"},\"txFee\":{\"type\":\"long\"}}},\"sendTime\":{\"type\":\"long\"},\"getTime\":{\"type\":\"long\"},\"state\":{\"type\":\"keyword\"},\"tooSmall\":{\"type\":\"boolean\"}}}}";
+    public static final String  swapPriceMappingJsonStr = "{\"mappings\":{\"properties\":{\"sid\":{\"type\":\"keyword\"},\"gTick\":{\"type\":\"keyword\"},\"mTick\":{\"type\":\"keyword\"},\"price\":{\"type\":\"double\"},\"time\":{\"type\":\"long\"}}}}";
+
+    public IndicesAPIP(ElasticsearchClient esClient, BufferedReader br){
         this.br = br;
-        this.jedis = jedis;
         this.esClient = esClient;
     }
 
     public void menu() throws IOException, InterruptedException {
-
 
         Menu menu = new Menu();
 
@@ -63,11 +65,20 @@ public class IndicesAPIP {
                 case 4 -> recreateApipIndex(br, esClient, REWARD, rewardMappingJsonStr);
                 case 5 -> recreateApipIndex(br, esClient, WEBHOOK, webhookMappingJsonStr);
                 case 6 -> recreateAllApipIndex(br, esClient);
+                case 7 -> recreateAllSwapIndex(br, esClient);
                 case 0 -> {
                     return;
                 }
             }
         }
+    }
+
+    public void recreateAllSwapIndex(BufferedReader br, ElasticsearchClient esClient) throws IOException, InterruptedException {
+        recreateApipIndex(br, esClient, SWAP_STATE, swapStateJsonStr);
+        recreateApipIndex(br, esClient, SWAP_LP, swapLpMappingJsonStr);
+        recreateApipIndex(br, esClient,SWAP_FINISHED, swapFinishedMappingJsonStr);
+        recreateApipIndex(br, esClient,SWAP_PENDING, swapPendingMappingJsonStr);
+        recreateApipIndex(br, esClient,SWAP_PRICE, swapPriceMappingJsonStr);
     }
 
     private void recreateAllApipIndex(BufferedReader br, ElasticsearchClient esClient) throws IOException, InterruptedException {
@@ -134,6 +145,37 @@ public class IndicesAPIP {
         String webhookIndex = getNameOfService( WEBHOOK);
         if (noSuchIndex(esClient, webhookIndex)) {
             createIndex(webhookIndex,esClient,webhookMappingJsonStr);
+        }
+    }
+
+    public void checkSwapIndices() throws IOException {
+        try {
+            String swapStateIndex = getNameOfService(SWAP_STATE);
+            if ( noSuchIndex(esClient, swapStateIndex)) {
+                createIndex(swapStateIndex,esClient,swapStateJsonStr);
+            }
+
+            String swapLpIndex = getNameOfService(SWAP_LP);
+            if (noSuchIndex(esClient, swapLpIndex)) {
+                createIndex(swapLpIndex,esClient,swapLpMappingJsonStr);
+            }
+
+            String swapFinishedIndex = getNameOfService(SWAP_FINISHED);
+            if (noSuchIndex(esClient, swapFinishedIndex)) {
+                createIndex(swapFinishedIndex,esClient,swapFinishedMappingJsonStr);
+            }
+
+            String swapPendingIndex = getNameOfService(SWAP_PENDING);
+            if (noSuchIndex(esClient, swapPendingIndex)) {
+                createIndex(swapPendingIndex,esClient,swapPendingMappingJsonStr);
+            }
+
+            String swapPriceIndex = getNameOfService(SWAP_PRICE);
+            if (noSuchIndex(esClient, swapPriceIndex)) {
+                createIndex(swapPriceIndex,esClient,swapPriceMappingJsonStr);
+            }
+        }catch(ElasticsearchException | IOException e) {
+            log.debug("Failed to check swap indices: {}",e.getMessage());
         }
     }
 

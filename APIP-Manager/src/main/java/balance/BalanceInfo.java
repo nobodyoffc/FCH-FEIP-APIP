@@ -8,26 +8,38 @@ import co.elastic.clients.json.JsonData;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import constants.Strings;
+import javaTools.JsonTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 import redisTools.ReadRedis;
 import startAPIP.StartAPIP;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 import static constants.Strings.*;
 
 public class BalanceInfo {
     private static final Logger log = LoggerFactory.getLogger(BalanceInfo.class);
+    public static final String BALANCE_BACKUP_JSON = "balanceBackup.json";
     private String user;
     private long bestHeight;
     private String consumeVia;
     private String orderVia;
     private String pending;
+
+    public static void recoverUserBalanceFromFile() {
+        try(Jedis jedis = StartAPIP.jedisPool.getResource()) {
+            BalanceInfo balanceInfo = JsonTools.readObjectFromJsonFile(null,BALANCE_BACKUP_JSON, BalanceInfo.class);
+            if(balanceInfo==null)return;
+            recoverBalanceToRedis(balanceInfo, jedis);
+        } catch (IOException e) {
+            log.debug("Failed to recoverUserBalanceFromFile: "+BALANCE_BACKUP_JSON);
+        }
+    }
 
     public String getPending() {
         return pending;
@@ -62,32 +74,22 @@ public class BalanceInfo {
         String balancesStr = null;
         String viaTStr = null;
         try(Jedis jedis = StartAPIP.jedisPool.getResource()) {
+            BalanceInfo balanceInfo = null;
             try {
                 SearchResponse<BalanceInfo> result = esClient.search(s -> s.index(index).size(1).sort(so -> so.field(f -> f.field(BEST_HEIGHT).order(SortOrder.Desc))), BalanceInfo.class);
                 if (result.hits().hits().size() == 0) {
                     System.out.println("No backup found in ES.");
                     return;
                 }
-                balancesStr = Objects.requireNonNull(result.hits().hits().get(0).source()).getUser();
-                viaTStr = Objects.requireNonNull(result.hits().hits().get(0).source()).getConsumeVia();
+                balanceInfo = result.hits().hits().get(0).source();
+                if(balanceInfo==null)return;
+                balancesStr = balanceInfo.getUser();
+                viaTStr = balanceInfo.getConsumeVia();
             } catch (IOException e) {
                 log.error("Get balance from ES error when recovering balances and viaTStr.", e);
             }
             if (balancesStr != null) {
-                Map<String, String> balanceMap = gson.fromJson(balancesStr, new TypeToken<HashMap<String, String>>() {
-                }.getType());
-
-                Map<String, String> viaTMap = gson.fromJson(viaTStr, new TypeToken<HashMap<String, String>>() {
-                }.getType());
-                for (String id : balanceMap.keySet()) {
-                    jedis.hset(StartAPIP.serviceName + "_" + Strings.FID_BALANCE, id, balanceMap.get(id));
-                }
-                for (String id : viaTMap.keySet()) {
-
-
-                    jedis.hset(StartAPIP.serviceName + "_" + CONSUME_VIA, id, viaTMap.get(id));
-                }
-                log.debug("Balances recovered from ES.");
+                recoverBalanceToRedis(balanceInfo, jedis);
             } else {
                 log.debug("Failed recovered balances from ES.");
             }
@@ -103,6 +105,24 @@ public class BalanceInfo {
                 log.debug("Failed recovered consuming ViaT from ES.");
             }
         }
+    }
+
+    private static void recoverBalanceToRedis(BalanceInfo balanceInfo, Jedis jedis) {
+        Gson gson = new Gson();
+        Map<String, String> balanceMap = gson.fromJson(balanceInfo.getUser(), new TypeToken<HashMap<String, String>>() {
+        }.getType());
+
+        Map<String, String> viaTMap = gson.fromJson(balanceInfo.getOrderVia(), new TypeToken<HashMap<String, String>>() {
+        }.getType());
+        for (String id : balanceMap.keySet()) {
+            jedis.hset(StartAPIP.serviceName + "_" + Strings.FID_BALANCE, id, balanceMap.get(id));
+        }
+        for (String id : viaTMap.keySet()) {
+
+
+            jedis.hset(StartAPIP.serviceName + "_" + CONSUME_VIA, id, viaTMap.get(id));
+        }
+        log.debug("Balances recovered from ES.");
     }
 
     public static void backupUserBalanceToEs(ElasticsearchClient esClient)  {
@@ -137,10 +157,17 @@ public class BalanceInfo {
                 log.error("Read ES wrong.", e);
             }
 
+            File file = new File(BALANCE_BACKUP_JSON);
+            if(!file.exists())file.createNewFile();
+            JsonTools.writeObjectToJsonFile(balanceInfo, BALANCE_BACKUP_JSON,false);
+            System.out.println("User balance backed up to file:"+BALANCE_BACKUP_JSON);
+
             if (result != null) {
                 System.out.println("User balance backup: " + result.result().toString());
             }
             log.debug(result.result().jsonValue());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

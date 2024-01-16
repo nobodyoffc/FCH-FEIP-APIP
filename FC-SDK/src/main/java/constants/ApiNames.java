@@ -5,6 +5,7 @@ import java.util.ArrayList;
 public class ApiNames {
     public static String[] OpenAPIs;
     public static String[] FreeGetAPIs;
+    public static String[] SwapHallAPIs;
     public static String[] BlockchainAPIs;
     public static String[] IdentityAPIs;
     public static String[] OrganizeAPIs;
@@ -37,6 +38,7 @@ public class ApiNames {
     public static final String APIP20V1Path = "/apip20/v1/";
     public static final String APIP21V1Path = "/apip21/v1/";
     public static final String FreeGetPath = "/freeGet/v1/";
+    public static final String SwapHallPath = "/swapHall/v1/";
     public static final String ToolsPath = "/tools/";
     public static final String SignInAPI = "signIn";
     public static final String SignInEccAPI = "signInEcc";
@@ -148,7 +150,18 @@ public class ApiNames {
     public static final String NewCashByFidsAPI = "newCashByFids";
     public static final String NobodyByIdsAPI ="nobodyByIds";
 
+    public static final String SwapRegisterAPI ="swapRegister";
+    public static final String SwapUpdateAPI ="swapUpdate";
+    public static final String SwapStateAPI ="swapState";
+    public static final String SwapLpAPI ="swapLp";
+    public static final String SwapPendingAPI ="swapPending";
+    public static final String SwapFinishedAPI ="swapFinished";
+    public static final String SwapPriceAPI ="swapPrice";
+
+
     public static ArrayList<String> freeApiList = new ArrayList<>();
+
+
     public static final String GetFreeKeyAPI="getFreeKey";
 
 
@@ -229,6 +242,11 @@ public class ApiNames {
         freeApiList.add(ApiNames.GetCashesAPI);
         freeApiList.add(ApiNames.GetFidCidAPI);
         freeApiList.add(ApiNames.GetServicesAPI);
+
+        SwapHallAPIs = new String[]{
+                SwapRegisterAPI,SwapUpdateAPI,SwapStateAPI,SwapLpAPI,SwapPendingAPI,SwapFinishedAPI,SwapPriceAPI
+        };
+
     }
 
     public static ArrayList<String> apiList = new ArrayList<String>();
@@ -350,5 +368,13 @@ public class ApiNames {
         ApiNames.apiList.add(ApiNames.Sha256x2BytesAPI);
 
         ApiNames.apiList.add(ApiNames.NewCashByFidsAPI);
+
+        ApiNames.apiList.add(ApiNames.SwapRegisterAPI);
+        ApiNames.apiList.add(ApiNames.SwapUpdateAPI);
+        ApiNames.apiList.add(ApiNames.SwapStateAPI);
+        ApiNames.apiList.add(ApiNames.SwapLpAPI);
+        ApiNames.apiList.add(ApiNames.SwapPendingAPI);
+        ApiNames.apiList.add(ApiNames.SwapFinishedAPI);
+        ApiNames.apiList.add(ApiNames.SwapPriceAPI);
     }
 }

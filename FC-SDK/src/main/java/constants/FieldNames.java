@@ -16,4 +16,5 @@ public class FieldNames {
     public static final String STD_NAME = "stdName";
     public static final String G_TICK = "gTick";
     public static final String M_TICK = "mTick";
+    public static final String REGISTERED_SWAP = "registered_Swap";
 }

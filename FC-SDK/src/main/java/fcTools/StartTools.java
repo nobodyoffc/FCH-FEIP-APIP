@@ -408,7 +408,6 @@ public class StartTools {
         System.out.println(HexFormat.of().formatHex(bytes));
         if(bytes.length==32)System.out.println(Base58.encode(KeyTools.priKey32To38Compressed(bytes)));
 
-
         Menu.anyKeyToContinue(br);
     }
 

@@ -5,6 +5,7 @@ import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import constants.IndicesNames;
 import constants.Strings;
 import constants.Values;
 import fcTools.ParseTools;
@@ -60,7 +61,7 @@ public class OrderManager {
             int choice = menu.choose(br);
             switch (choice) {
                 case 1-> howToByService(br);
-                case 2 -> recreateIndexAndResetOrderHeight(br, esClient,  ORDER, orderMappingJsonStr);
+                case 2 -> recreateIndexAndResetOrderHeight(br, esClient,  IndicesNames.ORDER, orderMappingJsonStr);
                 case 3 -> switchScanOpReturn(br);
                 case 4 -> switchOrderScanner(orderScanner);
                 case 5 -> findFidOrders(br,esClient);
@@ -74,7 +75,7 @@ public class OrderManager {
 
     private void recreateIndexAndResetOrderHeight(BufferedReader br, ElasticsearchClient esClient, String order, String orderMappingJsonStr) {
         Menu.askIfToDo("You will loss all orders info in the 'order' index of ES and Redis. Do you want to RECREATE?",br);
-        recreateApipIndex(br, esClient, ORDER, orderMappingJsonStr);
+        recreateApipIndex(br, esClient, IndicesNames.ORDER, orderMappingJsonStr);
         resetLastOrderHeight(br);
     }
 
@@ -133,7 +134,7 @@ public class OrderManager {
         SearchResponse<Order> result = null;
         try {
             result = esClient.search(s -> s
-                            .index(StartAPIP.getNameOfService(ORDER))
+                            .index(StartAPIP.getNameOfService(IndicesNames.ORDER))
                             .query(q -> q.term(t -> t.field(FROM_FID).value(finalFid)))
                             .sort(so->so.field(f->f.field(TIME)))
                             .size(100)

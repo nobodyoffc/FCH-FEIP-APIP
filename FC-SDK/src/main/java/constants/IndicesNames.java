@@ -40,6 +40,12 @@ public class IndicesNames {
     public static final String WEBHOOK = "webhook";
     public static final String NOBODY = "nobody";
 
+    public static final String SWAP_STATE = "swap_state";
+    public static final String SWAP_LP = "swap_lp";
+    public static final String SWAP_FINISHED = "swap_finished";
+    public static final String SWAP_PENDING = "swap_pending";
+    public static final String SWAP_PRICE = "swap_price";
+
     public static void printIndices() {
         Indices indices = Indices.CID;
         System.out.println(indices.name()+indices.ordinal());
