@@ -193,7 +193,7 @@ public class BlockchainAPIs {
         Fcdsl fcdsl = new Fcdsl();
         fcdsl.addNewQuery()
                 .addNewTerms()
-                .addNewFields("inMarks.fid","outMarks.fid")
+                .addNewFields("inMarks.owner","outMarks.owner")
                 .addNewValues(fid);
         if(last!=null){
             fcdsl.addNewAfter(last);

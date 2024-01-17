@@ -28,6 +28,8 @@ import java.util.HexFormat;
 import java.util.List;
 
 import static constants.Constants.APIP_PARAMS_JSON;
+import static constants.Strings.DESC;
+import static constants.Strings.HEIGHT;
 
 public class StartApipClient {
     public static final int DEFAULT_SIZE = 20;
@@ -356,6 +358,7 @@ public class StartApipClient {
         while(true){
             Menu menu = new Menu();
             menu.add(ApiNames.BlockchainAPIs);
+            menu.add("txByFid");
             menu.show();
             int choice = menu.choose(br);
 
@@ -374,11 +377,20 @@ public class StartApipClient {
                 case 12-> p2shSearch(DEFAULT_SIZE,"birthHeight:desc->fid:asc",sessionKey,br);
                 case 13-> txByIds(sessionKey,br);
                 case 14-> txSearch(DEFAULT_SIZE,"height:desc->txId:asc",sessionKey,br);
+                case 15-> txByFid(sessionKey,br);
                 case 0 -> {
                     return;
                 }
             }
         }
+    }
+
+    private static void txByFid(byte[] sessionKey, BufferedReader br) {
+        String fid = Inputer.inputGoodFid(br,"Input the fid:");
+        int size = Inputer.inputInteger(br,"Input the size:",0);
+        System.out.println("Requesting txSearch...");
+        ApipClient apipClient =BlockchainAPIs.txByFidPost(initApipParamsForClient.getUrlHead(),fid,HEIGHT,DESC,size,null, initApipParamsForClient.getVia(), sessionKey);
+        System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
     }
 
     public static void blockByIds(byte[] sessionKey, BufferedReader br) {
