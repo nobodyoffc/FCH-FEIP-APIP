@@ -389,7 +389,7 @@ public class StartApipClient {
         String fid = Inputer.inputGoodFid(br,"Input the fid:");
         int size = Inputer.inputInteger(br,"Input the size:",0);
         System.out.println("Requesting txSearch...");
-        ApipClient apipClient =BlockchainAPIs.txByFidPost(initApipParamsForClient.getUrlHead(),fid,HEIGHT,DESC,size,null, initApipParamsForClient.getVia(), sessionKey);
+        ApipClient apipClient =BlockchainAPIs.txByFidPost(initApipParamsForClient.getUrlHead(),fid,size,null, initApipParamsForClient.getVia(), sessionKey);
         System.out.println("apipClient:\n"+apipClient.getResponseBodyStr());
     }
 

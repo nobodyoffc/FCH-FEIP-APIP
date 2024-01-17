@@ -180,16 +180,16 @@ public class BlockchainAPIs {
         return apipClient;
     }
 
-    public static ApipClient txByFidPost(String urlHead, String fid,String sortField, String sortOrder, int size,  @Nullable String[] last, @Nullable String via, byte[] sessionKey)  {
-        Fcdsl fcdsl = txByFidQuery(fid,sortField,sortOrder,size,last);
+    public static ApipClient txByFidPost(String urlHead, String fid, int size,  @Nullable String[] last, @Nullable String via, byte[] sessionKey)  {
+        Fcdsl fcdsl = txByFidQuery(fid,size,last);
         return txSearchPost(urlHead,fcdsl,via,sessionKey);
     }
 
     public static Fcdsl txByFidQuery(String fid, @Nullable String[] last){
-        return txByFidQuery(fid,null,null,0,last);
+        return txByFidQuery(fid,0,last);
     }
 
-    public static Fcdsl txByFidQuery(String fid, String sortField, String sortOrder, int size, @Nullable String[] last){
+    public static Fcdsl txByFidQuery(String fid, int size, @Nullable String[] last){
         Fcdsl fcdsl = new Fcdsl();
         fcdsl.addNewQuery()
                 .addNewTerms()
@@ -197,10 +197,6 @@ public class BlockchainAPIs {
                 .addNewValues(fid);
         if(last!=null){
             fcdsl.addNewAfter(last);
-        }
-        if(sortField!=null){
-            if(sortOrder==null)sortOrder="desc";
-            fcdsl.addNewSort(sortField,sortOrder);
         }
         if(size!=0)
             fcdsl.addSize(size);

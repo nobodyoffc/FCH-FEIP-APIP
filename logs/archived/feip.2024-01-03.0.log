@@ -1,0 +1,32 @@
+2024-01-03 21:47:16.010 [main] INFO  startFEIP.StartFEIP - Start.
+2024-01-03 21:47:25.893 [main] INFO  startFEIP.FileParser - Start parse opreturn0.byte from 4064403
+2024-01-03 21:48:48.869 [main] INFO  startFEIP.StartFEIP - Start.
+2024-01-03 21:49:09.492 [main] INFO  startFEIP.FileParser - Start parse opreturn0.byte from 0
+2024-01-03 21:51:46.813 [main] INFO  startFEIP.StartFEIP - Start.
+2024-01-03 21:52:04.737 [main] INFO  startFEIP.FileParser - Start parse opreturn0.byte from 2456
+2024-01-03 21:53:35.190 [main] INFO  startFEIP.StartFEIP - Start.
+2024-01-03 21:53:48.869 [main] INFO  startFEIP.FileParser - Start parse opreturn0.byte from 2456
+2024-01-03 21:56:28.745 [main] INFO  startFEIP.StartFEIP - Start.
+2024-01-03 21:57:22.331 [main] INFO  startFEIP.FileParser - Start parse opreturn0.byte from 2456
+2024-01-03 22:01:06.397 [main] INFO  startFEIP.StartFEIP - Start.
+2024-01-03 22:01:34.657 [main] INFO  startFEIP.FileParser - Start parse opreturn0.byte from 4064403
+2024-01-03 22:31:04.573 [main] INFO  startFEIP.StartFEIP - Start.
+2024-01-03 22:31:30.987 [main] INFO  startFEIP.FileParser - Start parse opreturn0.byte from 0
+2024-01-03 22:31:33.403 [main] DEBUG startFEIP.FileParser - Invalid opReturn content on 3b2722888820281ed72f5c5f61360a8f98168123f40141b96eb19e8bfa89e159. 
+2024-01-03 22:31:37.812 [main] DEBUG startFEIP.FileParser - Invalid opReturn content on 11a1b0d99c4d048c520e3845e7cc1802cc7dd0e53db8825a2e5b3711191da593. 
+2024-01-03 22:32:28.010 [main] DEBUG startFEIP.FileParser - Invalid opReturn content on 835793a59d3f5cc550c38d61f2e2eb645b712b3ee83869d98b4ef696e225b66e. 
+2024-01-03 22:32:37.276 [main] DEBUG startFEIP.FileParser - Invalid opReturn content on 264e1ceb35238c53160dfde82444d8e3c11eee343753f041c233687a319418a2. 
+2024-01-03 22:33:10.973 [main] DEBUG startFEIP.FileParser - Invalid opReturn content on e44d607a9136ec900e62beb2f43a506684462618e55fbf975b874198cf3e9b40. 
+2024-01-03 22:33:11.323 [main] DEBUG startFEIP.FileParser - Invalid opReturn content on 05966c6ac38cc559d3ed0547e1860ccdbc4d43d72ef52f1c54c40b53c63513a6. 
+2024-01-03 22:33:13.284 [main] DEBUG startFEIP.FileParser - Invalid opReturn content on ca1e1c184b39f125b6ec6ff18444722c4236fe2f4581ed226afb1436e4795a23. 
+2024-01-03 22:33:13.284 [main] DEBUG startFEIP.FileParser - Invalid opReturn content on f894f3faa28396e40d1719fbd0fc0e3bcb441fca0109b0491300622430bb4569. 
+2024-01-03 22:33:14.482 [main] DEBUG startFEIP.FileParser - Invalid opReturn content on 904bb2e02a8981d540d8f7c5442a322fff55189e78f14ffedf43df0261de578f. 
+2024-01-03 22:33:14.483 [main] DEBUG startFEIP.FileParser - Invalid opReturn content on eb9eea7a759342fc2eb9cf072c83f4d27182fc5bdc0dccefe7ec37248a400df2. 
+2024-01-03 22:33:15.534 [main] DEBUG startFEIP.FileParser - Invalid opReturn content on 07ce800d064708bffd5e1be6bbee93ef026282ccef6eb6deb302e449fa08fa7f. 
+2024-01-03 22:33:20.783 [main] DEBUG startFEIP.FileParser - Invalid opReturn content on 9540900136655ed8fc7eeae6319d3beeae26ecd9141768c0a865a78365655e4b. 
+2024-01-03 22:34:47.934 [main] INFO  startFEIP.StartFEIP - Start.
+2024-01-03 22:35:11.074 [main] INFO  startFEIP.FileParser - Start parse opreturn0.byte from 4064403
+2024-01-03 22:42:24.792 [main] INFO  startFEIP.StartFEIP - Start.
+2024-01-03 22:42:29.832 [main] INFO  startFEIP.FileParser - Start parse opreturn0.byte from 4064403
+2024-01-03 22:43:03.982 [main] INFO  startFEIP.StartFEIP - Start.
+2024-01-03 22:43:14.881 [main] INFO  startFEIP.FileParser - Start parse opreturn0.byte from 4064403
