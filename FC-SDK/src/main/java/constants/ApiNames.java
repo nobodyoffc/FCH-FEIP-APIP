@@ -157,6 +157,8 @@ public class ApiNames {
     public static final String SwapPendingAPI ="swapPending";
     public static final String SwapFinishedAPI ="swapFinished";
     public static final String SwapPriceAPI ="swapPrice";
+    public static final String SwapInfoAPI ="swapInfo";
+    public static final String SwapSummaryAPI ="swapSummary";
 
 
     public static ArrayList<String> freeApiList = new ArrayList<>();
@@ -244,7 +246,9 @@ public class ApiNames {
         freeApiList.add(ApiNames.GetServicesAPI);
 
         SwapHallAPIs = new String[]{
-                SwapRegisterAPI,SwapUpdateAPI,SwapStateAPI,SwapLpAPI,SwapPendingAPI,SwapFinishedAPI,SwapPriceAPI
+                SwapRegisterAPI,SwapUpdateAPI,SwapStateAPI,
+                SwapLpAPI,SwapPendingAPI,SwapFinishedAPI,
+                SwapPriceAPI,SwapInfoAPI,SwapSummaryAPI
         };
 
     }
@@ -376,5 +380,7 @@ public class ApiNames {
         ApiNames.apiList.add(ApiNames.SwapPendingAPI);
         ApiNames.apiList.add(ApiNames.SwapFinishedAPI);
         ApiNames.apiList.add(ApiNames.SwapPriceAPI);
+        ApiNames.apiList.add(ApiNames.SwapInfoAPI);
+        ApiNames.apiList.add(ApiNames.SwapSummaryAPI);
     }
 }

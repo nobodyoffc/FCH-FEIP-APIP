@@ -177,4 +177,16 @@ public class BlockchainAPIs {
         if(!isGood)return null;
         return apipClient;
     }
+
+    public static Fcdsl txByFidQuery(String fid, @Nullable String[] last){
+        Fcdsl fcdsl = new Fcdsl();
+        fcdsl.addNewQuery()
+                .addNewTerms()
+                .addNewFields("inMarks.fid","outMarks.fid")
+                .addNewValues(fid);
+        if(last!=null){
+            fcdsl.addNewAfter(last);
+        }
+        return fcdsl;
+    }
 }

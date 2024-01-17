@@ -12,7 +12,6 @@ import initial.Initiator;
 import javaTools.JsonTools;
 import redis.clients.jedis.Jedis;
 import swapData.SwapParams;
-import swapData.SwapRegisterInfo;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -20,7 +19,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
@@ -73,6 +71,15 @@ public class SwapRegister extends HttpServlet {
         }
 
         String sid = dataMap.get(SID);
+        String swapServiceJson;
+        try(Jedis jedis = Initiator.jedisPool.getResource()){
+            swapServiceJson = jedis.hget(APIP_SWAP_SID_ADDR_KEY, sid);
+        }
+        if(swapServiceJson!=null) {
+            replier.setData(sid + " had been registered" + " by " + addr);
+            writer.write(replier.reply0Success(addr));
+            return;
+        }
 
         String index = IndicesNames.SERVICE;
 
@@ -120,7 +127,7 @@ public class SwapRegister extends HttpServlet {
             return;
         }
 
-        SwapRegisterInfo swapRegisterInfo = new SwapRegisterInfo();
+        swapData.SwapRegister swapRegisterInfo = new swapData.SwapRegister();
         swapRegisterInfo.setSid(sid);
         swapRegisterInfo.setRegisterer(addr);
         swapRegisterInfo.setRegisterTime(System.currentTimeMillis());
@@ -132,16 +139,16 @@ public class SwapRegister extends HttpServlet {
         writer.write(replier.reply0Success(addr));
     }
 
-    private static void saveSwapIntoFile(SwapRegisterInfo swapRegisterInfo) throws IOException {
+    private static void saveSwapIntoFile(swapData.SwapRegister swapRegisterInfo) throws IOException {
         File file = new File(APIP_SWAP_SID_ADDR_KEY + DOT_JSON);
         if(!file.exists())file.createNewFile();
-        List<SwapRegisterInfo> swapRegisterInfoList = JsonTools.readJsonObjectListFromFile(APIP_SWAP_SID_ADDR_KEY + DOT_JSON, SwapRegisterInfo.class);
+        List<swapData.SwapRegister> swapRegisterInfoList = JsonTools.readJsonObjectListFromFile(APIP_SWAP_SID_ADDR_KEY + DOT_JSON, swapData.SwapRegister.class);
         if(swapRegisterInfoList==null)swapRegisterInfoList=new ArrayList<>();
         swapRegisterInfoList.add(swapRegisterInfo);
         JsonTools.writeObjectListToJsonFile(swapRegisterInfoList,APIP_SWAP_SID_ADDR_KEY + DOT_JSON,false);
     }
 
-    private static void saveSwapIntoRedis(Gson gson, String sid, SwapRegisterInfo swapRegisterInfo) {
+    private static void saveSwapIntoRedis(Gson gson, String sid, swapData.SwapRegister swapRegisterInfo) {
         try(Jedis jedis = Initiator.jedisPool.getResource()){
             jedis.hset(APIP_SWAP_SID_ADDR_KEY, sid, gson.toJson(swapRegisterInfo));
         }
