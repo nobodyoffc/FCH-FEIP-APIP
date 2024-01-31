@@ -1,6 +1,6 @@
 package swapData;
 
-public class SwapState{
+public class SwapStateData {
     private String sid;
     private double gSum;
     private double mSum;

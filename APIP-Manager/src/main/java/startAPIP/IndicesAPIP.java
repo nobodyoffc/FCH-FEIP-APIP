@@ -30,13 +30,11 @@ public class IndicesAPIP {
     public static  final  String  balanceMappingJsonStr = "{\"mappings\":{\"properties\":{\"user\":{\"type\":\"text\"},\"consumeVia\":{\"type\":\"text\"},\"orderVia\":{\"type\":\"text\"},\"bestHeight\":{\"type\":\"keyword\"}}}}";
     public static final String  rewardMappingJsonStr = "{\"mappings\":{\"properties\":{\"rewardId\":{\"type\":\"keyword\"},\"rewardT\":{\"type\":\"long\"},\"time\":{\"type\":\"long\"},\"txId\":{\"type\":\"keyword\"},\"state\":{\"type\":\"keyword\"},\"bestHeight\":{\"type\":\"keyword\"},\"builderList\":{\"type\":\"nested\",\"properties\":{\"fid\":{\"type\":\"keyword\"},\"share\":{\"type\":\"float\"},\"amount\":{\"type\":\"long\"},\"fixed\":{\"type\":\"long\"}}},\"orderViaList\":{\"type\":\"nested\",\"properties\":{\"fid\":{\"type\":\"keyword\"},\"share\":{\"type\":\"float\"},\"amount\":{\"type\":\"long\"},\"fixed\":{\"type\":\"long\"}}},\"consumeViaList\":{\"type\":\"nested\",\"properties\":{\"fid\":{\"type\":\"keyword\"},\"share\":{\"type\":\"float\"},\"amount\":{\"type\":\"long\"},\"fixed\":{\"type\":\"long\"}}},\"costList\":{\"type\":\"nested\",\"properties\":{\"fid\":{\"type\":\"keyword\"},\"share\":{\"type\":\"float\"},\"amount\":{\"type\":\"long\"},\"fixed\":{\"type\":\"long\"}}}}}}";
     public static final String  webhookMappingJsonStr = "{\"mappings\":{\"properties\":{\"hookId\":{\"type\":\"keyword\"},\"owner\":{\"type\":\"wildcard\"},\"endpoint\":{\"type\":\"text\"},\"data\":{\"type\":\"object\"},\"method\":{\"type\":\"wildcard\"},\"op\":{\"type\":\"keyword\"}}}}";
-
     public static final String  swapStateJsonStr = "{\"mappings\":{\"properties\":{\"sid\":{\"type\":\"keyword\"},\"gSum\":{\"type\":\"double\"},\"mSum\":{\"type\":\"double\"},\"gBestBlockId\":{\"type\":\"keyword\"},\"gBestHeight\":{\"type\":\"long\"},\"mBestBlockId\":{\"type\":\"keyword\"},\"mBestHeight\":{\"type\":\"long\"},\"lastTime\":{\"type\":\"long\"},\"lastSn\":{\"type\":\"long\"},\"lastId\":{\"type\":\"keyword\"},\"gPendingSum\":{\"type\":\"double\"},\"mPendingSum\":{\"type\":\"double\"}}}}";
-    public static final String  swapPendingMappingJsonStr = "{\"mappings\":{\"properties\":{\"id\":{\"type\":\"keyword\"},\"sid\":{\"type\":\"keyword\"},\"sn\":{\"type\":\"long\"},\"act\":{\"type\":\"keyword\"},\"g\":{\"type\":\"object\",\"properties\":{\"txId\":{\"type\":\"keyword\"},\"refundTxId\":{\"type\":\"keyword\"},\"withdrawTxId\":{\"type\":\"keyword\"},\"refundAmt\":{\"type\":\"double\"},\"addr\":{\"type\":\"keyword\"},\"amt\":{\"type\":\"double\"},\"sum\":{\"type\":\"double\"},\"blockTime\":{\"type\":\"long\"},\"blockHeight\":{\"type\":\"long\"},\"blockIndex\":{\"type\":\"long\"},\"txFee\":{\"type\":\"long\"}}},\"m\":{\"type\":\"object\",\"properties\":{\"txId\":{\"type\":\"keyword\"},\"refundTxId\":{\"type\":\"keyword\"},\"withdrawTxId\":{\"type\":\"keyword\"},\"refundAmt\":{\"type\":\"double\"},\"addr\":{\"type\":\"keyword\"},\"amt\":{\"type\":\"double\"},\"sum\":{\"type\":\"double\"},\"blockTime\":{\"type\":\"long\"},\"blockHeight\":{\"type\":\"long\"},\"blockIndex\":{\"type\":\"long\"},\"txFee\":{\"type\":\"long\"}}},\"sendTime\":{\"type\":\"long\"},\"getTime\":{\"type\":\"long\"},\"state\":{\"type\":\"keyword\"},\"tooSmall\":{\"type\":\"boolean\"}}}}";
+    public static final String  swapPendingMappingJsonStr = "{\"mappings\":{\"properties\":{\"sid\":{\"type\":\"keyword\"},\"pendingList\":{\"type\":\"nested\",\"properties\":{\"id\":{\"type\":\"keyword\"},\"sid\":{\"type\":\"keyword\"},\"sn\":{\"type\":\"long\"},\"act\":{\"type\":\"keyword\"},\"g\":{\"type\":\"object\",\"properties\":{\"txId\":{\"type\":\"keyword\"},\"refundTxId\":{\"type\":\"keyword\"},\"withdrawTxId\":{\"type\":\"keyword\"},\"refundAmt\":{\"type\":\"double\"},\"addr\":{\"type\":\"keyword\"},\"amt\":{\"type\":\"double\"},\"sum\":{\"type\":\"double\"},\"blockTime\":{\"type\":\"long\"},\"blockHeight\":{\"type\":\"long\"},\"blockIndex\":{\"type\":\"long\"},\"txFee\":{\"type\":\"double\"}}},\"m\":{\"type\":\"object\",\"properties\":{\"txId\":{\"type\":\"keyword\"},\"refundTxId\":{\"type\":\"keyword\"},\"withdrawTxId\":{\"type\":\"keyword\"},\"refundAmt\":{\"type\":\"double\"},\"addr\":{\"type\":\"keyword\"},\"amt\":{\"type\":\"double\"},\"sum\":{\"type\":\"double\"},\"blockTime\":{\"type\":\"long\"},\"blockHeight\":{\"type\":\"long\"},\"blockIndex\":{\"type\":\"long\"},\"txFee\":{\"type\":\"double\"}}},\"sendTime\":{\"type\":\"long\"},\"getTime\":{\"type\":\"long\"},\"state\":{\"type\":\"keyword\"},\"tooSmall\":{\"type\":\"boolean\"}}}}}}";
     public static final String  swapLpMappingJsonStr = "{\"mappings\":{\"properties\":{\"sid\":{\"type\":\"keyword\"},\"gLpRawMap\":{\"type\":\"object\",\"properties\":{\"key\":{\"type\":\"keyword\"},\"value\":{\"type\":\"double\"}}},\"gLpNetMap\":{\"type\":\"object\",\"properties\":{\"key\":{\"type\":\"keyword\"},\"value\":{\"type\":\"double\"}}},\"gLpShareMap\":{\"type\":\"object\",\"properties\":{\"key\":{\"type\":\"keyword\"},\"value\":{\"type\":\"double\"}}},\"mLpRawMap\":{\"type\":\"object\",\"properties\":{\"key\":{\"type\":\"keyword\"},\"value\":{\"type\":\"double\"}}},\"mLpNetMap\":{\"type\":\"object\",\"properties\":{\"key\":{\"type\":\"keyword\"},\"value\":{\"type\":\"double\"}}},\"mLpShareMap\":{\"type\":\"object\",\"properties\":{\"key\":{\"type\":\"keyword\"},\"value\":{\"type\":\"double\"}}},\"gLpRawSum\":{\"type\":\"double\"},\"mLpRawSum\":{\"type\":\"double\"},\"gServiceFee\":{\"type\":\"double\"},\"mServiceFee\":{\"type\":\"double\"}}}}";
     public static final String  swapFinishedMappingJsonStr = "{\"mappings\":{\"properties\":{\"id\":{\"type\":\"keyword\"},\"sid\":{\"type\":\"keyword\"},\"sn\":{\"type\":\"long\"},\"act\":{\"type\":\"keyword\"},\"g\":{\"type\":\"object\",\"properties\":{\"txId\":{\"type\":\"keyword\"},\"refundTxId\":{\"type\":\"keyword\"},\"withdrawTxId\":{\"type\":\"keyword\"},\"refundAmt\":{\"type\":\"double\"},\"addr\":{\"type\":\"keyword\"},\"amt\":{\"type\":\"double\"},\"sum\":{\"type\":\"double\"},\"blockTime\":{\"type\":\"long\"},\"blockHeight\":{\"type\":\"long\"},\"blockIndex\":{\"type\":\"long\"},\"txFee\":{\"type\":\"long\"}}},\"m\":{\"type\":\"object\",\"properties\":{\"txId\":{\"type\":\"keyword\"},\"refundTxId\":{\"type\":\"keyword\"},\"withdrawTxId\":{\"type\":\"keyword\"},\"refundAmt\":{\"type\":\"double\"},\"addr\":{\"type\":\"keyword\"},\"amt\":{\"type\":\"double\"},\"sum\":{\"type\":\"double\"},\"blockTime\":{\"type\":\"long\"},\"blockHeight\":{\"type\":\"long\"},\"blockIndex\":{\"type\":\"long\"},\"txFee\":{\"type\":\"long\"}}},\"sendTime\":{\"type\":\"long\"},\"getTime\":{\"type\":\"long\"},\"state\":{\"type\":\"keyword\"},\"tooSmall\":{\"type\":\"boolean\"}}}}";
     public static final String  swapPriceMappingJsonStr = "{\"mappings\":{\"properties\":{\"sid\":{\"type\":\"keyword\"},\"gTick\":{\"type\":\"keyword\"},\"mTick\":{\"type\":\"keyword\"},\"price\":{\"type\":\"double\"},\"time\":{\"type\":\"long\"}}}}";
-
     public IndicesAPIP(ElasticsearchClient esClient, BufferedReader br){
         this.br = br;
         this.esClient = esClient;
@@ -53,6 +51,7 @@ public class IndicesAPIP {
         menuItemList.add("Recreate Reward index");
         menuItemList.add("Recreate Webhook index");
         menuItemList.add("Recreate Order, Balance and Reward indices");
+        menuItemList.add("Recreate All Swap indices");
 
         menu.add(menuItemList);
         while(true) {
@@ -74,11 +73,11 @@ public class IndicesAPIP {
     }
 
     public void recreateAllSwapIndex(BufferedReader br, ElasticsearchClient esClient) throws IOException, InterruptedException {
-        recreateApipIndex(br, esClient, SWAP_STATE, swapStateJsonStr);
-        recreateApipIndex(br, esClient, SWAP_LP, swapLpMappingJsonStr);
-        recreateApipIndex(br, esClient,SWAP_FINISHED, swapFinishedMappingJsonStr);
-        recreateApipIndex(br, esClient,SWAP_PENDING, swapPendingMappingJsonStr);
-        recreateApipIndex(br, esClient,SWAP_PRICE, swapPriceMappingJsonStr);
+        recreateSwapIndex(br, esClient, SWAP_STATE, swapStateJsonStr);
+        recreateSwapIndex(br, esClient, SWAP_LP, swapLpMappingJsonStr);
+        recreateSwapIndex(br, esClient,SWAP_FINISHED, swapFinishedMappingJsonStr);
+        recreateSwapIndex(br, esClient,SWAP_PENDING, swapPendingMappingJsonStr);
+        recreateSwapIndex(br, esClient,SWAP_PRICE, swapPriceMappingJsonStr);
     }
 
     private void recreateAllApipIndex(BufferedReader br, ElasticsearchClient esClient) throws IOException, InterruptedException {
@@ -96,6 +95,14 @@ public class IndicesAPIP {
             log.debug("Recreate index {} wrong.",index);
         }
         Menu.anyKeyToContinue(br);
+    }
+
+    public static void recreateSwapIndex(BufferedReader br, ElasticsearchClient esClient, String index, String mappingJsonStr) {
+        try {
+            recreateIndex(index, esClient,mappingJsonStr);
+        } catch (InterruptedException e) {
+            log.debug("Recreate index {} wrong.",index);
+        }
     }
     private static void listIndices(BufferedReader br) throws IOException {
         for (IndicesNames.Indices index : IndicesNames.Indices.values()) {
@@ -150,29 +157,24 @@ public class IndicesAPIP {
 
     public void checkSwapIndices() throws IOException {
         try {
-            String swapStateIndex = getNameOfService(SWAP_STATE);
-            if ( noSuchIndex(esClient, swapStateIndex)) {
-                createIndex(swapStateIndex,esClient,swapStateJsonStr);
+            if ( noSuchIndex(esClient, SWAP_STATE)) {
+                createIndex(SWAP_STATE,esClient,swapStateJsonStr);
             }
 
-            String swapLpIndex = getNameOfService(SWAP_LP);
-            if (noSuchIndex(esClient, swapLpIndex)) {
-                createIndex(swapLpIndex,esClient,swapLpMappingJsonStr);
+            if (noSuchIndex(esClient, SWAP_LP)) {
+                createIndex(SWAP_LP,esClient,swapLpMappingJsonStr);
             }
 
-            String swapFinishedIndex = getNameOfService(SWAP_FINISHED);
-            if (noSuchIndex(esClient, swapFinishedIndex)) {
-                createIndex(swapFinishedIndex,esClient,swapFinishedMappingJsonStr);
+            if (noSuchIndex(esClient, SWAP_FINISHED)) {
+                createIndex(SWAP_FINISHED,esClient,swapFinishedMappingJsonStr);
             }
 
-            String swapPendingIndex = getNameOfService(SWAP_PENDING);
-            if (noSuchIndex(esClient, swapPendingIndex)) {
-                createIndex(swapPendingIndex,esClient,swapPendingMappingJsonStr);
+            if (noSuchIndex(esClient, SWAP_PENDING)) {
+                createIndex(SWAP_PENDING,esClient,swapPendingMappingJsonStr);
             }
 
-            String swapPriceIndex = getNameOfService(SWAP_PRICE);
-            if (noSuchIndex(esClient, swapPriceIndex)) {
-                createIndex(swapPriceIndex,esClient,swapPriceMappingJsonStr);
+            if (noSuchIndex(esClient, SWAP_PRICE)) {
+                createIndex(SWAP_PRICE,esClient,swapPriceMappingJsonStr);
             }
         }catch(ElasticsearchException | IOException e) {
             log.debug("Failed to check swap indices: {}",e.getMessage());

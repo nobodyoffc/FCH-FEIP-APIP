@@ -2,6 +2,8 @@ package esTools;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.*;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import co.elastic.clients.elasticsearch._types.query_dsl.TermsQuery;
 import co.elastic.clients.elasticsearch.core.*;
 import co.elastic.clients.elasticsearch.core.BulkRequest.Builder;
 import co.elastic.clients.elasticsearch.core.mget.MultiGetResponseItem;
@@ -485,6 +487,17 @@ public class EsTools {
                         .sort(so->so.field(f->f.field("height").order(SortOrder.Desc)))
                 , Block.class);
         return result.hits().hits().get(0).source();
+    }
+
+    public static Query getTermsQuery(String field, String value) {
+        TermsQuery.Builder termsBuilder = new TermsQuery.Builder();
+        termsBuilder.field(field);
+        FieldValue fieldValue = FieldValue.of(value);
+        List<FieldValue> fieldValueList = new ArrayList<>();
+        fieldValueList.add(fieldValue);
+        termsBuilder.terms(t->t.value(fieldValueList));
+        TermsQuery termsQuery = termsBuilder.build();
+        return new Query.Builder().terms(termsQuery).build();
     }
 
     public static class MgetResult<E> {

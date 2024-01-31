@@ -470,7 +470,7 @@ public class WalletTools {
             searchBuilder.trackTotalHits(tr->tr.enabled(true));
             searchBuilder.aggregations(FieldNames.SUM, a->a.sum(s1->s1.field(FieldNames.VALUE)));
             searchBuilder.sort(s1->s1.field(f->f.field(FieldNames.CD).order(SortOrder.Asc)));
-            searchBuilder.size(100);
+            searchBuilder.size(200);
 
             BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
 

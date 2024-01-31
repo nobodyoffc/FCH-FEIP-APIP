@@ -12,6 +12,7 @@ import initial.Initiator;
 import javaTools.JsonTools;
 import redis.clients.jedis.Jedis;
 import swapData.SwapParams;
+import swapData.SwapRegisterInfo;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -71,11 +72,11 @@ public class SwapRegister extends HttpServlet {
         }
 
         String sid = dataMap.get(SID);
-        String swapServiceJson;
+        String swapRegisterInfoJson;
         try(Jedis jedis = Initiator.jedisPool.getResource()){
-            swapServiceJson = jedis.hget(APIP_SWAP_SID_ADDR_KEY, sid);
+            swapRegisterInfoJson = jedis.hget(APIP_SWAP_SID_ADDR_KEY, sid);
         }
-        if(swapServiceJson!=null) {
+        if(swapRegisterInfoJson!=null) {
             replier.setData(sid + " had been registered" + " by " + addr);
             writer.write(replier.reply0Success(addr));
             return;
@@ -89,21 +90,21 @@ public class SwapRegister extends HttpServlet {
         if(swapService==null){
             response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1011DataNotFound));
             replier.setData("Failed to get the swap service: "+sid);
-            writer.write(replier.reply1012BadQuery(addr));
+            writer.write(replier.reply1011DataNotFound(addr));
             return;
         }
 
         if(swapService.isClosed()){
             response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1020OtherError));
             replier.setData("The swap service "+sid+" is set to closed.");
-            writer.write(replier.reply1012BadQuery(addr));
+            writer.write(replier.reply1020OtherError(addr));
             return;
         }
 
         if(!swapService.isActive()){
             response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1020OtherError));
             replier.setData("The swap service "+sid+" is no longer active.");
-            writer.write(replier.reply1012BadQuery(addr));
+            writer.write(replier.reply1020OtherError(addr));
             return;
         }
 
@@ -123,11 +124,11 @@ public class SwapRegister extends HttpServlet {
         if(!swapRelatedAddrList.contains(addr)){
             response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1020OtherError));
             replier.setData("Only the owner, waiters, or dealers of the swap service can register the swap.");
-            writer.write(replier.reply1012BadQuery(addr));
+            writer.write(replier.reply1020OtherError(addr));
             return;
         }
 
-        swapData.SwapRegister swapRegisterInfo = new swapData.SwapRegister();
+        SwapRegisterInfo swapRegisterInfo = new SwapRegisterInfo();
         swapRegisterInfo.setSid(sid);
         swapRegisterInfo.setRegisterer(addr);
         swapRegisterInfo.setRegisterTime(System.currentTimeMillis());
@@ -139,16 +140,16 @@ public class SwapRegister extends HttpServlet {
         writer.write(replier.reply0Success(addr));
     }
 
-    private static void saveSwapIntoFile(swapData.SwapRegister swapRegisterInfo) throws IOException {
+    private static void saveSwapIntoFile(SwapRegisterInfo swapRegisterInfo) throws IOException {
         File file = new File(APIP_SWAP_SID_ADDR_KEY + DOT_JSON);
         if(!file.exists())file.createNewFile();
-        List<swapData.SwapRegister> swapRegisterInfoList = JsonTools.readJsonObjectListFromFile(APIP_SWAP_SID_ADDR_KEY + DOT_JSON, swapData.SwapRegister.class);
+        List<SwapRegisterInfo> swapRegisterInfoList = JsonTools.readJsonObjectListFromFile(APIP_SWAP_SID_ADDR_KEY + DOT_JSON, SwapRegisterInfo.class);
         if(swapRegisterInfoList==null)swapRegisterInfoList=new ArrayList<>();
         swapRegisterInfoList.add(swapRegisterInfo);
         JsonTools.writeObjectListToJsonFile(swapRegisterInfoList,APIP_SWAP_SID_ADDR_KEY + DOT_JSON,false);
     }
 
-    private static void saveSwapIntoRedis(Gson gson, String sid, swapData.SwapRegister swapRegisterInfo) {
+    private static void saveSwapIntoRedis(Gson gson, String sid, SwapRegisterInfo swapRegisterInfo) {
         try(Jedis jedis = Initiator.jedisPool.getResource()){
             jedis.hset(APIP_SWAP_SID_ADDR_KEY, sid, gson.toJson(swapRegisterInfo));
         }

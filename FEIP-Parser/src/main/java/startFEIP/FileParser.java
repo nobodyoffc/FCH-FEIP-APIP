@@ -63,9 +63,10 @@ public class FileParser {
 
 		FcInfo feip = null;
 		try {
-			feip = new Gson().fromJson(JsonTools.strToJson(opre.getOpReturn()),FcInfo.class);
+			String json = JsonTools.strToJson(opre.getOpReturn());
+			feip = new Gson().fromJson(json,FcInfo.class);
 		}catch(JsonSyntaxException e) {
-			log.debug("Invalid opReturn content on {}. ",opre.getTxId());
+			log.debug("Bad json on {}. ",opre.getTxId());
 		}
 		return  feip;
 	}

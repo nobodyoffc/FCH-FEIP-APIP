@@ -106,4 +106,7 @@ public class Strings {
     public static final String SWAP = "swap";
     public static String spendCashMapKey = "spentCashMap";
     public static String newCashMapKey = "newCashMap";
+    public static final String PENDING = "pending";
+    public static final String LP = "lp";
+    public static final String FINISHED = "finished";
 }

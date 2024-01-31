@@ -18,6 +18,7 @@ import fcTools.ParseTools;
 import fchClass.Address;
 import fchClass.Block;
 import appUtils.Inputer;
+import javaTools.JsonTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import fcTools.WeightMethod;
@@ -55,7 +56,6 @@ public class CdMaker {
 
 	public void makeUtxoCd(ElasticsearchClient esClient, Block bestBlock)
 			throws ElasticsearchException, IOException, InterruptedException {
-
 		long bestBlockTime = bestBlock.getTime();
 
 		System.out.println("Make all cd of UTXOs...");
@@ -82,7 +82,7 @@ public class CdMaker {
 	public void makeAddrCd(ElasticsearchClient esClient) throws Exception {
 
 		System.out.println("Make all cd of Addresses...");
-
+		long sum = 0;
 		long count = 0;
 
 		SearchResponse<Address> response = esClient.search(
@@ -93,6 +93,7 @@ public class CdMaker {
 		Map<String,Address> addrOldMap = new HashMap<>();
 		for(Address addr : addrOldList){
 			addrOldMap.put(addr.getFid(),addr);
+			sum+=addr.getBalance();
 		}
 
 		Map<String,Long> addrNewCdMap = makeAddrCdMap(esClient, addrOldList);
@@ -119,6 +120,9 @@ public class CdMaker {
 			count+=response.hits().hits().size();
 		}
 		String time = ParseTools.convertTimestampToDate(System.currentTimeMillis());
+		Map<String,Long> dataMap =new HashMap<>();
+		dataMap.put("circulating",sum);
+		JsonTools.writeObjectToJsonFile(dataMap,"state.json",false);
 		log.debug(time+": Made cd values of all "+count+" address.");
 		System.out.println(time+": Made cd values of all "+count+" address.");
 	}

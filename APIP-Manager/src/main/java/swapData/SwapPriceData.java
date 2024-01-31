@@ -1,6 +1,6 @@
 package swapData;
 
-public class swapPrice {
+public class SwapPriceData {
     private String sid;
     private String gTick;
     private String mTick;

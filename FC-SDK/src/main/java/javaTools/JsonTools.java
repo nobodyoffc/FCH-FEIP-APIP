@@ -81,6 +81,15 @@ public class JsonTools {
         return rawStr.replaceAll("[\r\n\t]", "");
     }
 
+    public static Map<String, Object> getStringObjectMap(String json) {
+        Gson gson = new Gson();
+        // Define the type of the map
+        Type mapType = new TypeToken<Map<String, Object>>() {}.getType();
+        // Parse the JSON string back into a map
+        Map<String, Object> map = gson.fromJson(json, mapType);
+        return map;
+    }
+
     @Test
     public void strTest (){
         String str = "{\n\t\"f\":\"v\"\n}";

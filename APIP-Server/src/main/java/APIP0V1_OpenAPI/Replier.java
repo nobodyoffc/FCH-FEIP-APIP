@@ -14,6 +14,7 @@ import constants.Strings;
 import walletTools.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -46,6 +47,20 @@ public class Replier {
         if(sign==null) return true;
         response.setHeader(ReplyInfo.SignInHeader,sign);
         return false;
+    }
+
+    public static void replyNoData(HttpServletResponse response, PrintWriter writer, Replier replier) {
+        replier.setTotal(0);
+        replier.setGot(0);
+        response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1011DataNotFound));
+        writer.write(replier.reply1011DataNotFound());
+    }
+    public static void replyOtherError(HttpServletResponse response, PrintWriter writer, Replier replier,String msg) {
+        replier.setTotal(0);
+        replier.setGot(0);
+        replier.setData(msg);
+        response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1020OtherError));
+        writer.write(replier.reply1020OtherError());
     }
 
     public String reply(String userAddr) {
@@ -221,6 +236,11 @@ public class Replier {
       code = ReplyInfo.Code1011DataNotFound;
         message = ReplyInfo.Msg1011DataNotFound;
         return reply(addr);
+    }
+    public String reply1011DataNotFound(){
+        code = ReplyInfo.Code1011DataNotFound;
+        message = ReplyInfo.Msg1011DataNotFound;
+        return reply();
     }
 
     public String reply1012BadQuery(String addr){

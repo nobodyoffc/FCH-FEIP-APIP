@@ -58,6 +58,7 @@ public class ApiNames {
     public static final String BlockHasByIdsAPI = "blockHasByIds";
     public static final String TxHasByIdsAPI = "TxHasByIds";
     public static final String CashValidAPI = "cashValid";
+    public static final String GetUtxoAPI = "getUtxo";
     public static final String FidByIdsAPI = "fidByIds";
     public static final String CidInfoByIdsAPI = "cidInfoByIds";
     public static final String GetFidCidAPI = "getFidCid";
@@ -158,13 +159,14 @@ public class ApiNames {
     public static final String SwapFinishedAPI ="swapFinished";
     public static final String SwapPriceAPI ="swapPrice";
     public static final String SwapInfoAPI ="swapInfo";
-    public static final String SwapSummaryAPI ="swapSummary";
+//    public static final String SwapInfoAPI ="swapSummary";
 
 
     public static ArrayList<String> freeApiList = new ArrayList<>();
 
 
     public static final String GetFreeKeyAPI="getFreeKey";
+    public static final String GetCirculatingAPI="getCirculating";
 
 
     static {
@@ -248,7 +250,7 @@ public class ApiNames {
         SwapHallAPIs = new String[]{
                 SwapRegisterAPI,SwapUpdateAPI,SwapStateAPI,
                 SwapLpAPI,SwapPendingAPI,SwapFinishedAPI,
-                SwapPriceAPI,SwapInfoAPI,SwapSummaryAPI
+                SwapPriceAPI,SwapInfoAPI, SwapInfoAPI
         };
 
     }
@@ -381,6 +383,6 @@ public class ApiNames {
         ApiNames.apiList.add(ApiNames.SwapFinishedAPI);
         ApiNames.apiList.add(ApiNames.SwapPriceAPI);
         ApiNames.apiList.add(ApiNames.SwapInfoAPI);
-        ApiNames.apiList.add(ApiNames.SwapSummaryAPI);
+        ApiNames.apiList.add(ApiNames.SwapInfoAPI);
     }
 }

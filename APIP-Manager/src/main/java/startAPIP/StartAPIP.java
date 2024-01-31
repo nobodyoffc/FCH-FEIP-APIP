@@ -95,7 +95,7 @@ public class StartAPIP {
 				indicesAPIP = new IndicesAPIP(esClient,br);
 				indicesAPIP.checkApipIndices();
 				indicesAPIP.checkSwapIndices();
-			};
+			}
 
 			if(orderScanner==null) startOrderScan(configAPIP, esClient);
 

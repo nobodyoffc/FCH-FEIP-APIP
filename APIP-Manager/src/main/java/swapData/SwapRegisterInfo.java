@@ -1,6 +1,6 @@
 package swapData;
 
-public class SwapRegister {
+public class SwapRegisterInfo {
     private String sid;
     private String registerer;
     private long registerTime;

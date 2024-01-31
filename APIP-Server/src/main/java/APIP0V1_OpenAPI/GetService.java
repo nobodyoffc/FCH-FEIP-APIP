@@ -52,8 +52,9 @@ public class GetService extends HttpServlet {
             writer.write(replier.reply0Success());
 
         } catch (Exception e){
-            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code2009NoFreeSessionKey));
-            writer.write(replier.reply2009NoFreeSessionKey());
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1020OtherError));
+            replier.setData("Jedis wrong when get service. Error:"+e.getMessage());
+            writer.write(replier.reply1020OtherError());
         }
     }
 }

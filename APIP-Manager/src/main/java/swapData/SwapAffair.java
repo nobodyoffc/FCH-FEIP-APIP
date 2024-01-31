@@ -168,16 +168,6 @@ public class SwapAffair {
         });
     }
 
-    public static boolean isFromGoods(SwapAffair swapAffair) {
-        boolean isGoods;
-        isGoods = swapAffair.getG().getAmt()>0;
-        return isGoods;
-    }
-    public  boolean isFromGoods() {
-        return this.id.equals(this.g.txId);
-    }
-
-
     public long getSn() {
         return sn;
     }

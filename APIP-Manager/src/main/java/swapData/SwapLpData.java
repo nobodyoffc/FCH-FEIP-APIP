@@ -3,7 +3,7 @@ package swapData;
 import java.util.HashMap;
 import java.util.Map;
 
-public class LpMaps {
+public class SwapLpData {
     private String sid;
     private Map<String,Double> gLpRawMap;
     private Map<String,Double> gLpNetMap;
@@ -16,7 +16,7 @@ public class LpMaps {
     private double gServiceFee;
     private double mServiceFee;
 
-    public LpMaps() {
+    public SwapLpData() {
         this.gLpRawMap = new HashMap<>();
         this.gLpNetMap = new HashMap<>();
         this.gLpShareMap = new HashMap<>();
@@ -25,23 +25,15 @@ public class LpMaps {
         this.mLpShareMap = new HashMap<>();
     }
 
-    public void calcGLpSum() {
+    public void calcGLpRawSum() {
         double gLpSum=0;
-        for(String addr: gLpNetMap.keySet()) gLpSum += gLpRawMap.get(addr);
+        for(String addr: gLpRawMap.keySet()) gLpSum += gLpRawMap.get(addr);
         this.gLpRawSum =gLpSum;
     }
-    public void calcMLpSum() {
+    public void calcMLpRawSum() {
         double mLpSum=0;
-        for(String addr: mLpNetMap.keySet()) mLpSum += mLpRawMap.get(addr);
+        for(String addr: mLpRawMap.keySet()) mLpSum += mLpRawMap.get(addr);
         this.mLpRawSum =mLpSum;
-    }
-
-    public String getSid() {
-        return sid;
-    }
-
-    public void setSid(String sid) {
-        this.sid = sid;
     }
 
     public Map<String, Double> getgLpNetMap() {
@@ -122,5 +114,13 @@ public class LpMaps {
 
     public void setmServiceFee(double mServiceFee) {
         this.mServiceFee = mServiceFee;
+    }
+
+    public String getSid() {
+        return sid;
+    }
+
+    public void setSid(String sid) {
+        this.sid = sid;
     }
 }
