@@ -7,7 +7,7 @@ import apipClass.Sort;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
-import organize.TeamHistory;
+import feipClass.TeamHistory;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

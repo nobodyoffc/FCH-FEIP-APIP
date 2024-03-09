@@ -161,12 +161,23 @@ public class ApiNames {
     public static final String SwapInfoAPI ="swapInfo";
 //    public static final String SwapInfoAPI ="swapSummary";
 
+    public static final String MyTokensAPI = "myTokens";
+    public static final String TokenByIdsAPI = "tokenByIds";
+    public static final String TokenHistoryAPI = "tokenHistory";
+    public static final String TokenHolderByIdsAPI = "tokenHolderByIds";
+    public static final String TokenHoldersAPI = "tokenHolders";
+    public static final String TokenSearchAPI = "tokenSearch";
 
     public static ArrayList<String> freeApiList = new ArrayList<>();
 
 
     public static final String GetFreeKeyAPI="getFreeKey";
     public static final String GetCirculatingAPI="getCirculating";
+    public static final String ChainInfoAPI ="chainInfo";
+    public static final String DifficultyHistoryAPI ="difficultyHistory";
+    public static final String HashRateHistoryAPI ="hashRateHistory";
+    public static final String BlockTimeHistoryAPI ="blockTimeHistory";
+
 
 
     static {
@@ -214,8 +225,9 @@ public class ApiNames {
 
         PublishAPIs = new String[]{
                 ProofByIdsAPI,ProofSearchAPI,ProofHistoryAPI,
-                StatementByIdsAPI,StatementSearchAPI,
-                NidSearchAPI
+                StatementByIdsAPI,StatementSearchAPI, NidSearchAPI,
+                MyTokensAPI,TokenByIdsAPI ,TokenHistoryAPI,
+                TokenHolderByIdsAPI,TokenHoldersAPI,TokenSearchAPI
         };
 
         WalletAPIs = new String[]{
@@ -384,5 +396,12 @@ public class ApiNames {
         ApiNames.apiList.add(ApiNames.SwapPriceAPI);
         ApiNames.apiList.add(ApiNames.SwapInfoAPI);
         ApiNames.apiList.add(ApiNames.SwapInfoAPI);
+
+        ApiNames.apiList.add(MyTokensAPI);
+        ApiNames.apiList.add(TokenByIdsAPI);
+        ApiNames.apiList.add(TokenHistoryAPI);
+        ApiNames.apiList.add(TokenHolderByIdsAPI);
+        ApiNames.apiList.add(TokenHoldersAPI);
+        ApiNames.apiList.add(TokenSearchAPI);
     }
 }

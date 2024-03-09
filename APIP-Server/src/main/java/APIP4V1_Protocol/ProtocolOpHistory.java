@@ -6,7 +6,7 @@ import apipClass.Sort;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
-import construct.ProtocolHistory;
+import feipClass.ProtocolHistory;
 import apipClass.Fcdsl;
 
 import javax.servlet.ServletException;

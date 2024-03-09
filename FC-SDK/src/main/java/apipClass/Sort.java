@@ -3,18 +3,22 @@ package apipClass;
 import co.elastic.clients.elasticsearch._types.FieldSort;
 import co.elastic.clients.elasticsearch._types.SortOptions;
 import co.elastic.clients.elasticsearch._types.SortOrder;
-import constants.Strings;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static constants.Strings.*;
+import static constants.Strings.HEIGHT;
+import static constants.Strings.TX_INDEX;
+
 
 public class Sort {
     private String field;
     private String order = DESC;
+    public static String DESC = "desc";
+    public static String ASC = "asc";
+
     public Sort(){}
     public Sort(String field,String order){
         if(order.equals(DESC)||order.equals(ASC)) {

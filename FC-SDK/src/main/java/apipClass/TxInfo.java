@@ -11,6 +11,7 @@ import java.util.Map;
 
 public class TxInfo {
     private String id;		//txid,hash of tx
+    private String rawTx;
     private int version;		//version
     private long lockTime;	//locktime
     private long blockTime;		//blockTime
@@ -47,6 +48,7 @@ public class TxInfo {
             if (tx != null) {
                 TxInfo txInfo = new TxInfo();
                 txInfo.setId(tx.getTxId());
+                txInfo.setRawTx(txHas.getRawTx());
                 txInfo.setHeight(txHas.getHeight());
                 txInfo.setSpentCashes(txHas.getInMarks());
                 txInfo.setIssuedCashes(txHas.getOutMarks());
@@ -204,5 +206,13 @@ public class TxInfo {
 
     public void setIssuedCashes(ArrayList<CashMark> issuedCashes) {
         this.issuedCashes = issuedCashes;
+    }
+
+    public String getRawTx() {
+        return rawTx;
+    }
+
+    public void setRawTx(String rawTx) {
+        this.rawTx = rawTx;
     }
 }

@@ -1,5 +1,6 @@
 package swapData;
 
+import java.beans.Transient;
 import java.util.List;
 
 public class SwapAffair {
@@ -12,7 +13,7 @@ public class SwapAffair {
     private long sendTime;
     private long getTime;
     private State state;
-    private boolean tooSmall;
+    private String error;
 
 
     public enum State{
@@ -31,13 +32,22 @@ public class SwapAffair {
         private String refundTxId;
         private String withdrawTxId;
         private double refundAmt;
+        private double withdrawAmt;
         private String addr;
         private double amt;
         private double sum;
         private long blockTime;
         private long blockHeight;
         private long blockIndex;
-        private long txFee;
+        private double txFee;
+
+        public double getWithdrawAmt() {
+            return withdrawAmt;
+        }
+
+        public void setWithdrawAmt(double withdrawAmt) {
+            this.withdrawAmt = withdrawAmt;
+        }
 
         public String getTxId() {
             return txId;
@@ -119,11 +129,11 @@ public class SwapAffair {
             this.refundAmt = refundAmt;
         }
 
-        public long getTxFee() {
+        public double getTxFee() {
             return txFee;
         }
 
-        public void setTxFee(long txFee) {
+        public void setTxFee(double txFee) {
             this.txFee = txFee;
         }
     }
@@ -167,6 +177,19 @@ public class SwapAffair {
             return 0;
         });
     }
+
+    @Transient
+    public static boolean isFromGoods(SwapAffair swapAffair) {
+        boolean isGoods;
+        isGoods = swapAffair.getG().getAmt()>0;
+        return isGoods;
+    }
+
+    @Transient
+    public  boolean isFromGoods() {
+        return this.id.equals(this.g.txId);
+    }
+
 
     public long getSn() {
         return sn;
@@ -224,12 +247,12 @@ public class SwapAffair {
         this.state = state;
     }
 
-    public boolean isTooSmall() {
-        return tooSmall;
+    public String getError() {
+        return error;
     }
 
-    public void setTooSmall(boolean tooSmall) {
-        this.tooSmall = tooSmall;
+    public void setError(String error) {
+        this.error = error;
     }
 
     public String getId() {
@@ -247,4 +270,5 @@ public class SwapAffair {
     public void setSid(String sid) {
         this.sid = sid;
     }
+
 }

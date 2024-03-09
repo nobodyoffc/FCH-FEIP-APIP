@@ -45,6 +45,9 @@ public class IndicesNames {
     public static final String SWAP_FINISHED = "swap_finished";
     public static final String SWAP_PENDING = "swap_pending";
     public static final String SWAP_PRICE = "swap_price";
+    public static final String TOKEN_HISTORY = "token_history";
+    public static final String TOKEN = "token";
+    public static final String TOKEN_HOLDER = "token_holder";
 
     public static void printIndices() {
         Indices indices = Indices.CID;

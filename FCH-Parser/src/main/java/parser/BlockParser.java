@@ -1,5 +1,6 @@
 package parser;
 
+import com.fasterxml.jackson.core.util.ByteArrayBuilder;
 import fchClass.*;
 import javaTools.BytesTools;
 import cryptoTools.SHA;
@@ -7,16 +8,19 @@ import keyTools.KeyTools;
 import fcTools.ParseTools;
 import fcTools.ParseTools.VarintResult;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HexFormat;
 
 import static txTools.RawTxParser.parseOpReturn;
 
 public class BlockParser {
 	public ReadyBlock parseBlock(byte[] blockBytes, BlockMark blockMark) throws IOException {
-		
+
 
 		Block block = new Block();
 		block.setBlockId(blockMark.getBlockId());
@@ -25,24 +29,24 @@ public class BlockParser {
 		block.setSize(blockMark.getSize());
 
 		ByteArrayInputStream blockInputStream = new ByteArrayInputStream(blockBytes);
-		
+
 		byte[] blockHeadBytes = new byte[80];
 		blockInputStream.read(blockHeadBytes);
-		
+
 		byte[] blockBodyBytes = new byte[(int) (block.getSize() - 80)];
 		blockInputStream.read(blockBodyBytes);
 
 		block = parseBlockHead(blockHeadBytes, block);
 
 		ReadyBlock readyBlock = parseBlockBody(blockBodyBytes, block);
-		
+
 		readyBlock.setBlockMark(blockMark);
 
 		return readyBlock;
 	}
 
 	private Block parseBlockHead(byte[] blockHeadBytes, Block block1) {
-		
+
 		Block block = block1;
 
 		int offset = 0;
@@ -75,7 +79,7 @@ public class BlockParser {
 		// 读取4字节挖矿难度：
 		byte[] b4Bits = Arrays.copyOfRange(blockHeadBytes, offset, offset + 4);
 		offset += 4;
-		block.setDiffTarget(BytesTools.bytes4ToLongLE(b4Bits));
+		block.setBits(BytesTools.bytes4ToLongLE(b4Bits));
 
 		// Read 4 bytes of nonce
 		// 读取4字节挖矿随机数：
@@ -87,7 +91,7 @@ public class BlockParser {
 	}
 
 	private ReadyBlock parseBlockBody(byte[] blockBodyBytes, Block block1) throws IOException {
-		
+
 		ReadyBlock readyBlock = new ReadyBlock();
 		Block block = block1;
 		ByteArrayInputStream blockInputStream = new ByteArrayInputStream(blockBodyBytes);
@@ -125,7 +129,7 @@ public class BlockParser {
 		readyBlock.setOutList(outList);
 		if (opReturnList != null)
 			readyBlock.setOpReturnList(opReturnList);
-		
+
 		return readyBlock;
 	}
 
@@ -178,13 +182,11 @@ public class BlockParser {
 		bytesList.add(b4LockTime);
 		tx.setLockTime(BytesTools.bytes4ToLongLE(b4LockTime));
 
-		tx.setTxId(BytesTools.bytesToHexStringLE(SHA.Sha256x2(BytesTools.bytesMerger(bytesList))));
+		byte[] rawTxBytes = BytesTools.bytesMerger(bytesList);
+		tx.setTxId(BytesTools.bytesToHexStringLE(SHA.Sha256x2(rawTxBytes)));
 		ArrayList<Cash> outList = makeOutList(tx.getTxId(), rawOutList);
 
-		TxHas txHas = new TxHas();
-		txHas.setTxId(tx.getTxId());
-		txHas.setHeight(tx.getHeight());
-
+		tx.setRawTx(HexFormat.of().formatHex(rawTxBytes));
 		TxResult txResult = new TxResult();
 		txResult.tx = tx;
 		txResult.outList = outList;
@@ -253,36 +255,36 @@ public class BlockParser {
 			b1Script = bScript[0];
 
 			switch (b1Script) {
-			case OP_DUP:
-				out.setType("P2PKH");
-				out.setLockScript(BytesTools.bytesToHexStringBE(bScript));
-				byte[] hash160Bytes = Arrays.copyOfRange(bScript, 3, 23);
-				out.setOwner(KeyTools.hash160ToFchAddr(hash160Bytes));
-				break;
-			case OP_RETURN:
-				out.setType("OP_RETURN");
-				opReturnStr = parseOpReturn(bScript);//new String(Arrays.copyOfRange(bScript, 2, bScript.length));
-				out.setOwner("OpReturn");
+				case OP_DUP:
+					out.setType("P2PKH");
+					out.setLockScript(BytesTools.bytesToHexStringBE(bScript));
+					byte[] hash160Bytes = Arrays.copyOfRange(bScript, 3, 23);
+					out.setOwner(KeyTools.hash160ToFchAddr(hash160Bytes));
+					break;
+				case OP_RETURN:
+					out.setType("OP_RETURN");
+					opReturnStr = parseOpReturn(bScript);//new String(Arrays.copyOfRange(bScript, 2, bScript.length));
+					out.setOwner("OpReturn");
 
-				out.setValid(false);
-				if (tx.getTxIndex() != 0) {
-					if (opReturnStr.length() <= 30) {
-						tx.setOpReBrief(opReturnStr);
-					} else {
-						tx.setOpReBrief(opReturnStr.substring(0, 29));
+					out.setValid(false);
+					if (tx.getTxIndex() != 0) {
+						if (opReturnStr.length() <= 30) {
+							tx.setOpReBrief(opReturnStr);
+						} else {
+							tx.setOpReBrief(opReturnStr.substring(0, 29));
+						}
 					}
-				}
-				break;
-			case OP_HASH160:
-				out.setType("P2SH");
-				out.setLockScript(BytesTools.bytesToHexStringBE(bScript));
-				byte[] hash160Bytes1 = Arrays.copyOfRange(bScript, 2, 22);
-				out.setOwner(KeyTools.hash160ToMultiAddr(hash160Bytes1));
-				break;
-			default:
-				out.setType("Unknown");
-				out.setLockScript(BytesTools.bytesToHexStringBE(bScript));
-				out.setOwner("Unknown");
+					break;
+				case OP_HASH160:
+					out.setType("P2SH");
+					out.setLockScript(BytesTools.bytesToHexStringBE(bScript));
+					byte[] hash160Bytes1 = Arrays.copyOfRange(bScript, 2, 22);
+					out.setOwner(KeyTools.hash160ToMultiAddr(hash160Bytes1));
+					break;
+				default:
+					out.setType("Unknown");
+					out.setLockScript(BytesTools.bytesToHexStringBE(bScript));
+					out.setOwner("Unknown");
 			}
 
 			// Add block and tx information to output./给输出添加区块和交易信息。
@@ -361,10 +363,13 @@ public class BlockParser {
 		bytesList.add(b4LockTime);
 		tx.setLockTime(BytesTools.bytesToIntLE(b4LockTime));
 
-		tx.setTxId(BytesTools.bytesToHexStringLE(SHA.Sha256x2(BytesTools.bytesMerger(bytesList))));
+		byte[] rawTxBytes = BytesTools.bytesMerger(bytesList);
+		tx.setTxId(BytesTools.bytesToHexStringLE(SHA.Sha256x2(rawTxBytes)));
+		tx.setRawTx(HexFormat.of().formatHex(rawTxBytes));
+
 		ArrayList<Cash> inList = makeInList(tx.getTxId(), rawInList);
 		ArrayList<Cash> outList = makeOutList(tx.getTxId(), rawOutList);
-		
+
 		OpReturn opReturn = new OpReturn();
 		if(parseTxOutResult.opReturnStr!=null && !"".equals(parseTxOutResult.opReturnStr)) {
 			opReturn.setOpReturn(parseTxOutResult.opReturnStr);
@@ -374,7 +379,7 @@ public class BlockParser {
 		}
 		TxResult txResult = new TxResult();
 		txResult.tx = tx;
-		if(parseTxOutResult.opReturnStr!=null && !"".equals(parseTxOutResult.opReturnStr)) 
+		if(parseTxOutResult.opReturnStr!=null && !"".equals(parseTxOutResult.opReturnStr))
 			txResult.opReturn = opReturn;
 		txResult.inList = inList;
 		txResult.outList = outList;
@@ -431,8 +436,8 @@ public class BlockParser {
 			int sigLen = Byte.toUnsignedInt(bvScript[0]);// Length of signature;
 			// Skip signature/跳过签名。
 			byte sigHash;
-			if(sigLen!=0){								// No multiSig
-				sigHash = bvScript[sigLen];				// 签名类型标志
+			if(sigLen!=0){                                // No multiSig
+				sigHash = bvScript[sigLen];                // 签名类型标志
 				setInputSigHash(input,sigHash);
 			}
 
@@ -487,7 +492,7 @@ public class BlockParser {
 	}
 
 	private ArrayList<Cash> makeInList(String txId, ArrayList<Cash> rawInList) {
-		
+
 		ArrayList<Cash> inList = rawInList;
 		for (Cash in : inList) {
 			in.setSpendTxId(txId);

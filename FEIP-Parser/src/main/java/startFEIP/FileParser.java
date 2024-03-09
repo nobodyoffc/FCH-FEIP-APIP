@@ -6,31 +6,30 @@ import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import constants.Constants;
 import constants.IndicesNames;
 import construct.*;
 import fcTools.ParseTools;
+import feipClass.*;
 import fileTools.OpReFileTools;
-import identity.CidHist;
+import feipClass.CidHist;
 import identity.IdentityParser;
 import identity.IdentityRollbacker;
-import identity.RepuHist;
-import feipClass.FcInfo;
+import feipClass.RepuHist;
 import fchClass.OpReturn;
 import fileTools.opReReadResult;
 import javaTools.JsonTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import organize.GroupHistory;
+import feipClass.GroupHistory;
 import organize.OrganizationParser;
 import organize.OrganizationRollbacker;
-import organize.TeamHistory;
-import personal.BoxHistory;
+import feipClass.TeamHistory;
+import feipClass.BoxHistory;
 import personal.PersonalParser;
 import personal.PersonalRollbacker;
-import publish.ProofHistory;
+import feipClass.ProofHistory;
 import publish.PublishParser;
 import publish.PublishRollbacker;
 import esTools.EsTools;
@@ -42,7 +41,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HexFormat;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -72,7 +70,7 @@ public class FileParser {
 	}
 
 	enum FEIP_NAME{
-		CID,NOBODY,MASTER,HOMEPAGE,NOTICE_FEE,REPUTATION,SERVICE,PROTOCOL,APP,CODE,NID, CONTACT,MAIL,SAFE,STATEMENT,GROUP,TEAM, BOX,PROOF
+		CID,NOBODY,MASTER,HOMEPAGE,NOTICE_FEE,REPUTATION,SERVICE,PROTOCOL,APP,CODE,NID, CONTACT,MAIL,SAFE,STATEMENT,GROUP,TEAM, BOX, TOKEN, PROOF
 	}
 
 	private static final Logger log = LoggerFactory.getLogger(FileParser.class);
@@ -322,6 +320,17 @@ public class FileParser {
 						esClient.index(i -> i.index(IndicesNames.PROOF_HISTORY).id(proofHist.getTxId()).document(proofHist));
 					System.out.println(isValid);
 				}
+				case TOKEN -> {
+					System.out.println("Token @"+opre.getHeight()+"."+opre.getTxId());
+					TokenHistory tokenHist = publishParser.makeToken(opre, feip);
+					if (tokenHist == null) break;
+					try {
+						isValid = publishParser.parseToken(esClient, tokenHist);
+					}catch (java.lang.NumberFormatException ignore) {}
+					if (isValid)
+						esClient.index(i -> i.index(IndicesNames.TOKEN_HISTORY).id(tokenHist.getTxId()).document(tokenHist));
+					System.out.println(isValid);
+				}
 				default -> {
 				}
 			}
@@ -373,6 +382,7 @@ public class FileParser {
 		if(sn.equals("17"))return FEIP_NAME.SAFE;
 		if(sn.equals("18"))return FEIP_NAME.TEAM;
 		if(sn.equals("19"))return FEIP_NAME.GROUP;
+		if(sn.equals("20"))return FEIP_NAME.TOKEN;
 
 
 		return null;

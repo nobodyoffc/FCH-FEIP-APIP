@@ -22,6 +22,15 @@ public class Tx {
 	private long fee;		//tx fee
 	
 	private long cdd;
+	transient private String rawTx;
+
+	public String getRawTx() {
+		return rawTx;
+	}
+
+	public void setRawTx(String rawTx) {
+		this.rawTx = rawTx;
+	}
 
 	public int getVersion() {
 		return version;

@@ -8,14 +8,17 @@ import keyTools.KeyTools;
 import org.bitcoinj.core.ECKey;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.junit.Test;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.io.Console;
+import java.util.concurrent.*;
 
 import static FeipClient.IdentityFEIPs.setMasterOnChain;
 

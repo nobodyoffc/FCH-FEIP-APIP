@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 public class TxHas {
 	private String txId;			//txid
+	private String rawTx;
 	private long height;		//height
 	private ArrayList<CashMark> inMarks;
 	private  ArrayList<CashMark> outMarks;
@@ -31,5 +32,13 @@ public class TxHas {
 	}
 	public void setOutMarks(ArrayList<CashMark> outMarks) {
 		this.outMarks = outMarks;
+	}
+
+	public String getRawTx() {
+		return rawTx;
+	}
+
+	public void setRawTx(String rawTx) {
+		this.rawTx = rawTx;
 	}
 }

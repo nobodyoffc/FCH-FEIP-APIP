@@ -81,7 +81,10 @@ public class SwapFinished extends HttpServlet {
             Replier.replyOtherError(response,writer,replier,"Searching ES wrong.");
             return;
         }
-
+        if(result.hits().total().value()==0){
+            Replier.replyNoData(response, writer, replier);
+            return;
+        }
         String[] last = result.hits().hits().get(result.hits().hits().size() - 1).sort().toArray(new String[0]);
         long total = result.hits().total().value();
         List<Hit<SwapAffair>> hitList = result.hits().hits();

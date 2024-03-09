@@ -1,9 +1,14 @@
 package swapData;
 
+import org.bouncycastle.pqc.jcajce.provider.ntru.NTRUKeyGeneratorSpi;
+
 public class SwapPriceData {
+    private String id;
     private String sid;
     private String gTick;
     private String mTick;
+    private double gAmt;
+    private double mAmt;
     private double price;
     private long time;
 
@@ -45,5 +50,29 @@ public class SwapPriceData {
 
     public void setTime(long time) {
         this.time = time;
+    }
+
+    public double getgAmt() {
+        return gAmt;
+    }
+
+    public void setgAmt(double gAmt) {
+        this.gAmt = gAmt;
+    }
+
+    public double getmAmt() {
+        return mAmt;
+    }
+
+    public void setmAmt(double mAmt) {
+        this.mAmt = mAmt;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

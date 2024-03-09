@@ -63,6 +63,16 @@ public class Replier {
         writer.write(replier.reply1020OtherError());
     }
 
+    public static boolean checkAndResponseOtherError(boolean count, HttpServletResponse response, Replier replier, String MAX_REQUEST_COUNT, PrintWriter writer) {
+        if (count) {
+            response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1020OtherError));
+            replier.setData(MAX_REQUEST_COUNT);
+            writer.write(replier.reply1020OtherError());
+            return true;
+        }
+        return false;
+    }
+
     public String reply(String userAddr) {
         if(userAddr==null)
             return replyBase();

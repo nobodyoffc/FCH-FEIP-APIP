@@ -6,17 +6,14 @@ public class SwapInfoData {
     private String owner;
     private String tRate;
     private String tCdd;
-
     private String gTick;
     private String mTick;
     private String gAddr;
     private String mAddr;
     private String gConfirm;
     private String mConfirm;
-    private String gMinPay;
-    private String mMinPay;
-    private String gMinLp;
-    private String mMinLp;
+    private String swapFee;
+    private String serviceFee;
     private String gWithdrawFee;
     private String mWithdrawFee;
 
@@ -114,39 +111,6 @@ public class SwapInfoData {
     public void setmConfirm(String mConfirm) {
         this.mConfirm = mConfirm;
     }
-
-    public String getgMinPay() {
-        return gMinPay;
-    }
-
-    public void setgMinPay(String gMinPay) {
-        this.gMinPay = gMinPay;
-    }
-
-    public String getmMinPay() {
-        return mMinPay;
-    }
-
-    public void setmMinPay(String mMinPay) {
-        this.mMinPay = mMinPay;
-    }
-
-    public String getgMinLp() {
-        return gMinLp;
-    }
-
-    public void setgMinLp(String gMinLp) {
-        this.gMinLp = gMinLp;
-    }
-
-    public String getmMinLp() {
-        return mMinLp;
-    }
-
-    public void setmMinLp(String mMinLp) {
-        this.mMinLp = mMinLp;
-    }
-
     public String getgWithdrawFee() {
         return gWithdrawFee;
     }
@@ -209,5 +173,21 @@ public class SwapInfoData {
 
     public void setLastTime(long lastTime) {
         this.lastTime = lastTime;
+    }
+
+    public String getSwapFee() {
+        return swapFee;
+    }
+
+    public void setSwapFee(String swapFee) {
+        this.swapFee = swapFee;
+    }
+
+    public String getServiceFee() {
+        return serviceFee;
+    }
+
+    public void setServiceFee(String serviceFee) {
+        this.serviceFee = serviceFee;
     }
 }

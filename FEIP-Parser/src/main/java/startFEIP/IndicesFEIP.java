@@ -74,10 +74,15 @@ public class IndicesFEIP {
 		String statementJsonStr = "{\"mappings\":{\"properties\":{\"statementId\":{\"type\":\"keyword\"},\"title\":{\"type\":\"text\"},\"content\":{\"type\":\"text\"},\"owner\":{\"type\":\"wildcard\"},\"birthTime\":{\"type\":\"long\"},\"birthHeight\":{\"type\":\"long\"},\"lastHeight\":{\"type\":\"long\"},\"active\":{\"type\":\"boolean\"}}}}";
 		String proofJsonStr = "{\"mappings\":{\"properties\":{\"proofId\":{\"type\":\"keyword\"},\"title\":{\"type\":\"text\"},\"content\":{\"type\":\"text\"},\"cosignersInvited\":{\"type\":\"wildcard\"},\"cosignersSigned\":{\"type\":\"wildcard\"},\"isTransferable\":{\"type\":\"boolean\"},\"active\":{\"type\":\"boolean\"},\"issuer\":{\"type\":\"wildcard\"},\"owner\":{\"type\":\"wildcard\"},\"birthTime\":{\"type\":\"long\"},\"birthHeight\":{\"type\":\"long\"},\"lastTxId\":{\"type\":\"keyword\"},\"lastTime\":{\"type\":\"long\"},\"lastHeight\":{\"type\":\"long\"}}}}";
 		String proofHistJsonStr = "{\"mappings\":{\"properties\":{\"txId\":{\"type\":\"keyword\"},\"height\":{\"type\":\"long\"},\"index\":{\"type\":\"short\"},\"time\":{\"type\":\"long\"},\"signer\":{\"type\":\"wildcard\"},\"cdd\":{\"type\":\"long\"},\"proofId\":{\"type\":\"keyword\"},\"op\":{\"type\":\"keyword\"},\"title\":{\"type\":\"text\"},\"content\":{\"type\":\"text\"},\"cosignersInvited\":{\"type\":\"wildcard\"},\"isTransferable\":{\"type\":\"boolean\"},\"allSignsRequired\":{\"type\":\"boolean\"}}}}";
-
+		String tokenJsonStr ="{\"mappings\":{\"properties\":{\"tokenId\":{\"type\":\"keyword\"},\"name\":{\"type\":\"text\"},\"desc\":{\"type\":\"text\"},\"consensusId\":{\"type\":\"keyword\"},\"capacity\":{\"type\":\"keyword\"},\"decimal\":{\"type\":\"keyword\"},\"transferable\":{\"type\":\"keyword\"},\"closable\":{\"type\":\"keyword\"},\"openIssue\":{\"type\":\"keyword\"},\"maxAmtPerIssue\":{\"type\":\"keyword\"},\"minCddPerIssue\":{\"type\":\"keyword\"},\"maxIssuesPerAddr\":{\"type\":\"keyword\"},\"closed\":{\"type\":\"keyword\"},\"deployer\":{\"type\":\"keyword\"},\"circulating\":{\"type\":\"double\"},\"birthTime\":{\"type\":\"long\"},\"birthHeight\":{\"type\":\"long\"},\"lastTxId\":{\"type\":\"keyword\"},\"lastTime\":{\"type\":\"long\"},\"lastHeight\":{\"type\":\"long\"}}}}";
+		String tokenHolderJsonStr ="{\"mappings\":{\"properties\":{\"id\":{\"type\":\"keyword\"},\"fid\":{\"type\":\"keyword\"},\"tokenId\":{\"type\":\"keyword\"},\"balance\":{\"type\":\"double\"},\"firstHeight\":{\"type\":\"long\"},\"lastHeight\":{\"type\":\"long\"}}}}";
+		String tokenHistJsonStr = "{\"mappings\":{\"properties\":{\"txId\":{\"type\":\"keyword\"},\"height\":{\"type\":\"long\"},\"index\":{\"type\":\"integer\"},\"time\":{\"type\":\"long\"},\"signer\":{\"type\":\"keyword\"},\"recipient\":{\"type\":\"keyword\"},\"cdd\":{\"type\":\"long\"},\"tokenId\":{\"type\":\"keyword\"},\"op\":{\"type\":\"keyword\"},\"name\":{\"type\":\"text\"},\"desc\":{\"type\":\"text\"},\"consensusId\":{\"type\":\"keyword\"},\"capacity\":{\"type\":\"keyword\"},\"decimal\":{\"type\":\"keyword\"},\"transferable\":{\"type\":\"keyword\"},\"closable\":{\"type\":\"keyword\"},\"openIssue\":{\"type\":\"keyword\"},\"maxAmtPerIssue\":{\"type\":\"keyword\"},\"minCddPerIssue\":{\"type\":\"keyword\"},\"maxIssuesPerAddr\":{\"type\":\"keyword\"},\"issueTo\":{\"type\":\"nested\",\"properties\":{\"fid\":{\"type\":\"keyword\"},\"amount\":{\"type\":\"double\"}}},\"transferTo\":{\"type\":\"nested\",\"properties\":{\"fid\":{\"type\":\"keyword\"},\"amount\":{\"type\":\"double\"}}}}}}";
 		EsTools.createIndex(esClient, IndicesNames.STATEMENT, statementJsonStr);
 		EsTools.createIndex(esClient, IndicesNames.PROOF, proofJsonStr);
 		EsTools.createIndex(esClient, IndicesNames.PROOF_HISTORY, proofHistJsonStr);
+		EsTools.createIndex(esClient, IndicesNames.TOKEN, tokenJsonStr);
+		EsTools.createIndex(esClient, IndicesNames.TOKEN_HOLDER, tokenHolderJsonStr);
+		EsTools.createIndex(esClient, IndicesNames.TOKEN_HISTORY, tokenHistJsonStr);
 
 		String nidJsonStr = "{\"mappings\":{\"properties\":{\"nameId\":{\"type\":\"keyword\"},\"name\":{\"type\":\"wildcard\"},\"desc\":{\"type\":\"text\"},\"oid\":{\"type\":\"wildcard\"},\"active\":{\"type\":\"boolean\"},\"namer\":{\"type\":\"wildcard\"},\"birthTime\":{\"type\":\"long\"},\"birthHeight\":{\"type\":\"long\"},\"lastTxId\":{\"type\":\"keyword\"},\"lastTime\":{\"type\":\"long\"},\"lastHeight\":{\"type\":\"long\"}}}}";
 		EsTools.createIndex(esClient, IndicesNames.NID, nidJsonStr);
@@ -122,6 +127,9 @@ public class IndicesFEIP {
 		EsTools.deleteIndex(esClient, IndicesNames.PROOF);
 		EsTools.deleteIndex(esClient, IndicesNames.PROOF_HISTORY);
 		EsTools.deleteIndex(esClient, IndicesNames.NID);
+		EsTools.deleteIndex(esClient, IndicesNames.TOKEN);
+		EsTools.deleteIndex(esClient, IndicesNames.TOKEN_HOLDER);
+		EsTools.deleteIndex(esClient, IndicesNames.TOKEN_HISTORY);
 		EsTools.deleteIndex(esClient, IndicesNames.NOBODY);
 	}
 }

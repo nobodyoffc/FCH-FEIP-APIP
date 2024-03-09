@@ -121,7 +121,6 @@ public class SwapInfo extends HttpServlet {
             return;
         }
 
-        if(total==0)total=swapInfoList.size();
         replySuccess(response, writer, replier, swapInfoList, total, swapInfoList.size(), last);
     }
 
@@ -180,41 +179,39 @@ public class SwapInfo extends HttpServlet {
     }
 
     private SwapInfoData makeSwapInfo(SwapStateData swapState, Service service, SwapParams swapParams) {
-        SwapInfoData swapSummary = new SwapInfoData();
+        SwapInfoData swapInfoData = new SwapInfoData();
 
-        swapSummary.setSid(swapState.getSid());
+        swapInfoData.setSid(swapState.getSid());
 
-        swapSummary.setName(service.getStdName());
-        swapSummary.setOwner(service.getOwner());
-        swapSummary.settRate(String.valueOf(service.gettRate()));
-        swapSummary.settCdd(String.valueOf(service.gettCdd()));
+        swapInfoData.setName(service.getStdName());
+        swapInfoData.setOwner(service.getOwner());
+        swapInfoData.settRate(String.valueOf(service.gettRate()));
+        swapInfoData.settCdd(String.valueOf(service.gettCdd()));
 
-        swapSummary.setgTick(swapParams.getgTick());
-        swapSummary.setmTick(swapParams.getmTick());
-        swapSummary.setgAddr(swapParams.getgAddr());
-        swapSummary.setmAddr(swapParams.getmAddr());
-        swapSummary.setgConfirm(swapParams.getgConfirm());
-        swapSummary.setmConfirm(swapParams.getmConfirm());
-        swapSummary.setgMinPay(swapParams.getgMinPay());
-        swapSummary.setmMinPay(swapParams.getmMinPay());
-        swapSummary.setgMinLp(swapParams.getgMinLp());
-        swapSummary.setmMinLp(swapParams.getmMinLp());
-        swapSummary.setgWithdrawFee(swapParams.getgWithdrawFee());
-        swapSummary.setmWithdrawFee(swapParams.getmWithdrawFee());
+        swapInfoData.setgTick(swapParams.getgTick());
+        swapInfoData.setmTick(swapParams.getmTick());
+        swapInfoData.setgAddr(swapParams.getgAddr());
+        swapInfoData.setmAddr(swapParams.getmAddr());
+        swapInfoData.setgConfirm(swapParams.getgConfirm());
+        swapInfoData.setmConfirm(swapParams.getmConfirm());
+        swapInfoData.setSwapFee(swapParams.getSwapFee());
+        swapInfoData.setServiceFee(swapParams.getServiceFee());
+        swapInfoData.setgWithdrawFee(swapParams.getgWithdrawFee());
+        swapInfoData.setmWithdrawFee(swapParams.getmWithdrawFee());
 
-        swapSummary.setgSum(swapState.getgSum());
-        swapSummary.setmSum(swapState.getmSum());
-        swapSummary.setgPendingSum(swapState.getgPendingSum());
-        swapSummary.setmPendingSum(swapState.getmPendingSum());
+        swapInfoData.setgSum(swapState.getgSum());
+        swapInfoData.setmSum(swapState.getmSum());
+        swapInfoData.setgPendingSum(swapState.getgPendingSum());
+        swapInfoData.setmPendingSum(swapState.getmPendingSum());
 
-        double dM = Double.parseDouble(swapParams.getmMinPay());
+        double dM = 1-Double.parseDouble(swapInfoData.getSwapFee())-Double.parseDouble(swapInfoData.getServiceFee());
         double dG = ammCalculator(swapState.getmSum() + swapState.getmPendingSum(), swapState.getgSum() + swapState.getgPendingSum(), dM);
-        double price = roundDouble8(dM/ dG);
+        double price = roundDouble8(1/ dG);
 
-        swapSummary.setPrice(price);
-        swapSummary.setLastTime(swapState.getLastTime());
+        swapInfoData.setPrice(price);
+        swapInfoData.setLastTime(swapState.getLastTime());
 
-        return swapSummary;
+        return swapInfoData;
     }
 
     public static double ammCalculator(double x, double y, double dX){

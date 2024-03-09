@@ -126,6 +126,7 @@ public class BlockMaker {
 			ArrayList<CashMark> inMarks = new ArrayList<CashMark>();
 			ArrayList<CashMark> outMarks = new ArrayList<CashMark>();
 			txHas.setTxId(tx.getTxId());
+			txHas.setRawTx(tx.getRawTx());
 			txHas.setHeight(tx.getHeight());
 			txHas.setInMarks(inMarks);
 			txHas.setOutMarks(outMarks);

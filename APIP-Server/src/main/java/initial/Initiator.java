@@ -42,6 +42,7 @@ public class Initiator extends HttpServlet {
     public static boolean forbidFreeGet;
     private final NewEsClient newEsClient = new NewEsClient();
     public static JsonRpcHttpClient fcClient;
+    public static ConfigAPIP configAPIP;
 
     @Override
     public void destroy(){
@@ -62,7 +63,7 @@ public class Initiator extends HttpServlet {
         jedisPool = GetJedis.createJedisPool();
 
         //Get config.json
-        ConfigAPIP configAPIP = new ConfigAPIP();
+        configAPIP = new ConfigAPIP();
         Gson gson = new Gson();
 
         try(Jedis jedis = jedisPool.getResource()) {

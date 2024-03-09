@@ -50,9 +50,9 @@ public class BoxHistory extends HttpServlet {
         String index = IndicesNames.BOX_HISTORY;
 
         DataRequestHandler esRequest = new DataRequestHandler(dataCheckResult.getAddr(), requestBody, response, replier);
-        List<personal.BoxHistory> meetList;
+        List<feipClass.BoxHistory> meetList;
         try {
-            meetList = esRequest.doRequest(index, sort, personal.BoxHistory.class);
+            meetList = esRequest.doRequest(index, sort, feipClass.BoxHistory.class);
             if (meetList == null) {
                 return;
             }

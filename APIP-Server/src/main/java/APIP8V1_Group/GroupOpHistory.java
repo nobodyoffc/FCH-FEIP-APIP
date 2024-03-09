@@ -6,7 +6,7 @@ import apipClass.Sort;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
-import organize.GroupHistory;
+import feipClass.GroupHistory;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

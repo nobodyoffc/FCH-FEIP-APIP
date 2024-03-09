@@ -134,8 +134,8 @@ public class SwapUpdate extends HttpServlet {
         }
 
         if(dataMap.get(PRICE)!=null){
-            SwapPriceData swapPrice = gson.fromJson(gson.toJson(dataMap.get(PRICE)), SwapPriceData.class);
-            String result = writePriceToEs(esClient,swapPrice);
+            List<SwapPriceData> swapPriceList = SwapDataGetter.getSwapPriceList(dataMap.get(PRICE));
+            String result = writePriceToEs(esClient,swapPriceList);
             resultList.add(result);
         }
 
@@ -143,20 +143,22 @@ public class SwapUpdate extends HttpServlet {
         writer.write(replier.reply0Success(addr));
     }
 
-    private String writePriceToEs(ElasticsearchClient esClient, SwapPriceData swapPrice) {
-        if(swapPrice==null||swapPrice.getSid()==null)return "No data.";
+    private String writePriceToEs(ElasticsearchClient esClient, List<SwapPriceData> swapPriceList) {
+        if(swapPriceList==null||swapPriceList.isEmpty())return "No data.";
+        ArrayList<String>idList =new ArrayList<>();
+        for(SwapPriceData swapPriceData : swapPriceList){
+            idList.add(swapPriceData.getId());
+        }
         try {
-            String id = swapPrice.getSid().substring(0,6)+"_"+swapPrice.getTime();
-            esClient.index(i -> i.index(SWAP_PRICE).id(id).document(swapPrice));
-        } catch (IOException e) {
-            return "Failed to write swap price into ES.";
+            EsTools.bulkWriteList(esClient,SWAP_PRICE,(ArrayList<SwapPriceData>) swapPriceList,idList,SwapPriceData.class);
+        } catch (Exception e) {
+            return "Failed to write into ES: "+e.getMessage();
         }
         return "Saved swap price to ES.";
     }
 
     private String writePendingToEs(ElasticsearchClient esClient, List<SwapAffair> pendingList, String sid) {
-        if(pendingList==null||pendingList.isEmpty())return "No data.";
-//        String pendingListJson = new Gson().toJson(pendingList);
+
         SwapPendingData swapPending = new SwapPendingData();
         swapPending.setSid(sid);
         swapPending.setPendingList(pendingList);
@@ -165,7 +167,7 @@ public class SwapUpdate extends HttpServlet {
         } catch (IOException e) {
             return "Failed to write swap pending into ES.";
         }
-        return "Saved swap pending to ES.";
+        return "Swap pending was updated to ES.";
     }
 
     private String writeFinishedToEs(ElasticsearchClient esClient, List<SwapAffair> finishedList, String sid) {

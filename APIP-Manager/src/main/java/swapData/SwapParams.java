@@ -11,10 +11,6 @@ public class SwapParams {
     private String serviceFee;
     private String gConfirm;
     private String mConfirm;
-    private String gMinPay;
-    private String mMinPay;
-    private String gMinLp;
-    private String mMinLp;
     private String gWithdrawFee;
     private String mWithdrawFee;
     private String curve;
@@ -98,39 +94,6 @@ public class SwapParams {
     public void setmConfirm(String mConfirm) {
         this.mConfirm = mConfirm;
     }
-
-    public String getgMinPay() {
-        return gMinPay;
-    }
-
-    public void setgMinPay(String gMinPay) {
-        this.gMinPay = gMinPay;
-    }
-
-    public String getmMinPay() {
-        return mMinPay;
-    }
-
-    public void setmMinPay(String mMinPay) {
-        this.mMinPay = mMinPay;
-    }
-
-    public String getgMinLp() {
-        return gMinLp;
-    }
-
-    public void setgMinLp(String gMinLp) {
-        this.gMinLp = gMinLp;
-    }
-
-    public String getmMinLp() {
-        return mMinLp;
-    }
-
-    public void setmMinLp(String mMinLp) {
-        this.mMinLp = mMinLp;
-    }
-
     public String getgWithdrawFee() {
         return gWithdrawFee;
     }

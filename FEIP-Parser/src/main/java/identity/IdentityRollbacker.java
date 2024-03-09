@@ -10,6 +10,8 @@ import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
 import constants.IndicesNames;
 import esTools.EsTools;
+import feipClass.CidHist;
+import feipClass.RepuHist;
 import javaTools.JsonTools;
 
 import java.io.IOException;

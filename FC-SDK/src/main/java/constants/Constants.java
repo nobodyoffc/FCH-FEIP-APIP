@@ -52,6 +52,15 @@ public class Constants {
     public static final String MAKER_SN = "2";
     public static final String FEIP = "FEIP";
     public static final double Dust = 0.00001;
+    public static final double TWO_POWER_32 = 4294967296D;
+    public static final String DAYS_PER_YEAR = "400";
+    public static final String MINE_MUTUAL_DAYS = "10";
+    public static final String FUND_MUTUAL_DAYS = "100";
+    public static final String BLOCK_TIME_MINUTE = "1";
+    public static final String INITIAL_COINBASE_MINE ="25";
+    public static final String INITIAL_COINBASE_FUND ="25";
+    public static final long START_TIME = 1577836802;
+    public static final String GENESIS_BLOCK_ID = "00000000cbe04361b1d6de82b893a7d8419e76e99dd2073ac0db2ba0e652eea8";
     public static int RedisDb4Webhook = 4;
     public static int RedisDb3Mempool=3;
     public static int RedisDb0Common=0;

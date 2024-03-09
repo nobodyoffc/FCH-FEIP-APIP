@@ -1,12 +1,14 @@
 package fcTools;
 
 import com.google.gson.Gson;
+import constants.Constants;
 import cryptoTools.SHA;
 import javaTools.BytesTools;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.file.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -265,6 +267,26 @@ public class ParseTools {
         return j;
     }
 
+    public static double bitsToDifficulty(long bits) {
+        // Decode the "bits" field
+        int exponent = (int) ((bits >> 24) & 0xff);
+        long mantissa = bits & 0xffffff;
+        BigInteger target = BigInteger.valueOf(mantissa).shiftLeft((exponent - 3) * 8);
+
+        // The maximum target based on the original Bitcoin difficulty adjustment system
+        BigInteger maxTarget = new BigInteger("00000000FFFF0000000000000000000000000000000000000000000000000000", 16);
+
+        // Calculate the difficulty as the ratio of the max target to the current target
+        return maxTarget.divide(target).doubleValue();
+    }
+
+    public static double difficultyToHashRate(double difficulty){
+        return difficulty * Constants.TWO_POWER_32/60;
+    }
+
+    public static double bitsToHashRate(long bits){
+        return difficultyToHashRate(bitsToDifficulty(bits));
+    }
     @Test
     public void test(){
         roundDouble2(1.343);

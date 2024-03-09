@@ -7,7 +7,7 @@ import apipClass.Sort;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
-import identity.CidHist;
+import feipClass.CidHist;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

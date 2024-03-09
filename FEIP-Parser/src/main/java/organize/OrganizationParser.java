@@ -267,7 +267,7 @@ public class OrganizationParser {
 		return isValid;
 	}
 
-	public TeamHistory makeTeam(OpReturn opre, FcInfo feip) throws InterruptedException {
+	public TeamHistory makeTeam(OpReturn opre, FcInfo feip)  {
 
         if (opre.getHeight() > StartFEIP.CddCheckHeight && opre.getCdd() < StartFEIP.CddRequired) return null;
 

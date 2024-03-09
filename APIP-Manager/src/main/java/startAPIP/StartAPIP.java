@@ -157,6 +157,7 @@ public class StartAPIP {
 						if(mempoolCleaner==null|| !mempoolCleaner.getRunning().get()) System.out.println("Mempool cleaner is set to stop.");
 						if(pusher==null ||!pusher.isRunning().get()) System.out.println("Webhook pusher is set to stop.");
 						System.out.println("Exited, see you again.");
+						System.exit(0);
 						return;
 					}
 				}

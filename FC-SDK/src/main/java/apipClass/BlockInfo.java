@@ -168,7 +168,7 @@ public class BlockInfo {
             blockInfo.setPreId(block.getPreBlockId());
             blockInfo.setMerkleRoot(block.getMerkleRoot());
             blockInfo.setTime(block.getTime());
-            blockInfo.setDiffTarget(block.getDiffTarget());
+            blockInfo.setDiffTarget(block.getBits());
             blockInfo.setNonce(block.getNonce());
             blockInfo.setTxCount(block.getTxCount());
             blockInfo.setInValueT(block.getInValueT());

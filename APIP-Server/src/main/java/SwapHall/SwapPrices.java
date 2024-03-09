@@ -5,9 +5,12 @@ import apipClass.Sort;
 import co.elastic.clients.elasticsearch._types.SortOptions;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
+import co.elastic.clients.elasticsearch._types.query_dsl.RangeQuery;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
+import co.elastic.clients.json.JsonData;
 import constants.ApiNames;
 import constants.FieldNames;
 import constants.ReplyInfo;
@@ -57,6 +60,8 @@ public class SwapPrices extends HttpServlet {
         String gTick = request.getParameter(G_TICK);
         String mTick = request.getParameter(M_TICK);
         String lastStr = request.getParameter(FieldNames.LAST);
+        String startTime = request.getParameter(START_TIME);
+        String endTime = request.getParameter(END_TIME);
 
         SearchRequest.Builder searchBuilder = new SearchRequest.Builder();
 
@@ -84,6 +89,16 @@ public class SwapPrices extends HttpServlet {
                 Query query = EsTools.getTermsQuery(M_TICK, mTick.toLowerCase());
                 queryList.add(query);
             }
+        }
+
+        if(startTime!=null||endTime!=null){
+            RangeQuery.Builder rqb = new RangeQuery.Builder();
+            if(startTime!=null)
+                rqb.gte(JsonData.of(startTime));
+            if(endTime!=null)
+                rqb.lt(JsonData.of(endTime));
+            Query query = new Query.Builder().range(rqb.build()).build();
+            queryList.add(query);
         }
 
         BoolQuery boolQuery = boolBuilder.must(queryList).build();

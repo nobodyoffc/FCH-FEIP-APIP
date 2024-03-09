@@ -2,7 +2,7 @@ package test;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.*;
-import identity.CidHist;
+import feipClass.CidHist;
 import esTools.EsTools;
 import esTools.NewEsClient;
 import javaTools.JsonTools;

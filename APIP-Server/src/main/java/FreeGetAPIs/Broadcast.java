@@ -8,7 +8,6 @@ import freecashRPC.FcRpcMethods;
 import initial.Initiator;
 import javaTools.BytesTools;
 import redis.clients.jedis.Jedis;
-
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -58,18 +57,23 @@ public class Broadcast extends HttpServlet {
             return;
         }
 
+        if(result.startsWith("\""))result=result.substring(1);
+        if(result.endsWith("\""))result=result.substring(0,result.length()-1);
 
-        if(result.startsWith("\"")){
-            result=result.substring(1);
-            if(result.endsWith("\""))result=result.substring(0,result.length()-2);
+        if(!BytesTools.isHexString(result)){
+            response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1020OtherError));
             replier.setData(result);
-            replier.setTotal(1);
-            replier.setGot(1);
-            try(Jedis jedis = Initiator.jedisPool.getResource()) {
-                replier.setBestHeight(Long.parseLong(jedis.get(Strings.BEST_HEIGHT)));
-            }
-            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code0Success));
-            writer.write(replier.reply0Success());
+            writer.write(replier.reply1020OtherError());
+            return;
         }
+
+        replier.setData(result);
+        replier.setTotal(1);
+        replier.setGot(1);
+        try(Jedis jedis = Initiator.jedisPool.getResource()) {
+            replier.setBestHeight(Long.parseLong(jedis.get(Strings.BEST_HEIGHT)));
+        }
+        response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code0Success));
+        writer.write(replier.reply0Success());
     }
 }

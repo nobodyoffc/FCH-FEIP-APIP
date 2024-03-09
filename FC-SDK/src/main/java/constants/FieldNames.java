@@ -16,10 +16,13 @@ public class FieldNames {
     public static final String STD_NAME = "stdName";
     public static final String G_TICK = "gTick";
     public static final String M_TICK = "mTick";
+    public static final String START_TIME = "startTime";
+    public static final String END_TIME = "endTime";
     public static final String REGISTERED_SWAP = "registered_Swap";
     public static final String LAST = "last";
     public static final String TIME = "time";
     public static final String GET_TIME = "getTime";
     public static final String ID = "id";
     public static final String BALANCE = "balance";
+    public static final String BLOCK_ID = "blockId";
 }

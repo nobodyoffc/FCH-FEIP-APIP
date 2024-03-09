@@ -22,4 +22,10 @@ public class SwapDataGetter {
         return gson.fromJson(gson.toJson(responseData), t);
     }
 
+    public static List<SwapPriceData> getSwapPriceList(Object responseData) {
+        Type t = new TypeToken<ArrayList<SwapPriceData>>() {}.getType();
+        Gson gson = new Gson();
+        return gson.fromJson(gson.toJson(responseData), t);
+    }
+
 }

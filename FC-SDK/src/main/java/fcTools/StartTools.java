@@ -395,16 +395,21 @@ public class StartTools {
 
     private static void decryptWithPassword(BufferedReader br) throws Exception {
         // TODO Auto-generated method stub
-        String ask = "Input the password no longer than 64:";
-        char[]password = Inputer.inputPassword(br,ask);
         System.out.println("Input the json string of EccAesData:");
         String eccAesDataJson = br.readLine();
+        byte[] bytes=null;
+        while(true) {
+            String ask = "Input the password no longer than 64:";
+            char[] password = Inputer.inputPassword(br, ask);
+            EccAes256K1P7 ecc = new EccAes256K1P7();
 
-        EccAes256K1P7 ecc = new EccAes256K1P7();
+            String decrypt = ecc.decrypt(eccAesDataJson, password);
+            System.out.println(decrypt);
 
-        String decrypt = ecc.decrypt(eccAesDataJson, password);
-        System.out.println(decrypt);
-        byte[] bytes = ecc.decryptForBytes(eccAesDataJson, password);
+            bytes = ecc.decryptForBytes(eccAesDataJson, password);
+            if(bytes!=null)break;
+            System.out.println("Wrong password.");
+        }
         System.out.println(HexFormat.of().formatHex(bytes));
         if(bytes.length==32)System.out.println(Base58.encode(KeyTools.priKey32To38Compressed(bytes)));
 

@@ -430,6 +430,24 @@ public class BytesTools {
         System.arraycopy(add, 0, total, original.length, add.length);
         return total;
     }
+
+    public static long byte4ArrayToUnsignedInt(byte[] byteArray) {
+        if (byteArray.length != 4) {
+            throw new IllegalArgumentException("Input byte array must have exactly 4 bytes.");
+        }
+
+        long result = 0;
+
+        for (int i = 0; i < 4; i++) {
+            // Convert each byte to a long (treat it as unsigned)
+            long unsignedByte = byteArray[i] & 0xFFL;
+
+            // Shift and combine the bytes into the result
+            result |= unsignedByte << (8 * i);
+        }
+
+        return result;
+    }
 }
 
 

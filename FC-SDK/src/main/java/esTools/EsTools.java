@@ -219,37 +219,38 @@ public class EsTools {
 
         if (result.hits().total().value() == 0) return null;
 
-        List<String> lastSort = result.hits().hits().get(result.hits().hits().size() - 1).sort();
+//        List<String> lastSort = result.hits().hits().get(result.hits().hits().size() - 1).sort();
 
         ArrayList<T> itemList = new ArrayList<T>();
 
         for (Hit<T> hit : result.hits().hits()) {
             itemList.add(hit.source());
         }
-        while (true) {
-
-            if (result.hits().total().value() == EsTools.READ_MAX) {
-
-                List<String> lastSort1 = lastSort;
-
-                result = esClient.search(s -> s.index(index)
-                        .query(q -> q.terms(t->t.field(termField).terms(t1->t1.value(values))))
-                        .size(EsTools.READ_MAX)
-                        .sort(s1 -> s1
-                                .field(f -> f
-                                        .field(sortField).order(SortOrder.Asc)
-                                ))
-                        .searchAfter(lastSort1), clazz);
-
-                if (result.hits().total().value() == 0) break;
-                lastSort = result.hits().hits().get(result.hits().hits().size() - 1).sort();
-                for (Hit<T> hit : result.hits().hits()) {
-                    itemList.add(hit.source());
-                }
-            } else break;
-        }
+//        while (true) {
+//
+//            if (result.hits().total().value() == EsTools.READ_MAX) {
+//
+//                List<String> lastSort1 = lastSort;
+//
+//                result = esClient.search(s -> s.index(index)
+//                        .query(q -> q.terms(t->t.field(termField).terms(t1->t1.value(values))))
+//                        .size(EsTools.READ_MAX)
+//                        .sort(s1 -> s1
+//                                .field(f -> f
+//                                        .field(sortField).order(SortOrder.Asc)
+//                                ))
+//                        .searchAfter(lastSort1), clazz);
+//
+//                if (result.hits().total().value() == 0) break;
+//                lastSort = result.hits().hits().get(result.hits().hits().size() - 1).sort();
+//                for (Hit<T> hit : result.hits().hits()) {
+//                    itemList.add(hit.source());
+//                }
+//            } else break;
+//        }
         return itemList;
     }
+
 
     public static <T> ArrayList<T> getListSinceHeight(ElasticsearchClient esClient, String index, String field, long height, Class<T> clazz) throws IOException {
 

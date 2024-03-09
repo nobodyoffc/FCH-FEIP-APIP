@@ -48,9 +48,9 @@ public class ProofHistory extends HttpServlet {
         String index = IndicesNames.PROOF_HISTORY;
 
         DataRequestHandler esRequest = new DataRequestHandler(dataCheckResult.getAddr(),requestBody,response,replier);
-        List<publish.ProofHistory> meetList;
+        List<feipClass.ProofHistory> meetList;
         try {
-            meetList = esRequest.doRequest(index,sort, publish.ProofHistory.class);
+            meetList = esRequest.doRequest(index,sort, feipClass.ProofHistory.class);
             if(meetList==null){
                 return;
             }

@@ -8,7 +8,7 @@ public class Block {
 	private String preBlockId;	//previous block hash
 	private String merkleRoot;	//merkle tree root
 	private long time;		//block timestamp
-	private long diffTarget;		//The current difficulty target
+	private long bits;		//The current difficulty target
 	private long nonce;		//nonce
 	private int txCount;		//number of TXs included
 
@@ -17,8 +17,7 @@ public class Block {
 	private long inValueT;		//total amount of all inputs values in satoshi
 	private long outValueT;		//total amount of all outputs values in satoshi
 	private long fee;		//total amount of tx fee in satoshi
-	private long cdd;		//total amount of coindays destroyed	
-	
+	private long cdd;		//total amount of coindays destroyed
 	
 	public long getSize() {
 		return size;
@@ -56,11 +55,11 @@ public class Block {
 	public void setTime(long time) {
 		this.time = time;
 	}
-	public long getDiffTarget() {
-		return diffTarget;
+	public long getBits() {
+		return bits;
 	}
-	public void setDiffTarget(long diffTarget) {
-		this.diffTarget = diffTarget;
+	public void setBits(long bits) {
+		this.bits = bits;
 	}
 	public long getNonce() {
 		return nonce;
