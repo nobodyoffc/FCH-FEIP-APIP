@@ -15,6 +15,8 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import static walletTools.WalletTools.checkUnconfirmed;
+
 
 @WebServlet(ApiNames.APIP2V1Path + ApiNames.CashValidAPI)
 public class CashValid extends HttpServlet {
@@ -59,6 +61,7 @@ public class CashValid extends HttpServlet {
             if(meetList==null){
                 return;
             }
+            checkUnconfirmed(requestBody.getFcdsl().getQuery().getTerms().getValues()[0],meetList);
         } catch (Exception e) {
             e.printStackTrace();
             response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
@@ -66,9 +69,7 @@ public class CashValid extends HttpServlet {
             return;
         }
 
-
         //response
-
         replier.setData(meetList);
         replier.setGot(meetList.size());
         esRequest.writeSuccess(dataCheckResult.getSessionKey());

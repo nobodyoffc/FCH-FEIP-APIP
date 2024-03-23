@@ -6,6 +6,8 @@ public class Team {
 	private String owner;
 	private String stdName;
 	private String[] localNames;
+	private String[] waiters;
+	private String[] accounts;
 	private String consensusId;
 	private String desc;
 	private String[] members;
@@ -152,5 +154,20 @@ public class Team {
 	public void setMemberNum(long memberNum) {
 		this.memberNum = memberNum;
 	}
-	
+
+	public String[] getWaiters() {
+		return waiters;
+	}
+
+	public void setWaiters(String[] waiters) {
+		this.waiters = waiters;
+	}
+
+	public String[] getAccounts() {
+		return accounts;
+	}
+
+	public void setAccounts(String[] accounts) {
+		this.accounts = accounts;
+	}
 }

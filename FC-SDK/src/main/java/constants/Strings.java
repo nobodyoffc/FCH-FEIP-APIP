@@ -104,6 +104,7 @@ public class Strings {
     public static final String FOUND = "found";
     public static final String PRE_KEY = "priKey";
     public static final String SWAP = "swap";
+    public static final String DATA = "data";
     public static String spendCashMapKey = "spentCashMap";
     public static String newCashMapKey = "newCashMap";
     public static final String PENDING = "pending";

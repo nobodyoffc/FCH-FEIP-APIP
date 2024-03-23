@@ -50,7 +50,7 @@ public class ListUnspent {
     }
 
     public Utxo[] listUnspent(String url, String username, String password){
-        ListUnspentParams listUnspentParams = new ListUnspentParams(null,null);
+        ListUnspentParams listUnspentParams = new ListUnspentParams(null, (String[]) null);
         RpcRequest jsonRPC2Request = new RpcRequest(method, listUnspentParams.toParams());
         Object result = RpcRequest.requestRpc(url, username,password,"listUnspent",jsonRPC2Request);
         return getUtxos(result);

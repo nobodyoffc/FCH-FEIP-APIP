@@ -160,7 +160,7 @@ public class MempoolScanner implements Runnable {
         String spendCashesKey = "spendCashes";
         String incomeCountKey = "incomeCount";
         String incomeValueKey = "incomeValue";
-        String incomeCashesKey = "incomeCashes";
+        String newCashesKey = "newCashes";
 
         Map<String, Long> fidNetMap = new HashMap<>();
 
@@ -230,22 +230,22 @@ public class MempoolScanner implements Runnable {
 
             int incomeCount = 0;
             long incomeValue = 0;
-            String[] incomeCashes = new String[0];
+            String[] newCashes = new String[0];
             Map<String,Long> txValueMap;
 
             if (jedis.hget(fid, incomeCountKey) != null) {
                 incomeCount = Integer.parseInt(jedis.hget(fid, incomeCountKey));
                 incomeValue = Long.parseLong(jedis.hget(fid, incomeValueKey));
-                incomeCashes = gson.fromJson(jedis.hget(fid,incomeCashesKey),String[].class);
-                if(incomeCashes==null)incomeCashes = new String[0];
+                newCashes = gson.fromJson(jedis.hget(fid,newCashesKey),String[].class);
+                if(newCashes==null)newCashes = new String[0];
             }
 
             incomeValue += cash.getValue();
 
             incomeCount++;
 
-            String[] newIncomeCashes = new String[incomeCashes.length+1];
-            System.arraycopy(incomeCashes,0,newIncomeCashes,0,incomeCashes.length);
+            String[] newIncomeCashes = new String[newCashes.length+1];
+            System.arraycopy(newCashes,0,newIncomeCashes,0,newCashes.length);
             newIncomeCashes[newIncomeCashes.length-1]=cash.getCashId();
 
             String txValueMapStr = jedis.hget(fid, txValueMapKey);
@@ -260,7 +260,7 @@ public class MempoolScanner implements Runnable {
 
             jedis.hset(fid, incomeValueKey, String.valueOf(incomeValue));
             jedis.hset(fid, incomeCountKey, String.valueOf(incomeCount));
-            jedis.hset(fid,incomeCashesKey, JsonTools.getNiceString(newIncomeCashes));
+            jedis.hset(fid,newCashesKey, JsonTools.getNiceString(newIncomeCashes));
             jedis.hset(fid, netKey, String.valueOf(net));
             jedis.hset(fid, txValueMapKey, JsonTools.getNiceString(txValueMap));
         }

@@ -6,6 +6,8 @@ public class TeamData {
 	private String op;
 	private String stdName;
 	private String[] localNames;
+	private String[] waiters;
+	private String[] accounts;
 	private String consensusId;
 	private String desc;
 	private String transferee;
@@ -72,7 +74,21 @@ public class TeamData {
 	public void setRate(int rate) {
 		this.rate = rate;
 	}
-	
-	
-	
+
+
+	public String[] getWaiters() {
+		return waiters;
+	}
+
+	public void setWaiters(String[] waiters) {
+		this.waiters = waiters;
+	}
+
+	public String[] getAccounts() {
+		return accounts;
+	}
+
+	public void setAccounts(String[] accounts) {
+		this.accounts = accounts;
+	}
 }

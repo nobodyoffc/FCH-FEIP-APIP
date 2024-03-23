@@ -8,6 +8,7 @@ public class OpNames {
     public static final String RECOVER = "recover";
     public static final String CLOSE = "close";
     public static final String RATE = "rate";
+    public static final String REGISTER = "register";
 
     public static boolean contains(String value) {
         return value.equals(UPDATE) || value.equals(PUBLISH) || value.equals(STOP) ||

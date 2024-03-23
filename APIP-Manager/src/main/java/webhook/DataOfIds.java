@@ -1,6 +1,6 @@
 package webhook;
 
-public class DataOfNewCashListByIds {
+public class DataOfIds {
     private String[] fids;
 
     public String[] getFids() {

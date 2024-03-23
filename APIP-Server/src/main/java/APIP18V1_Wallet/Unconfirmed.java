@@ -2,11 +2,17 @@ package APIP18V1_Wallet;
 
 import APIP0V1_OpenAPI.*;
 import apipClass.RequestBody;
+import apipClass.Sort;
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.elasticsearch.core.search.Hit;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import constants.ApiNames;
-import constants.ReplyInfo;
+import constants.*;
+import fchClass.Cash;
+import initial.Initiator;
 import redis.clients.jedis.Jedis;
+import walletTools.CashListReturn;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -19,6 +25,8 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import static walletTools.WalletTools.getCashListForPay;
 
 @WebServlet(ApiNames.APIP18V1Path + ApiNames.UnconfirmedAPI)
 public class Unconfirmed extends HttpServlet {
@@ -123,5 +131,74 @@ public class Unconfirmed extends HttpServlet {
         private int incomeCount;
         private long incomeValue;
         private Map<String,Long> txValueMap;
+    }
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        PrintWriter writer = response.getWriter();
+        Replier replier = new Replier();
+
+        if(Initiator.forbidFreeGet){
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code2001NoFreeGet));
+            writer.write(replier.reply2001NoFreeGet());
+            return;
+        }
+        String fid = request.getParameter("fid");
+        if (fid==null){
+            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code2003IllegalFid));
+            writer.write(replier.reply2003IllegalFid());
+            return;
+        }
+
+
+        List<UnconfirmedInfo> meetList = new ArrayList<>();
+        try(Jedis jedis = Initiator.jedisPool.getResource()) {
+            jedis.select(3);
+            Map<String, String> resultMap = null;
+            try {
+                resultMap = jedis.hgetAll(fid);
+            } catch (Exception e) {
+                UnconfirmedInfo info = new UnconfirmedInfo();
+                info.fid = fid;
+                info.incomeCount = 0;
+                info.incomeValue = 0;
+                info.spendCount = 0;
+                info.spendValue = 0;
+                info.net = 0;
+                meetList.add(info);
+            }
+            UnconfirmedInfo info = new UnconfirmedInfo();
+            info.fid = fid;
+            if (resultMap.get(IncomeCount) != null) info.incomeCount = Integer.parseInt(resultMap.get(IncomeCount));
+            if (resultMap.get(IncomeValue) != null) info.incomeValue = Long.parseLong(resultMap.get(IncomeValue));
+            if (resultMap.get(SpendCount) != null) info.spendCount = Integer.parseInt(resultMap.get(SpendCount));
+            if (resultMap.get(SpendValue) != null) info.spendValue = Long.parseLong(resultMap.get(SpendValue));
+            if (resultMap.get(TxValueMap) != null) {
+                Type mapType = new TypeToken<Map<String, Long>>() {
+                }.getType();
+
+                info.txValueMap = new Gson().fromJson(resultMap.get(TxValueMap), mapType);
+            }
+            info.net = info.incomeValue - info.spendValue;
+            meetList.add(info);
+
+            if (meetList.size() == 0) {
+                response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1011DataNotFound));
+                writer.write(replier.reply1011DataNotFound());
+                return;
+            }
+            //response
+            replier.setData(meetList);
+            replier.setGot(meetList.size());
+            replier.setTotal(meetList.size());
+            jedis.select(0);
+            replier.setBestHeight(Long.parseLong(jedis.get(Strings.BEST_HEIGHT)));
+        }
+        response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code0Success));
+        String reply = replier.reply0Success();
+        if(reply==null)return;
+
+        writer.write(reply);
     }
 }

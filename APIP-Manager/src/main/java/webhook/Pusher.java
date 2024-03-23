@@ -11,6 +11,7 @@ import constants.*;
 import esTools.EsTools;
 import fcTools.ParseTools;
 import fchClass.Cash;
+import fchClass.OpReturn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
@@ -131,6 +132,8 @@ public class Pusher implements Runnable{
         for(String method: methodFidWatchedFidsMapMap.keySet()){
             switch (method){
                 case ApiNames.NewCashByFidsAPI-> putNewCashByFids(methodFidWatchedFidsMapMap.get(method),sinceHeight);
+                //TODO untested
+                case ApiNames.NewOpReturnByFidsAPI-> putNewOpReturnByFids(methodFidWatchedFidsMapMap.get(method),sinceHeight);
             }
         }
     }
@@ -140,13 +143,21 @@ public class Pusher implements Runnable{
             WebhookRequestBody webhookInfo = ownerWebhookInfoMap.get(owner);
             ArrayList<Cash> newCashList = getNewCashList(webhookInfo,sinceHeight);
             if(newCashList==null)return;
-            pushNewCashList(webhookInfo,newCashList);
+            pushDataList(webhookInfo,ApiNames.NewCashByFidsAPI,newCashList);
         }
     }
 
-    private void pushNewCashList(WebhookRequestBody webhookInfo, ArrayList<Cash> newCashList) {
+    private void putNewOpReturnByFids(Map<String, WebhookRequestBody> ownerWebhookInfoMap, long sinceHeight) {
+        for(String owner:ownerWebhookInfoMap.keySet()){
+            WebhookRequestBody webhookInfo = ownerWebhookInfoMap.get(owner);
+            ArrayList<OpReturn> newOpReturnList = getNewOpReturnList(webhookInfo,sinceHeight);
+            if(newOpReturnList==null)return;
+            pushDataList(webhookInfo,ApiNames.NewOpReturnByFidsAPI,newOpReturnList);
+        }
+    }
+
+    private <T> void pushDataList(WebhookRequestBody webhookInfo, String method, ArrayList<T> dataList) {
         Gson gson = new Gson();
-        String method = ApiNames.NewCashByFidsAPI;
         String sessionName ;
         String sessionKey;
         String balance;
@@ -155,7 +166,7 @@ public class Pusher implements Runnable{
             jedis.select(0);
             balance = jedis.hget(StartAPIP.serviceName+"_"+Strings.FID_BALANCE,webhookInfo.getUserName());
             if(balance==null)return;
-            String nPrice = jedis.hget(StartAPIP.serviceName+"_"+Strings.N_PRICE, ApiNames.NewCashByFidsAPI);
+            String nPrice = jedis.hget(StartAPIP.serviceName+"_"+Strings.N_PRICE, method);
             long price = (long)(Double.parseDouble(jedis.hget(CONFIG,PRICE))*Constants.FchToSatoshi);
             float nPriceF = Float.parseFloat(nPrice);
             long balanceL = Long.parseLong(balance);
@@ -172,7 +183,7 @@ public class Pusher implements Runnable{
             jedis.select(1);
             sessionKey = jedis.hget(sessionName,Strings.SESSION_KEY);
         }catch (Exception e){
-            log.error("Operate redis wrong when pushNewCashList.",e);
+            log.error("Operate redis wrong when push {}.",method,e);
             return;
         }
         byte[] sessionKeyBytes = HexFormat.of().parseHex(sessionKey);
@@ -180,7 +191,7 @@ public class Pusher implements Runnable{
         Map<String,Object> dataMap = new HashMap<>();
         dataMap.put(BALANCE,balance);
         dataMap.put(BEST_HEIGHT,bestHeight);
-        dataMap.put(FieldNames.NEW_CASHES,newCashList);
+        dataMap.put(Strings.DATA,dataList);
 
         String dataStr = gson.toJson(dataMap);
         byte[] dataBytes = dataStr.getBytes(StandardCharsets.UTF_8);
@@ -204,12 +215,25 @@ public class Pusher implements Runnable{
     private ArrayList<Cash> getNewCashList(WebhookRequestBody webhookInfo, long sinceHeight) {
         Gson gson = new Gson();
 
-        DataOfNewCashListByIds data = gson.fromJson(gson.toJson(webhookInfo.getData()),DataOfNewCashListByIds.class);
+        DataOfIds data = gson.fromJson(gson.toJson(webhookInfo.getData()), DataOfIds.class);
         String[] fids = data.getFids();
         try {
             return EsTools.getListByTermsSinceHeight(esClient,IndicesNames.CASH, FieldNames.OWNER,fids,sinceHeight,Strings.CASH_ID,SortOrder.Asc,Cash.class);
         } catch (IOException e) {
             log.error("Get new cash list for "+ApiNames.NewCashByFidsAPI+" from ES wrong.",e);
+            return null;
+        }
+    }
+
+    private ArrayList<OpReturn> getNewOpReturnList(WebhookRequestBody webhookInfo, long sinceHeight) {
+        Gson gson = new Gson();
+
+        DataOfIds data = gson.fromJson(gson.toJson(webhookInfo.getData()), DataOfIds.class);
+        String[] fids = data.getFids();
+        try {
+            return EsTools.getListByTermsSinceHeight(esClient,IndicesNames.OPRETURN, FieldNames.RECIPIENT,fids,sinceHeight,"txId",SortOrder.Asc, OpReturn.class);
+        } catch (IOException e) {
+            log.error("Get new OpReturn list for "+ApiNames.NewOpReturnByFidsAPI+" from ES wrong.",e);
             return null;
         }
     }

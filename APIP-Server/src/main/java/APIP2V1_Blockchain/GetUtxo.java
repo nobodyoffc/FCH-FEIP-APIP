@@ -22,6 +22,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import static walletTools.WalletTools.checkUnconfirmed;
 import static walletTools.WalletTools.getCashListForPay;
 
 
@@ -89,7 +90,7 @@ public class GetUtxo extends HttpServlet {
                     .trackTotalHits(tr->tr.enabled(true))
                     .aggregations("sum",a->a.sum(s1->s1.field("value")))
                     .sort(Sort.getSortList(sortList))
-                    .size(20), Cash.class);
+                    .size(200), Cash.class);
 
             List<Hit<Cash>> hitList = cashResult.hits().hits();
 
@@ -104,16 +105,21 @@ public class GetUtxo extends HttpServlet {
                 cashList.add(hit.source());
             }
 
-            assert cashResult.hits().total() != null;
+            checkUnconfirmed(idRequested,cashList);
+
+            List<Utxo> utxoList = new ArrayList<>();
+            for(Cash cash:cashList)
+                utxoList.add(Utxo.cashToUtxo(cash));
+
+            replier.setData(utxoList);
+            int size = cashList.size();
             replier.setTotal(cashResult.hits().total().value());
-            replier.setGot(cashList.size());
-            replier.setData(cashList);
+            replier.setGot(size);
             try(Jedis jedis = Initiator.jedisPool.getResource()) {
                 replier.setBestHeight(Long.parseLong(jedis.get(Strings.BEST_HEIGHT)));
             }
             response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code0Success));
             writer.write(replier.reply0Success());
-            return;
         }else {
             response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code2003IllegalFid));
             writer.write(replier.reply2003IllegalFid());

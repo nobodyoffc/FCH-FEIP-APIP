@@ -7,6 +7,6 @@
 </head>
 <body>
 <h2>欢迎！</h2>
-<a href="apip1/v1/connect">connectAPI</a>
+<a href="apip0/v1/totals">All indices</a>
 </body>
 </html>

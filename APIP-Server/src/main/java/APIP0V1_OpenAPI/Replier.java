@@ -230,6 +230,12 @@ public class Replier {
         return reply(addr);
     }
 
+    public String reply1008BadSign(){
+        code = ReplyInfo.Code1008BadSign;
+        message = ReplyInfo.Msg1008BadSign;
+        return reply();
+    }
+
     public String reply1009SessionTimeExpired(){
         code = ReplyInfo.Code1009SessionTimeExpired;
         message = ReplyInfo.Msg1009SessionTimeExpired;

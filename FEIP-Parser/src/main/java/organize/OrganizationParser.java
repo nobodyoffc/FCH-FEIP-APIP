@@ -292,7 +292,7 @@ public class OrganizationParser {
 				if(teamRaw.getStdName()==null) return null;
 				if(teamRaw.getTid()!=null) return null;
 				if(teamRaw.getConsensusId()==null) return null;
-            if (opre.getHeight() > StartFEIP.CddCheckHeight && opre.getCdd() < StartFEIP.CddRequired * 100) return null;
+            	if (opre.getHeight() > StartFEIP.CddCheckHeight && opre.getCdd() < StartFEIP.CddRequired * 100) return null;
 				teamHist.setTxId(opre.getTxId());
 				teamHist.setTid(opre.getTxId());
 				teamHist.setHeight(opre.getHeight());
@@ -302,12 +302,14 @@ public class OrganizationParser {
 
 				teamHist.setStdName(teamRaw.getStdName());
 				if(teamRaw.getLocalNames()!=null)teamHist.setLocalNames(teamRaw.getLocalNames());
+				if(teamRaw.getWaiters()!=null)teamHist.setWaiters(teamRaw.getWaiters());
+				if(teamRaw.getAccounts()!=null)teamHist.setAccounts(teamRaw.getAccounts());
 				if(teamRaw.getDesc()!=null)teamHist.setDesc(teamRaw.getDesc());
 				if(teamRaw.getConsensusId()!=null)teamHist.setConsensusId(teamRaw.getConsensusId());
 
 				break;
 
-			case "disband":
+			case "disband", "leave":
 				if(teamRaw.getTid()==null)return null;
 				teamHist.setTid(teamRaw.getTid());
 
@@ -357,6 +359,8 @@ public class OrganizationParser {
 
 				teamHist.setStdName(teamRaw.getStdName());
 				if(teamRaw.getLocalNames()!=null)teamHist.setLocalNames(teamRaw.getLocalNames());
+				if(teamRaw.getWaiters()!=null)teamHist.setWaiters(teamRaw.getWaiters());
+				if(teamRaw.getAccounts()!=null)teamHist.setAccounts(teamRaw.getAccounts());
 				if(teamRaw.getDesc()!=null)teamHist.setDesc(teamRaw.getDesc());
 				if(teamRaw.getConsensusId()!=null)teamHist.setConsensusId(teamRaw.getConsensusId());
 
@@ -374,7 +378,7 @@ public class OrganizationParser {
 				teamHist.setTime(opre.getTime());
 				teamHist.setSigner(opre.getSigner());
 				break;
-			case "invite":
+			case "invite", "withdraw invitation", "dismiss", "appoint", "cancel appointment":
 				if(teamRaw.getTid()==null)return null;
 				if(teamRaw.getList()==null)return null;
 				if(teamRaw.getList().length==0)return null;
@@ -387,19 +391,7 @@ public class OrganizationParser {
 				teamHist.setTime(opre.getTime());
 				teamHist.setSigner(opre.getSigner());
 				break;
-			case "withdraw invitation":
-				if(teamRaw.getTid()==null)return null;
-				if(teamRaw.getList()==null)return null;
-				if(teamRaw.getList().length==0)return null;
-				teamHist.setTid(teamRaw.getTid());
-				teamHist.setList(teamRaw.getList());
 
-				teamHist.setTxId(opre.getTxId());
-				teamHist.setHeight(opre.getHeight());
-				teamHist.setIndex(opre.getTxIndex());
-				teamHist.setTime(opre.getTime());
-				teamHist.setSigner(opre.getSigner());
-				break;
 			case "join":
 				if(teamRaw.getTid()==null)return null;
 				if(!teamRaw.getConfirm().equals("I join the team and agree with the team consensus."))return null;
@@ -412,59 +404,11 @@ public class OrganizationParser {
 				teamHist.setTime(opre.getTime());
 				teamHist.setSigner(opre.getSigner());
 				break;
-			case "leave":
-				if(teamRaw.getTid()==null)return null;
-				teamHist.setTid(teamRaw.getTid());
 
-				teamHist.setTxId(opre.getTxId());
-				teamHist.setHeight(opre.getHeight());
-				teamHist.setIndex(opre.getTxIndex());
-				teamHist.setTime(opre.getTime());
-				teamHist.setSigner(opre.getSigner());
-				break;
-			case "dismiss":
-				if(teamRaw.getTid()==null)return null;
-				if(teamRaw.getList()==null)return null;
-				if(teamRaw.getList().length==0)return null;
-				teamHist.setTid(teamRaw.getTid());
-				teamHist.setList(teamRaw.getList());
-
-				teamHist.setTxId(opre.getTxId());
-				teamHist.setHeight(opre.getHeight());
-				teamHist.setIndex(opre.getTxIndex());
-				teamHist.setTime(opre.getTime());
-				teamHist.setSigner(opre.getSigner());
-				break;
-			case "appoint":
-				if(teamRaw.getTid()==null)return null;
-				if(teamRaw.getList()==null)return null;
-				if(teamRaw.getList().length==0)return null;
-				teamHist.setTid(teamRaw.getTid());
-				teamHist.setList(teamRaw.getList());
-
-				teamHist.setTxId(opre.getTxId());
-				teamHist.setHeight(opre.getHeight());
-				teamHist.setIndex(opre.getTxIndex());
-				teamHist.setTime(opre.getTime());
-				teamHist.setSigner(opre.getSigner());
-				break;
-			case "cancel appointment":
-				if(teamRaw.getTid()==null)return null;
-				if(teamRaw.getList()==null)return null;
-				if(teamRaw.getList().length==0)return null;
-				teamHist.setTid(teamRaw.getTid());
-				teamHist.setList(teamRaw.getList());
-
-				teamHist.setTxId(opre.getTxId());
-				teamHist.setHeight(opre.getHeight());
-				teamHist.setIndex(opre.getTxIndex());
-				teamHist.setTime(opre.getTime());
-				teamHist.setSigner(opre.getSigner());
-				break;
 			case "rate":
 				if(teamRaw.getTid()==null)return null;
 				if(teamRaw.getRate()<0 ||teamRaw.getRate()>5)return null;
-            if (opre.getCdd() < StartFEIP.CddRequired) return null;
+            	if (opre.getCdd() < StartFEIP.CddRequired) return null;
 				teamHist.setTid(teamRaw.getTid());
 				teamHist.setRate(teamRaw.getRate());
 				teamHist.setCdd(opre.getCdd());
@@ -495,6 +439,8 @@ public class OrganizationParser {
 					team.setOwner(teamHist.getSigner());
 					team.setStdName(teamHist.getStdName());
 					if(teamHist.getLocalNames()!=null)team.setLocalNames(teamHist.getLocalNames());
+					if(teamHist.getWaiters()!=null)team.setWaiters(teamHist.getWaiters());
+					if(teamHist.getAccounts()!=null)team.setAccounts(teamHist.getAccounts());
 					if(teamHist.getConsensusId() !=null)team.setConsensusId(teamHist.getConsensusId());
 					if(teamHist.getDesc() !=null)team.setDesc(teamHist.getDesc());
 
@@ -664,6 +610,8 @@ public class OrganizationParser {
 
 				team.setStdName(teamHist.getStdName());
 				if(teamHist.getLocalNames() !=null) team.setLocalNames(teamHist.getLocalNames());
+				if(teamHist.getWaiters()!=null)team.setWaiters(teamHist.getWaiters());
+				if(teamHist.getAccounts()!=null)team.setAccounts(teamHist.getAccounts());
 				if(teamHist.getDesc() !=null) team.setDesc(teamHist.getDesc());
 
 				if(teamHist.getConsensusId() !=null) {
@@ -1100,9 +1048,9 @@ public class OrganizationParser {
 					}
 				}
 
-				String[] magagers = magagerSet.toArray(new String[magagerSet.size()]);
+				String[] managers = magagerSet.toArray(new String[0]);
 
-				team.setManagers(magagers);
+				team.setManagers(managers);
 				team.setLastTxId(teamHist.getTxId());
 				team.setLastTime(teamHist.getTime());
 				team.setLastHeight(teamHist.getHeight());

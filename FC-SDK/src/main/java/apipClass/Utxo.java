@@ -13,6 +13,7 @@ public class Utxo {
         Utxo utxo = new Utxo();
         utxo.setAddr(cash.getOwner());
         utxo.setTxId(cash.getBirthTxId());
+        utxo.setIndex(cash.getBirthIndex());
         utxo.setAmount((double) cash.getValue()/100000000);
         utxo.setCd(cash.getCd());
         return utxo;

@@ -25,4 +25,6 @@ public class FieldNames {
     public static final String ID = "id";
     public static final String BALANCE = "balance";
     public static final String BLOCK_ID = "blockId";
+    public static final String RECIPIENT = "recipient";
+    public static final String CASH_ID = "cashId";
 }

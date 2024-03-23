@@ -38,6 +38,7 @@ public class ApiNames {
     public static final String APIP20V1Path = "/apip20/v1/";
     public static final String APIP21V1Path = "/apip21/v1/";
     public static final String FreeGetPath = "/freeGet/v1/";
+    public static final String CryptoKeepPath = "/cryptoKeep/v1/";
     public static final String SwapHallPath = "/swapHall/v1/";
     public static final String ToolsPath = "/tools/";
     public static final String SignInAPI = "signIn";
@@ -149,6 +150,7 @@ public class ApiNames {
     public static final String OffLineTxByCdAPI = "offLineTxByCd";
     public static final String AddressesAPI = "addresses";
     public static final String NewCashByFidsAPI = "newCashByFids";
+    public static final String NewOpReturnByFidsAPI = "newOpReturnByFids";
     public static final String NobodyByIdsAPI ="nobodyByIds";
 
     public static final String SwapRegisterAPI ="swapRegister";
@@ -167,6 +169,10 @@ public class ApiNames {
     public static final String TokenHolderByIdsAPI = "tokenHolderByIds";
     public static final String TokenHoldersAPI = "tokenHolders";
     public static final String TokenSearchAPI = "tokenSearch";
+
+    public static final String MadeCryptoKeepAPI = "madeCryptoKeep";
+    public static final String CheckCryptoKeepAPI = "checkCryptoKeep";
+    public static final String RegisterCryptoKeepAPI = "registerCryptoKeep";
 
     public static ArrayList<String> freeApiList = new ArrayList<>();
 
