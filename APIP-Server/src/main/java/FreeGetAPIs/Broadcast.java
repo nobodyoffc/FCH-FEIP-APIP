@@ -30,11 +30,11 @@ public class Broadcast extends HttpServlet {
         PrintWriter writer = response.getWriter();
         Replier replier = new Replier();
 
-        if(Initiator.forbidFreeGet){
-            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code2001NoFreeGet));
-            writer.write(replier.reply2001NoFreeGet());
-            return;
-        }
+//        if(Initiator.forbidFreeGet){
+//            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code2001NoFreeGet));
+//            writer.write(replier.reply2001NoFreeGet());
+//            return;
+//        }
 
         if(!BytesTools.isHexString(rawTxHex)){
             response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code2004RawTxNoHex));

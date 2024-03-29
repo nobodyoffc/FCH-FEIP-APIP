@@ -35,11 +35,11 @@ public class GetUtxo extends HttpServlet {
         PrintWriter writer = response.getWriter();
         Replier replier = new Replier();
 
-        if(Initiator.forbidFreeGet){
-            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code2001NoFreeGet));
-            writer.write(replier.reply2001NoFreeGet());
-            return;
-        }
+//        if(Initiator.forbidFreeGet){
+//            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code2001NoFreeGet));
+//            writer.write(replier.reply2001NoFreeGet());
+//            return;
+//        }
         String idRequested = request.getParameter("address");
         if (idRequested==null){
             response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code2003IllegalFid));
