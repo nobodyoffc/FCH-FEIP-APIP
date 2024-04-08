@@ -6,6 +6,7 @@ import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
 import constants.Strings;
+import feipClass.Service;
 import initial.Initiator;
 import redis.clients.jedis.Jedis;
 import service.ApipService;
@@ -66,9 +67,13 @@ public class GetService extends HttpServlet {
 
         try (Jedis jedis = Initiator.jedisPool.getResource()) {
 
-            service = new Gson().fromJson(jedis.get(Initiator.serviceName +"_"+ Strings.SERVICE), ApipService.class);
-
-            replier.setData(service);
+            GetResponse<Service> result = Initiator.esClient.get(g -> g.index(SERVICE).id(Initiator.service.getSid()), Service.class);
+            if(!result.found()){
+                response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code2008ServiceNoFound));
+                writer.write(replier.reply2008ServiceNoFound());
+                return;
+            }
+            replier.setData(result.source());
             replier.setTotal(1);
             replier.setGot(1);
             jedis.select(0);

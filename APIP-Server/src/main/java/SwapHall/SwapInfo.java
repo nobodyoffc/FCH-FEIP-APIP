@@ -15,9 +15,9 @@ import feipClass.Service;
 import initial.Initiator;
 import org.jetbrains.annotations.Nullable;
 import redis.clients.jedis.Jedis;
-import swapData.SwapInfoData;
-import swapData.SwapParams;
-import swapData.SwapStateData;
+import swapClass.SwapInfoData;
+import swapClass.SwapParams;
+import swapClass.SwapStateData;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

@@ -1,4 +1,4 @@
-package swapData;
+package swapClass;
 
 import java.util.HashMap;
 import java.util.Map;

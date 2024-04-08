@@ -1,4 +1,4 @@
-package swapData;
+package swapClass;
 
 public class SwapInfoData {
     private String sid;

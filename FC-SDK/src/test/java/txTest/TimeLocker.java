@@ -1,5 +1,6 @@
 package txTest;
 
+import fc.Hex;
 import fcTools.ParseTools;
 import fchClass.Cash;
 import keyTools.KeyTools;
@@ -9,15 +10,18 @@ import org.bitcoinj.fch.FchMainNetwork;
 import org.bitcoinj.script.Script;
 import org.bitcoinj.script.ScriptBuilder;
 import org.bitcoinj.script.ScriptOpCodes;
+import org.junit.Test;
 import txTools.FchTool;
+import txTools.RawTxParser;
 import walletTools.SendTo;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class TimeLocker {
 
-
+@Test
     public static String createTimeLockedTransaction(List<Cash> inputs, byte[] priKey, List<SendTo> outputs,long lockUntil, String opReturn) {
 
         String changeToFid=inputs.get(0).getOwner();

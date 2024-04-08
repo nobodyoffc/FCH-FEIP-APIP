@@ -11,8 +11,8 @@ import feipClass.Service;
 import initial.Initiator;
 import javaTools.JsonTools;
 import redis.clients.jedis.Jedis;
-import swapData.SwapParams;
-import swapData.SwapRegisterInfo;
+import swapClass.SwapParams;
+import swapClass.SwapRegisterInfo;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -120,10 +120,16 @@ public class SwapRegister extends HttpServlet {
             if(swapParams.getmAddr()!=null)
                 swapRelatedAddrList.add(swapParams.getmAddr());
         }catch (Exception ignore){}
-
-        if(!swapRelatedAddrList.contains(addr)){
+        boolean goodFid = false;
+        for(String fid: swapRelatedAddrList){
+            if(fid.equals(addr)){
+                goodFid=true;
+                break;
+            }
+        }
+        if (!goodFid){
             response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1020OtherError));
-            replier.setData("Only the owner, waiters, or dealers of the swap service can register the swap.");
+            replier.setData("Requester "+addr+" is not the owner, waiter, or dealer of the swap service."+Arrays.toString(swapRelatedAddrList.toArray()));
             writer.write(replier.reply1020OtherError(addr));
             return;
         }

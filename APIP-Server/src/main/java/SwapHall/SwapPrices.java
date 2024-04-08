@@ -5,7 +5,6 @@ import apipClass.Sort;
 import co.elastic.clients.elasticsearch._types.SortOptions;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
-import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import co.elastic.clients.elasticsearch._types.query_dsl.RangeQuery;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
@@ -18,7 +17,7 @@ import constants.Strings;
 import esTools.EsTools;
 import initial.Initiator;
 import redis.clients.jedis.Jedis;
-import swapData.SwapPriceData;
+import swapClass.SwapPriceData;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

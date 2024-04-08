@@ -2,7 +2,6 @@ package SwapHall;
 
 import APIP0V1_OpenAPI.Replier;
 import co.elastic.clients.elasticsearch.core.GetResponse;
-import com.google.gson.reflect.TypeToken;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
@@ -10,8 +9,8 @@ import constants.Strings;
 import initial.Initiator;
 import javaTools.BytesTools;
 import redis.clients.jedis.Jedis;
-import swapData.SwapAffair;
-import swapData.SwapPendingData;
+import swapClass.SwapAffair;
+import swapClass.SwapPendingData;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -20,8 +19,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.List;
 
 import static initial.Initiator.esClient;

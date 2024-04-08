@@ -8,7 +8,7 @@ import constants.Strings;
 import initial.Initiator;
 import javaTools.BytesTools;
 import redis.clients.jedis.Jedis;
-import swapData.SwapStateData;
+import swapClass.SwapStateData;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

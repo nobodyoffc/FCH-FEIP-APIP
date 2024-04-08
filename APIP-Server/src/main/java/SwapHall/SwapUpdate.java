@@ -13,8 +13,8 @@ import esTools.EsTools;
 import initial.Initiator;
 import javaTools.JsonTools;
 import redis.clients.jedis.Jedis;
-import swapData.*;
-import swapData.SwapPendingData;
+import swapClass.*;
+import swapClass.SwapPendingData;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

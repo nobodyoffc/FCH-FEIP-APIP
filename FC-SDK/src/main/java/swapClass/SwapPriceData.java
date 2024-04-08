@@ -1,6 +1,4 @@
-package swapData;
-
-import org.bouncycastle.pqc.jcajce.provider.ntru.NTRUKeyGeneratorSpi;
+package swapClass;
 
 public class SwapPriceData {
     private String id;

@@ -1,4 +1,4 @@
-package swapData;
+package swapClass;
 
 public class SwapParams {
     private String goods;

@@ -1,4 +1,4 @@
-package swapData;
+package swapClass;
 
 import java.util.List;
 

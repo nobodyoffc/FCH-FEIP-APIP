@@ -14,7 +14,7 @@ import constants.Strings;
 import esTools.EsTools;
 import initial.Initiator;
 import redis.clients.jedis.Jedis;
-import swapData.SwapAffair;
+import swapClass.SwapAffair;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

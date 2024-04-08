@@ -1,4 +1,4 @@
-package swapData;
+package swapClass;
 
 import java.beans.Transient;
 import java.util.List;
