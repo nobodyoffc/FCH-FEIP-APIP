@@ -54,9 +54,8 @@ public class CidByIds extends HttpServlet {
 
         try {
             meetList = dataRequestHandler.doRequest(IndicesNames.CID, null, Cid.class);
-            if(meetList==null){
-                return;
-            }
+            if(meetList==null)return;
+
             //Make data
             for(Cid cid:meetList){
                 String cidStr = cid.getCid();
@@ -64,7 +63,6 @@ public class CidByIds extends HttpServlet {
                 fidCidMap.put(cid.getFid(),cidStr);
             }
         } catch (Exception e) {
-            e.printStackTrace();
             response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
             writer.write(replier.reply1012BadQuery(addr));
             return;

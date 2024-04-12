@@ -53,21 +53,16 @@ public class CidInfoByIds extends HttpServlet {
 
         try {
             meetAddrList = esRequest.doRequest(IndicesNames.ADDRESS, null,Address.class);
-            if(meetAddrList==null){
-                response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
-                writer.write(replier.reply1012BadQuery(addr));
-                return;
-            }
+            if(meetAddrList==null) return;
+
 
             EsTools.MgetResult<Cid> multiResult = EsTools.getMultiByIdList(Initiator.esClient, IndicesNames.CID, Arrays.asList(requestBody.getFcdsl().getIds()), Cid.class);
             meetCidList = multiResult.getResultList();
             //            meetCidList = esRequest.doRequest(IndicesNames.CID,null, Cid.class);
-
-
         } catch (Exception e) {
-            e.printStackTrace();
-            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
-            writer.write(replier.reply1012BadQuery(addr));
+//            e.printStackTrace();
+//            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1012BadQuery));
+//            writer.write(replier.reply1012BadQuery(addr));
             return;
         }
 
