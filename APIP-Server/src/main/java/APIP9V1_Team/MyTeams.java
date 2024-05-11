@@ -1,6 +1,7 @@
 package APIP9V1_Team;
 
 import APIP0V1_OpenAPI.*;
+import apipClass.MyTeamData;
 import apipClass.RequestBody;
 import apipClass.Sort;
 import constants.ApiNames;
@@ -69,15 +70,13 @@ public class MyTeams extends HttpServlet {
         }
 
         //Make data
-        List<Data> dataList = new ArrayList<>();
+        List<MyTeamData> dataList = new ArrayList<>();
         for(Team team: meetList){
-            Data data = new Data();
-            data.stdName = team.getStdName();
-            data.memberNum = team.getMemberNum();
-            data.desc = team.getDesc();
-            data.tid = team.getTid();
-
-
+            MyTeamData data = new MyTeamData();
+            data.setStdName(team.getStdName());
+            data.setMemberNum(team.getMemberNum());
+            data.setDesc(team.getDesc());
+            data.setTid(team.getTid());
             dataList.add(data);
         }
 
@@ -87,13 +86,6 @@ public class MyTeams extends HttpServlet {
         esRequest.writeSuccess(dataCheckResult.getSessionKey());
 
         return;
-    }
-
-    class Data {
-        String tid;
-        String stdName;
-        String desc;
-        long memberNum;
     }
 
     private boolean isThisApiRequest(RequestBody requestBody) {

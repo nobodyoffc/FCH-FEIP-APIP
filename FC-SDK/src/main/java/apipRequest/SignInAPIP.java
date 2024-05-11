@@ -36,7 +36,7 @@ public class SignInAPIP {
         //signIn接口，sessionKey不加密
         String urlHead = "https://qm.cash/APIP";
         System.out.println("Request signIn:");
-        SignInApipReplyData result = signIn(urlHead, null, priKey32Bytes,Strings.REFRESH);
+        SessionData result = signIn(urlHead, null, priKey32Bytes,Strings.REFRESH);
         System.out.println("Session key : "+result.getSessionKey());
         System.out.println("Session expire at : "+ ParseTools.convertTimestampToDate(result.getExpireTime()));
 
@@ -58,9 +58,9 @@ public class SignInAPIP {
         System.out.println("SessinName:"+sessionName);
     }
 
-    public static SignInApipReplyData signIn(String urlHead, String via, byte[]priKey, String mode){
+    public static SessionData signIn(String urlHead, String via, byte[]priKey, String mode){
         RequestBody signInRequestBody = new RequestBody();
-        SignInApipReplyData signInReplyData;
+        SessionData signInReplyData;
         String fid = KeyTools.pubKeyToFchAddr(KeyTools.priKeyToPubKey(priKey));
         try {
             String url = urlHead + ApiNames.APIP0V1Path + ApiNames.SignInAPI;
@@ -74,26 +74,26 @@ public class SignInAPIP {
         return signInReplyData;
     }
 
-    private static SignInApipReplyData makeResult( String responseJson) {
+    private static SessionData makeResult(String responseJson) {
         Gson gson = new Gson();
         ResponseBody responseBody = gson.fromJson(responseJson, ResponseBody.class);
-        SignInApipReplyData signInReplyData;
+        SessionData signInReplyData;
         if (responseBody.getCode() != 0) {
             System.out.println(responseJson);
-            signInReplyData = new SignInApipReplyData();
+            signInReplyData = new SessionData();
         } else {
             Object data = responseBody.getData();
-            Type t = new TypeToken<SignInApipReplyData>() {
+            Type t = new TypeToken<SessionData>() {
             }.getType();
             signInReplyData = gson.fromJson(gson.toJson(data), t);
         }
         return signInReplyData;
     }
 
-    public static SignInApipReplyData signInEcc(String urlHead, String via, byte[]priKey,String mode){
+    public static SessionData signInEcc(String urlHead, String via, byte[]priKey, String mode){
 
         RequestBody signInRequestBody = new RequestBody();
-        SignInApipReplyData signInReplyData;
+        SessionData signInReplyData;
         String fid = KeyTools.pubKeyToFchAddr(KeyTools.priKeyToPubKey(priKey));
         try {
             String url = urlHead + ApiNames.APIP0V1Path + ApiNames.SignInEccAPI;
@@ -106,9 +106,9 @@ public class SignInAPIP {
         return signInReplyData;
     }
 
-    public static SignInApipReplyData doSignInRequest(String fid, String url, byte[] priKey, RequestBody signInRequestBody, String via, String mode) {
+    public static SessionData doSignInRequest(String fid, String url, byte[] priKey, RequestBody signInRequestBody, String via, String mode) {
         Gson gson = new Gson();
-        SignInApipReplyData signInReplyData;
+        SessionData signInReplyData;
         signInRequestBody.makeRequestBody(url, via,mode);
 
         HashMap<String, String> headerMap = new HashMap<>();

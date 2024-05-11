@@ -17,8 +17,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HexFormat;
 
-import static constants.ApiNames.Sha256API;
-
 @WebServlet(ApiNames.APIP21V1Path +ApiNames.Sha256BytesAPI)
 public class Sha256Bytes extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, RuntimeException {

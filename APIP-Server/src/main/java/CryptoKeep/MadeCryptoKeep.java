@@ -5,8 +5,6 @@ import co.elastic.clients.elasticsearch._types.Result;
 import co.elastic.clients.elasticsearch.core.IndexResponse;
 import constants.ApiNames;
 import constants.ReplyInfo;
-import constants.Strings;
-import initial.Initiator;
 import redis.clients.jedis.Jedis;
 
 import javax.servlet.ServletException;
@@ -77,7 +75,7 @@ public class MadeCryptoKeep extends HttpServlet {
         }
 
         replier.setData("Done.");
-        replier.setTotal(1);
+        replier.setTotal(1L);
         replier.setGot(1);
 
         response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code0Success));

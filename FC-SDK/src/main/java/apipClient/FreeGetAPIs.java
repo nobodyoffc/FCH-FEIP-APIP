@@ -83,4 +83,5 @@ public class FreeGetAPIs {
         apipClient.get();
         return apipClient;
     }
+
 }

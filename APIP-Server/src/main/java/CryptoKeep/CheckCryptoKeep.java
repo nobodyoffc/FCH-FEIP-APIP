@@ -1,16 +1,11 @@
 package CryptoKeep;
 
 import APIP0V1_OpenAPI.Replier;
-import co.elastic.clients.elasticsearch._types.Result;
-import co.elastic.clients.elasticsearch.core.IndexResponse;
 import constants.ApiNames;
 import constants.ReplyInfo;
-import constants.Strings;
 import cryptoTools.Hash;
 import esTools.EsTools;
-import initial.Initiator;
 import javaTools.JsonTools;
-import redis.clients.jedis.Jedis;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -22,7 +17,6 @@ import java.io.PrintWriter;
 
 import static CryptoKeep.MadeCryptoKeep.CRYPTO_KEEP;
 import static initial.Initiator.esClient;
-import static initial.Initiator.jedisPool;
 
 @WebServlet(ApiNames.CryptoKeepPath + ApiNames.CheckCryptoKeepAPI)
 public class CheckCryptoKeep extends HttpServlet {
@@ -62,7 +56,7 @@ public class CheckCryptoKeep extends HttpServlet {
         cryptoKeep.setChipId(null);
 
         replier.setData(JsonTools.getNiceString(cryptoKeep));
-        replier.setTotal(1);
+        replier.setTotal(1L);
         replier.setGot(1);
         response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code0Success));
         writer.write(replier.reply0Success());

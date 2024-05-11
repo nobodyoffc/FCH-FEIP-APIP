@@ -1,6 +1,6 @@
 package APIP0V1_OpenAPI;
 
-import apipRequest.SignInApipReplyData;
+import apipRequest.SessionData;
 import constants.*;
 import initial.Initiator;
 import redis.clients.jedis.Jedis;
@@ -79,7 +79,7 @@ public class SignInEccAPI extends HttpServlet {
 
         fid = signInCheckResult.getFid();
 
-        SignInApipReplyData signInReplyData = new SignInApipReplyData();
+        SessionData signInReplyData = new SessionData();
 
         String mode = signInCheckResult.getSignInRequestBody().getMode();
 
@@ -148,7 +148,7 @@ public class SignInEccAPI extends HttpServlet {
         signInReplyData.setSessionKey(null);
         response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code0Success));
         replier.setGot(1);
-        replier.setTotal(1);
+        replier.setTotal(1L);
         replier.setData(signInReplyData);
         writer.write(replier.reply0Success(fid));
         replier.clean();

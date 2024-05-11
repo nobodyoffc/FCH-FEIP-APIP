@@ -52,7 +52,7 @@ public class GetBestBlock extends HttpServlet {
         List<BlockInfo> blockInfos = BlockInfo.mergeBlockAndBlockHas(blockList,blockHasList);
 
 
-        replier.setTotal(1);
+        replier.setTotal(1L);
         replier.setGot(1);
         replier.setData(blockInfos.get(0));
         try(Jedis jedis = Initiator.jedisPool.getResource()) {

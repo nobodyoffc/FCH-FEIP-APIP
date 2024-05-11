@@ -74,7 +74,7 @@ public class TeamExMembers extends HttpServlet {
         //Response
         replier.setData(dataMap);
         replier.setGot(dataMap.size());
-        replier.setTotal(dataMap.size());
+        replier.setTotal((long) dataMap.size());
         esRequest.writeSuccess(dataCheckResult.getSessionKey());
 
         return;

@@ -84,4 +84,20 @@ public class OpenAPIs {
 
         return apipClient;
     }
+
+    public static ApipClient pingGet(String urlHead){
+        ApipClient apipClient = new ApipClient();
+        apipClient.addNewApipUrl(urlHead, ApiNames.PingAPI);
+        apipClient.get();
+        return apipClient;
+    }
+
+    public static ApipClient pingPost(String urlHead,@Nullable String via, byte[] sessionKey){
+        ApipClient apipClient = new ApipClient();
+        String urlTail = ApiNames.PingAPI;
+        boolean isGood = apipClient.post(urlHead,urlTail, null, via, sessionKey);
+        if(!isGood)return null;
+
+        return apipClient;
+    }
 }

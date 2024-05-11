@@ -71,7 +71,7 @@ public class NobodyByIds extends HttpServlet {
 
         replier.setData(meetList);
         replier.setGot(meetList.size());
-        replier.setTotal(meetList.size());
+        replier.setTotal((long) meetList.size());
 
         dataRequestHandler.writeSuccess(dataCheckResult.getSessionKey());
     }

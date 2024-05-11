@@ -67,13 +67,13 @@ public class SwapStatus extends HttpServlet {
             if (response1.found()) {
                 SwapStateData swapState = response1.source();
                 replier.setData(swapState);
-                replier.setTotal(1);
+                replier.setTotal(1L);
                 replier.setGot(1);
                 response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code0Success));
                 writer.write(replier.reply0Success());
             } else {
                 // Handle the case where the document doesn't exist
-                replier.setTotal(0);
+                replier.setTotal(0L);
                 replier.setGot(0);
                 response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1011DataNotFound));
                 writer.write(replier.reply1011DataNotFound());

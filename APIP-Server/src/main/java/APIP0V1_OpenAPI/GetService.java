@@ -1,7 +1,6 @@
 package APIP0V1_OpenAPI;
 
 import co.elastic.clients.elasticsearch.core.GetResponse;
-import com.google.gson.Gson;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
@@ -9,8 +8,6 @@ import constants.Strings;
 import feipClass.Service;
 import initial.Initiator;
 import redis.clients.jedis.Jedis;
-import service.ApipService;
-import service.Params;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -19,10 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.Map;
 
-import static constants.FieldNames.OWNER;
 import static constants.Strings.*;
 
 @WebServlet(ApiNames.APIP0V1Path + ApiNames.GetServiceAPI)
@@ -31,15 +25,8 @@ public class GetService extends HttpServlet {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         PrintWriter writer = response.getWriter();
-        ApipService service;
 
         Replier replier = new Replier();
-
-//        if(Initiator.forbidFreeGet){
-//            response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code2001NoFreeGet));
-//            writer.write(replier.reply2001NoFreeGet());
-//            return;
-//        }
 
         String sid = request.getParameter("sid");
         if(sid!=null){
@@ -50,7 +37,7 @@ public class GetService extends HttpServlet {
                 return;
             }
             replier.setData(result.source());
-            replier.setTotal(1);
+            replier.setTotal(1L);
             replier.setGot(1);
             try (Jedis jedis = Initiator.jedisPool.getResource()) {
                 replier.setBestHeight(Long.parseLong(jedis.get(Strings.BEST_HEIGHT)));
@@ -74,7 +61,7 @@ public class GetService extends HttpServlet {
                 return;
             }
             replier.setData(result.source());
-            replier.setTotal(1);
+            replier.setTotal(1L);
             replier.setGot(1);
             jedis.select(0);
             replier.setBestHeight(Long.parseLong(jedis.get(Strings.BEST_HEIGHT)));

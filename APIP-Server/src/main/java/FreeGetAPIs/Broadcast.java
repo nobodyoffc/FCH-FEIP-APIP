@@ -21,7 +21,6 @@ import static initial.Initiator.fcClient;
 @WebServlet(ApiNames.FreeGetPath + ApiNames.BroadcastAPI)
 public class Broadcast extends HttpServlet {
 
-
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
@@ -68,7 +67,7 @@ public class Broadcast extends HttpServlet {
         }
 
         replier.setData(result);
-        replier.setTotal(1);
+        replier.setTotal(1L);
         replier.setGot(1);
         try(Jedis jedis = Initiator.jedisPool.getResource()) {
             replier.setBestHeight(Long.parseLong(jedis.get(Strings.BEST_HEIGHT)));

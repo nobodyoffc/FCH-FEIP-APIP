@@ -2,14 +2,7 @@ package APIP2V1_Blockchain;
 
 import APIP0V1_OpenAPI.Replier;
 import apipClass.FreecashInfo;
-import co.elastic.clients.elasticsearch._types.aggregations.Aggregate;
-import co.elastic.clients.elasticsearch._types.aggregations.SumAggregate;
-import co.elastic.clients.elasticsearch.core.SearchRequest;
-import co.elastic.clients.elasticsearch.core.SearchResponse;
 import constants.*;
-import esTools.EsTools;
-import fcTools.ParseTools;
-import fchClass.Block;
 import initial.Initiator;
 import redis.clients.jedis.Jedis;
 
@@ -51,7 +44,7 @@ public class ChainInfo extends HttpServlet {
         }
 
         replier.setGot(1);
-        replier.setTotal(1);
+        replier.setTotal(1L);
         replier.setData(freecashInfo);
         response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code0Success));
         writer.write(replier.reply0Success());

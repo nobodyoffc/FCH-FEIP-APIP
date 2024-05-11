@@ -1,6 +1,6 @@
 package APIP0V1_OpenAPI;
 
-import apipRequest.SignInApipReplyData;
+import apipRequest.SessionData;
 import constants.Strings;
 import eccAes256K1P7.EccAes256K1P7;
 import eccAes256K1P7.EccAesData;
@@ -19,17 +19,17 @@ public class Session {
     private String sessionKey;
     private String fid;
 
-    public SignInApipReplyData makeSession(Jedis jedis, String fid) {
+    public SessionData makeSession(Jedis jedis, String fid) {
         String sessionKey;
         String sessionName;
-        SignInApipReplyData data;
+        SessionData data;
 
         jedis.select(1);
         do {
             sessionKey = genSessionKey();
             sessionName = makeSessionName(sessionKey);
         } while (jedis.exists(sessionName));
-        data = new SignInApipReplyData();
+        data = new SessionData();
         Map<String,String> sessionMap = new HashMap<>();
         sessionMap.put("sessionKey",sessionKey);
         sessionMap.put("fid", fid);

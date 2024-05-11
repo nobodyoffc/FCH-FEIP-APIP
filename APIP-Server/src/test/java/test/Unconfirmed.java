@@ -102,7 +102,7 @@ public class Unconfirmed extends HttpServlet {
         //response
         replier.setData(meetList);
         replier.setGot(meetList.size());
-        replier.setTotal(meetList.size());
+        replier.setTotal((long) meetList.size());
 
         response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code0Success));
         String reply = replier.reply0Success();

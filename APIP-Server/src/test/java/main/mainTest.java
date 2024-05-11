@@ -25,18 +25,26 @@ import static constants.IndicesNames.CASH;
 
 public class mainTest {
     public static void main(String[] args) throws IOException {
-        NewEsClient newEsClient = new NewEsClient();
-        ElasticsearchClient esClient = null;
-        ConfigAPIP configAPIP = new ConfigAPIP();
-        try {
-            configAPIP = configAPIP.getClassInstanceFromFile(ConfigAPIP.class);
-            if (configAPIP.getEsIp() == null||configAPIP.getEsPort()==0) System.out.println("Es IP is null. Config first.");
-            esClient = newEsClient.getEsClientSilent(configAPIP,new Jedis());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        InfoResponse info = esClient.info();
-        System.out.println(info.toString());
+        StringBuilder stringBuilder = new StringBuilder();
+        String a  = "a";
+        String b = null;
+        String c = "c";
+        stringBuilder.append(a);
+        stringBuilder.append(b);
+        stringBuilder.append(c);
+        System.out.println(stringBuilder.toString());
+//        NewEsClient newEsClient = new NewEsClient();
+//        ElasticsearchClient esClient = null;
+//        ConfigAPIP configAPIP = new ConfigAPIP();
+//        try {
+//            configAPIP = configAPIP.getClassInstanceFromFile(ConfigAPIP.class);
+//            if (configAPIP.getEsIp() == null||configAPIP.getEsPort()==0) System.out.println("Es IP is null. Config first.");
+//            esClient = newEsClient.getEsClientSilent(configAPIP,new Jedis());
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        InfoResponse info = esClient.info();
+//        System.out.println(info.toString());
 
         //RollBacker.readEffectedAddresses(esClient,1517963);
 

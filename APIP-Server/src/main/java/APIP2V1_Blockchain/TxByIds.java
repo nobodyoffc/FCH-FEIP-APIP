@@ -84,7 +84,7 @@ public class TxByIds extends HttpServlet {
         //response
         replier.setData(meetList);
         replier.setGot(meetList.size());
-        replier.setTotal(meetList.size());
+        replier.setTotal((long) meetList.size());
         esRequest.writeSuccess(dataCheckResult.getSessionKey());
 
         return;

@@ -93,7 +93,7 @@ public class BlockByIds extends HttpServlet {
 
         replier.setData(meetMap);
         replier.setGot(meetMap.size());
-        replier.setTotal(meetMap.size());
+        replier.setTotal((long) meetMap.size());
         esRequest.writeSuccess(dataCheckResult.getSessionKey());
         return;
     }

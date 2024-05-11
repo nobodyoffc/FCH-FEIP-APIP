@@ -3,15 +3,10 @@ package APIP21V1_CryptoTool;
 import APIP0V1_OpenAPI.DataCheckResult;
 import APIP0V1_OpenAPI.Replier;
 import APIP0V1_OpenAPI.RequestChecker;
-import apipClass.EncryptIn;
 import apipClass.RequestBody;
-import com.google.gson.Gson;
 import constants.ApiNames;
 import constants.ReplyInfo;
 import cryptoTools.Hash;
-import eccAes256K1P7.EccAes256K1P7;
-import eccAes256K1P7.EccAesData;
-import eccAes256K1P7.EccAesType;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -21,7 +16,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import static constants.ApiNames.EncryptAPI;
 import static constants.ApiNames.Sha256API;
 
 @WebServlet(ApiNames.APIP21V1Path +Sha256API)

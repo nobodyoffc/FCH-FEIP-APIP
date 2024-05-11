@@ -9,7 +9,6 @@ import apipClass.Sort;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
-import feipClass.Group;
 import feipClass.TokenHolder;
 
 import javax.servlet.ServletException;

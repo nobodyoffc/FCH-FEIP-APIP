@@ -59,7 +59,7 @@ public class GeneralAPI extends HttpServlet {
         //response
         replier.setData(meetList);
         replier.setGot(meetList.size());
-        if(replier.getTotal()==0)replier.setTotal(meetList.size());
+        if(replier.getTotal()==0)replier.setTotal((long) meetList.size());
         esRequest.writeSuccess(dataCheckResult.getSessionKey());
     }
     private boolean isThisApiRequest(RequestBody requestBody) {

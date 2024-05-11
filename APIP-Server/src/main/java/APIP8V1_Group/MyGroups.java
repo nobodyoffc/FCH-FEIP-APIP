@@ -1,6 +1,7 @@
 package APIP8V1_Group;
 
 import APIP0V1_OpenAPI.*;
+import apipClass.MyGroupData;
 import apipClass.RequestBody;
 import apipClass.Sort;
 import constants.ApiNames;
@@ -68,13 +69,13 @@ public class MyGroups extends HttpServlet {
         }
 
         //Make data
-        List<Data> dataList = new ArrayList<>();
+        List<MyGroupData> dataList = new ArrayList<>();
         for(Group group: meetList){
-            Data data = new Data();
-            data.name = group.getName();
-            data.gid = group.getGid();
-            data.tCdd = group.gettCdd();
-            data.memberNum = group.getMemberNum();
+            MyGroupData data = new MyGroupData();
+            data.setName(group.getName());
+            data.setGid(group.getGid());
+            data.settCdd(group.gettCdd());
+            data.setMemberNum(group.getMemberNum());
 
             dataList.add(data);
         }
@@ -83,13 +84,6 @@ public class MyGroups extends HttpServlet {
         replier.setData(dataList);
         replier.setGot(dataList.size());
         esRequest.writeSuccess(dataCheckResult.getSessionKey());
-    }
-
-    class Data {
-        String name;
-        long memberNum;
-        String gid;
-        long tCdd;
     }
 
     private boolean isThisApiRequest(RequestBody requestBody) {

@@ -594,8 +594,7 @@ public class FchTool {
         return priceInSatoshi*length;
     }
 
-    public static long calcFeeMultiSign(int inputNum, int outputNum, int opReturnBytesLen,int m, int n) {
-        long priceInSatoshi =1;
+    public static long calcFeeMultiSign(int inputNum, int outputNum, int opReturnBytesLen, int m, int n) {
 
         /*多签单个Input长度：
             基础字节40（preTxId 32，preIndex 4，sequence 4），
@@ -611,20 +610,98 @@ public class FchTool {
                     OP_CHECKMULTISIG    1
          */
 
-        long redeemScriptLength = 1+(n* 33L)+1+1;
-        long redeemScriptVarInt = VarInt.sizeOf(redeemScriptLength);
-        long scriptLength = 1+ (m* 66L) + redeemScriptVarInt + redeemScriptLength;
+        long op_mLen =1;
+        long op_nLen =1;
+        long pubKeyLen = 33;
+        long pubKeyLenLen = 1;
+        long op_checkmultisigLen = 1;
+
+        long redeemScriptLength = op_mLen + (n * (pubKeyLenLen + pubKeyLen)) + op_nLen + op_checkmultisigLen; //105 n=3
+        long redeemScriptVarInt = VarInt.sizeOf(redeemScriptLength);//1 n=3
+
+        long op_pushDataLen = 1;
+        long sigHashLen = 1;
+        long signLen=64;
+        long signLenLen = 1;
+        long zeroByteLen = 1;
+
+        long mSignLen = m * (signLenLen + signLen + sigHashLen); //132 m=2
+
+        long scriptLength = zeroByteLen + mSignLen + op_pushDataLen + redeemScriptVarInt + redeemScriptLength;//236 m=2
         long scriptVarInt = VarInt.sizeOf(scriptLength);
-        long inputLength = 40+scriptVarInt+scriptLength;
+
+        long preTxIdLen = 32;
+        long preIndexLen = 4;
+        long sequenceLen = 4;
+
+        long inputLength = preTxIdLen + preIndexLen + sequenceLen + scriptVarInt + scriptLength;//240 n=3,m=2
+
+
+        long opReturnLen = 0;
+        if (opReturnBytesLen != 0)
+            opReturnLen = calcOpReturnLen(opReturnBytesLen);
+
+        long outputValueLen=8;
+        long unlockScriptLen = 25; //If sending to multiSignAddr, it will be 23.
+        long unlockScriptLenLen =1;
+        long outPutLen = outputValueLen + unlockScriptLenLen + unlockScriptLen;
+
+        long inputCountLen=1;
+        long outputCountLen=1;
+        long txVerLen = 4;
+        long nLockTimeLen = 4;
+        long txFixedLen = inputCountLen + outputCountLen + txVerLen + nLockTimeLen;
 
         long length;
-        if(opReturnBytesLen==0) {
-            length = 10+ inputLength * inputNum + (long) 34 *(outputNum+1);
-        }else{
-            length= 10+ inputLength * inputNum + (long) 34 *(outputNum+1)+ (opReturnBytesLen+VarInt.sizeOf(opReturnBytesLen)+1+VarInt.sizeOf(opReturnBytesLen+VarInt.sizeOf(opReturnBytesLen)+1)+8);
-        }
-        return priceInSatoshi*length;
+        length = txFixedLen + inputLength * inputNum + outPutLen * (outputNum + 1) + opReturnLen;
+
+        return length;
     }
+
+    private static int calcOpReturnLen(int opReturnBytesLen) {
+        int dataLen;
+        if (opReturnBytesLen < 76) {
+            dataLen = opReturnBytesLen + 1;
+        } else if (opReturnBytesLen < 256) {
+            dataLen = opReturnBytesLen + 2;
+        } else dataLen = opReturnBytesLen + 3;
+        int scriptLen;
+        scriptLen = (dataLen + 1) + VarInt.sizeOf(dataLen + 1);
+        int amountLen = 8;
+        return scriptLen + amountLen;
+    }
+
+//    public static long calcFeeMultiSign(int inputNum, int outputNum, int opReturnBytesLen,int m, int n) {
+//        long priceInSatoshi =1;
+//
+//        /*多签单个Input长度：
+//            基础字节40（preTxId 32，preIndex 4，sequence 4），
+//            可变脚本长度：？
+//            脚本：
+//                op_0    1
+//                签名：m * (1+64+1)     // length + pubKeyLength + sigHash ALL
+//                可变redeemScript 长度：？
+//                redeem script：
+//                    op_m    1
+//                    pubKeys    n * 33
+//                    op_n    1
+//                    OP_CHECKMULTISIG    1
+//         */
+//
+//        long redeemScriptLength = 1+(n* 33L)+1+1;
+//        long redeemScriptVarInt = VarInt.sizeOf(redeemScriptLength);
+//        long scriptLength = 1+ (m* 66L) + redeemScriptVarInt + redeemScriptLength;
+//        long scriptVarInt = VarInt.sizeOf(scriptLength);
+//        long inputLength = 40+scriptVarInt+scriptLength;
+//
+//        long length;
+//        if(opReturnBytesLen==0) {
+//            length = 10+ inputLength * inputNum + (long) 34 *(outputNum+1);
+//        }else{
+//            length= 10+ inputLength * inputNum + (long) 34 *(outputNum+1)+ (opReturnBytesLen+VarInt.sizeOf(opReturnBytesLen)+1+VarInt.sizeOf(opReturnBytesLen+VarInt.sizeOf(opReturnBytesLen)+1)+8);
+//        }
+//        return priceInSatoshi*length;
+//    }
 
     @org.jetbrains.annotations.Nullable
     public static String buildSignedTx(String[] signedData) {

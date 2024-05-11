@@ -90,7 +90,8 @@ public class StartAPIP {
 					}
 				}else freshServiceFromEsToRedis(service,esClient,jedis,configAPIP);
 
-				if(!jedis.exists(serviceName+"_"+Strings.N_PRICE)) Settings.setNPrices(br);
+				if(!jedis.exists(serviceName+"_"+Strings.N_PRICE))
+					Settings.setNPrices(br);
 
 				indicesAPIP = new IndicesAPIP(esClient,br);
 				indicesAPIP.checkApipIndices();

@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import static constants.ApiNames.EncryptAPI;
-import static constants.ApiNames.ToolsPath;
 
 @WebServlet(ApiNames.APIP21V1Path +EncryptAPI)
 public class Encrypt extends HttpServlet {

@@ -78,7 +78,7 @@ public class SwapPending extends HttpServlet {
                     return;
                 }
                 replier.setData(swapPendingList);
-                replier.setTotal(swapPendingList.size());
+                replier.setTotal((long) swapPendingList.size());
                 replier.setGot(swapPendingList.size());
                 response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code0Success));
                 writer.write(replier.reply0Success());

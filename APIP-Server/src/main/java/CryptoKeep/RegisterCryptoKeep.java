@@ -25,7 +25,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.HexFormat;
 import java.util.List;
 
@@ -90,7 +89,7 @@ public class RegisterCryptoKeep extends HttpServlet {
             return;
         }
 
-        int total = 0;
+        Long total = 0L;
         int done = 0;
 
         for(OpReturn opReturn :opReturnList){

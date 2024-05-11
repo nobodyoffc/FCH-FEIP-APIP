@@ -45,6 +45,7 @@ public class ApiNames {
     public static final String SignInEccAPI = "signInEcc";
     public static final String GeneralAPI = "general";
     public static final String TotalsAPI = "totals";
+    public static final String PingAPI = "ping";
     public static final String BlockByIdsAPI = "blockByIds";
     public static final String BlockSearchAPI = "blockSearch";
     public static final String BlockByHeightsAPI = "blockByHeights";
@@ -281,6 +282,7 @@ public class ApiNames {
         ApiNames.apiList.add(ApiNames.SignInEccAPI);
         ApiNames.apiList.add(ApiNames.GeneralAPI);
         ApiNames.apiList.add(ApiNames.TotalsAPI);
+        ApiNames.apiList.add(ApiNames.PingAPI);
 
         ApiNames.apiList.add(ApiNames.BlockByIdsAPI);
         ApiNames.apiList.add(ApiNames.BlockSearchAPI);

@@ -8,6 +8,7 @@ public class Utxo {
     private int index;
     private double amount;
     private long cd;
+    private String issuer;
 
     public static Utxo cashToUtxo(Cash cash) {
         Utxo utxo = new Utxo();
@@ -16,6 +17,7 @@ public class Utxo {
         utxo.setIndex(cash.getBirthIndex());
         utxo.setAmount((double) cash.getValue()/100000000);
         utxo.setCd(cash.getCd());
+        utxo.setIssuer(cash.getIssuer());
         return utxo;
     }
 
@@ -57,5 +59,13 @@ public class Utxo {
 
     public void setCd(long cd) {
         this.cd = cd;
+    }
+
+    public String getIssuer() {
+        return issuer;
+    }
+
+    public void setIssuer(String issuer) {
+        this.issuer = issuer;
     }
 }

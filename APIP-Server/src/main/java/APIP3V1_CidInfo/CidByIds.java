@@ -76,7 +76,7 @@ public class CidByIds extends HttpServlet {
 
         replier.setData(fidCidMap);
         replier.setGot(fidCidMap.size());
-        replier.setTotal(fidCidMap.size());
+        replier.setTotal((long) fidCidMap.size());
 
         dataRequestHandler.writeSuccess(dataCheckResult.getSessionKey());
     }

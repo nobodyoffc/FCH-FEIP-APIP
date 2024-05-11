@@ -2,6 +2,7 @@ package APIP9V1_Team;
 
 import APIP0V1_OpenAPI.*;
 import apipClass.RequestBody;
+import apipClass.TeamOtherPersonsData;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
@@ -14,9 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 @WebServlet(ApiNames.APIP9V1Path + ApiNames.TeamOtherPersonsAPI)
@@ -67,16 +66,17 @@ public class TeamOtherPersons extends HttpServlet {
         }
         
         //Make data
-        Map<String,Object> dataMap = new HashMap<>();
-        dataMap.put("tid",meetList.get(0).getTid());
-        dataMap.put("transferee",meetList.get(0).getTransferee());
-        dataMap.put("invitees",meetList.get(0).getInvitees());
-        dataMap.put("notAgreeMembers",meetList.get(0).getNotAgreeMembers());
+        TeamOtherPersonsData teamOtherPersons = new TeamOtherPersonsData();
+        Team team = meetList.get(0);
+        teamOtherPersons.setTid(team.getTid());
+        teamOtherPersons.setInvitees(team.getInvitees());
+        teamOtherPersons.setTransferee(team.getTransferee());
+        teamOtherPersons.setNotAgreeMembers(team.getNotAgreeMembers());
 
         //Response
-        replier.setData(dataMap);
+        replier.setData(teamOtherPersons);
         replier.setGot(1);
-        replier.setTotal(1);
+        replier.setTotal(1L);
         esRequest.writeSuccess(dataCheckResult.getSessionKey());
     }
 

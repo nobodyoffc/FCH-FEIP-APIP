@@ -61,7 +61,7 @@ public class GetFidCid extends HttpServlet {
             Address fid = fidResult.source();
 
             CidInfo cidInfo = mergeCidInfo(cid,fid);
-            replier.setTotal(1);
+            replier.setTotal(1L);
             replier.setGot(1);
             try(Jedis jedis = Initiator.jedisPool.getResource()) {
                 replier.setBestHeight(Long.parseLong(jedis.get(Strings.BEST_HEIGHT)));
@@ -78,7 +78,7 @@ public class GetFidCid extends HttpServlet {
                 Cid cid = cidResult.source();
                 if(cid ==null){
                     replier.setData(addr);
-                    replier.setTotal(1);
+                    replier.setTotal(1L);
                     replier.setGot(1);
                     try(Jedis jedis = Initiator.jedisPool.getResource()) {
                         replier.setBestHeight(Long.parseLong(jedis.get(Strings.BEST_HEIGHT)));
@@ -87,7 +87,7 @@ public class GetFidCid extends HttpServlet {
                     writer.write(replier.reply0Success());
                 }else {
                     CidInfo cidInfo = CidInfo.mergeCidInfo(cid, addr);
-                    replier.setTotal(1);
+                    replier.setTotal(1L);
                     replier.setGot(1);
                     try(Jedis jedis = Initiator.jedisPool.getResource()) {
                         replier.setBestHeight(Long.parseLong(jedis.get(Strings.BEST_HEIGHT)));

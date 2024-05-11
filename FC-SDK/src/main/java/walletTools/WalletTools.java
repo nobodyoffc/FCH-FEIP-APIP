@@ -15,7 +15,9 @@ import com.googlecode.jsonrpc4j.Base64;
 import com.googlecode.jsonrpc4j.JsonRpcHttpClient;
 import constants.*;
 import cryptoTools.Hash;
+import esTools.EsTools;
 import fcTools.SchnorrSignature;
+import fchClass.Block;
 import javaTools.JsonTools;
 import keyTools.KeyTools;
 import org.bitcoinj.core.ECKey;
@@ -39,6 +41,8 @@ import static txTools.FchTool.createTransactionSign;
 
 public class WalletTools {
     static final double Million = 100000000d;
+    public static final int DEFAULT_CASH_COUNT = 200;
+
     private static JsonRpcHttpClient createFcRpcClient() {
 
         System.out.println("Create esClient test");
@@ -403,7 +407,7 @@ public class WalletTools {
                     .trackTotalHits(tr -> tr.enabled(true))
                     .aggregations("sum", a -> a.sum(s1 -> s1.field(FieldNames.CD)))
                     .sort(s1 -> s1.field(f -> f.field(FieldNames.CD).order(SortOrder.Desc)))
-                    .size(100), Cash.class);
+                    .size(DEFAULT_CASH_COUNT), Cash.class);
         }else {
             result = esClient.search(s -> s.index(index)
                     .query(q -> q.bool(b -> b
@@ -414,7 +418,7 @@ public class WalletTools {
                     .trackTotalHits(tr -> tr.enabled(true))
                     .aggregations("sum", a -> a.sum(s1 -> s1.field(FieldNames.CD)))
                     .sort(s1 -> s1.field(f -> f.field(FieldNames.CD).order(SortOrder.Desc)))
-                    .size(100), Cash.class);
+                    .size(DEFAULT_CASH_COUNT), Cash.class);
         }
 
         if(result==null){
@@ -423,11 +427,11 @@ public class WalletTools {
             return cashListReturn;
         }
 
-        long sum = (long)result.aggregations().get("sum").sum().value();
+        long sumCd =(long)result.aggregations().get("sum").sum().value();
 
-        if(sum<cd){
+        if(sumCd<cd){
             cashListReturn.setCode(2);
-            cashListReturn.setMsg("No enough cd balance: "+sum+ " cd");
+            cashListReturn.setMsg("No enough cd balance: "+sumCd+ " cd");
             return cashListReturn;
         }
 
@@ -443,100 +447,27 @@ public class WalletTools {
 
         List<Cash> cashList = new ArrayList<>();
 
+        sumCd=0;
+        long bestHeight = getBestHeight(esClient);
         for(Hit<Cash> hit : hitList){
             Cash cash = hit.source();
+
+            //Remove immature cashes
+            if(cash==null)continue;
+            if(cash.getIssuer().equals(Values.COINBASE)&& cash.getBirthHeight()>(bestHeight-Constants.ONE_DAY_BLOCKS*10))
+                continue;
+
             cashList.add(cash);
+            sumCd+=cash.getCd();
+            if(sumCd>cd)break;
         }
 
-        List<Cash> meetList = new ArrayList<>();
-        long adding = 0;
-        for(Cash cash:cashList){
-            adding+=cash.getCd();
-            meetList.add(cash);
-            if (adding>cd)break;
-        }
-
-        if(adding<cd){
+        if(sumCd<cd){
             cashListReturn.setCode(4);
-            cashListReturn.setMsg("Can not get enough cd from 100 cashes. Merge cashes with small cd first please.");
+            cashListReturn.setMsg("Can not get enough cd from "+DEFAULT_CASH_COUNT+" cashes. Merge cashes with small cd first please.");
             return cashListReturn;
         }
-
-        cashListReturn.setCashList(meetList);
-        return cashListReturn;
-    }
-
-    public static CashListReturn getCashListForPayOld(long value, String addrRequested, ElasticsearchClient esClient) {
-
-        CashListReturn cashListReturn = new CashListReturn();
-
-        String index = IndicesNames.CASH;
-
-        SearchResponse<Cash> result = null;
-        try {
-            result = esClient.search(s -> s.index(index)
-                    .query(q ->q.bool(b->b
-                                    .must(m->m.term(t -> t.field(FieldNames.OWNER).value(addrRequested)))
-                                    .must(m1->m1.term(t1->t1.field(FieldNames.VALID).value(true)))
-                            )
-                    )
-                    .trackTotalHits(tr->tr.enabled(true))
-                    .aggregations(FieldNames.SUM, a->a.sum(s1->s1.field(FieldNames.VALUE)))
-                    .sort(s1->s1.field(f->f.field(FieldNames.CD).order(SortOrder.Asc)))
-                    .size(100), Cash.class);
-        } catch (IOException e) {
-            cashListReturn.setCode(1);
-            cashListReturn.setMsg("Can not get cashes. Check ES.");
-            return cashListReturn;
-        }
-
-        if(result==null){
-            cashListReturn.setCode(1);
-            cashListReturn.setMsg("Can not get cashes.Check ES.");
-            return cashListReturn;
-        }
-
-        assert result.hits().total() != null;
-        cashListReturn.setTotal(result.hits().total().value());
-
-        long sum = (long)result.aggregations().get(FieldNames.SUM).sum().value();
-
-        if(sum<value){
-            cashListReturn.setCode(2);
-            cashListReturn.setMsg("No enough balance: "+sum/Constants.FchToSatoshi+ " fch");
-            return cashListReturn;
-        }
-
-        List<Hit<Cash>> hitList = result.hits().hits();
-        if(hitList.size()==0){
-            cashListReturn.setCode(3);
-            cashListReturn.setMsg("Get cashes failed.");
-            return cashListReturn;
-        }
-
-        List<Cash> cashList = new ArrayList<>();
-
-        for(Hit<Cash> hit : hitList){
-            Cash cash = hit.source();
-            cashList.add(cash);
-        }
-
-        checkUnconfirmed(addrRequested,cashList);
-
-        List<Cash> meetList = new ArrayList<>();
-        long adding = 0;
-        for(Cash cash:cashList){
-            adding+=cash.getValue();
-            meetList.add(cash);
-            if (adding>value)break;
-        }
-        if(adding<value){
-            cashListReturn.setCode(4);
-            cashListReturn.setMsg("Can't get enough amount from 100 cashes. Merge cashes with small cd first please. "+adding/Million + "f can be paid.");
-            return cashListReturn;
-        }
-
-        cashListReturn.setCashList(meetList);
+        cashListReturn.setCashList(cashList);
         return cashListReturn;
     }
     public static CashListReturn getCashListForPay(long value, String addrRequested, ElasticsearchClient esClient) {
@@ -550,9 +481,9 @@ public class WalletTools {
             SearchRequest.Builder searchBuilder = new SearchRequest.Builder();
             searchBuilder.index(index);
             searchBuilder.trackTotalHits(tr->tr.enabled(true));
-            searchBuilder.aggregations(FieldNames.SUM, a->a.sum(s1->s1.field(FieldNames.VALUE)));
+//            searchBuilder.aggregations(FieldNames.SUM, a->a.sum(s1->s1.field(FieldNames.VALUE)));
             searchBuilder.sort(s1->s1.field(f->f.field(FieldNames.CD).order(SortOrder.Asc)));
-            searchBuilder.size(200);
+            searchBuilder.size(DEFAULT_CASH_COUNT);
 
             BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
 
@@ -578,14 +509,22 @@ public class WalletTools {
         assert result.hits().total() != null;
         long total = result.hits().total().value();
 
-        long sum = (long)result.aggregations().get(FieldNames.SUM).sum().value();
+        long sum = 0;//(long)result.aggregations().get(FieldNames.SUM).sum().value();
 
         List<Cash> cashList = new ArrayList<>();
         List<Hit<Cash>> hitList = result.hits().hits();
+
+        long bestHeight = getBestHeight(esClient);
+
         for(Hit<Cash> hit : hitList){
             Cash cash = hit.source();
+            if(cash==null)continue;
+            if(cash.getIssuer().equals(Values.COINBASE)&& cash.getBirthHeight()>(bestHeight-Constants.ONE_DAY_BLOCKS *10))
+                continue;
             cashList.add(cash);
+            sum+=cash.getValue();
         }
+
 
         List<Cash> issuingCashList = getIssuingCashList(addrRequested);
         if(issuingCashList!=null && issuingCashList.size()>0) {
@@ -636,6 +575,18 @@ public class WalletTools {
         cashListReturn.setTotal(total);
         cashListReturn.setCashList(meetList);
         return cashListReturn;
+    }
+
+    private static long getBestHeight(ElasticsearchClient esClient) {
+        long bestHeight = 0;
+        try {
+            Block bestBlock = EsTools.getBestBlock(esClient);
+            if(bestBlock!=null)
+                bestHeight=bestBlock.getHeight();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return bestHeight;
     }
 
     private static void makeUnconfirmedFilter(List<String> spendCashIdList, BoolQuery.Builder boolQueryBuilder) {

@@ -1,16 +1,12 @@
 package APIP2V1_Blockchain;
 
 import APIP0V1_OpenAPI.*;
-import apipClass.BlockInfo;
 import apipClass.RequestBody;
 import apipClass.Sort;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
-import esTools.EsTools;
 import fchClass.Block;
-import fchClass.BlockHas;
-import initial.Initiator;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -20,9 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @WebServlet(ApiNames.APIP2V1Path + ApiNames.BlockSearchAPI)
 public class BlockSearch extends HttpServlet {

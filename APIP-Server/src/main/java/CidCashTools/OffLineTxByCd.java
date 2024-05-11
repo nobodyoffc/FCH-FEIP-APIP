@@ -116,7 +116,7 @@ public class OffLineTxByCd extends HttpServlet {
 
         replier.setData(rawTxForCs);
         replier.setGot(1);
-        replier.setTotal(1);
+        replier.setTotal(1L);
 
         esRequest.writeSuccess(dataCheckResult.getSessionKey());
     }

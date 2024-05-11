@@ -39,6 +39,12 @@ import static initial.Initiator.esClient;
 @WebServlet(ApiNames.SwapHallPath + ApiNames.SwapPriceAPI)
 public class SwapPrices extends HttpServlet {
 
+    /*
+        - https://cid.cash/APIP/swapHall/v1/swapPrice
+        - https://cid.cash/APIP/swapHall/v1/swapPrice?sid=c12aef3c9341a8ab135bd412e1ad798f480519004649871d0a59e7ba799a6f06
+        - https://cid.cash/APIP/swapHall/v1/swapPrice?sid=c12aef3c9341a8ab135bd412e1ad798f480519004649871d0a59e7ba799a6f06&startTime=1708157907767&endTime=1713237231924&last=1712476822738,c12aef3c9341a8ab135bd412e1ad798f480519004649871d0a59e7ba799a6f06
+        - https://cid.cash/APIP/swapHall/v1/swapPrice?gTick=fch&mTick=doge&startTime=1708157907767&endTime=1713237231924&last=1712476822738,c12aef3c9341a8ab135bd412e1ad798f480519004649871d0a59e7ba799a6f06&last=1712476822738,c12aef3c9341a8ab135bd412e1ad798f480519004649871d0a59e7ba799a6f06
+     */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
@@ -56,11 +62,14 @@ public class SwapPrices extends HttpServlet {
         }
 
         String sid = request.getParameter(SID);
+
         String gTick = request.getParameter(G_TICK);
         String mTick = request.getParameter(M_TICK);
+
         String lastStr = request.getParameter(FieldNames.LAST);
         String startTime = request.getParameter(START_TIME);
         String endTime = request.getParameter(END_TIME);
+        String size = request.getParameter(SIZE);
 
         SearchRequest.Builder searchBuilder = new SearchRequest.Builder();
 
@@ -68,7 +77,8 @@ public class SwapPrices extends HttpServlet {
 
         searchBuilder.index(SWAP_PRICE);
         searchBuilder.sort(sortOptionsList);
-        searchBuilder.size(20);
+        if(size!=null)searchBuilder.size(Integer.valueOf(size));
+        else searchBuilder.size(50);
         if(lastStr!=null) {
             String[] last = lastStr.split(",");
             searchBuilder.searchAfter(Arrays.asList(last));
@@ -92,10 +102,11 @@ public class SwapPrices extends HttpServlet {
 
         if(startTime!=null||endTime!=null){
             RangeQuery.Builder rqb = new RangeQuery.Builder();
+            rqb.field(TIME);
             if(startTime!=null)
-                rqb.gte(JsonData.of(startTime));
+                rqb.gte(JsonData.of(Long.parseLong(startTime)));
             if(endTime!=null)
-                rqb.lt(JsonData.of(endTime));
+                rqb.lt(JsonData.of(Long.parseLong(endTime)));
             Query query = new Query.Builder().range(rqb.build()).build();
             queryList.add(query);
         }
@@ -115,7 +126,10 @@ public class SwapPrices extends HttpServlet {
             return;
         }
 
-        String[] last = result.hits().hits().get(result.hits().hits().size() - 1).sort().toArray(new String[0]);
+        if(result.hits().hits().size() >0){
+            String[] last = result.hits().hits().get(result.hits().hits().size() - 1).sort().toArray(new String[0]);
+            replier.setLast(last);
+        }
 
         List<Hit<SwapPriceData>> hitList = result.hits().hits();
         List<SwapPriceData> swapPriceList = new ArrayList<>();
@@ -130,7 +144,7 @@ public class SwapPrices extends HttpServlet {
 
         replier.setData(swapPriceList);
         replier.setTotal(total);
-        replier.setLast(last);
+
         replier.setGot(swapPriceList.size());
         response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code0Success));
         writer.write(replier.reply0Success());

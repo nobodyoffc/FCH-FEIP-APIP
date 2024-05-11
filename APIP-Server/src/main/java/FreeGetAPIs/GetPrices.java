@@ -1,9 +1,6 @@
 package FreeGetAPIs;
 
 import APIP0V1_OpenAPI.Replier;
-import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch.cat.IndicesResponse;
-import co.elastic.clients.elasticsearch.cat.indices.IndicesRecord;
 import constants.ApiNames;
 import constants.ReplyInfo;
 import constants.Strings;
@@ -18,7 +15,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @WebServlet(ApiNames.FreeGetPath + ApiNames.GetPricesAPI)
@@ -50,7 +46,7 @@ public class GetPrices extends HttpServlet {
 //        }
         Map<String,Double> prices = new HashMap<>();
         prices.put("fch/doge",0.05);
-        replier.setTotal(prices.size());
+        replier.setTotal((long) prices.size());
         replier.setGot(prices.size());
         replier.setData(prices);
         try(Jedis jedis = Initiator.jedisPool.getResource()) {

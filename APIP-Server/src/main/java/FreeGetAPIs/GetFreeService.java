@@ -66,7 +66,7 @@ public class GetFreeService  extends HttpServlet {
             data.put(SESSION_KEY, publicSessionKey);
 
             replier.setData(data);
-            replier.setTotal(1);
+            replier.setTotal(1L);
             replier.setGot(1);
             jedis.select(0);
             replier.setBestHeight(Long.parseLong(jedis.get(Strings.BEST_HEIGHT)));

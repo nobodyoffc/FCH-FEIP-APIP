@@ -1,13 +1,11 @@
 package APIP0V1_OpenAPI;
 
-import com.google.gson.Gson;
 import constants.ApiNames;
 import constants.ReplyInfo;
 import constants.Strings;
 import initial.Initiator;
 import redis.clients.jedis.Jedis;
 import service.ApipService;
-import service.Params;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -19,7 +17,6 @@ import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
-import static constants.FieldNames.OWNER;
 import static constants.Strings.*;
 
 @WebServlet(ApiNames.APIP0V1Path + ApiNames.GetFreeKeyAPI)
@@ -48,7 +45,7 @@ public class GetFreeKey extends HttpServlet {
             data.put(SESSION_KEY, publicSessionKey);
 
             replier.setData(data);
-            replier.setTotal(1);
+            replier.setTotal(1L);
             replier.setGot(1);
             jedis.select(0);
             replier.setBestHeight(Long.parseLong(jedis.get(Strings.BEST_HEIGHT)));

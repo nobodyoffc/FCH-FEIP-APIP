@@ -8,7 +8,6 @@ import apipClass.RequestBody;
 import constants.ApiNames;
 import constants.IndicesNames;
 import constants.ReplyInfo;
-import feipClass.Token;
 import feipClass.TokenHolder;
 
 import javax.servlet.ServletException;
@@ -76,7 +75,7 @@ public class TokenHolderByIds extends HttpServlet {
         //response
         replier.setData(meetMap);
         replier.setGot(meetMap.size());
-        replier.setTotal(meetMap.size());
+        replier.setTotal((long) meetMap.size());
         esRequest.writeSuccess(dataCheckResult.getSessionKey());
     }
 

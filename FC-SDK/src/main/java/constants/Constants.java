@@ -3,9 +3,9 @@ package constants;
 public class Constants {
 
 
-    public static final Long OneDayInterval = 1440L;
-    public static final Long BalanceBackupInterval = OneDayInterval;
-    public static final Long RewardInterval = OneDayInterval*10;
+    public static final Long ONE_DAY_BLOCKS = 1440L;
+    public static final Long BalanceBackupInterval = ONE_DAY_BLOCKS;
+    public static final Long RewardInterval = ONE_DAY_BLOCKS *10;
     public static  final String UserDir = "user.dir";
     public static final int MaxRequestSize = 100;
     public static final int DefaultSize = 20;

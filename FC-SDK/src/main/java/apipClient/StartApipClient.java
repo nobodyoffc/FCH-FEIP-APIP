@@ -28,8 +28,6 @@ import java.util.HexFormat;
 import java.util.List;
 
 import static constants.Constants.APIP_PARAMS_JSON;
-import static constants.Strings.DESC;
-import static constants.Strings.HEIGHT;
 
 public class StartApipClient {
     public static final int DEFAULT_SIZE = 20;
@@ -64,6 +62,8 @@ public class StartApipClient {
         Menu menu = new Menu();
 
         ArrayList<String> menuItemList = new ArrayList<>();
+        menuItemList.add("Ping get");
+        menuItemList.add("Ping post");
         menuItemList.add("Example");
         menuItemList.add("FreeGet");
         menuItemList.add("OpenAPI");
@@ -75,6 +75,7 @@ public class StartApipClient {
         menuItemList.add("Publish");
         menuItemList.add("Wallet");
         menuItemList.add("CryptoTool");
+        menuItemList.add("Example");
         menuItemList.add("Settings");
 
         menu.add(menuItemList);
@@ -84,18 +85,20 @@ public class StartApipClient {
             menu.show();
             int choice = menu.choose(br);
             switch (choice) {
-                case 1 -> showExample(sessionKey,br);
-                case 2 -> freeGet(br);
-                case 3 -> openAPI(sessionKey, symKey,br);
-                case 4 -> blockchain(sessionKey, br);
-                case 5 -> identity(sessionKey, br);
-                case 6 -> organize(sessionKey, br);
-                case 7 -> construct(sessionKey, br);
-                case 8 -> personal(sessionKey, br);
-                case 9 -> publish(sessionKey, br);
-                case 10 -> wallet(sessionKey, br);
-                case 11 -> cryptoTools(sessionKey,br);
-                case 12 -> setting(sessionKey,symKey,br);
+                case 1 -> PingGet(br);
+                case 2 -> PingPost(sessionKey,br);
+                case 3 -> freeGet(br);
+                case 4 -> openAPI(sessionKey, symKey,br);
+                case 5 -> blockchain(sessionKey, br);
+                case 6 -> identity(sessionKey, br);
+                case 7 -> organize(sessionKey, br);
+                case 8 -> construct(sessionKey, br);
+                case 9 -> personal(sessionKey, br);
+                case 10 -> publish(sessionKey, br);
+                case 11 -> wallet(sessionKey, br);
+                case 12 -> cryptoTools(sessionKey,br);
+                case 13 -> showExample(sessionKey,br);
+                case 14 -> setting(sessionKey,symKey,br);
                 case 0 -> {
                     BytesTools.clearByteArray(sessionKey);
                     return;
@@ -214,6 +217,19 @@ public class StartApipClient {
         if("".equals(id))id=null;
         System.out.println("Getting services...");
         ApipClient apipClient = FreeGetAPIs.getServices(initApipParamsForClient.getUrlHead(),id);
+        System.out.println(apipClient.getResponseBodyStr());;
+        Menu.anyKeyToContinue(br);
+    }
+
+    public static void PingGet(BufferedReader br) {
+        System.out.println("Pinging...");
+        ApipClient apipClient = OpenAPIs.pingGet(initApipParamsForClient.getUrlHead());
+        System.out.println(apipClient.getResponseBodyStr());;
+        Menu.anyKeyToContinue(br);
+    }
+    public static void PingPost(byte[] sessionKey, BufferedReader br) {
+        System.out.println("Pinging...");
+        ApipClient apipClient = OpenAPIs.pingPost(initApipParamsForClient.getUrlHead(), initApipParamsForClient.getVia(), sessionKey);
         System.out.println(apipClient.getResponseBodyStr());;
         Menu.anyKeyToContinue(br);
     }

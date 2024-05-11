@@ -1,13 +1,18 @@
-package APIP0V1_OpenAPI;
+package initial;
 
+import APIP0V1_OpenAPI.DataCheckResult;
+import APIP0V1_OpenAPI.DataRequestHandler;
+import APIP0V1_OpenAPI.Replier;
+import APIP0V1_OpenAPI.RequestChecker;
 import apipClass.RequestBody;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.cat.IndicesResponse;
 import co.elastic.clients.elasticsearch.cat.indices.IndicesRecord;
+import com.google.gson.Gson;
 import constants.ApiNames;
+import constants.FeipNames;
 import constants.ReplyInfo;
 import constants.Strings;
-import initial.Initiator;
 import redis.clients.jedis.Jedis;
 
 import javax.servlet.ServletException;
@@ -18,11 +23,15 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-@WebServlet(ApiNames.APIP0V1Path + ApiNames.TotalsAPI)
-public class TotalsAPI extends HttpServlet {
+import static constants.Strings.FID_BALANCE;
+import static constants.Strings.FID_SESSION_NAME;
+
+@WebServlet("/" + ApiNames.PingAPI)
+public class PingApi extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
@@ -37,26 +46,13 @@ public class TotalsAPI extends HttpServlet {
 
         if(dataCheckResult==null)return;
 
-        String addr = dataCheckResult.getAddr();
-        RequestBody requestBody = dataCheckResult.getDataRequestBody();
-        DataRequestHandler esRequest = new DataRequestHandler(dataCheckResult.getAddr(),requestBody,response,replier);
-
-        ElasticsearchClient esClient = Initiator.esClient;
-
-        IndicesResponse result = esClient.cat().indices();
-        List<IndicesRecord> indicesRecordList = result.valueBody();
-
-        Map<String, String> allSumMap = new HashMap<>();
-        for(IndicesRecord record : indicesRecordList){
-            allSumMap.put(record.index(),record.docsCount());
-        }
-
         //response
-        replier.setData(allSumMap);
-        replier.setGot(allSumMap.size());
-        replier.setTotal((long) allSumMap.size());
-
-        esRequest.writeSuccess(dataCheckResult.getSessionKey());
+        try(Jedis jedis = Initiator.jedisPool.getResource()){
+            String balance = jedis.hget(Initiator.serviceName+"_"+ FID_BALANCE,dataCheckResult.getAddr());
+            replier.setBalance(Long.parseLong(balance));
+        }catch (Exception ignore){}
+        response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code0Success));
+        writer.write(replier.reply0Success());
     }
 
 
@@ -74,22 +70,6 @@ public class TotalsAPI extends HttpServlet {
             return;
         }
 
-        ElasticsearchClient esClient = Initiator.esClient;
-
-        IndicesResponse result = esClient.cat().indices();
-        List<IndicesRecord> indicesRecordList = result.valueBody();
-
-        Map<String, String> docsCountInIndex = new HashMap<>();
-        for(IndicesRecord record : indicesRecordList){
-//            if(record.index()==null||record.index().contains("_"))continue;
-            docsCountInIndex.put(record.index(),record.docsCount());
-        }
-        replier.setTotal((long) docsCountInIndex.size());
-        replier.setGot(docsCountInIndex.size());
-        replier.setData(docsCountInIndex);
-        try(Jedis jedis = Initiator.jedisPool.getResource()) {
-            replier.setBestHeight(Long.parseLong(jedis.get(Strings.BEST_HEIGHT)));
-        }
         response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code0Success));
         writer.write(replier.reply0Success());
     }

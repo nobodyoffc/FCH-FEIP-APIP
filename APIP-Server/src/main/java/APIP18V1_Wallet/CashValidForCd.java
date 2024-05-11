@@ -3,7 +3,6 @@ package APIP18V1_Wallet;
 import APIP0V1_OpenAPI.*;
 import apipClass.RequestBody;
 import constants.ApiNames;
-import constants.IndicesNames;
 import constants.ReplyInfo;
 import fchClass.Cash;
 import initial.Initiator;

@@ -48,7 +48,7 @@ public class GetTotals extends HttpServlet {
             if(record.index()==null||record.index().contains("_"))continue;
             docsCountInIndex.put(record.index(),record.docsCount());
         }
-        replier.setTotal(docsCountInIndex.size());
+        replier.setTotal((long) docsCountInIndex.size());
         replier.setGot(docsCountInIndex.size());
         replier.setData(docsCountInIndex);
         try(Jedis jedis = Initiator.jedisPool.getResource()) {

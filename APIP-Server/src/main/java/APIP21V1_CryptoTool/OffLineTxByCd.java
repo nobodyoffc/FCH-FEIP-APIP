@@ -9,7 +9,6 @@ import constants.ApiNames;
 import constants.ReplyInfo;
 import fchClass.Cash;
 import initial.Initiator;
-import txTools.FchTool;
 import walletTools.*;
 
 import javax.servlet.ServletException;
@@ -117,7 +116,7 @@ public class OffLineTxByCd extends HttpServlet {
 
         replier.setData(rawTxForCs);
         replier.setGot(1);
-        replier.setTotal(1);
+        replier.setTotal(1L);
 
         esRequest.writeSuccess(dataCheckResult.getSessionKey());
     }

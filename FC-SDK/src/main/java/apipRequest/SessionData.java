@@ -1,6 +1,6 @@
 package apipRequest;
 
-public class SignInApipReplyData {
+public class SessionData {
     private String sessionKey;
     private long expireTime;
     private String sessionKeyCipher;

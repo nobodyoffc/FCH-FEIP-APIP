@@ -85,7 +85,7 @@ public class TeamByIds extends HttpServlet {
         //response
         replier.setData(meetMap);
         replier.setGot(meetMap.size());
-        replier.setTotal(meetMap.size());
+        replier.setTotal((long) meetMap.size());
         esRequest.writeSuccess(dataCheckResult.getSessionKey());
 
         return;

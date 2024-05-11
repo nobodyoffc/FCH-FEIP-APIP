@@ -41,7 +41,7 @@ public class SwapLp extends HttpServlet {
         }
         String sid = request.getParameter(Strings.SID);
         if(sid==null){
-            replier.setTotal(0);
+            replier.setTotal(0L);
             replier.setGot(0);
             response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1020OtherError));
             replier.setData("SID is required.");
@@ -65,15 +65,15 @@ public class SwapLp extends HttpServlet {
             , SwapLpData.class);
 
             if (response1.found()) {
-                SwapLpData lpMaps = response1.source();
-                replier.setData(lpMaps);
-                replier.setTotal(1);
+                SwapLpData swapLpData = response1.source();
+                replier.setData(swapLpData);
+                replier.setTotal(1L);
                 replier.setGot(1);
                 response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code0Success));
                 writer.write(replier.reply0Success());
             } else {
                 // Handle the case where the document doesn't exist
-                replier.setTotal(0);
+                replier.setTotal(0L);
                 replier.setGot(0);
                 response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1011DataNotFound));
                 writer.write(replier.reply1011DataNotFound());

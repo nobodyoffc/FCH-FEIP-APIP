@@ -86,7 +86,7 @@ public class Avatars extends HttpServlet {
         //response
         replier.setData(addrPngBase64Map);
         replier.setGot(addrPngBase64Map.size());
-        replier.setTotal(addrPngBase64Map.size());
+        replier.setTotal((long) addrPngBase64Map.size());
 
         response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code0Success));
         String reply = replier.reply0Success(addr);

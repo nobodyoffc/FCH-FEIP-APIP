@@ -16,8 +16,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import static constants.ApiNames.Sha256API;
-
 @WebServlet(ApiNames.APIP21V1Path +ApiNames.Sha256x2API)
 public class Sha256x2 extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, RuntimeException {

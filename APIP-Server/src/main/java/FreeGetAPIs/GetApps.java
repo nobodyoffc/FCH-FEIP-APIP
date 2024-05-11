@@ -10,7 +10,6 @@ import constants.IndicesNames;
 import constants.ReplyInfo;
 import constants.Strings;
 import feipClass.App;
-import feipClass.Service;
 import initial.Initiator;
 import redis.clients.jedis.Jedis;
 

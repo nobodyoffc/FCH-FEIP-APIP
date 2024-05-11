@@ -2,17 +2,12 @@ package APIP18V1_Wallet;
 
 import APIP0V1_OpenAPI.*;
 import apipClass.RequestBody;
-import apipClass.Sort;
-import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch.core.SearchResponse;
-import co.elastic.clients.elasticsearch.core.search.Hit;
+import apipClass.UnconfirmedInfo;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import constants.*;
-import fchClass.Cash;
 import initial.Initiator;
 import redis.clients.jedis.Jedis;
-import walletTools.CashListReturn;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -25,8 +20,6 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import static walletTools.WalletTools.getCashListForPay;
 
 @WebServlet(ApiNames.APIP18V1Path + ApiNames.UnconfirmedAPI)
 public class Unconfirmed extends HttpServlet {
@@ -70,27 +63,28 @@ public class Unconfirmed extends HttpServlet {
                 resultMap = jedis.hgetAll(id);
             }catch(Exception e){
                 UnconfirmedInfo info = new UnconfirmedInfo();
-                info.fid = id;
-                info.incomeCount = 0;
-                info.incomeValue = 0;
-                info.spendCount = 0;
-                info.spendValue = 0;
-                info.net = 0;
+                info.setFid(id);
+                info.setIncomeCount(0);
+                info.setIncomeValue(0);
+                info.setSpendCount(0);
+                info.setSpendValue(0);
+                info.setNet(0);
                 meetList.add(info);
                 continue;
             }
             UnconfirmedInfo info = new UnconfirmedInfo();
-            info.fid = id;
-            if(resultMap.get(IncomeCount)!=null)info.incomeCount = Integer.parseInt(resultMap.get(IncomeCount));
-            if(resultMap.get(IncomeValue)!=null)info.incomeValue = Long.parseLong(resultMap.get(IncomeValue));
-            if(resultMap.get(SpendCount)!=null)info.spendCount = Integer.parseInt(resultMap.get(SpendCount));
-            if(resultMap.get(SpendValue)!=null)info.spendValue = Long.parseLong(resultMap.get(SpendValue));
+            info.setFid(id);
+
+            if (resultMap.get(IncomeCount) != null) info.setIncomeCount(Integer.parseInt(resultMap.get(IncomeCount)));
+            if (resultMap.get(IncomeValue) != null) info.setIncomeValue(Long.parseLong(resultMap.get(IncomeValue)));
+            if (resultMap.get(SpendCount) != null) info.setSpendCount(Integer.parseInt(resultMap.get(SpendCount)));
+            if (resultMap.get(SpendValue) != null) info.setSpendValue(Long.parseLong(resultMap.get(SpendValue)));
             if(resultMap.get(TxValueMap)!=null){
                 Type mapType = new TypeToken<Map<String, Long>>(){}.getType();
 
-                info.txValueMap = new Gson().fromJson(resultMap.get(TxValueMap),mapType);
+                info.setTxValueMap(new Gson().fromJson(resultMap.get(TxValueMap),mapType));
             }
-            info.net = info.incomeValue -info.spendValue;
+            info.setNet(info.getIncomeValue() -info.getSpendValue());
             meetList.add(info);
         }
         jedis.close();
@@ -102,7 +96,7 @@ public class Unconfirmed extends HttpServlet {
         //response
         replier.setData(meetList);
         replier.setGot(meetList.size());
-        replier.setTotal(meetList.size());
+        replier.setTotal((long) meetList.size());
 
         response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code0Success));
         String reply = replier.reply0Success(addr);
@@ -121,16 +115,6 @@ public class Unconfirmed extends HttpServlet {
         if(requestBody.getFcdsl().getIds()==null)
             return false;
         return true;
-    }
-
-    private class UnconfirmedInfo {
-        private String fid;
-        private long net;
-        private int spendCount;
-        private long spendValue;
-        private int incomeCount;
-        private long incomeValue;
-        private Map<String,Long> txValueMap;
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -160,27 +144,27 @@ public class Unconfirmed extends HttpServlet {
                 resultMap = jedis.hgetAll(fid);
             } catch (Exception e) {
                 UnconfirmedInfo info = new UnconfirmedInfo();
-                info.fid = fid;
-                info.incomeCount = 0;
-                info.incomeValue = 0;
-                info.spendCount = 0;
-                info.spendValue = 0;
-                info.net = 0;
+                info.setFid(fid);
+                info.setIncomeCount(0);
+                info.setIncomeValue(0);
+                info.setSpendCount(0);
+                info.setSpendValue(0);
+                info.setNet(0);
                 meetList.add(info);
             }
             UnconfirmedInfo info = new UnconfirmedInfo();
-            info.fid = fid;
-            if (resultMap.get(IncomeCount) != null) info.incomeCount = Integer.parseInt(resultMap.get(IncomeCount));
-            if (resultMap.get(IncomeValue) != null) info.incomeValue = Long.parseLong(resultMap.get(IncomeValue));
-            if (resultMap.get(SpendCount) != null) info.spendCount = Integer.parseInt(resultMap.get(SpendCount));
-            if (resultMap.get(SpendValue) != null) info.spendValue = Long.parseLong(resultMap.get(SpendValue));
+            info.setFid(fid);
+            if (resultMap.get(IncomeCount) != null) info.setIncomeCount(Integer.parseInt(resultMap.get(IncomeCount)));
+            if (resultMap.get(IncomeValue) != null) info.setIncomeValue(Long.parseLong(resultMap.get(IncomeValue)));
+            if (resultMap.get(SpendCount) != null) info.setSpendCount(Integer.parseInt(resultMap.get(SpendCount)));
+            if (resultMap.get(SpendValue) != null) info.setSpendValue(Long.parseLong(resultMap.get(SpendValue)));
             if (resultMap.get(TxValueMap) != null) {
                 Type mapType = new TypeToken<Map<String, Long>>() {
                 }.getType();
 
-                info.txValueMap = new Gson().fromJson(resultMap.get(TxValueMap), mapType);
+                info.setTxValueMap(new Gson().fromJson(resultMap.get(TxValueMap), mapType));
             }
-            info.net = info.incomeValue - info.spendValue;
+            info.setNet(info.getIncomeValue() - info.getSpendValue());
             meetList.add(info);
 
             if (meetList.size() == 0) {
@@ -191,7 +175,7 @@ public class Unconfirmed extends HttpServlet {
             //response
             replier.setData(meetList);
             replier.setGot(meetList.size());
-            replier.setTotal(meetList.size());
+            replier.setTotal((long) meetList.size());
             jedis.select(0);
             replier.setBestHeight(Long.parseLong(jedis.get(Strings.BEST_HEIGHT)));
         }

@@ -82,7 +82,7 @@ public class CidInfoByIds extends HttpServlet {
             meetMap.put(cidInfo.getFid(),cidInfo);
         }
         replier.setGot(meetMap.size());
-        replier.setTotal(meetMap.size());
+        replier.setTotal((long) meetMap.size());
         replier.setData(meetMap);
         esRequest.writeSuccess(dataCheckResult.getSessionKey());
     }

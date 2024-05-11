@@ -24,13 +24,13 @@ import static initial.Initiator.*;
 
 public class Replier {
 
-    private int code;
+    private Integer code;
     private String message;
-    private long nonce;
-    private long balance;
-    private int got;
-    private long total;
-    private long bestHeight;
+    private Long nonce;
+    private Long balance;
+    private Integer got;
+    private Long total;
+    private Long bestHeight;
     private Object data;
     private String via;
     private String[] last;
@@ -39,7 +39,7 @@ public class Replier {
 
     public static boolean makeSingleReplier(HttpServletResponse response, Replier replier, DataCheckResult dataCheckResult, String addr) {
         replier.setGot(1);
-        replier.setTotal(1);
+        replier.setTotal(1L);
         response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code0Success));
         String reply = replier.reply0Success(addr);
         if(reply==null) return true;
@@ -50,13 +50,13 @@ public class Replier {
     }
 
     public static void replyNoData(HttpServletResponse response, PrintWriter writer, Replier replier) {
-        replier.setTotal(0);
+        replier.setTotal(0L);
         replier.setGot(0);
         response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1011DataNotFound));
         writer.write(replier.reply1011DataNotFound());
     }
     public static void replyOtherError(HttpServletResponse response, PrintWriter writer, Replier replier,String msg) {
-        replier.setTotal(0);
+        replier.setTotal(0L);
         replier.setGot(0);
         replier.setData(msg);
         response.setHeader(ReplyInfo.CodeInHeader,String.valueOf(ReplyInfo.Code1020OtherError));
@@ -93,7 +93,7 @@ public class Replier {
         String replyJson = gson.toJson(this);
 
         if(paramsInRedis==null){
-            balance = 0;
+            balance = 0L;
             return gson.toJson(this);
         }
         long price = paramsInRedis.getPrice();
@@ -150,7 +150,7 @@ public class Replier {
 
                 data = d;
                 last = null;
-                balance = 0;
+                balance = 0L;
                 return gson.toJson(this);
             } else {
                 jedis0Common.hset(Initiator.serviceName+"_"+Strings.FID_BALANCE, userAddr, String.valueOf(balance));
@@ -354,11 +354,11 @@ public class Replier {
         return reply();
     }
 
-    public int getCode() {
+    public Integer getCode() {
         return code;
     }
 
-    public void setCode(int code) {
+    public void setCode(Integer code) {
         this.code = code;
     }
 
@@ -378,27 +378,27 @@ public class Replier {
         this.data = data;
     }
 
-    public long getBalance() {
+    public Long getBalance() {
         return balance;
     }
 
-    public void setBalance(long balance) {
+    public void setBalance(Long balance) {
         this.balance = balance;
     }
 
-    public int getGot() {
+    public Integer getGot() {
         return got;
     }
 
-    public void setGot(int got) {
+    public void setGot(Integer got) {
         this.got = got;
     }
 
-    public long getBestHeight() {
+    public Long getBestHeight() {
         return bestHeight;
     }
 
-    public void setBestHeight(long bestHeight) {
+    public void setBestHeight(Long bestHeight) {
         this.bestHeight = bestHeight;
     }
 
@@ -410,19 +410,19 @@ public class Replier {
         this.last = last;
     }
 
-    public long getTotal() {
+    public Long getTotal() {
         return total;
     }
 
-    public void setTotal(long total) {
+    public void setTotal(Long total) {
         this.total = total;
     }
 
-    public long getNonce() {
+    public Long getNonce() {
         return nonce;
     }
 
-    public void setNonce(long nonce) {
+    public void setNonce(Long nonce) {
         this.nonce = nonce;
     }
 
@@ -445,11 +445,11 @@ public class Replier {
     public void clean() {
 //        code=0;
 //        message=null;
-        nonce=0;
-        balance=0;
+        nonce=0L;
+        balance=0L;
         got=0;
-        total=0;
-        bestHeight=0;
+        total=0L;
+        bestHeight=0L;
         data=null;
         via=null;
         last=null;
