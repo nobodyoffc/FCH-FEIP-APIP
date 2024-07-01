@@ -40,7 +40,7 @@ public class DataRequestHandler {
         this.writer = response.getWriter();
     }
 
-    public <T> List<T> doRequest(String index, ArrayList<Sort> sort, Class<T> tClass) {
+    public <T> List<T> doRequest(String index, ArrayList<Sort> defaultSortList, Class<T> tClass) {
         if(index==null||tClass==null)return null;
 
         SearchRequest.Builder searchBuilder = new SearchRequest.Builder();
@@ -106,11 +106,11 @@ public class DataRequestHandler {
             searchBuilder.size(size);
 
             if(fcdsl.getSort()!=null) {
-                sort = fcdsl.getSort();
+                defaultSortList = fcdsl.getSort();
             }
-            if(sort!=null) {
-                if (sort.size() > 0) {
-                    searchBuilder.sort(Sort.getSortList(sort));
+            if(defaultSortList!=null) {
+                if (defaultSortList.size() > 0) {
+                    searchBuilder.sort(Sort.getSortList(defaultSortList));
                 }
             }
             if(fcdsl.getAfter()!=null){

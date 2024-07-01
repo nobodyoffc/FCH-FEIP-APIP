@@ -1,3 +1,4 @@
+import constants.ApiNames;
 import eccAes256K1P7.EccAes256K1P7;
 import eccAes256K1P7.EccAesData;
 import eccAes256K1P7.EccAesType;
@@ -13,22 +14,17 @@ import java.util.*;
 public class SimpleTest {
     public static void main(String[] args) {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        String title = "text";
-        String[] fields = new String[]{"name","age","money"};
-        int[] widths = new int[]{4,8,33};
-        List<List<Object>> valueListList = new ArrayList<>();
-        List<Object>oneLine = new ArrayList<>();
-        oneLine.add("name1");
-        oneLine.add(20);
-        oneLine.add(12.834030940322);
-        valueListList.add(oneLine);
-        List<Object>oneLine1 = new ArrayList<>();
-        oneLine1.add("name2");
-        oneLine1.add(100);
-        oneLine1.add(3439248212.8340309);
-        valueListList.add(oneLine1);
-
-        Shower.showDataTable(title,fields,widths,valueListList);
+        String data = """
+                    A signature are requested:
+                    \tRequest header:
+                    \t\tSessionName = <The session name which is the hex of the first 6 bytes of the sessionKey>
+                    \t\tSign = <The value of double sha256 of the request body bytes adding the sessionKey bytes.>
+                    1. 
+                    2. {}
+                    3. {}
+                    """
+                .formatted("urlHead"+ ApiNames.APIP0V1Path + ApiNames.SignInAPI,"nonce","timestamp");
+        System.out.println(data);
     }
 
     private static void enumTest() {

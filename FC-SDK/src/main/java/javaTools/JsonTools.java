@@ -53,7 +53,8 @@ public class JsonTools {
         return new TypeToken<Map<T, E>>() {}.getType();
     }
     public static <T>Type getArrayListType(Class<T> t) {
-        return new TypeToken<ArrayList<T>>() {}.getType();
+        return TypeToken.getParameterized(ArrayList.class, t).getType();
+//        return new TypeToken<ArrayList<T>>() {}.getType();
     }
 
     public static String getNiceString(Object ob) {

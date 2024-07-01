@@ -2,7 +2,7 @@ package constants;
 
 public class Constants {
 
-
+    public static final int EMPTY_BLOCK_SIZE = 283;
     public static final Long ONE_DAY_BLOCKS = 1440L;
     public static final Long BalanceBackupInterval = ONE_DAY_BLOCKS;
     public static final Long RewardInterval = ONE_DAY_BLOCKS *10;

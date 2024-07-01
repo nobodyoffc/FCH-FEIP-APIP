@@ -40,7 +40,7 @@ public class CashSearch extends HttpServlet {
         //Check API
 
         //Set default sort.
-        ArrayList<Sort> sort = Sort.makeSortList("valid",false,"birthHeight",false,"cashId",true);
+        ArrayList<Sort> sort = Sort.makeSortList("valid",false,"lastTime",false,"cashId",true);
 
         //Request
         String index = IndicesNames.CASH;

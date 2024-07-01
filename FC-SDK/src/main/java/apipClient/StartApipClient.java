@@ -64,7 +64,6 @@ public class StartApipClient {
         ArrayList<String> menuItemList = new ArrayList<>();
         menuItemList.add("Ping get");
         menuItemList.add("Ping post");
-        menuItemList.add("Example");
         menuItemList.add("FreeGet");
         menuItemList.add("OpenAPI");
         menuItemList.add("Blockchain");

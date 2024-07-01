@@ -1,5 +1,6 @@
 package main;
 
+import apipClass.ResponseBody;
 import apipClass.Sort;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.SortOrder;
@@ -7,7 +8,10 @@ import co.elastic.clients.elasticsearch.core.InfoResponse;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import fchClass.Cash;
+import jakarta.json.Json;
 import javaTools.BytesTools;
 import javaTools.JsonTools;
 import org.bitcoinj.core.ECKey;
@@ -18,6 +22,8 @@ import esTools.NewEsClient;
 import config.ConfigAPIP;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 import java.security.SignatureException;
 import java.util.*;
 
@@ -25,31 +31,91 @@ import static constants.IndicesNames.CASH;
 
 public class mainTest {
     public static void main(String[] args) throws IOException {
-        StringBuilder stringBuilder = new StringBuilder();
-        String a  = "a";
-        String b = null;
-        String c = "c";
-        stringBuilder.append(a);
-        stringBuilder.append(b);
-        stringBuilder.append(c);
-        System.out.println(stringBuilder.toString());
-//        NewEsClient newEsClient = new NewEsClient();
-//        ElasticsearchClient esClient = null;
-//        ConfigAPIP configAPIP = new ConfigAPIP();
-//        try {
-//            configAPIP = configAPIP.getClassInstanceFromFile(ConfigAPIP.class);
-//            if (configAPIP.getEsIp() == null||configAPIP.getEsPort()==0) System.out.println("Es IP is null. Config first.");
-//            esClient = newEsClient.getEsClientSilent(configAPIP,new Jedis());
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        InfoResponse info = esClient.info();
-//        System.out.println(info.toString());
+        List<Cash> cashList = new ArrayList<>();
+        Cash cash = new Cash();
+        cash.setIssuer("me");
+        cash.setCashId("1");
+        Cash cash1 = new Cash();
+        cash1.setIssuer("you");
+        cash1.setCashId("2");
+        cashList.add(cash1);
+        cashList.add(cash);
 
-        //RollBacker.readEffectedAddresses(esClient,1517963);
+        ResponseBody responseBody = new ResponseBody();
+        responseBody.setCode(0);
+        responseBody.setMessage("OK");
+        responseBody.setData(cashList);
+        String resStr = JsonTools.getString(responseBody);
 
+        ResponseBody responseBody1 = new Gson().fromJson(resStr,ResponseBody.class);
+//        String cashListStr = JsonTools.getString(cashList);
+        List<Cash> newCashList = getList(responseBody1.getData(), Cash.class);
+        JsonTools.gsonPrint(newCashList);
+
+        List<Cash> newCashList1 =objectToList(cashList,Cash.class);
+        JsonTools.gsonPrint(newCashList1);
+
+        Map<String, Cash> map = listToMap(newCashList, "cashId");
+//        String mapStr = JsonTools.getString(map);
+        Map<String, Cash> map1 = objectToMap(map, String.class, Cash.class);
+        JsonTools.gsonPrint(map1);
+
+//        List<Cash> newCashList2 = getCashList(cashListStr);
+//        JsonTools.gsonPrint(newCashList2);
     }
 
+//    public static <K, T> Map<K, T> objectToMap(String jsonString, Class<K> kClass, Class<T> tClass) {
+//        Gson gson = new Gson();
+//        Type type = TypeToken.getParameterized(Map.class, kClass, tClass).getType();
+//        return gson.fromJson(jsonString, type);
+//    }
+
+    public static <K, T> Map<K, T> objectToMap(Object obj, Class<K> kClass, Class<T> tClass) {
+        Gson gson = new Gson();
+        Type type = TypeToken.getParameterized(Map.class, kClass, tClass).getType();
+        String jsonString = gson.toJson(obj);
+        Map<K, T> tempMap = gson.fromJson(jsonString, type);
+        return new HashMap<>(tempMap);
+    }
+
+    public static <T> List<T> objectToList(Object obj, Class<T> tClass) {
+        Gson gson = new Gson();
+        Type type = TypeToken.getParameterized(ArrayList.class, tClass).getType();
+        String jsonString = gson.toJson(obj);
+        List<T> tempList = gson.fromJson(jsonString, type);
+        return new ArrayList<>(tempList);
+    }
+
+    public static <T, K> Map<K, T> listToMap(List<T> list, String keyFieldName) {
+        Map<K, T> resultMap = new HashMap<>();
+        try {
+            if (list != null && !list.isEmpty()) {
+                Field keyField = list.get(0).getClass().getDeclaredField(keyFieldName);
+                keyField.setAccessible(true);
+
+                for (T item : list) {
+                    @SuppressWarnings("unchecked")
+                    K key = (K) keyField.get(item);
+                    resultMap.put(key, item);
+                }
+            }
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return resultMap;
+    }
+    public static <T> List<T> getList(Object responseData, Class<T> clazz) {
+        Type type = TypeToken.getParameterized(ArrayList.class, clazz).getType();
+        Gson gson = new Gson();
+        String json = gson.toJson(responseData);
+        return gson.fromJson(json, type);
+    }
+    public static List<Cash> getCashList(Object responseData) {
+        Type t = new TypeToken<ArrayList<Cash>>() {
+        }.getType();
+        Gson gson = new Gson();
+        return gson.fromJson(gson.toJson(responseData), t);
+    }
     private static ArrayList<String> readEffectedAddresses(ElasticsearchClient esClient, long lastHeight) throws IOException {
         Set<String> addrSet = new HashSet<>();
         int size = EsTools.READ_MAX;

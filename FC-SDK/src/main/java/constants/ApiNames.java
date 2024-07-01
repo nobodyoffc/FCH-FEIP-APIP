@@ -138,6 +138,7 @@ public class ApiNames {
     public static final String CashValidLiveAPI = "cashValidLive";
     public static final String CashValidForCdAPI = "cashValidForCd";
     public static final String CashValidForPayAPI = "cashValidForPay";
+    public static final String FeeRateAPI = "feeRate";
     public static final String GetTotalsAPI = "getTotals";
     public static final String GetPricesAPI = "getPrices";
     public static final String NidSearchAPI = "nidSearch";
@@ -240,7 +241,7 @@ public class ApiNames {
         WalletAPIs = new String[]{
                 BroadcastTxAPI,DecodeRawTxAPI,
                 CashValidForPayAPI,CashValidForCdAPI,
-                UnconfirmedAPI
+                UnconfirmedAPI, FeeRateAPI
         };
 
         CryptoToolsAPIs = new String[]{
@@ -382,6 +383,7 @@ public class ApiNames {
         ApiNames.apiList.add(ApiNames.CashValidForPayAPI);
         ApiNames.apiList.add(ApiNames.DecodeRawTxAPI);
         ApiNames.apiList.add(ApiNames.BroadcastTxAPI);
+        ApiNames.apiList.add(ApiNames.FeeRateAPI);
 
         ApiNames.apiList.add(ApiNames.OffLineTxAPI);
         ApiNames.apiList.add(ApiNames.OffLineTxByCdAPI);

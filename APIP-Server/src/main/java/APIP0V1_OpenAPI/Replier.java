@@ -30,8 +30,8 @@ public class Replier {
     private Long balance;
     private Integer got;
     private Long total;
-    private Long bestHeight;
     private Object data;
+    private Long bestHeight;
     private String via;
     private String[] last;
     private transient ServerParamsInRedis paramsInRedis;
@@ -104,7 +104,7 @@ public class Replier {
         double cost = 0;
         if (paramsInRedis.isPricePerRequest()) {
             balance = balance - (nPrice * price);
-        } else if (isPricePerRequest) {
+        } else {
             if(nPrice ==null) nPrice =0;
             cost = price * nPrice * (Math.ceil((double) replyJson.getBytes().length / 1024));
             balance = balance - (long) cost;

@@ -65,6 +65,9 @@ public class Strings {
     public static final String ORDER_VIA_SHARE = "orderViaShare";
     public static final String COST_MAP = "costMap";
     public static final String STATE = "state";
+    public static final String AMOUNT = "amount";
+    public static final String CD = "cd";
+
     public static final String UNPAID = "unpaid";
     public static final String TIME = "time";
 

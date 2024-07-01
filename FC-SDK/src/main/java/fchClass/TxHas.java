@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class TxHas {
 	private String txId;			//txid
 	private String rawTx;
-	private long height;		//height
+	private Long height;		//height
 	private ArrayList<CashMark> inMarks;
 	private  ArrayList<CashMark> outMarks;
 	
@@ -15,10 +15,10 @@ public class TxHas {
 	public void setTxId(String txId) {
 		this.txId = txId;
 	}
-	public long getHeight() {
+	public Long getHeight() {
 		return height;
 	}
-	public void setHeight(long height) {
+	public void setHeight(Long height) {
 		this.height = height;
 	}
 	public ArrayList<CashMark> getInMarks() {

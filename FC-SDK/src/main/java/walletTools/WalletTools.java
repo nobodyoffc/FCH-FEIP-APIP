@@ -21,6 +21,7 @@ import fchClass.Block;
 import javaTools.JsonTools;
 import keyTools.KeyTools;
 import org.bitcoinj.core.ECKey;
+import org.bitcoinj.core.VarInt;
 import txTools.FchTool;
 import fchClass.Cash;
 
@@ -481,7 +482,6 @@ public class WalletTools {
             SearchRequest.Builder searchBuilder = new SearchRequest.Builder();
             searchBuilder.index(index);
             searchBuilder.trackTotalHits(tr->tr.enabled(true));
-//            searchBuilder.aggregations(FieldNames.SUM, a->a.sum(s1->s1.field(FieldNames.VALUE)));
             searchBuilder.sort(s1->s1.field(f->f.field(FieldNames.CD).order(SortOrder.Asc)));
             searchBuilder.size(DEFAULT_CASH_COUNT);
 
@@ -575,6 +575,135 @@ public class WalletTools {
         cashListReturn.setTotal(total);
         cashListReturn.setCashList(meetList);
         return cashListReturn;
+    }
+
+    public static CashListReturn getCashList(long value,long cd,int outputNum,int opReturnLength, String addrRequested, ElasticsearchClient esClient) {
+
+        CashListReturn cashListReturn = new CashListReturn();
+
+        String index = IndicesNames.CASH;
+
+        SearchResponse<Cash> result;
+        try {
+            SearchRequest.Builder searchBuilder = new SearchRequest.Builder();
+            searchBuilder.index(index);
+            searchBuilder.trackTotalHits(tr->tr.enabled(true));
+            searchBuilder.sort(s1->s1.field(f->f.field(FieldNames.CD).order(SortOrder.Asc)));
+            searchBuilder.size(DEFAULT_CASH_COUNT);
+
+            BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
+
+            boolQueryBuilder.must(m->m.term(t -> t.field(FieldNames.OWNER).value(addrRequested)));
+            boolQueryBuilder.must(m1->m1.term(t1->t1.field(FieldNames.VALID).value(true)));
+
+            searchBuilder.query(q->q.bool(boolQueryBuilder.build()));
+
+            result = esClient.search(searchBuilder.build(),Cash.class);
+
+        } catch (IOException e) {
+            cashListReturn.setCode(1);
+            cashListReturn.setMsg("Can't get cashes. Check ES.");
+            return cashListReturn;
+        }
+
+        if(result==null){
+            cashListReturn.setCode(1);
+            cashListReturn.setMsg("Can't get cashes.Check ES.");
+            return cashListReturn;
+        }
+
+        assert result.hits().total() != null;
+        long total = result.hits().total().value();
+
+        long valueSum = 0;//(long)result.aggregations().get(FieldNames.SUM).valueSum().value();
+        long cdSum = 0;
+        long fee = 0;
+
+
+        List<Cash> cashList = new ArrayList<>();
+        List<Hit<Cash>> hitList = result.hits().hits();
+
+        long bestHeight = getBestHeight(esClient);
+
+        for(Hit<Cash> hit : hitList){
+            Cash cash = hit.source();
+            if(cash==null)continue;
+            if(cash.getIssuer()!=null && cash.getIssuer().equals(Values.COINBASE)&& cash.getBirthHeight()>(bestHeight-Constants.ONE_DAY_BLOCKS *10))
+                continue;
+            cashList.add(cash);
+        }
+
+
+        List<Cash> issuingCashList = getIssuingCashList(addrRequested);
+        if(issuingCashList!=null && issuingCashList.size()>0) {
+            for (Cash cash : issuingCashList) {
+                cashList.add(cash);
+            }
+        }
+
+        String[] spendingCashIds = getSpendingCashId(addrRequested);
+        if (spendingCashIds != null) {
+            for (String id : spendingCashIds) {
+                Iterator<Cash> iter = cashList.iterator();
+                while (iter.hasNext()) {
+                    Cash cash = iter.next();
+                    if (id.equals(cash.getCashId())) {
+                        iter.remove();
+                        break;
+                    }
+                }
+            }
+        }
+
+        List<Cash> meetList = new ArrayList<>();
+        boolean done = false;
+        for(Cash cash : cashList){
+            meetList.add(cash);
+            valueSum+=cash.getValue();
+            cdSum += cash.getCd();
+            fee = calcTxSize(cashList.size(),outputNum,opReturnLength);
+
+            if(valueSum>(value+fee) && cdSum > cd) {
+                done = true;
+                break;
+            }
+        }
+
+        if(!done){
+            cashListReturn.setCode(4);
+            cashListReturn.setMsg("Can't meet the conditions.");
+            return cashListReturn;
+        }
+        cashListReturn.setTotal(total);
+        cashListReturn.setCashList(meetList);
+
+        return cashListReturn;
+    }
+
+    public static long calcTxSize(int inputNum, int outputNum, int opReturnBytesLen) {
+
+        long baseLength = 10;
+        long inputLength = 141 * (long) inputNum;
+        long outputLength = 34 * (long) (outputNum + 1); // Include change output
+
+        int opReturnLen = 0;
+        if (opReturnBytesLen != 0)
+            opReturnLen = calcOpReturnLen(opReturnBytesLen);
+
+        return baseLength + inputLength + outputLength + opReturnLen;
+    }
+
+    private static int calcOpReturnLen(int opReturnBytesLen) {
+        int dataLen;
+        if (opReturnBytesLen < 76) {
+            dataLen = opReturnBytesLen + 1;
+        } else if (opReturnBytesLen < 256) {
+            dataLen = opReturnBytesLen + 2;
+        } else dataLen = opReturnBytesLen + 3;
+        int scriptLen;
+        scriptLen = (dataLen + 1) + VarInt.sizeOf(dataLen + 1);
+        int amountLen = 8;
+        return scriptLen + amountLen;
     }
 
     private static long getBestHeight(ElasticsearchClient esClient) {

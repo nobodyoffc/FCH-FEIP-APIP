@@ -4,7 +4,7 @@ public class Tx {
 	
 	//from block;
 	private String txId;		//txid,hash of tx
-	private int version;		//version
+	private Integer version;		//version
 	private long lockTime;	//lockTime
 	private long blockTime;		//blockTime
 	private String blockId;		//block ID, hash of block head
@@ -32,11 +32,11 @@ public class Tx {
 		this.rawTx = rawTx;
 	}
 
-	public int getVersion() {
+	public Integer getVersion() {
 		return version;
 	}
 
-	public void setVersion(int version) {
+	public void setVersion(Integer version) {
 		this.version = version;
 	}
 

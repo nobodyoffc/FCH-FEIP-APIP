@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import fileTools.OpReFileTools;
 import parser.Preparer;
 import parser.ReadyBlock;
-import redis.clients.jedis.Jedis;
 import esTools.EsTools;
 
 import java.util.ArrayList;

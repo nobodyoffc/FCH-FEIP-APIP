@@ -3,7 +3,7 @@ package fchClass;
 public class CashMark {
 	private String cashId;		//input id, the hash of previous txid and index, e.g. the first 32+4 bytes of the input.
 	private String owner;
-	private long value;
+	private Long value;
 	private long cdd;
 
 	
@@ -19,10 +19,10 @@ public class CashMark {
 	public void setOwner(String owner) {
 		this.owner = owner;
 	}
-	public long getValue() {
+	public Long getValue() {
 		return value;
 	}
-	public void setValue(long value) {
+	public void setValue(Long value) {
 		this.value = value;
 	}
 	public long getCdd() {

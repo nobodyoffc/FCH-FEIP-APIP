@@ -24,7 +24,7 @@ public class ConfigBase {
     protected String blockFilePath;
     protected String configFileName = "config.json";
     protected String configFilePath = System.getProperty(UserDir);
-    private String opReturnFilePath= System.getProperty(UserDir)+"opreturn";
+    private String opReturnFilePath= Path.of(System.getProperty(UserDir),"opreturn").toString();
 
     public void config(BufferedReader br) throws IOException {
         printConfigJson();

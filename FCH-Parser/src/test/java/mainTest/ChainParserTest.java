@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import fileTools.BlockFileTools;
 import fileTools.OpReFileTools;
 import parser.ReadyBlock;
-import startFCH.IndicesFCH;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -55,7 +54,7 @@ public class ChainParserTest {
 			
 			BlockMark blockMark = checkResult.getBlockMark();
 			byte[] blockBytes = checkResult.getBlockBytes();	
-			int blockLength = checkResult.getBlockLength();
+			long blockLength = checkResult.getBlockLength();
 			CheckStatus checkStatus = checkResult.getCheckStatus();
 			
 			switch (checkStatus) {
@@ -204,10 +203,10 @@ public class ChainParserTest {
 		
 		//Parse blockSize
 		b4 = Arrays.copyOfRange(b8, 4, 8);
-		int blockSize = (int) BytesTools.bytes4ToLongLE(b4);
+		long blockSize = BytesTools.bytes4ToLongLE(b4);
 		blockMark.setSize(blockSize);
 
-		byte[] blockBytes = new byte[blockSize];
+		byte[] blockBytes = new byte[Math.toIntExact(blockSize)];
 		if(fis.read(blockBytes)== -1) {
 			System.out.println("File end when reading block. pointer: "+PreparerTest.Pointer);
 			log.info("File end when reading block. Pointer:"+ PreparerTest.Pointer);
@@ -226,7 +225,7 @@ public class ChainParserTest {
 		String preId =  BytesTools.bytesToHexStringLE(Arrays.copyOfRange(blockHeadBytes, 4, 4+32));
 		blockMark.setPreBlockId(preId);
 		
-		byte[] blockBodyBytes = new byte[blockSize-80];
+		byte[] blockBodyBytes = new byte[(int) (blockSize-80)];
 		blockInputStream.read(blockBodyBytes);
 		
 		//If valid headers-only fork
@@ -352,14 +351,14 @@ public class ChainParserTest {
 		return BlockFileTools.getFileOrder(PreparerTest.CurrentFile);
 	}
 	private class CheckResult{
-		int blockLength;
+		long blockLength;
 		CheckStatus checkStatus;
 		BlockMark blockMark;
 		byte[] blockBytes;
-		public int getBlockLength() {
+		public long getBlockLength() {
 			return blockLength;
 		}
-		public void setBlockLength(int blockLength) {
+		public void setBlockLength(long blockLength) {
 			this.blockLength = blockLength;
 		}
 		public BlockMark getBlockMark() {
@@ -600,7 +599,7 @@ public class ChainParserTest {
 		File file = new File(PreparerTest.Path, BlockFileTools.getFileNameWithOrder(bm.get_fileOrder()));
 		FileInputStream fis = new FileInputStream(file);
 		fis.skip(bm.get_pointer()+8);
-		byte[] blockBytes = new byte[(int) bm.getSize()];
+		byte[] blockBytes = new byte[Math.toIntExact(bm.getSize())];
 		fis.read(blockBytes);
 		fis.close();
 		return blockBytes;

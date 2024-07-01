@@ -113,7 +113,7 @@ public class StartAPIP {
 			System.out.println();
 			if(orderScanner!=null && orderScanner.isRunning().get()) System.out.println("Order scanner is running...");
 			if(mempoolScanner!=null && mempoolScanner.getRunning().get()) System.out.println("Mempool scanner is running...");
-			if(mempoolScanner!=null && mempoolCleaner.getRunning().get()) System.out.println("Mempool cleaner is running...");
+			if(mempoolCleaner!=null && mempoolCleaner.getRunning().get()) System.out.println("Mempool cleaner is running...");
 			if(pusher!=null && pusher.isRunning().get()) System.out.println("Webhook pusher is running.");
 			System.out.println();
 

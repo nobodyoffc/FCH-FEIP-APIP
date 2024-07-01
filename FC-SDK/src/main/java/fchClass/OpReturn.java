@@ -3,9 +3,9 @@ package fchClass;
 public class OpReturn {
 
 	private String txId;		//txid
-	private long height;		//block height
-	private long time;
-	private int txIndex;		//tx index in the block
+	private Long height;		//block height
+	private Long time;
+	private Integer txIndex;		//tx index in the block
 	private String opReturn;	//OP_RETURN text
 	private String signer;	//address of the first input.
 	private String recipient;	//address of the first output, but the first input address and opReturn output.
@@ -17,22 +17,22 @@ public class OpReturn {
 	public void setTxId(String txId) {
 		this.txId = txId;
 	}
-	public long getHeight() {
+	public Long getHeight() {
 		return height;
 	}
-	public void setHeight(long height) {
+	public void setHeight(Long height) {
 		this.height = height;
 	}
-	public long getTime() {
+	public Long getTime() {
 		return time;
 	}
-	public void setTime(long time) {
+	public void setTime(Long time) {
 		this.time = time;
 	}
-	public int getTxIndex() {
+	public Integer getTxIndex() {
 		return txIndex;
 	}
-	public void setTxIndex(int txIndex) {
+	public void setTxIndex(Integer txIndex) {
 		this.txIndex = txIndex;
 	}
 	public String getOpReturn() {

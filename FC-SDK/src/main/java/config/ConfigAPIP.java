@@ -52,7 +52,7 @@ public class ConfigAPIP extends ConfigService {
             jedis.hset(CONFIG, ES_PORT, String.valueOf(esPort));
             jedis.hset(CONFIG, CONFIG_FILE_PATH, configFilePath);
             jedis.hset(CONFIG, OP_RETURN_FILE_PATH, this.getOpReturnFilePath());
-            jedis.hset(CONFIG, TOMCAT_BASE_PATH, this.tomcatBasePath);
+            if(this.tomcatBasePath!=null)jedis.hset(CONFIG, TOMCAT_BASE_PATH, this.tomcatBasePath);
             jedis.hset(CONFIG, LISTEN_PATH, this.getListenPath());
             if(serviceName!=null)jedis.hset(CONFIG, SERVICE_NAME, serviceName);
             jedis.hset(CONFIG, FORBID_FREE_GET, String.valueOf(forbidFreeGet));

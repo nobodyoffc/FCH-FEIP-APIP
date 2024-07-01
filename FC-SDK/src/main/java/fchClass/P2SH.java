@@ -16,13 +16,13 @@ import java.util.concurrent.TimeUnit;
 public class P2SH {
 	private String fid;
 	private String redeemScript;
-	private int m;
-	private int n;
+	private Integer m;
+	private Integer n;
 	private String pubKeys[];
 	private String fids[];
 
-	private long birthHeight;
-	private long birthTime;
+	private Long birthHeight;
+	private Long birthTime;
 	private String birthTxId;
 
 	public void parseP2SH(ElasticsearchClient esClient,Cash input) throws ElasticsearchException, IOException {
@@ -198,19 +198,19 @@ public class P2SH {
 		this.redeemScript = redeemScript;
 	}
 
-	public int getM() {
+	public Integer getM() {
 		return m;
 	}
 
-	public void setM(int m) {
+	public void setM(Integer m) {
 		this.m = m;
 	}
 
-	public int getN() {
+	public Integer getN() {
 		return n;
 	}
 
-	public void setN(int n) {
+	public void setN(Integer n) {
 		this.n = n;
 	}
 
@@ -222,19 +222,19 @@ public class P2SH {
 		this.pubKeys = pubKeys;
 	}
 
-	public long getBirthHeight() {
+	public Long getBirthHeight() {
 		return birthHeight;
 	}
 
-	public void setBirthHeight(long birthHeight) {
+	public void setBirthHeight(Long birthHeight) {
 		this.birthHeight = birthHeight;
 	}
 
-	public long getBirthTime() {
+	public Long getBirthTime() {
 		return birthTime;
 	}
 
-	public void setBirthTime(long birthTime) {
+	public void setBirthTime(Long birthTime) {
 		this.birthTime = birthTime;
 	}
 

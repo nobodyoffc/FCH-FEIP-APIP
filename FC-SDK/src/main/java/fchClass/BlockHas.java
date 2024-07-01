@@ -3,14 +3,14 @@ package fchClass;
 import java.util.ArrayList;
 
 public class BlockHas {
-	private long height;		//height
+	private Long height;		//height
 	private String blockId;		//block hash
 	private ArrayList<TxMark> txMarks;
 	
-	public long getHeight() {
+	public Long getHeight() {
 		return height;
 	}
-	public void setHeight(long height) {
+	public void setHeight(Long height) {
 		this.height = height;
 	}
 	public String getBlockId() {

@@ -1,5 +1,7 @@
 package apipClass;
 
+import cryptoTools.SHA;
+
 public class WebhookRequestBody {
     private String hookUserId;
     private String userName;
@@ -7,6 +9,11 @@ public class WebhookRequestBody {
     private String endpoint;
     private Object data;
     private String op;
+    private Long lastHeight;
+
+    public static String makeHookUserId(String sid, String userId, String newCashByFidsAPI) {
+        return cryptoTools.Hash.Sha256x2(sid+newCashByFidsAPI+userId);
+    }
     public String getOp() {
         return op;
     }
@@ -53,5 +60,13 @@ public class WebhookRequestBody {
 
     public void setMethod(String method) {
         this.method = method;
+    }
+
+    public Long getLastHeight() {
+        return lastHeight;
+    }
+
+    public void setLastHeight(Long lastHeight) {
+        this.lastHeight = lastHeight;
     }
 }

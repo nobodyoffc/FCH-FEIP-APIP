@@ -170,7 +170,7 @@ public class Preparer {
 
 		for(BlockMark bm : readList) {
 			bm.setStatus(ORPHAN);
-			bm.setHeight(0);
+			bm.setHeight(0L);
 		}
 
 		return readList;

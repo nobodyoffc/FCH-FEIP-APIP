@@ -8,7 +8,6 @@ import javaTools.BytesTools;
 import keyTools.KeyTools;
 import fcTools.ParseTools;
 import esTools.EsTools;
-import org.bitcoinj.script.ScriptBuilder;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;

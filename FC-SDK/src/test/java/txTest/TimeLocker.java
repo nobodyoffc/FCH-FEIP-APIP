@@ -1,6 +1,5 @@
 package txTest;
 
-import fc.Hex;
 import fcTools.ParseTools;
 import fchClass.Cash;
 import keyTools.KeyTools;
@@ -12,10 +11,8 @@ import org.bitcoinj.script.ScriptBuilder;
 import org.bitcoinj.script.ScriptOpCodes;
 import org.junit.Test;
 import txTools.FchTool;
-import txTools.RawTxParser;
 import walletTools.SendTo;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 

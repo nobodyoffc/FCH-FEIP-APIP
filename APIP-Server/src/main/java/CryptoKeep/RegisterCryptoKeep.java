@@ -56,7 +56,7 @@ public class RegisterCryptoKeep extends HttpServlet {
         Gson gson = new Gson();
         String bodyJson = new String(bodyBytes);
 
-        WebhookPushBody postBody = gson.fromJson(bodyJson,WebhookPushBody.class);
+        WebhookPushBody postBody = gson.fromJson(bodyJson, WebhookPushBody.class);
         if(postBody==null){
             response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1020OtherError));
             replier.setData("Failed to get WebhookPushBody from bodyJson:"+bodyJson);

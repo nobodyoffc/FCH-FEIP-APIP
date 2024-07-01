@@ -16,6 +16,8 @@ import static constants.IndicesNames.CASH;
 
 public class BlockMaker {
 
+	public static final String FUND_ADDR = "FTqiqAyXHnK7uDTXzMap3acvqADK4ZGzts";
+
 	public ReadyBlock makeReadyBlock(ElasticsearchClient esClient, ReadyBlock rawBlock) throws Exception {
 		//TODO
 		//System.out.println("[makeReadyBloc]Address 0 in rawBlock: "+ rawBlock.getOutList().get(0).getAddr());
@@ -77,14 +79,15 @@ public class BlockMaker {
 			in.setBirthTime(out.getBirthTime());
 			in.setBirthHeight(out.getBirthHeight());
 			in.setCdd(ParseTools.cdd(in.getValue(), in.getBirthTime(), in.getSpendTime()));
-
 			inMadeList.add(in);
 		}
 
 		for (String id : inNewIdList) {
 			Cash in = inMap.get(id);
 			Cash out = outMap.get(id);
-			in.setIssuer(out.getIssuer());
+
+			//这些本区块产生的cash 还没有被设置issuer
+//			in.setIssuer(out.getIssuer());
 			in.setOwner(out.getOwner());
 			in.setBirthIndex(out.getBirthIndex());
 			in.setType(out.getType());
@@ -139,6 +142,7 @@ public class BlockMaker {
 				long cdd = in.getCdd();
 
 				Tx tx = txMap.get(in.getSpendTxId());
+
 				tx.setInValueT(tx.getInValueT() + value);
 				tx.setCdd(tx.getCdd() + cdd);
 
@@ -170,6 +174,14 @@ public class BlockMaker {
 				out.setIssuer(txHas.getInMarks().get(0).getOwner());
 			}else {
 				out.setIssuer("coinbase");
+			}
+		}
+
+		for(Cash in : blockForMaking.getInList()){
+			if(in.getIssuer()==null){
+				TxHas txHas = txHasMap.get(in.getBirthTxId());
+				ArrayList<CashMark> inMarks = txHas.getInMarks();
+				in.setIssuer(inMarks.get(0).getOwner());
 			}
 		}
 
@@ -322,7 +334,7 @@ public class BlockMaker {
 				addr.setLastHeight(txHas.getHeight());
 				addr.setCash(addr.getCash() + 1);
 
-				if (addr.getBirthHeight() == 0 && (!addr.getFid().equals("FTqiqAyXHnK7uDTXzMap3acvqADK4ZGzts")))
+				if (addr.getBirthHeight() == null)
 					addr.setBirthHeight(txHas.getHeight());
 
 				if (addr.getGuide() == null) {

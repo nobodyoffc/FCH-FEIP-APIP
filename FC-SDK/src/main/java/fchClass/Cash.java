@@ -7,31 +7,32 @@ public class Cash {
 	private String issuer; //first input fid when this cash was born.
 
 	//from utxo
-	private int birthIndex;		//index of cash. Order in cashs of the tx when created.
+	private Integer birthIndex;		//index of cash. Order in cashs of the tx when created.
 	private String type;	//type of the script. P2PKH,P2SH,OP_RETURN,Unknown,MultiSig
 	private String owner; 	//address
-	private long value;		//in satoshi
+	private Long value;		//in satoshi
 	private String lockScript;	//LockScript
 	private String birthTxId;		//txid, hash in which this cash was created.
-	private int birthTxIndex;		//Order in the block of the tx in which this cash was created.
+	private Integer birthTxIndex;		//Order in the block of the tx in which this cash was created.
 	private String birthBlockId;		//block ID, hash of block head
-	private long birthTime;		//Block time when this cash is created.
-	private long birthHeight;		//Block height.
+	private Long birthTime;		//Block time when this cash is created.
+	private Long birthHeight;		//Block height.
 
 	//from input
-	private long spendTime;	//Block time when spent.
+	private Long spendTime;	//Block time when spent.
 	private String spendTxId;	//Tx hash when spent.
-	private long spendHeight; 	//Block height when spent.
-	private int spendTxIndex;		//Order in the block of the tx in which this cash was spent.
+	private Long spendHeight; 	//Block height when spent.
+	private Integer spendTxIndex;		//Order in the block of the tx in which this cash was spent.
 	private String spendBlockId;		//block ID, hash of block head
-	private int spendIndex;		//Order in inputs of the tx when spent.
+	private Integer spendIndex;		//Order in inputs of the tx when spent.
 	private String unlockScript;	//unlock script.
 	private String sigHash;	//sigHash.
 	private String sequence;	//nSequence
-	private long cdd;		//CoinDays Destroyed
-	private long cd;		//CoinDays
-	private boolean valid;	//Is this cash valid (utxo), or spent (stxo);
+	private Long cdd;		//CoinDays Destroyed
+	private Long cd;		//CoinDays
+	private Boolean valid;	//Is this cash valid (utxo), or spent (stxo);
 
+	private Long lastTime;
 	public Cash() {
 		// default constructor
 	}
@@ -65,11 +66,11 @@ public class Cash {
 	public void setSpendBlockId(String spendBlockId) {
 		this.spendBlockId = spendBlockId;
 	}
-	public int getSpendTxIndex() {
+	public Integer getSpendTxIndex() {
 		return spendTxIndex;
 	}
 
-	public void setSpendTxIndex(int spendTxIndex) {
+	public void setSpendTxIndex(Integer spendTxIndex) {
 		this.spendTxIndex = spendTxIndex;
 	}
 
@@ -79,10 +80,10 @@ public class Cash {
 	public void setCashId(String cashId) {
 		this.cashId = cashId;
 	}
-	public int getBirthIndex() {
+	public Integer getBirthIndex() {
 		return birthIndex;
 	}
-	public void setBirthIndex(int birthIndex) {
+	public void setBirthIndex(Integer birthIndex) {
 		this.birthIndex = birthIndex;
 	}
 	public String getType() {
@@ -97,10 +98,10 @@ public class Cash {
 	public void setOwner(String owner) {
 		this.owner = owner;
 	}
-	public long getValue() {
+	public Long getValue() {
 		return value;
 	}
-	public void setValue(long value) {
+	public void setValue(Long value) {
 		this.value = value;
 	}
 	public String getLockScript() {
@@ -115,28 +116,28 @@ public class Cash {
 	public void setBirthTxId(String birthTxId) {
 		this.birthTxId = birthTxId;
 	}
-	public int getBirthTxIndex() {
+	public Integer getBirthTxIndex() {
 		return birthTxIndex;
 	}
-	public void setBirthTxIndex(int birthTxIndex) {
+	public void setBirthTxIndex(Integer birthTxIndex) {
 		this.birthTxIndex = birthTxIndex;
 	}
-	public long getBirthTime() {
+	public Long getBirthTime() {
 		return birthTime;
 	}
-	public void setBirthTime(long birthTime) {
+	public void setBirthTime(Long birthTime) {
 		this.birthTime = birthTime;
 	}
-	public long getBirthHeight() {
+	public Long getBirthHeight() {
 		return birthHeight;
 	}
-	public void setBirthHeight(long birthHeight) {
+	public void setBirthHeight(Long birthHeight) {
 		this.birthHeight = birthHeight;
 	}
-	public long getSpendTime() {
+	public Long getSpendTime() {
 		return spendTime;
 	}
-	public void setSpendTime(long spendTime) {
+	public void setSpendTime(Long spendTime) {
 		this.spendTime = spendTime;
 	}
 	public String getSpendTxId() {
@@ -145,16 +146,16 @@ public class Cash {
 	public void setSpendTxId(String spendTxId) {
 		this.spendTxId = spendTxId;
 	}
-	public long getSpendHeight() {
+	public Long getSpendHeight() {
 		return spendHeight;
 	}
-	public void setSpendHeight(long spendHeight) {
+	public void setSpendHeight(Long spendHeight) {
 		this.spendHeight = spendHeight;
 	}
-	public int getSpendIndex() {
+	public Integer getSpendIndex() {
 		return spendIndex;
 	}
-	public void setSpendIndex(int spendIndex) {
+	public void setSpendIndex(Integer spendIndex) {
 		this.spendIndex = spendIndex;
 	}
 	public String getUnlockScript() {
@@ -175,22 +176,22 @@ public class Cash {
 	public void setSequence(String sequence) {
 		this.sequence = sequence;
 	}
-	public long getCdd() {
+	public Long getCdd() {
 		return cdd;
 	}
-	public void setCdd(long cdd) {
+	public void setCdd(Long cdd) {
 		this.cdd = cdd;
 	}
-	public long getCd() {
+	public Long getCd() {
 		return cd;
 	}
-	public void setCd(long cd) {
+	public void setCd(Long cd) {
 		this.cd = cd;
 	}
-	public boolean isValid() {
+	public Boolean isValid() {
 		return valid;
 	}
-	public void setValid(boolean valid) {
+	public void setValid(Boolean valid) {
 		this.valid = valid;
 	}
 
@@ -200,5 +201,13 @@ public class Cash {
 
 	public void setIssuer(String issuer) {
 		this.issuer = issuer;
+	}
+
+	public Long getLastTime() {
+		return lastTime;
+	}
+
+	public void setLastTime(Long lastTime) {
+		this.lastTime = lastTime;
 	}
 }

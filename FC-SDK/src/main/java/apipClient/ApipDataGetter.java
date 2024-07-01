@@ -13,6 +13,12 @@ import java.util.List;
 import java.util.Map;
 
 public class ApipDataGetter {
+    public static Map<String, String> getStringMap(Object responseData) {
+        Type t = new TypeToken<HashMap<String, String>>() {
+        }.getType();
+        Gson gson = new Gson();
+        return gson.fromJson(gson.toJson(responseData), t);
+    }
     public static List<TxInfo> getTxInfoList(Object responseData) {
         Type t = new TypeToken<ArrayList<TxInfo>>() {}.getType();
         Gson gson = new Gson();

@@ -22,6 +22,23 @@ public class WalletAPIs {
         return apipClient;
     }
 
+    public static ApipClient feeRateGet(String urlHead){
+        ApipClient apipClient = new ApipClient();
+        String urlTail = ApiNames.APIP18V1Path + ApiNames.FeeRateAPI;
+        apipClient.addNewApipUrl(urlHead, urlTail);
+        apipClient.get();
+        return apipClient;
+    }
+
+    public static ApipClient feeRatePost(String urlHead,@Nullable String via, byte[] sessionKey){
+        ApipClient apipClient = new ApipClient();
+        String urlTail = ApiNames.APIP18V1Path + ApiNames.FeeRateAPI;
+        boolean isGood = apipClient.post(urlHead,urlTail, null, via, sessionKey);
+        if(!isGood)return null;
+
+        return apipClient;
+    }
+
     public static ApipClient decodeRawTxPost(String urlHead, String rawTx, @Nullable String via, byte[] sessionKey)  {
         ApipClient apipClient = new ApipClient();
         apipClient.setSn("18");

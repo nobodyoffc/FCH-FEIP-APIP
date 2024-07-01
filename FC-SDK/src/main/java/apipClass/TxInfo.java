@@ -12,15 +12,15 @@ import java.util.Map;
 public class TxInfo {
     private String id;		//txid,hash of tx
     private String rawTx;
-    private int version;		//version
-    private long lockTime;	//locktime
-    private long blockTime;		//blockTime
+    private Integer version;		//version
+    private Long lockTime;	//locktime
+    private Long blockTime;		//blockTime
     private String blockId;		//block ID, hash of block head
-    private int txIndex;		//the index of this tx in the block
+    private Integer txIndex;		//the index of this tx in the block
     private String coinbase;	//string of the coinbase script
-    private int outCount;		//number of outputs
-    private int inCount;		//number of inputs
-    private long height;		//block height of the block
+    private Integer outCount;		//number of outputs
+    private Integer inCount;		//number of inputs
+    private Long height;		//block height of the block
 
     private String opReBrief; 	//Former 30 bytes of OP_RETURN data in String.
 
@@ -80,27 +80,27 @@ public class TxInfo {
         this.id = id;
     }
 
-    public int getVersion() {
+    public Integer getVersion() {
         return version;
     }
 
-    public void setVersion(int version) {
+    public void setVersion(Integer version) {
         this.version = version;
     }
 
-    public long getLockTime() {
+    public Long getLockTime() {
         return lockTime;
     }
 
-    public void setLockTime(long lockTime) {
+    public void setLockTime(Long lockTime) {
         this.lockTime = lockTime;
     }
 
-    public long getBlockTime() {
+    public Long getBlockTime() {
         return blockTime;
     }
 
-    public void setBlockTime(long blockTime) {
+    public void setBlockTime(Long blockTime) {
         this.blockTime = blockTime;
     }
 
@@ -112,11 +112,11 @@ public class TxInfo {
         this.blockId = blockId;
     }
 
-    public int getTxIndex() {
+    public Integer getTxIndex() {
         return txIndex;
     }
 
-    public void setTxIndex(int txIndex) {
+    public void setTxIndex(Integer txIndex) {
         this.txIndex = txIndex;
     }
 
@@ -128,27 +128,27 @@ public class TxInfo {
         this.coinbase = coinbase;
     }
 
-    public int getOutCount() {
+    public Integer getOutCount() {
         return outCount;
     }
 
-    public void setOutCount(int outCount) {
+    public void setOutCount(Integer outCount) {
         this.outCount = outCount;
     }
 
-    public int getInCount() {
+    public Integer getInCount() {
         return inCount;
     }
 
-    public void setInCount(int inCount) {
+    public void setInCount(Integer inCount) {
         this.inCount = inCount;
     }
 
-    public long getHeight() {
+    public Long getHeight() {
         return height;
     }
 
-    public void setHeight(long height) {
+    public void setHeight(Long height) {
         this.height = height;
     }
 

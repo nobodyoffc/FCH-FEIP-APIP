@@ -19,7 +19,7 @@ public class ConfigService extends ConfigFEIP {
     protected String listenPath;
     protected String rpcIp = "127.0.0.1";
     protected int rpcPort = 8332;
-    protected String rpcUser = "user";
+    protected String rpcUser = "username";
     protected String rpcPassword = "password";
 
     public long getWindowTime() {

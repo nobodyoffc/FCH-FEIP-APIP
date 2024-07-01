@@ -129,7 +129,7 @@ public class OrderScanner implements Runnable {
     private void checkIfNewStart() {
         try(Jedis jedis0Common = StartAPIP.jedisPool.getResource()) {
             String lastHeightStr = jedis0Common.get(StartAPIP.serviceName + "_" + ORDER_LAST_HEIGHT);
-            if (lastHeightStr == null) {
+            if (lastHeightStr == null || "".equals(lastHeightStr)) {
                 jedis0Common.set(StartAPIP.serviceName + "_" + ORDER_LAST_HEIGHT, "0");
                 jedis0Common.set(StartAPIP.serviceName + "_" + Strings.ORDER_LAST_BLOCK_ID, Constants.zeroBlockId);
             }
@@ -144,7 +144,13 @@ private void waitNewOrder() {
 
     private void checkRollback() {
         try(Jedis jedis0Common = StartAPIP.jedisPool.getResource()) {
-            long lastHeight = ReadRedis.readLong(StartAPIP.serviceName + "_" + ORDER_LAST_HEIGHT);
+            long lastHeight;
+            try {
+                lastHeight = ReadRedis.readLong(StartAPIP.serviceName + "_" + ORDER_LAST_HEIGHT);
+            }catch (Exception e){
+                lastHeight = 0;
+                jedis0Common.set(StartAPIP.serviceName + "_" + ORDER_LAST_HEIGHT,"0");
+            }
             String lastBlockId = jedis0Common.get(StartAPIP.serviceName + "_" + Strings.ORDER_LAST_BLOCK_ID);
             try {
                 if (Rollbacker.isRolledBack(esClient, lastHeight, lastBlockId))
@@ -237,6 +243,8 @@ private void waitNewOrder() {
                 continue;
             }
             String issuer = cash.getIssuer();
+            if(issuer==null)
+                System.out.println("Issuer is null");
             if(issuer.equals(params.getAccount())||issuer.equals(service.getOwner())){
                 iterator.remove();
                 continue;

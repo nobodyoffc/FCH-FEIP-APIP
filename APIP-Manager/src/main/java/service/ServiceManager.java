@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static constants.Constants.APIP;
 import static constants.Strings.*;
 
 
@@ -150,8 +151,8 @@ public class ServiceManager {
 		}
 
 		String finalStr = str;
-//		SearchResponse<ApipService> result = esClient.search(s -> s.index(SERVICE).query(q -> q.term(t -> t.field(FieldNames.OWNER).value(finalStr))), ApipService.class);
-		SearchResponse<Service> result = esClient.search(s -> s.index(SERVICE).query(q -> q.bool(b->b.must(m->m.term(t -> t.field(FieldNames.OWNER).value(finalStr))).must(m1->m1.term(t -> t.field(FieldNames.TYPES).value("APIP"))))), Service.class);
+//		SearchResponse<Service> result = esClient.search(s -> s.index(SERVICE).query(q -> q.term(t -> t.field(FieldNames.OWNER).value(finalStr))), Service.class);
+		SearchResponse<Service> result = esClient.search(s -> s.index(SERVICE).query(q -> q.bool(b->b.must(m->m.term(t -> t.field(FieldNames.OWNER).value(finalStr))).must(m1->m1.match(t -> t.field(FieldNames.TYPES).query(APIP))))), Service.class);
 
 		List<Hit<Service>> hitList = result.hits().hits();
         ArrayList<Service> serviceList = new ArrayList<Service>();
@@ -192,7 +193,8 @@ public class ServiceManager {
 			}
 			service1 = serviceToApip(serviceList.get(choice - 1));
 		}while (service1==null);
-        System.out.println(choice +". name: "+ StartAPIP.service.getStdName()+"sid: "+StartAPIP.service.getSid());
+
+//        System.out.println(choice +". name: "+ StartAPIP.service.getStdName()+"sid: "+StartAPIP.service.getSid());
         return service1;
 	}
 

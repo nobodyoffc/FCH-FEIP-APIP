@@ -40,7 +40,7 @@ eid：entity identify
   * Subject: Key Keeper
   * Object: Data
 
-## FVI 身份
+## FI 身份
 
 * ID type
   * digitalId: hash of entity
@@ -54,7 +54,7 @@ eid：entity identify
             * master
             * messenger
             * waiter
-            * fchTx
+            * account
             * teller
             * dealer
             * ...
@@ -72,7 +72,7 @@ eid：entity identify
           * #cidByIds/Request-body@(pid)00000000000
           * #ECC256/encrypt/String-String-String@EccAes256K1P7@C_armX
 
-## FVN  名称 可读身份
+## FN  名称 可读身份
 
     CID
     NID
@@ -97,15 +97,17 @@ fcl是eid或通过eid的命名空间可以得到的元素位置。
 
     # 位置标记符: #A，A指向某数据的特定内部位置。
 	@ 命名符：A@B，A在B的命名空间内。
-	/ 定位符：A/B，B在A的命名空间内。
+	/ 定位符：A/B，B在A的命名空间内，或B属于A。
 	() 转型符：(pid)3243,将did3243转换为pid类型。
 	\ 转义符：之后的1个字符不解释为关系符
 	
 	关系解析由左至右
-	\优先于#优先于()优先于@优先于/：big\@dog@(cid)B/C@D = (cid)B/big\@dog/D/C = C@D@big\@dog@(cid)B。 A/(cid)B@C/D = A/C/cid#B/D = D@cid#B@C@A
+    优先级：\ -> # -> () -> @ -> /
+        - big\@dog@(cid)B/C@D = (cid)B/big\@dog/D/C = C@D@big\@dog@(cid)B。 
+        - A/(cid)B@C/D = A/C/cid#B/D = D@cid#B@C@A
 	方法：
 	1）#两端保持不变
 	2）将所有@两端对换，得到全/
 	3）将全/逆序，得到全@
 
-保留id名称，aid，bid，cid，did，eid，fid，gid，nid, pid，sid，tid
+保留id名称，aid，bid，cid，did，eid，fid，gid，nid, pid，sid，tid, oid, iid,

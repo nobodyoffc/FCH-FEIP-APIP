@@ -1,19 +1,20 @@
 package apipClass;
 
 public class WebhookPushBody {
-    private String fromSid;
+    private String hookUserId;
     private String method;
     private String sessionName;
     private String data;
     private String sign;
+    private Long sinceHeight;
+    private Long bestHeight;
 
-
-    public String getFromSid() {
-        return fromSid;
+    public String getHookUserId() {
+        return hookUserId;
     }
 
-    public void setFromSid(String fromSid) {
-        this.fromSid = fromSid;
+    public void setHookUserId(String hookUserId) {
+        this.hookUserId = hookUserId;
     }
 
     public String getMethod() {
@@ -48,5 +49,19 @@ public class WebhookPushBody {
         this.sign = sign;
     }
 
+    public Long getSinceHeight() {
+        return sinceHeight;
+    }
 
+    public void setSinceHeight(Long sinceHeight) {
+        this.sinceHeight = sinceHeight;
+    }
+
+    public Long getBestHeight() {
+        return bestHeight;
+    }
+
+    public void setBestHeight(Long bestHeight) {
+        this.bestHeight = bestHeight;
+    }
 }

@@ -1,6 +1,5 @@
 package parser;
 
-import com.fasterxml.jackson.core.util.ByteArrayBuilder;
 import fchClass.*;
 import javaTools.BytesTools;
 import cryptoTools.SHA;
@@ -8,10 +7,8 @@ import keyTools.KeyTools;
 import fcTools.ParseTools;
 import fcTools.ParseTools.VarintResult;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HexFormat;
@@ -233,6 +230,7 @@ public class BlockParser {
 			out.setBirthHeight(tx.getHeight());
 			out.setBirthBlockId(tx.getBlockId());
 			out.setBirthTime(tx.getBlockTime());
+			out.setLastTime(tx.getBlockTime());
 
 			// Read the value of this output in satoshi.
 			// 读取该输出的金额，以聪为单位。
@@ -265,7 +263,6 @@ public class BlockParser {
 					out.setType("OP_RETURN");
 					opReturnStr = parseOpReturn(bScript);//new String(Arrays.copyOfRange(bScript, 2, bScript.length));
 					out.setOwner("OpReturn");
-
 					out.setValid(false);
 					if (tx.getTxIndex() != 0) {
 						if (opReturnStr.length() <= 30) {
@@ -292,6 +289,7 @@ public class BlockParser {
 			out.setValid(true);
 			out.setBirthTime(tx.getBlockTime());
 			out.setBirthTxIndex(tx.getTxIndex());
+			out.setLastTime(tx.getBlockTime());
 
 			// Add this output to List.
 			// 添加输出到列表。
@@ -411,6 +409,7 @@ public class BlockParser {
 			input.setSpendBlockId(tx1.getBlockId());
 			input.setSpendIndex(j);
 			input.setValid(false);
+			input.setLastTime(tx1.getBlockTime());
 
 			// Read preTXHash and preOutIndex./读取前交易哈希和输出索引。
 			byte[] b36PreTxIdAndIndex = new byte[32 + 4];

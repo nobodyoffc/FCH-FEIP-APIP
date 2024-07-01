@@ -2,15 +2,15 @@ package fchClass;
 
 public class Block {
 	//from block head
-	private long size;		//block size
-	private long height;		//block height
+	private Long size;		//block size
+	private Long height;		//block height
 	private String version;		//version
 	private String preBlockId;	//previous block hash
 	private String merkleRoot;	//merkle tree root
-	private long time;		//block timestamp
-	private long bits;		//The current difficulty target
-	private long nonce;		//nonce
-	private int txCount;		//number of TXs included
+	private Long time;		//block timestamp
+	private Long bits;		//The current difficulty target
+	private Long nonce;		//nonce
+	private Integer txCount;		//number of TXs included
 
 	//calculated
 	private String blockId;		//block hash
@@ -19,16 +19,16 @@ public class Block {
 	private long fee;		//total amount of tx fee in satoshi
 	private long cdd;		//total amount of coindays destroyed
 	
-	public long getSize() {
+	public Long getSize() {
 		return size;
 	}
-	public void setSize(long size) {
+	public void setSize(Long size) {
 		this.size = size;
 	}
-	public long getHeight() {
+	public Long getHeight() {
 		return height;
 	}
-	public void setHeight(long height) {
+	public void setHeight(Long height) {
 		this.height = height;
 	}
 	public String getVersion() {
@@ -49,28 +49,28 @@ public class Block {
 	public void setMerkleRoot(String merkleRoot) {
 		this.merkleRoot = merkleRoot;
 	}
-	public long getTime() {
+	public Long getTime() {
 		return time;
 	}
-	public void setTime(long time) {
+	public void setTime(Long time) {
 		this.time = time;
 	}
-	public long getBits() {
+	public Long getBits() {
 		return bits;
 	}
-	public void setBits(long bits) {
+	public void setBits(Long bits) {
 		this.bits = bits;
 	}
-	public long getNonce() {
+	public Long getNonce() {
 		return nonce;
 	}
-	public void setNonce(long nonce) {
+	public void setNonce(Long nonce) {
 		this.nonce = nonce;
 	}
-	public int getTxCount() {
+	public Integer getTxCount() {
 		return txCount;
 	}
-	public void setTxCount(int txCount) {
+	public void setTxCount(Integer txCount) {
 		this.txCount = txCount;
 	}
 	public String getBlockId() {

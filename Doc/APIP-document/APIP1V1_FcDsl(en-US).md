@@ -594,6 +594,26 @@ URL：http://localhost:8080/APIP/apip1/v1/general
 }
 ```
 
+# FCDSL in URL
+Fcdsl to URL parameters:
+
+index = <String indexName>
+ids = <String[] IDs>
+match = field1,field2,...,value
+part = field1,field2,...,value
+terms = field,value1,value2...
+equals = field,value1,value2,...
+range = field,lt,value1,lte,value2,gt,value3,gte,value4
+exists = field1,field2,...
+unexists = field1,field2,...
+
+sort = field1,order1,field2,order2...
+size = <String of int>
+after = <List<String> last>
+other = <String obj>
+
+Filter and Except is forbidden.
+
 
 
 

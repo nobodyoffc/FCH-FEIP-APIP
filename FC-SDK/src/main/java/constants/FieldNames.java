@@ -6,6 +6,7 @@ public class FieldNames {
     public static final String LAST_HEIGHT = "lastHeight";
     public static final String VALUE = "value";
     public static final String SUM = "sum";
+    public static final String OP_RETURN_LENGTH = "opReturnLength";
     public static final String SPEND_CASHES = "spendCashes";
     public static final String NEW_CASHES = "newCashes";
     public static final String SYM_SIGN = "symSign";

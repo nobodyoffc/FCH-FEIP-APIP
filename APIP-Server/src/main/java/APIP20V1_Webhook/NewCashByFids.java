@@ -60,7 +60,7 @@ public class NewCashByFids extends HttpServlet {
 
             webhookRequestBody.setUserName(addr);
             webhookRequestBody.setMethod(ApiNames.NewCashByFidsAPI);
-            hookUserId = HexFormat.of().formatHex(SHA.Sha256x2(SHA.stringMergeToBytes(webhookRequestBody.getUserName(), StandardCharsets.UTF_8,webhookRequestBody.getMethod(),StandardCharsets.UTF_8)));
+            hookUserId = WebhookRequestBody.makeHookUserId(Initiator.service.getSid(), addr,ApiNames.NewCashByFidsAPI);
             webhookRequestBody.setHookUserId(hookUserId);
             Map<String,String> dataMap = new HashMap<>();
             switch (webhookRequestBody.getOp()) {

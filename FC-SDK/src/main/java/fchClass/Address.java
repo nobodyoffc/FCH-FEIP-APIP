@@ -11,8 +11,8 @@ public class Address {
 	private long income;		//total amount of fch received in satoshi
 	private long expend;		//total amount of fch paid in satoshi
 	private String guide;	//the address of the address which sent the first fch to this address
-	private long birthHeight;	//the height where this address got its first fch
-	private long lastHeight; 	//the height where this address info changed latest. If roll back happened, lastHei point to the lastHeight before fork.
+	private Long birthHeight;	//the height where this address got its first fch
+	private Long lastHeight; 	//the height where this address info changed latest. If roll back happened, lastHei point to the lastHeight before fork.
 	private long cdd;		//the total amount of coindays destroyed
 	private long cd;		//CoinDays
 	private long weight;  // Calculated from cd, cdd and reputation
@@ -79,19 +79,19 @@ public class Address {
 		this.guide = guide;
 	}
 
-	public long getBirthHeight() {
+	public Long getBirthHeight() {
 		return birthHeight;
 	}
 
-	public void setBirthHeight(long birthHeight) {
+	public void setBirthHeight(Long birthHeight) {
 		this.birthHeight = birthHeight;
 	}
 
-	public long getLastHeight() {
+	public Long getLastHeight() {
 		return lastHeight;
 	}
 
-	public void setLastHeight(long lastHeight) {
+	public void setLastHeight(Long lastHeight) {
 		this.lastHeight = lastHeight;
 	}
 

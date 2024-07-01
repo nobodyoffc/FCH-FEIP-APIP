@@ -48,7 +48,7 @@ public class ChainParser {
 		FileInputStream fis = new FileInputStream(file);
 		fis.skip(Preparer.Pointer);
 
-		int blockLength;
+		long blockLength;
 
 		long cdMakeTime = System.currentTimeMillis();
 
@@ -163,7 +163,7 @@ public class ChainParser {
 		}
 
 		b4 = Arrays.copyOfRange(b8, 4, 8);
-		int blockSize = (int) BytesTools.bytes4ToLongLE(b4);
+		long blockSize = BytesTools.bytes4ToLongLE(b4);
 		blockMark.setSize(blockSize);
 
 		if(blockSize==0) {
@@ -179,7 +179,7 @@ public class ChainParser {
 			return checkResult;
 		}
 
-		byte[] blockBytes = new byte[blockSize];
+		byte[] blockBytes = new byte[Math.toIntExact(blockSize)];
 		if(fis.read(blockBytes)== FILE_END) {
 			System.out.println("File end when reading block. pointer: "+Preparer.Pointer);
 			log.info("File end when reading block. Pointer:"+ Preparer.Pointer);
@@ -198,7 +198,7 @@ public class ChainParser {
 		String preId =  BytesTools.bytesToHexStringLE(Arrays.copyOfRange(blockHeadBytes, 4, 4+32));
 		blockMark.setPreBlockId(preId);
 
-		byte[] blockBodyBytes = new byte[blockSize-80];
+		byte[] blockBodyBytes = new byte[(int) (blockSize-80)];
 		blockInputStream.read(blockBodyBytes);
 
 		//Check valid header fork
@@ -221,15 +221,15 @@ public class ChainParser {
 	}
 
 	private class CheckResult{
-		int blockLength;
+		long blockLength;
 		BlockMark blockMark;
 		byte[] blockBytes;
 
-		public int getBlockLength() {
+		public long getBlockLength() {
 			return blockLength;
 		}
 
-		public void setBlockLength(int blockLength) {
+		public void setBlockLength(long blockLength) {
 			this.blockLength = blockLength;
 		}
 
@@ -487,7 +487,7 @@ public class ChainParser {
 		File file = new File(Preparer.Path, BlockFileTools.getFileNameWithOrder(bm.get_fileOrder()));
 		FileInputStream fis = new FileInputStream(file);
 		fis.skip(bm.get_pointer()+8);
-		byte[] blockBytes = new byte[(int) bm.getSize()];
+		byte[] blockBytes = new byte[Math.toIntExact(bm.getSize())];
 		fis.read(blockBytes);
 		fis.close();
 		return blockBytes;

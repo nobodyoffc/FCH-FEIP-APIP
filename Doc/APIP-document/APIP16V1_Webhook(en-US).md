@@ -1,5 +1,8 @@
 
 
+hookId = sha256x2(sid+method)
+hookUserId = sha256x2(sid+method+userId)
+
 
 订购：
    请求：

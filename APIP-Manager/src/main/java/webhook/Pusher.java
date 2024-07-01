@@ -58,6 +58,9 @@ public class Pusher implements Runnable{
             // <method:<owner:webhookInfo>>
 
             jedis.select(Constants.RedisDb4Webhook);
+
+            //TODO
+//            alsjdf
             jedis.flushDB();
             setNewCashByFidsMapMapIntoRedis(methodFidEndpointInfoMapMap,jedis);
 
@@ -203,12 +206,17 @@ public class Pusher implements Runnable{
         WebhookPushBody postBody = new WebhookPushBody();
 
         postBody.setData(dataStr);
-        postBody.setFromSid(StartAPIP.service.getSid());
+
+        postBody.setHookUserId(webhookInfo.getHookUserId());
         postBody.setMethod(method);
         postBody.setSessionName(sessionName);
         postBody.setSign(sign);
+        postBody.setSinceHeight(webhookInfo.getLastHeight());
 
         String result = PostRequester.requestPost(endpoint,null,gson.toJson(postBody));
+        if(result.equals(String.valueOf(postBody.getSinceHeight()))){
+
+        }
         System.out.println(result);
     }
 

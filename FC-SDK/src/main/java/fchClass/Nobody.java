@@ -3,10 +3,10 @@ package fchClass;
 public class Nobody {
     private String fid;
     private String priKey;
-    private long deathTime;
-    private long deathHeight;
+    private Long deathTime;
+    private Long deathHeight;
     private String deathTxId;
-    private int deathTxIndex;
+    private Integer deathTxIndex;
     public String getFid() {
         return fid;
     }
@@ -23,19 +23,19 @@ public class Nobody {
         this.priKey = priKey;
     }
 
-    public long getDeathTime() {
+    public Long getDeathTime() {
         return deathTime;
     }
 
-    public void setDeathTime(long deathTime) {
+    public void setDeathTime(Long deathTime) {
         this.deathTime = deathTime;
     }
 
-    public long getDeathHeight() {
+    public Long getDeathHeight() {
         return deathHeight;
     }
 
-    public void setDeathHeight(long deathHeight) {
+    public void setDeathHeight(Long deathHeight) {
         this.deathHeight = deathHeight;
     }
 
@@ -47,11 +47,11 @@ public class Nobody {
         this.deathTxId = deathTxId;
     }
 
-    public int getDeathTxIndex() {
+    public Integer getDeathTxIndex() {
         return deathTxIndex;
     }
 
-    public void setDeathTxIndex(int deathTxIndex) {
+    public void setDeathTxIndex(Integer deathTxIndex) {
         this.deathTxIndex = deathTxIndex;
     }
 }

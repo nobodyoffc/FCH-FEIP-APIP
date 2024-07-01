@@ -4,11 +4,14 @@ import com.google.gson.Gson;
 import constants.Constants;
 import cryptoTools.SHA;
 import javaTools.BytesTools;
+import javaTools.NumberTools;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.nio.file.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -237,6 +240,16 @@ public class ParseTools {
 
     public static long fchToSatoshi(double fch){
         return (long)(fch*FchToSatoshi);
+    }
+
+    public static long coinToSatoshi(double amount) {
+        BigDecimal coins = BigDecimal.valueOf(amount);
+        BigDecimal satoshis = coins.multiply(new BigDecimal(100000000)); // Convert BTC to Satoshis
+        return satoshis.setScale(0, RoundingMode.HALF_UP).longValueExact(); // Set scale to 0 (no fractional part) and use HALF_UP rounding
+    }
+
+    public static double satoshiToCoin(long satoshis) {
+        return NumberTools.roundDouble8((double) satoshis / 100000000);
     }
 
     public static double roundDouble8(double raw){
