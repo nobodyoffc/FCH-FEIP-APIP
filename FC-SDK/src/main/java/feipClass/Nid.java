@@ -1,7 +1,7 @@
 package feipClass;
 
 public class Nid {
-	private String nameId;
+	private String nid;
     private String name;
 	private String desc;
 	private String oid;
@@ -13,12 +13,12 @@ public class Nid {
 	private long lastHeight;
 	private boolean active;
 
-	public String getNameId() {
-		return nameId;
+	public String getNid() {
+		return nid;
 	}
 
-	public void setNameId(String nameId) {
-		this.nameId = nameId;
+	public void setNid(String nid) {
+		this.nid = nid;
 	}
 
 	public String getName() {

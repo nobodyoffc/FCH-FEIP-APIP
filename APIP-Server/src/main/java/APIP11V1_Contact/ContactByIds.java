@@ -20,7 +20,7 @@ import java.util.Map;
 
 
 @WebServlet(ApiNames.APIP11V1Path + ApiNames.ContactByIdsAPI)
-public class contactByIds extends HttpServlet {
+public class ContactByIds extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("application/json");

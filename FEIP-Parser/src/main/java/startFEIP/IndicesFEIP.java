@@ -84,7 +84,7 @@ public class IndicesFEIP {
 		EsTools.createIndex(esClient, IndicesNames.TOKEN_HOLDER, tokenHolderJsonStr);
 		EsTools.createIndex(esClient, IndicesNames.TOKEN_HISTORY, tokenHistJsonStr);
 
-		String nidJsonStr = "{\"mappings\":{\"properties\":{\"nameId\":{\"type\":\"keyword\"},\"name\":{\"type\":\"wildcard\"},\"desc\":{\"type\":\"text\"},\"oid\":{\"type\":\"wildcard\"},\"active\":{\"type\":\"boolean\"},\"namer\":{\"type\":\"wildcard\"},\"birthTime\":{\"type\":\"long\"},\"birthHeight\":{\"type\":\"long\"},\"lastTxId\":{\"type\":\"keyword\"},\"lastTime\":{\"type\":\"long\"},\"lastHeight\":{\"type\":\"long\"}}}}";
+		String nidJsonStr = "{\"mappings\":{\"properties\":{\"nid\":{\"type\":\"keyword\"},\"name\":{\"type\":\"wildcard\"},\"desc\":{\"type\":\"text\"},\"oid\":{\"type\":\"wildcard\"},\"active\":{\"type\":\"boolean\"},\"namer\":{\"type\":\"wildcard\"},\"birthTime\":{\"type\":\"long\"},\"birthHeight\":{\"type\":\"long\"},\"lastTxId\":{\"type\":\"keyword\"},\"lastTime\":{\"type\":\"long\"},\"lastHeight\":{\"type\":\"long\"}}}}";
 		EsTools.createIndex(esClient, IndicesNames.NID, nidJsonStr);
 
 		String nobodyJsonStr = "{\"mappings\":{\"properties\":{\"fid\":{\"type\":\"keyword\"},\"priKey\":{\"type\":\"keyword\"},\"deathTime\":{\"type\":\"long\"},\"deathTxIndex\":{\"type\":\"integer\"},\"deathTxId\":{\"type\":\"keyword\"}}}}";

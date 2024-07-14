@@ -632,7 +632,7 @@ public class PublishParser {
                 if(nidRaw.getName()==null)return false;
                 if(nidRaw.getOid()==null) return false;
 
-                nid.setNameId(Hash.Sha256x2(nidRaw.getName()+opre.getSigner()));
+                nid.setNid(Hash.Sha256x2(nidRaw.getName()+opre.getSigner()));
                 nid.setName(nidRaw.getName());
                 nid.setDesc(nidRaw.getDesc());
                 nid.setOid(nidRaw.getOid());
@@ -646,7 +646,7 @@ public class PublishParser {
 
                 Nid nid0 = nid;
 
-                esClient.index(i->i.index(IndicesNames.NID).id(nid0.getNameId()).document(nid0));
+                esClient.index(i->i.index(IndicesNames.NID).id(nid0.getNid()).document(nid0));
                 isValid = true;
                 break;
 
@@ -669,7 +669,7 @@ public class PublishParser {
                 nid.setLastHeight(height);
 
                 Nid nid2 = nid;
-                esClient.index(i->i.index(IndicesNames.NID).id(nid2.getNameId()).document(nid2));
+                esClient.index(i->i.index(IndicesNames.NID).id(nid2.getNid()).document(nid2));
 
                 isValid = true;
                 break;
@@ -692,7 +692,7 @@ public class PublishParser {
                 nid.setLastHeight(height);
 
                 Nid nid3 = nid;
-                esClient.index(i->i.index(IndicesNames.NID).id(nid3.getNameId()).document(nid3));
+                esClient.index(i->i.index(IndicesNames.NID).id(nid3.getNid()).document(nid3));
 
                 isValid = true;
                 break;

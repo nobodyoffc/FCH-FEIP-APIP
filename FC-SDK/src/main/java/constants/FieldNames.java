@@ -29,4 +29,5 @@ public class FieldNames {
     public static final String RECIPIENT = "recipient";
     public static final String CASH_ID = "cashId";
     public static final String SIZE = "size";
+    public static final String USED_CIDS = "usedCids";
 }

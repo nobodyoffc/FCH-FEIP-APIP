@@ -33,17 +33,7 @@ public class GetPrices extends HttpServlet {
             writer.write(replier.reply2001NoFreeGet());
             return;
         }
-//
-//        ElasticsearchClient esClient = Initiator.esClient;
-//
-//        IndicesResponse result = esClient.cat().indices();
-//        List<IndicesRecord> indicesRecordList = result.valueBody();
-//
-//        Map<String, String> docsCountInIndex = new HashMap<>();
-//        for(IndicesRecord record : indicesRecordList){
-//            if(record.index()==null||record.index().contains("_"))continue;
-//            docsCountInIndex.put(record.index(),record.docsCount());
-//        }
+
         Map<String,Double> prices = new HashMap<>();
         prices.put("fch/doge",0.05);
         replier.setTotal((long) prices.size());

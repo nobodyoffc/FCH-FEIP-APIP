@@ -16,7 +16,7 @@ public class Utxo {
         utxo.setTxId(cash.getBirthTxId());
         utxo.setIndex(cash.getBirthIndex());
         utxo.setAmount((double) cash.getValue()/100000000);
-        utxo.setCd(cash.getCd());
+        if(cash.getCd()!=null)utxo.setCd(cash.getCd());
         utxo.setIssuer(cash.getIssuer());
         return utxo;
     }

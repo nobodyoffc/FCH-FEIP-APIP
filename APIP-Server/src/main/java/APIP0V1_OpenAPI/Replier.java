@@ -63,8 +63,8 @@ public class Replier {
         writer.write(replier.reply1020OtherError());
     }
 
-    public static boolean checkAndResponseOtherError(boolean count, HttpServletResponse response, Replier replier, String MAX_REQUEST_COUNT, PrintWriter writer) {
-        if (count) {
+    public static boolean checkAndResponseOtherError(boolean condition, HttpServletResponse response, Replier replier, String MAX_REQUEST_COUNT, PrintWriter writer) {
+        if (condition) {
             response.setHeader(ReplyInfo.CodeInHeader, String.valueOf(ReplyInfo.Code1020OtherError));
             replier.setData(MAX_REQUEST_COUNT);
             writer.write(replier.reply1020OtherError());
